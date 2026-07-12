@@ -1,38 +1,52 @@
-body {
+html, body {
     margin: 0;
     padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+body {
     background-image: url('images/grafit_bg.png'); 
     background-size: cover;       
     background-position: center;  
     background-repeat: no-repeat; 
     background-attachment: fixed; 
     background-color: #1a1a1a; 
-    overflow: hidden; /* Чтобы не появлялось полос прокрутки из-за слоев */
 }
 
-/* Настройки для слоя с тенью */
 .shadow-layer {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    right: 0;
+    bottom: 0;
+    
     background-image: url('images/shadow.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    z-index: 1; /* Картинка будет строго над главным фоном */
+    pointer-events: none; 
     
-    /* Подключаем анимацию: название, длительность (3 секунды), плавность, финал */
-    animation: fadeInShadow 3s ease-out forwards; 
+    /* Магия здесь: сначала 3 секунды работает fadeInShadow, 
+       а затем включается бесконечная (infinite) анимация breathe */
+    animation: fadeInShadow 3s ease-out forwards, 
+               breathe 6s ease-in-out 3s infinite alternate; 
 }
 
-/* Создаем саму анимацию проявления */
+/* 1. Первая анимация: просто проявляет тень из прозрачности */
 @keyframes fadeInShadow {
-    from {
-        opacity: 0; /* В самом начале тень полностью прозрачная */
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* 2. Вторая анимация: тихое "дыхание" тени (колебание прозрачности и размера) */
+@keyframes breathe {
+    0% {
+        opacity: 1;
+        transform: scale(1); /* Обычный размер */
     }
-    to {
-        opacity: 1; /* В конце тень полностью видимая */
+    100% {
+        opacity: 0.75;       /* Чуть-чуть прозрачнее */
+        transform: scale(1.03); /* Микро-увеличение для эффекта движения */
     }
 }
