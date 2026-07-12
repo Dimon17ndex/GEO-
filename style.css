@@ -54,14 +54,15 @@ body {
     gap: 40px; 
 }
 
-/* Картинка-иконка (круглый знак) */
+/* Картинка-иконка (Вылет с вращением) */
 .logo-icon {
     height: auto;
-    max-width: 240px; /* Увеличили размер со 180px до 240px */
+    max-width: 240px; 
     width: 100%; 
     opacity: 0;
     z-index: 3;
-    animation: fadeInElement 2s ease-out 4.5s forwards;
+    /* Поменяли анимацию на planetFlyIn */
+    animation: planetFlyIn 2.5s cubic-bezier(0.25, 1, 0.5, 1) 4.5s forwards;
 }
 
 /* Блок текста справа */
@@ -77,10 +78,10 @@ body {
 /* Заголовок GEOГРАФИЯ */
 .main-title {
     margin: 0;
-    font-family: 'Unbounded', sans-serif; /* Включаем новый шрифт */
-    font-size: 64px; /* Чуть уменьшил, так как Unbounded сам по себе очень широкий */
-    font-weight: 900; /* Максимально жирный и мощный */
-    letter-spacing: -1px; /* Для Unbounded круто смотрится плотный трекинг */
+    font-family: 'Unbounded', sans-serif;
+    font-size: 64px; 
+    font-weight: 900; 
+    letter-spacing: -1px; 
     line-height: 1;
     opacity: 0;
     animation: fadeInElement 2s ease-out 5s forwards;
@@ -125,6 +126,22 @@ body {
     85% { opacity: 0.75; transform: scale(1.02); }
 }
 
+/* НОВАЯ АНИМАЦИЯ: Вылет слева из-за экрана (-150vw) с разворотом на 360 градусов */
+@keyframes planetFlyIn {
+    0% {
+        opacity: 0;
+        transform: translateX(-150vw) rotate(-360deg);
+    }
+    60% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) rotate(0deg);
+    }
+}
+
+/* Стандартное появление для текста */
 @keyframes fadeInElement {
     from {
         opacity: 0;
