@@ -1,3 +1,147 @@
+/* 1. БАЗА И ФОН */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0b0b0b;
+    font-family: 'Montserrat', sans-serif;
+    color: #ffffff;
+    overflow: hidden;
+}
+
+body {
+    background-image: url('images/grafit_bg.png'); 
+    background-size: cover;       
+    background-position: center;  
+    background-repeat: no-repeat; 
+    background-attachment: fixed; 
+}
+
+/* 2. АНИМИРОВАННАЯ ТЕНЬ */
+.shadow-layer {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url('images/shadow.png');
+    background-size: cover;
+    background-position: center;
+    pointer-events: none; 
+    z-index: 1;
+    animation: fadeInShadow 1.5s ease-out forwards, 
+               breathe 8s ease-in-out 1.5s infinite; 
+}
+
+/* 3. ГЛАВНЫЙ КОНТЕЙНЕР (ЦЕНТРИРОВАНИЕ) */
+.main-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+    pointer-events: none;
+    box-sizing: border-box;
+    padding: 20px;
+}
+
+/* Блок с логотипом и правым текстом */
+.brand-block {
+    display: flex;
+    align-items: center;
+    gap: 40px; 
+}
+
+/* Картинка-иконка (Вылет с вращением) */
+.logo-icon {
+    height: auto;
+    max-width: 240px; 
+    width: 100%; 
+    opacity: 0;
+    z-index: 3;
+    animation: planetFlyIn 1.8s cubic-bezier(0.25, 1, 0.5, 1) 0.5s forwards;
+}
+
+/* Блок текста справа */
+.text-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    z-index: 4; 
+    position: relative;
+    flex-shrink: 0; 
+}
+
+/* Заголовок GEOГРАФИЯ */
+.main-title {
+    margin: 0;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 64px; 
+    font-weight: 900; 
+    letter-spacing: -1px; 
+    line-height: 1;
+    display: flex; 
+}
+
+/* ПОБУКВЕННАЯ АНИМАЦИЯ ПОМЕХ И ВЫЛЕТА */
+.main-title span {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(40px);
+    animation: letterGlitchIn 0.5s linear forwards, 
+               letterFlyUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.main-title span:nth-child(1) { animation-delay: 1.0s, 1.0s; }
+.main-title span:nth-child(2) { animation-delay: 1.1s, 1.1s; }
+.main-title span:nth-child(3) { animation-delay: 1.2s, 1.2s; }
+.main-title span:nth-child(4) { animation-delay: 1.3s, 1.3s; }
+.main-title span:nth-child(5) { animation-delay: 1.4s, 1.4s; }
+.main-title span:nth-child(6) { animation-delay: 1.5s, 1.5s; }
+.main-title span:nth-child(7) { animation-delay: 1.6s, 1.6s; }
+.main-title span:nth-child(8) { animation-delay: 1.7s, 1.7s; }
+.main-title span:nth-child(9) { animation-delay: 1.8s, 1.8s; }
+
+/* Плашка с подзаголовком */
+.subtitle-badge {
+    margin-top: 15px;
+    background-color: #ffffff;
+    color: #000000;
+    padding: 8px 24px;
+    border-radius: 50px; 
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 1px;
+    opacity: 0;
+    animation: fadeInElement 1.2s ease-out 2.2s forwards; 
+}
+
+/* НАСТРОЙКИ ДЛЯ НИЖНЕГО ТЕКСТА (ВКЛЮЧАЕМ МЫШКУ) */
+.bottom-credits-wrapper {
+    position: absolute;
+    bottom: 50px;
+    z-index: 5;
+    pointer-events: auto; /* Разрешаем наведение на этот блок */
+    cursor: pointer;
+}
+
+.bottom-credits {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    opacity: 0;
+    animation: fadeInElement 1.5s ease-out 2.7s forwards; 
+    transition: color 0.3s ease;
+}
+
+/* Небольшой интерактив: текст чуть подсвечивается при наведении */
+.bottom-credits-wrapper:hover .bottom-credits {
+    color: #dddddd;
+}
+
 /* 4. ИКОНКА В НИЖНЕМ ПРАВОМ УГЛУ (МАКСИМАЛЬНЫЙ МАСШТАБ) */
 .corner-icon {
     position: fixed;
@@ -23,4 +167,57 @@ body:has(.bottom-credits-wrapper:hover) .corner-icon {
     opacity: 0.9; /* Слегка приглушаем прозрачность, чтобы она не перебивала контент */
     /* Сдвигаем на 120px и 100px за экран, чтобы зафиксировать её гигантский срез */
     transform: translateY(100px) translateX(120px) scale(1);
+}
+
+/* 5. КЛЮЧЕВЫЕ КАДРЫ (АНИМАЦИИ) */
+@keyframes fadeInShadow {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes breathe {
+    0%, 100%, 70% { opacity: 1; transform: scale(1); }
+    25% { opacity: 0.6; transform: scale(1.04); }
+    85% { opacity: 0.75; transform: scale(1.02); }
+}
+
+@keyframes planetFlyIn {
+    0% {
+        opacity: 0;
+        transform: translateX(-150vw) rotate(-360deg);
+    }
+    60% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) rotate(0deg);
+    }
+}
+
+@keyframes letterGlitchIn {
+    0% { opacity: 0; transform: skewX(-15deg) translateX(-5px); }
+    15% { opacity: 0.8; transform: skewX(10deg) translateX(4px); color: #00ffff; }
+    30% { opacity: 0.3; transform: skewX(-20deg) translateX(-8px); }
+    45% { opacity: 0.9; transform: skewX(15deg) translateX(6px); color: #ff00ff; }
+    60% { opacity: 0.4; transform: skewX(-5deg) translateX(-3px); }
+    75% { opacity: 1; transform: skewX(5deg) translateX(2px); }
+    90% { opacity: 0.7; transform: skewX(0deg) translateX(-1px); }
+    100% { opacity: 1; transform: skewX(0deg) translateX(0px); color: #ffffff; }
+}
+
+@keyframes letterFlyUp {
+    0% { transform: translateY(40px); }
+    100% { transform: translateY(0); }
+}
+
+@keyframes fadeInElement {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
