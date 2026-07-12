@@ -1,15 +1,38 @@
 body {
     margin: 0;
     padding: 0;
-    /* Указываем точное имя и расширение твоей картинки */
     background-image: url('images/grafit_bg.png'); 
-    
-    /* Идеально растягиваем её на весь экран */
     background-size: cover;       
     background-position: center;  
     background-repeat: no-repeat; 
     background-attachment: fixed; 
-    
-    /* Темный цвет-заглушка, пока загружается картинка */
     background-color: #1a1a1a; 
+    overflow: hidden; /* Чтобы не появлялось полос прокрутки из-за слоев */
+}
+
+/* Настройки для слоя с тенью */
+.shadow-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('images/shadow.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 1; /* Картинка будет строго над главным фоном */
+    
+    /* Подключаем анимацию: название, длительность (3 секунды), плавность, финал */
+    animation: fadeInShadow 3s ease-out forwards; 
+}
+
+/* Создаем саму анимацию проявления */
+@keyframes fadeInShadow {
+    from {
+        opacity: 0; /* В самом начале тень полностью прозрачная */
+    }
+    to {
+        opacity: 1; /* В конце тень полностью видимая */
+    }
 }
