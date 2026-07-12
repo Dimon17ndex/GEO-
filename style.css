@@ -1,1 +1,15 @@
-
+body {
+    margin: 0;
+    padding: 0;
+    /* Указываем точное имя и расширение твоей картинки */
+    background-image: url('images/grafit_bg.png'); 
+    
+    /* Идеально растягиваем её на весь экран */
+    background-size: cover;       
+    background-position: center;  
+    background-repeat: no-repeat; 
+    background-attachment: fixed; 
+    
+    /* Темный цвет-заглушка, пока загружается картинка */
+    background-color: #1a1a1a; 
+}
