@@ -61,7 +61,6 @@ body {
     width: 100%; 
     opacity: 0;
     z-index: 3;
-    /* Поменяли анимацию на planetFlyIn */
     animation: planetFlyIn 2.5s cubic-bezier(0.25, 1, 0.5, 1) 4.5s forwards;
 }
 
@@ -75,7 +74,7 @@ body {
     flex-shrink: 0; 
 }
 
-/* Заголовок GEOГРАФИЯ */
+/* Заголовок GEOГРАФИЯ (Базовые настройки под буквы) */
 .main-title {
     margin: 0;
     font-family: 'Unbounded', sans-serif;
@@ -83,9 +82,29 @@ body {
     font-weight: 900; 
     letter-spacing: -1px; 
     line-height: 1;
-    opacity: 0;
-    animation: fadeInElement 2s ease-out 5s forwards;
+    display: flex; /* Выстраиваем буквы в ряд */
 }
+
+/* ПОБУКВЕННАЯ АНИМАЦИЯ ПОМЕХ И ВЫЛЕТА */
+.main-title span {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(40px);
+    /* Запускаем комбинированную анимацию глитча и вылета */
+    animation: letterGlitchIn 0.6s linear forwards, 
+               letterFlyUp 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* Поочередные задержки появления для каждой буквы после прилета планеты (с 5.2s) */
+.main-title span:nth-child(1) { animation-delay: 5.2s, 5.2s; }
+.main-title span:nth-child(2) { animation-delay: 5.3s, 5.3s; }
+.main-title span:nth-child(3) { animation-delay: 5.4s, 5.4s; }
+.main-title span:nth-child(4) { animation-delay: 5.5s, 5.5s; }
+.main-title span:nth-child(5) { animation-delay: 5.6s, 5.6s; }
+.main-title span:nth-child(6) { animation-delay: 5.7s, 5.7s; }
+.main-title span:nth-child(7) { animation-delay: 5.8s, 5.8s; }
+.main-title span:nth-child(8) { animation-delay: 5.9s, 5.9s; }
+.main-title span:nth-child(9) { animation-delay: 6.0s, 6.0s; }
 
 /* Плашка с подзаголовком */
 .subtitle-badge {
@@ -98,7 +117,7 @@ body {
     font-size: 16px;
     letter-spacing: 1px;
     opacity: 0;
-    animation: fadeInElement 2s ease-out 5.5s forwards;
+    animation: fadeInElement 2s ease-out 6.5s forwards; /* Сдвинули появление плашки */
 }
 
 /* Текст в самом низу */
@@ -111,7 +130,7 @@ body {
     letter-spacing: 1px;
     opacity: 0;
     z-index: 4;
-    animation: fadeInElement 2s ease-out 6.5s forwards;
+    animation: fadeInElement 2s ease-out 7.2s forwards; /* Сдвинули появление копирайта */
 }
 
 /* 4. КЛЮЧЕВЫЕ КАДРЫ (АНИМАЦИИ) */
@@ -126,7 +145,7 @@ body {
     85% { opacity: 0.75; transform: scale(1.02); }
 }
 
-/* НОВАЯ АНИМАЦИЯ: Вылет слева из-за экрана (-150vw) с разворотом на 360 градусов */
+/* Вылет планеты */
 @keyframes planetFlyIn {
     0% {
         opacity: 0;
@@ -141,7 +160,25 @@ body {
     }
 }
 
-/* Стандартное появление для текста */
+/* АНИМАЦИЯ ГЛИТЧА: Буквы быстро меняют прозрачность и хаотично дергаются по горизонтали */
+@keyframes letterGlitchIn {
+    0% { opacity: 0; transform: skewX(-15deg) translateX(-5px); }
+    15% { opacity: 0.8; transform: skewX(10deg) translateX(4px); color: #00ffff; }
+    30% { opacity: 0.3; transform: skewX(-20deg) translateX(-8px); }
+    45% { opacity: 0.9; transform: skewX(15deg) translateX(6px); color: #ff00ff; }
+    60% { opacity: 0.4; transform: skewX(-5deg) translateX(-3px); }
+    75% { opacity: 1; transform: skewX(5deg) translateX(2px); }
+    90% { opacity: 0.7; transform: skewX(0deg) translateX(-1px); }
+    100% { opacity: 1; transform: skewX(0deg) translateX(0px); color: #ffffff; }
+}
+
+/* АНИМАЦИЯ ПОДЪЕМА: Отвечает за плавное вылетание букв снизу вверх */
+@keyframes letterFlyUp {
+    0% { transform: translateY(40px); }
+    100% { transform: translateY(0); }
+}
+
+/* Обычное появление для остальных блоков */
 @keyframes fadeInElement {
     from {
         opacity: 0;
