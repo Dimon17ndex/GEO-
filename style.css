@@ -51,14 +51,16 @@ body {
 .brand-block {
     display: flex;
     align-items: center;
-    gap: 40px; /* Расстояние между картинкой и текстом */
+    gap: 40px; 
 }
 
 /* Картинка-иконка (круглый знак) */
 .logo-icon {
     height: auto;
-    max-width: 180px; /* Подбери размер под оригинал знака */
+    max-width: 180px; 
+    width: 100%; 
     opacity: 0;
+    z-index: 3;
     animation: fadeInElement 2s ease-out 4.5s forwards;
 }
 
@@ -67,14 +69,18 @@ body {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    z-index: 4; 
+    position: relative;
+    flex-shrink: 0; 
 }
 
-/* Заголовок ГЕОГРАФИЯ */
+/* Заголовок GEOГРАФИЯ */
 .main-title {
     margin: 0;
-    font-size: 72px;
-    font-weight: 800;
-    letter-spacing: 2px;
+    font-family: 'Unbounded', sans-serif; /* Включаем новый шрифт */
+    font-size: 64px; /* Чуть уменьшил, так как Unbounded сам по себе очень широкий */
+    font-weight: 900; /* Максимально жирный и мощный */
+    letter-spacing: -1px; /* Для Unbounded круто смотрится плотный трекинг */
     line-height: 1;
     opacity: 0;
     animation: fadeInElement 2s ease-out 5s forwards;
@@ -86,7 +92,7 @@ body {
     background-color: #ffffff;
     color: #000000;
     padding: 8px 24px;
-    border-radius: 50px; /* Закругленная плашка */
+    border-radius: 50px; 
     font-weight: 700;
     font-size: 16px;
     letter-spacing: 1px;
@@ -103,11 +109,11 @@ body {
     font-weight: 400;
     letter-spacing: 1px;
     opacity: 0;
+    z-index: 4;
     animation: fadeInElement 2s ease-out 6.5s forwards;
 }
 
 /* 4. КЛЮЧЕВЫЕ КАДРЫ (АНИМАЦИИ) */
-
 @keyframes fadeInShadow {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -119,7 +125,6 @@ body {
     85% { opacity: 0.75; transform: scale(1.02); }
 }
 
-/* Универсальная плавная анимация появления для текста и знака */
 @keyframes fadeInElement {
     from {
         opacity: 0;
