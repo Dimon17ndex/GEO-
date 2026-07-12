@@ -1,8 +1,10 @@
+/* 1. БАЗОВЫЕ НАСТРОЙКИ САЙТА И ФОНА */
 html, body {
     margin: 0;
     padding: 0;
     width: 100%;
     height: 100%;
+    background-color: #1a1a1a;
 }
 
 body {
@@ -11,62 +13,67 @@ body {
     background-position: center;  
     background-repeat: no-repeat; 
     background-attachment: fixed; 
-    background-color: #1a1a1a; 
 }
 
+/* 2. НАСТРОЙКИ СЛОЯ ТЕНИ */
 .shadow-layer {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    
+    top: 0; left: 0; right: 0; bottom: 0;
     background-image: url('images/shadow.png');
     background-size: cover;
     background-position: center;
-    background-repeat: no-repeat;
     pointer-events: none; 
+    z-index: 1; /* Тень идет поверх основного фона */
     
-    /* Оставили 8 секунд, но за счет плавных переходов ритм станет более "тягучим" */
+    /* Анимации тени: плавное появление (3с) и вечное дыхание (8с) */
     animation: fadeInShadow 3s ease-out forwards, 
                breathe 8s ease-in-out 3s infinite; 
 }
 
-/* 1. Плавное проявление при старте сайта */
+/* 3. НАСТРОЙКИ СЛОЯ ЛОГОТИПА */
+.logo-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center; /* Центрируем по горизонтали */
+    align-items: center;     /* Центрируем по вертикали */
+    z-index: 2; /* Логотип идет поверх тени */
+    pointer-events: none;
+}
+
+.main-logo {
+    max-width: 300px; /* Размер логотипа на экране */
+    opacity: 0;       /* Изначально он невидим */
+    
+    /* Анимация: плавно выплывает через 5 секунд после старта */
+    animation: logoRoll 2.5s ease-out 5s forwards;
+}
+
+/* 4. ВСЕ АНИМАЦИИ (KEYFRAMES) */
+
+/* Проявление тени */
 @keyframes fadeInShadow {
     from { opacity: 0; }
     to { opacity: 1; }
 }
 
-/* 2. Нежное дыхание без уменьшения картинки ниже исходного размера */
+/* Мягкое дыхание тени без показа краев */
 @keyframes breathe {
+    0%, 100%, 70% { opacity: 1; transform: scale(1); }
+    25% { opacity: 0.6; transform: scale(1.04); }
+    85% { opacity: 0.75; transform: scale(1.02); }
+}
+
+/* Выплывание логотипа снизу вверх */
+@keyframes logoRoll {
     0% {
-        opacity: 1;
-        transform: scale(1); /* Исходный размер, краев не видно */
+        opacity: 0;
+        transform: translateY(30px); 
     }
-    /* Плавный, глубокий вдох */
-    25% {
-        opacity: 0.6;         /* Мягко блекнет */
-        transform: scale(1.04); /* Чуть-чуть увеличивается */
-    }
-    /* Очень плавное возвращение в исходную точку */
-    50% {
-        opacity: 1;
-        transform: scale(1);    /* Мягко вернулась к базовому размеру */
-    }
-    /* Нежная пауза — с 50% до 70% тень застывает в исходном состоянии */
-    70% {
-        opacity: 1;
-        transform: scale(1);
-    }
-    /* Легкий, едва заметный повторный вздох */
-    85% {
-        opacity: 0.75;
-        transform: scale(1.02);
-    }
-    /* Плавный выход из вздоха и подготовка к новому циклу */
     100% {
         opacity: 1;
-        transform: scale(1);
+        transform: translateY(0); 
     }
 }
