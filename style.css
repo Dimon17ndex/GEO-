@@ -51,28 +51,25 @@ body {
 .brand-block {
     display: flex;
     align-items: center;
-    gap: 40px; 
-    position: relative; /* Чтобы внутренние элементы могли накладываться */
+    gap: 40px; /* Расстояние между картинкой и текстом */
 }
 
-/* Планета в натуральную величину */
+/* Картинка-иконка (круглый знак) */
 .logo-icon {
-    max-width: 100%;
     height: auto;
+    max-width: 180px; /* Подбери размер под оригинал знака */
     opacity: 0;
-    z-index: 3;
     animation: fadeInElement 2s ease-out 4.5s forwards;
 }
 
-/* Блок текста справа (форсируем его видимость поверх картинки) */
+/* Блок текста справа */
 .text-right {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    z-index: 4; /* Выше, чем картинка */
 }
 
-/* Заголовок GEOГРАФИЯ */
+/* Заголовок ГЕОГРАФИЯ */
 .main-title {
     margin: 0;
     font-size: 72px;
@@ -89,7 +86,7 @@ body {
     background-color: #ffffff;
     color: #000000;
     padding: 8px 24px;
-    border-radius: 50px; 
+    border-radius: 50px; /* Закругленная плашка */
     font-weight: 700;
     font-size: 16px;
     letter-spacing: 1px;
@@ -106,11 +103,11 @@ body {
     font-weight: 400;
     letter-spacing: 1px;
     opacity: 0;
-    z-index: 4;
     animation: fadeInElement 2s ease-out 6.5s forwards;
 }
 
 /* 4. КЛЮЧЕВЫЕ КАДРЫ (АНИМАЦИИ) */
+
 @keyframes fadeInShadow {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -122,6 +119,7 @@ body {
     85% { opacity: 0.75; transform: scale(1.02); }
 }
 
+/* Универсальная плавная анимация появления для текста и знака */
 @keyframes fadeInElement {
     from {
         opacity: 0;
