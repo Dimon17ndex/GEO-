@@ -27,26 +27,50 @@ body {
     background-repeat: no-repeat;
     pointer-events: none; 
     
-    /* Магия здесь: сначала 3 секунды работает fadeInShadow, 
-       а затем включается бесконечная (infinite) анимация breathe */
+    /* Изменили вторую анимацию: теперь один цикл длится 8 секунд, 
+       и он повторяется по кругу без авто-реверса (убрали alternate) */
     animation: fadeInShadow 3s ease-out forwards, 
-               breathe 6s ease-in-out 3s infinite alternate; 
+               breathe 8s ease-in-out 3s infinite; 
 }
 
-/* 1. Первая анимация: просто проявляет тень из прозрачности */
+/* 1. Плавное проявление при старте сайта */
 @keyframes fadeInShadow {
     from { opacity: 0; }
     to { opacity: 1; }
 }
 
-/* 2. Вторая анимация: тихое "дыхание" тени (колебание прозрачности и размера) */
+/* 2. Рваный ритм "интенсивного дыхания с паузами" */
 @keyframes breathe {
     0% {
         opacity: 1;
-        transform: scale(1); /* Обычный размер */
+        transform: scale(1);
+    }
+    /* Быстрое и интенсивное сжатие/проявление */
+    15% {
+        opacity: 0.6;         /* Сильно блекнет */
+        transform: scale(1.06); /* Заметно увеличивается */
+    }
+    30% {
+        opacity: 1;
+        transform: scale(0.97); /* Заметно уменьшается */
+    }
+    /* Первая пауза (замирание) — с 30% до 50% ничего не меняется */
+    50% {
+        opacity: 1;
+        transform: scale(0.97); 
+    }
+    /* Снова резкий вдох */
+    65% {
+        opacity: 0.5; 
+        transform: scale(1.08);
+    }
+    /* Вторая пауза перед новым циклом — с 80% до 100% анимация стоит */
+    80% {
+        opacity: 1;
+        transform: scale(1);
     }
     100% {
-        opacity: 0.75;       /* Чуть-чуть прозрачнее */
-        transform: scale(1.03); /* Микро-увеличение для эффекта движения */
+        opacity: 1;
+        transform: scale(1);
     }
 }
