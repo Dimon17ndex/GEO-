@@ -13,6 +13,10 @@
 
     <div class="shadow-layer"></div>
 
+    <img src="images/zaporozge_gerb.png" alt="Zaporozhye Big Gerb" class="bg-blur-gerb">
+
+    <div id="bg-wave-container"></div>
+
     <div class="main-container">
         
         <div class="brand-block">
@@ -29,12 +33,83 @@
         </div>
 
         <div class="bottom-credits-wrapper">
-            <p class="bottom-credits">проект Запорожской области</p>
+            <p class="bottom-credits" id="wave-text">проект Запорожской области</p>
         </div>
         
     </div>
 
-    <img src="images/zaporoge_icon.png" alt="Zaporozhye Icon" class="corner-icon">
+    <div class="corner-icon-floating-wrapper">
+        <img src="images/zaporoge_icon.png" alt="Zaporozhye Icon" class="corner-icon">
+    </div>
+
+    <script>
+        const textContainer = document.getElementById('wave-text');
+        const waveContainer = document.getElementById('bg-wave-container');
+        const text = textContainer.innerText;
+        textContainer.innerHTML = '';
+
+        // Флаг контроля: была ли уже пущена волна за текущую сессию наведения
+        let isWaveTriggered = false;
+
+        // Разделяем строку на отдельные буквы
+        const letters = Array.from(text).map((char) => {
+            const span = document.createElement('span');
+            span.style.display = 'inline-block';
+            span.style.transition = 'color 0.3s ease, transform 0.3s ease';
+            if (char === ' ') {
+                span.innerHTML = '&nbsp;';
+            } else {
+                span.innerText = char;
+            }
+            textContainer.appendChild(span);
+            return span;
+        });
+
+        // Отслеживаем движение мыши по буквам
+        letters.forEach((span, index) => {
+            span.addEventListener('mouseenter', (e) => {
+                letters.forEach((otherSpan, otherIndex) => {
+                    const distance = Math.abs(index - otherIndex);
+                    const delay = distance * 0.04;
+                    
+                    otherSpan.style.transitionDelay = `${delay}s`;
+                    otherSpan.style.color = `rgba(255, 50, 50, ${Math.max(0.3, 1 - distance * 0.08)})`;
+                    otherSpan.style.transform = `translateY(${Math.max(-4, -6 + distance * 0.5)}px)`;
+                });
+
+                // ГЕНЕРАЦИЯ ВОЛНЫ ПО ФОНУ (Только при первом касании букв)
+                if (!isWaveTriggered) {
+                    isWaveTriggered = true; // Блокируем повторный спам волн внутри текста
+
+                    const ripple = document.createElement('div');
+                    ripple.classList.add('bg-wave-ripple');
+                    
+                    const x = e.clientX;
+                    const y = e.clientY;
+                    
+                    ripple.style.left = `${x}px`;
+                    ripple.style.top = `${y}px`;
+                    
+                    waveContainer.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 1500);
+                }
+            });
+        });
+
+        // Полный сброс эффектов при уходе курсора с текста (отпуск текста)
+        textContainer.addEventListener('mouseleave', () => {
+            isWaveTriggered = false; // Разблокируем волну для следующего захода
+
+            letters.forEach((span) => {
+                span.style.transitionDelay = '0s';
+                span.style.color = '#ffffff';
+                span.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
 
 </body>
 </html>
