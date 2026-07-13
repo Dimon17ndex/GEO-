@@ -142,31 +142,30 @@ body {
     color: #dddddd;
 }
 
-/* 4. ИКОНКА В НИЖНЕМ ПРАВОМ УГЛУ (МАКСИМАЛЬНЫЙ МАСШТАБ) */
+/* 4. ИКОНКА В НИЖНЕМ ПРАВОМ УГЛУ (БОЛЬШАЯ И В КАДРЕ) */
 .corner-icon {
     position: fixed;
-    bottom: 0;
-    right: 0;
-    max-width: 500px; /* Увеличили до 500px для монументального эффекта */
+    bottom: 40px; /* Отступ от нижнего края экрана */
+    right: 40px;  /* Отступ от правого края экрана */
+    max-width: 500px; /* Прежний огромный размер */
     width: 100%;
     height: auto;
     z-index: 10;
     pointer-events: none;
     
-    /* Начальное состояние: глубоко спрятана за экраном */
+    /* Начальное состояние: смещена вниз для эффекта вылета */
     opacity: 0;
-    transform: translateY(300px) translateX(300px) scale(0.7);
+    transform: translateY(100px) scale(0.9);
     
-    /* Плавный и мягкий возврат назад */
-    transition: opacity 0.7s cubic-bezier(0.25, 1, 0.5, 1), 
-                transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+    /* Плавное исчезновение обратно */
+    transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), 
+                transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* МАГИЯ НАВЕДЕНИЯ: иконка эпично «выглядывает» из-за угла */
+/* МАГИЯ НАВЕДЕНИЯ: плавно встает на свои законные координаты */
 body:has(.bottom-credits-wrapper:hover) .corner-icon {
-    opacity: 0.9; /* Слегка приглушаем прозрачность, чтобы она не перебивала контент */
-    /* Сдвигаем на 120px и 100px за экран, чтобы зафиксировать её гигантский срез */
-    transform: translateY(100px) translateX(120px) scale(1);
+    opacity: 0.95;
+    transform: translateY(0) scale(1); /* Полностью возвращается в кадр без срезов */
 }
 
 /* 5. КЛЮЧЕВЫЕ КАДРЫ (АНИМАЦИИ) */
