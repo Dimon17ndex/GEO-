@@ -52,6 +52,7 @@ body {
     display: flex;
     align-items: center;
     gap: 40px; 
+    /* Плавный сдвиг только для этого блока */
     transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
@@ -93,8 +94,6 @@ body {
     transform: translateY(40px);
     animation: letterGlitchIn 0.5s linear forwards, 
                letterFlyUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-    /* transition гарантирует мягкое возвращение букв на место после прыжка */
-    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1); 
 }
 
 /* Очередь появления букв при загрузке */
@@ -145,74 +144,38 @@ body {
     color: #dddddd;
 }
 
-/* 4. ОБЁРТКА И ИКОНКА В НИЖНЕМ ПРАВОМ УГЛУ */
-.corner-icon-wrapper {
-    position: fixed;
-    bottom: 40px;
-    right: 40px;
-    width: 500px;
-    height: 500px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10;
-    pointer-events: none;
-}
-
+/* 4. ИКОНКА В НИЖНЕМ ПРАВОМ УГЛУ (БОЛЬШАЯ И В КАДРЕ) */
 .corner-icon {
+    position: fixed;
+    bottom: 40px; 
+    right: 40px;  
     max-width: 500px; 
     width: 100%;
     height: auto;
-    opacity: 0;
-    transform: translateY(100px) scale(0.8);
-    transition: opacity 0.4s ease;
-}
-
-/* КРАСНОВАТАЯ СТРЕМИТЕЛЬНАЯ ВОЛНА */
-.wave-pulse {
-    position: absolute;
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255, 50, 50, 0.2) 0%, rgba(255, 0, 0, 0) 70%);
-    border: 2px solid rgba(255, 70, 70, 0.3);
-    opacity: 0;
-    transform: scale(0);
+    z-index: 10;
     pointer-events: none;
+    
+    /* Начальное состояние: скрыта внизу */
+    opacity: 0;
+    transform: translateY(100px) scale(0.9);
+    
+    /* Плавный переход туда и обратно */
+    transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), 
+                transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* 5. МАГИЯ ВЗАИМОДЕЙСТВИЯ ПРИ НАВЕДЕНИИ (ХОВЕР-ЭФФЕКТЫ) */
+/* 5. МАГИЯ ВЗАИМОДЕЙСТВИЯ ПРИ НАВЕДЕНИИ */
 
-/* Выпрыгивание самой иконки герба */
+/* Появление иконки в углу */
 body:has(.bottom-credits-wrapper:hover) .corner-icon {
-    animation: jumpIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    opacity: 0.95;
+    transform: translateY(0) scale(1);
 }
 
-/* Запуск стремительной волны от центра иконки */
-body:has(.bottom-credits-wrapper:hover) .wave-pulse {
-    animation: waveSpread 0.7s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
-}
-
-/* Смещение бренд-блока влево-вверх */
+/* Смещение только бренд-блока влево-вверх */
 body:has(.bottom-credits-wrapper:hover) .brand-block {
     transform: translate(-40px, -30px); 
 }
-
-/* ВОЛНООБРАЗНОЕ ПОДПРЫГИВАНИЕ БУКВ ЗАГОЛОВКА */
-body:has(.bottom-credits-wrapper:hover) .main-title span {
-    animation: letterBounce 0.5s ease-in-out forwards;
-}
-/* Задержки для каждой буквы, чтобы прыжок шёл волной слева направо */
-body:has(.bottom-credits-wrapper:hover) .main-title span:nth-child(1) { animation-delay: 0.05s; }
-body:has(.bottom-credits-wrapper:hover) .main-title span:nth-child(2) { animation-delay: 0.10s; }
-body:has(.bottom-credits-wrapper:hover) .main-title span:nth-child(3) { animation-delay: 0.15s; }
-body:has(.bottom-credits-wrapper:hover) .main-title span:nth-child(4) { animation-delay: 0.20s; }
-body:has(.bottom-credits-wrapper:hover) .main-title span:nth-child(5) { animation-delay: 0.25s; }
-body:has(.bottom-credits-wrapper:hover) .main-title span:nth-child(6) { animation-delay: 0.30s; }
-body:has(.bottom-credits-wrapper:hover) .main-title span:nth-child(7) { animation-delay: 0.35s; }
-body:has(.bottom-credits-wrapper:hover) .main-title span:nth-child(8) { animation-delay: 0.40s; }
-body:has(.bottom-credits-wrapper:hover) .main-title span:nth-child(9) { animation-delay: 0.45s; }
-
 
 /* 6. КЛЮЧЕВЫЕ КАДРЫ (АНИМАЦИИ) */
 @keyframes fadeInShadow {
@@ -226,46 +189,44 @@ body:has(.bottom-credits-wrapper:hover) .main-title span:nth-child(9) { animatio
     85% { opacity: 0.75; transform: scale(1.02); }
 }
 
-/* Вылет планеты при загрузке */
+/* Вылет планеты */
 @keyframes planetFlyIn {
-    0% { opacity: 0; transform: translateX(-150vw) rotate(-360deg); }
-    100% { opacity: 1; transform: translateX(0) rotate(0deg); }
+    0% {
+        opacity: 0;
+        transform: translateX(-150vw) rotate(-360deg);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) rotate(0deg);
+    }
 }
 
-/* Глитч букв при загрузке */
+/* Анимация цифровых помех (глитча) */
 @keyframes letterGlitchIn {
     0% { opacity: 0; transform: skewX(-15deg) translateX(-5px); }
-    50% { opacity: 0.9; transform: skewX(15deg) translateX(6px); color: #ff00ff; }
+    15% { opacity: 0.8; transform: skewX(10deg) translateX(4px); color: #00ffff; }
+    30% { opacity: 0.3; transform: skewX(-20deg) translateX(-8px); }
+    45% { opacity: 0.9; transform: skewX(15deg) translateX(6px); color: #ff00ff; }
+    60% { opacity: 0.4; transform: skewX(-5deg) translateX(-3px); }
+    75% { opacity: 1; transform: skewX(5deg) translateX(2px); }
+    90% { opacity: 0.7; transform: skewX(0deg) translateX(-1px); }
     100% { opacity: 1; transform: skewX(0deg) translateX(0px); color: #ffffff; }
 }
 
+/* Плавный подъем букв */
 @keyframes letterFlyUp {
     0% { transform: translateY(40px); }
     100% { transform: translateY(0); }
 }
 
+/* Обычное появление элементов */
 @keyframes fadeInElement {
-    from { opacity: 0; transform: translateY(15px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Анимация выпрыгивания иконки (эффект упругой пружины) */
-@keyframes jumpIn {
-    0% { opacity: 0; transform: translateY(120px) scale(0.7); }
-    60% { opacity: 1; transform: translateY(-15px) scale(1.05); }
-    100% { opacity: 0.95; transform: translateY(0) scale(1); }
-}
-
-/* Быстрое расширение неяркой красноватой волны */
-@keyframes waveSpread {
-    0% { transform: scale(0.3); opacity: 0.8; }
-    50% { opacity: 0.4; }
-    100% { transform: scale(5); opacity: 0; }
-}
-
-/* Подпрыгивание букв волной */
-@keyframes letterBounce {
-    0%, 100% { transform: translateY(0); }
-    40% { transform: translateY(-20px); }
-    70% { transform: translateY(5px); }
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
