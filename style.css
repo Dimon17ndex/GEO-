@@ -31,7 +31,7 @@ body {
                breathe 8s ease-in-out 1.5s infinite; 
 }
 
-/* 3. ГЛАВНЫЙ КОНТЕЙНЕР (ЦЕНТРИРОВАНИЕ) */
+/* 3. ГЛАВНЫЙ КОНТЕЙНЕР (ЦЕНТРИРОВАНИЕ И СМЕЩЕНИЕ) */
 .main-container {
     position: fixed;
     top: 0; left: 0;
@@ -46,7 +46,7 @@ body {
     box-sizing: border-box;
     padding: 20px;
     
-    /* Добавляем плавность для анимации смещения всего содержимого */
+    /* Плавный сдвиг всего контента влево-вверх при ховере */
     transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
@@ -97,6 +97,7 @@ body {
                letterFlyUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
+/* Очередь появления букв с 1 секунды */
 .main-title span:nth-child(1) { animation-delay: 1.0s, 1.0s; }
 .main-title span:nth-child(2) { animation-delay: 1.1s, 1.1s; }
 .main-title span:nth-child(3) { animation-delay: 1.2s, 1.2s; }
@@ -121,12 +122,12 @@ body {
     animation: fadeInElement 1.2s ease-out 2.2s forwards; 
 }
 
-/* НАСТРОЙКИ ДЛЯ НИЖНЕГО ТЕКСТА (ВКЛЮЧАЕМ МЫШКУ) */
+/* НАСТРОЙКИ ДЛЯ НИЖНЕГО ТЕКСТА-ТРИГГЕРА */
 .bottom-credits-wrapper {
     position: absolute;
     bottom: 50px;
     z-index: 5;
-    pointer-events: auto; /* Разрешаем наведение на этот блок */
+    pointer-events: auto; 
     cursor: pointer;
 }
 
@@ -140,7 +141,6 @@ body {
     transition: color 0.3s ease;
 }
 
-/* Небольшой интерактив: текст чуть подсвечивается при наведении */
 .bottom-credits-wrapper:hover .bottom-credits {
     color: #dddddd;
 }
@@ -148,30 +148,37 @@ body {
 /* 4. ИКОНКА В НИЖНЕМ ПРАВОМ УГЛУ (БОЛЬШАЯ И В КАДРЕ) */
 .corner-icon {
     position: fixed;
-    bottom: 40px; /* Отступ от нижнего края экрана */
-    right: 40px;  /* Отступ от правого края экрана */
-    max-width: 500px; /* Прежний огромный размер */
+    bottom: 40px; 
+    right: 40px;  
+    max-width: 500px; 
     width: 100%;
     height: auto;
     z-index: 10;
     pointer-events: none;
     
-    /* Начальное состояние: смещена вниз для эффекта вылета */
+    /* Начальное состояние: смещена вниз и скрыта */
     opacity: 0;
     transform: translateY(100px) scale(0.9);
     
-    /* Плавное исчезновение обратно */
+    /* Плавный возврат обратно */
     transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), 
                 transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* МАГИЯ НАВЕДЕНИЯ: планета и текст нежно уходят влево-вверх */
+/* 5. МАГИЯ ВЗАИМОДЕЙСТВИЯ ПРИ НАВЕДЕНИИ */
+
+/* Появление иконки в углу */
+body:has(.bottom-credits-wrapper:hover) .corner-icon {
+    opacity: 0.95;
+    transform: translateY(0) scale(1);
+}
+
+/* Смещение главного контента влево-вверх */
 body:has(.bottom-credits-wrapper:hover) .main-container {
-    /* Нежно смещаем по оси X (влево на 40px) и по оси Y (вверх на 30px) */
     transform: translate(-40px, -30px); 
 }
 
-/* 5. КЛЮЧЕВЫЕ КАДРЫ (АНИМАЦИИ) */
+/* 6. КЛЮЧЕВЫЕ КАДРЫ (АНИМАЦИИ) */
 @keyframes fadeInShadow {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -183,6 +190,7 @@ body:has(.bottom-credits-wrapper:hover) .main-container {
     85% { opacity: 0.75; transform: scale(1.02); }
 }
 
+/* Вылет планеты */
 @keyframes planetFlyIn {
     0% {
         opacity: 0;
@@ -197,6 +205,7 @@ body:has(.bottom-credits-wrapper:hover) .main-container {
     }
 }
 
+/* Анимация цифровых помех (глитча) */
 @keyframes letterGlitchIn {
     0% { opacity: 0; transform: skewX(-15deg) translateX(-5px); }
     15% { opacity: 0.8; transform: skewX(10deg) translateX(4px); color: #00ffff; }
@@ -208,11 +217,13 @@ body:has(.bottom-credits-wrapper:hover) .main-container {
     100% { opacity: 1; transform: skewX(0deg) translateX(0px); color: #ffffff; }
 }
 
+/* Плавный подъем букв */
 @keyframes letterFlyUp {
     0% { transform: translateY(40px); }
     100% { transform: translateY(0); }
 }
 
+/* Обычное появление элементов */
 @keyframes fadeInElement {
     from {
         opacity: 0;
