@@ -45,6 +45,9 @@ body {
     pointer-events: none;
     box-sizing: border-box;
     padding: 20px;
+    
+    /* Добавляем плавность для анимации смещения всего содержимого */
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 /* Блок с логотипом и правым текстом */
@@ -162,10 +165,10 @@ body {
                 transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* МАГИЯ НАВЕДЕНИЯ: плавно встает на свои законные координаты */
-body:has(.bottom-credits-wrapper:hover) .corner-icon {
-    opacity: 0.95;
-    transform: translateY(0) scale(1); /* Полностью возвращается в кадр без срезов */
+/* МАГИЯ НАВЕДЕНИЯ: планета и текст нежно уходят влево-вверх */
+body:has(.bottom-credits-wrapper:hover) .main-container {
+    /* Нежно смещаем по оси X (влево на 40px) и по оси Y (вверх на 30px) */
+    transform: translate(-40px, -30px); 
 }
 
 /* 5. КЛЮЧЕВЫЕ КАДРЫ (АНИМАЦИИ) */
