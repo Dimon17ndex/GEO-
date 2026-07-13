@@ -31,7 +31,7 @@ body {
                breathe 8s ease-in-out 1.5s infinite; 
 }
 
-/* 3. ГЛАВНЫЙ КОНТЕЙНЕР (ЦЕНТРИРОВАНИЕ И СМЕЩЕНИЕ) */
+/* 3. ГЛАВНЫЙ КОНТЕЙНЕР (ЦЕНТРИРОВАНИЕ) */
 .main-container {
     position: fixed;
     top: 0; left: 0;
@@ -45,16 +45,15 @@ body {
     pointer-events: none;
     box-sizing: border-box;
     padding: 20px;
-    
-    /* Плавный сдвиг всего контента влево-вверх при ховере */
-    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* Блок с логотипом и правым текстом */
+/* Блок с логотипом и правым текстом (смещается при ховере) */
 .brand-block {
     display: flex;
     align-items: center;
     gap: 40px; 
+    /* Плавный сдвиг только для этого блока */
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 /* Картинка-иконка (Вылет с вращением) */
@@ -156,7 +155,7 @@ body {
     z-index: 10;
     pointer-events: none;
     
-    /* Начальное состояние: смещена вниз и скрыта */
+    /* Начальное состояние: скрыта внизу */
     opacity: 0;
     transform: translateY(100px) scale(0.9);
     
@@ -173,8 +172,8 @@ body:has(.bottom-credits-wrapper:hover) .corner-icon {
     transform: translateY(0) scale(1);
 }
 
-/* Смещение главного контента влево-вверх */
-body:has(.bottom-credits-wrapper:hover) .main-container {
+/* Смещение бренд-блока (текст-триггер стоит на месте) */
+body:has(.bottom-credits-wrapper:hover) .brand-block {
     transform: translate(-40px, -30px); 
 }
 
