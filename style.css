@@ -93,6 +93,8 @@ body {
     transform: translateY(40px);
     animation: letterGlitchIn 0.5s linear forwards, 
                letterFlyUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    /* transition гарантирует мягкое возвращение букв на место после прыжка */
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1); 
 }
 
 /* Очередь появления букв при загрузке */
@@ -198,7 +200,7 @@ body:has(.bottom-credits-wrapper:hover) .brand-block {
 
 /* ВОЛНООБРАЗНОЕ ПОДПРЫГИВАНИЕ БУКВ ЗАГОЛОВКА */
 body:has(.bottom-credits-wrapper:hover) .main-title span {
-    animation: letterBounce 0.5s ease-in-out;
+    animation: letterBounce 0.5s ease-in-out forwards;
 }
 /* Задержки для каждой буквы, чтобы прыжок шёл волной слева направо */
 body:has(.bottom-credits-wrapper:hover) .main-title span:nth-child(1) { animation-delay: 0.05s; }
@@ -247,21 +249,21 @@ body:has(.bottom-credits-wrapper:hover) .main-title span:nth-child(9) { animatio
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* НОВАЯ: Анимация выпрыгивания иконки (эффект упругой пружины) */
+/* Анимация выпрыгивания иконки (эффект упругой пружины) */
 @keyframes jumpIn {
     0% { opacity: 0; transform: translateY(120px) scale(0.7); }
     60% { opacity: 1; transform: translateY(-15px) scale(1.05); }
     100% { opacity: 0.95; transform: translateY(0) scale(1); }
 }
 
-/* НОВАЯ: Быстрое расширение неяркой красноватой волны */
+/* Быстрое расширение неяркой красноватой волны */
 @keyframes waveSpread {
     0% { transform: scale(0.3); opacity: 0.8; }
     50% { opacity: 0.4; }
     100% { transform: scale(5); opacity: 0; }
 }
 
-/* НОВАЯ: Подпрыгивание букв волной */
+/* Подпрыгивание букв волной */
 @keyframes letterBounce {
     0%, 100% { transform: translateY(0); }
     40% { transform: translateY(-20px); }
