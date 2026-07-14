@@ -96,7 +96,7 @@ body {
     animation: slowAmbientBlast 3s cubic-bezier(0.2, 0.5, 0.4, 1) forwards;
 }
 
-/* ЯРКАЯ КРАСНОВАТАЯ ЭМБИЕНТ-ВОЛНА */
+/* ЯРКАЯ КРАСНОВАТАЯ ЭМБИЕНТ-ВОЛНА (при наведении) */
 .bg-ambient-red {
     position: absolute;
     width: 10px;
@@ -108,7 +108,7 @@ body {
     animation: slowAmbientBlast 3s cubic-bezier(0.2, 0.5, 0.4, 1) forwards;
 }
 
-/* ЯРКАЯ ЗЕЛЕНОВАТАЯ ЭМБИЕНТ-ВОЛНА */
+/* ЯРКАЯ ЗЕЛЕНОВАТАЯ ЭМБИЕНТ-ВОЛНА (при наведении) */
 .bg-ambient-green {
     position: absolute;
     width: 10px;
