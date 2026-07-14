@@ -96,7 +96,7 @@ body {
     animation: slowAmbientBlast 3s cubic-bezier(0.2, 0.5, 0.4, 1) forwards;
 }
 
-/* ИСПРАВЛЕНО: КРАСНОВАТАЯ ЭМБИЕНТ-ВОЛНА СТАЛА ЯРЧЕ (Непрозрачность 0.4) */
+/* ЯРКАЯ КРАСНОВАТАЯ ЭМБИЕНТ-ВОЛНА */
 .bg-ambient-red {
     position: absolute;
     width: 10px;
@@ -108,7 +108,7 @@ body {
     animation: slowAmbientBlast 3s cubic-bezier(0.2, 0.5, 0.4, 1) forwards;
 }
 
-/* ИСПРАВЛЕНО: ЗЕЛЕНОВАТАЯ ЭМБИЕНТ-ВОЛНА СТАЛА ЯРЧЕ (Непрозрачность 0.35 и более сочный оттенок) */
+/* ЯРКАЯ ЗЕЛЕНОВАТАЯ ЭМБИЕНТ-ВОЛНА */
 .bg-ambient-green {
     position: absolute;
     width: 10px;
