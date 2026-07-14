@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GEOГРАФИЯ</title>
+    
+    <link rel="icon" type="image/png" href="images/favicon.png">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
@@ -50,7 +53,6 @@
         textContainer.innerHTML = '';
 
         let isWaveTriggered = false;
-        // НОВОЕ: Переменная отслеживания наведения для фоновых волн
         let isTextHovered = false; 
 
         // Разделяем строку на буквы
@@ -85,7 +87,7 @@
             createBackgroundRipple(centerX, centerY, 'bg-click-ripple');
         }, 1700);
 
-        // --- ИСПРАВЛЕНО: АВТОМАТИЧЕСКИЕ ВОЛНЫ С ИЗМЕНЕНИЕМ ЦВЕТА ПРИ НАВЕДЕНИИ ---
+        // АВТОМАТИЧЕСКИЕ ВОЛНЫ С ИЗМЕНЕНИЕМ ЦВЕТА И СПАВНОМ У КРАЕВ
         setTimeout(() => {
             function spawnAmbientWave() {
                 let spawnX = 0;
@@ -99,11 +101,11 @@
                     case 3: spawnX = -50; spawnY = Math.random() * window.innerHeight; break;
                 }
 
-                // Логика выбора цвета на основе наведения
-                let currentClassName = 'bg-ambient-ripple'; // По умолчанию белая
+                // Выбор класса волны
+                let currentClassName = 'bg-ambient-ripple'; // Белая по умолчанию
                 
                 if (isTextHovered) {
-                    // Если наведено, рандомим между красным и зеленым (50/50)
+                    // Рандомный выбор цвета при наведении
                     currentClassName = Math.random() > 0.5 ? 'bg-ambient-red' : 'bg-ambient-green';
                 }
 
@@ -115,10 +117,10 @@
             spawnAmbientWave();
         }, 3500);
 
-        // 2. КРАСНАЯ ВОЛНА ПРИ НАВЕДЕНИИ НА ТЕКСТ + СМЕНА ФЛАГА ХОВЕРА
+        // 2. КРАСНАЯ ВОЛНА ПРИ НАВЕДЕНИИ НА ТЕКСТ
         letters.forEach((span, index) => {
             span.addEventListener('mouseenter', (e) => {
-                isTextHovered = true; // Текст под курсором
+                isTextHovered = true; 
 
                 letters.forEach((otherSpan, otherIndex) => {
                     const distance = Math.abs(index - otherIndex);
@@ -138,7 +140,7 @@
 
         textContainer.addEventListener('mouseleave', () => {
             isWaveTriggered = false;
-            isTextHovered = false; // Курсор покинул текст, волны снова белые
+            isTextHovered = false; 
 
             letters.forEach((span) => {
                 span.style.transitionDelay = '0s';
