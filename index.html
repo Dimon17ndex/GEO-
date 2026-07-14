@@ -20,7 +20,7 @@
     <div class="main-container">
         
         <div class="brand-block">
-            <img src="images/geo_logo.png" alt="Geo Logo" class="logo-icon">
+            <img src="images/geo_logo.png" alt="Geo Logo" class="logo-icon" id="main-logo">
             
             <div class="text-right">
                 <h1 class="main-title">
@@ -45,13 +45,15 @@
     <script>
         const textContainer = document.getElementById('wave-text');
         const waveContainer = document.getElementById('bg-wave-container');
+        const logoElement = document.getElementById('main-logo');
         const text = textContainer.innerText;
         textContainer.innerHTML = '';
 
-        // Флаг контроля: была ли уже пущена волна за текущую сессию наведения
         let isWaveTriggered = false;
+        // НОВОЕ: Переменная отслеживания наведения для фоновых волн
+        let isTextHovered = false; 
 
-        // Разделяем строку на отдельные буквы
+        // Разделяем строку на буквы
         const letters = Array.from(text).map((char) => {
             const span = document.createElement('span');
             span.style.display = 'inline-block';
@@ -65,9 +67,59 @@
             return span;
         });
 
-        // Отслеживаем движение мыши по буквам
+        // Базовая функция генерации волн бэкграунда
+        function createBackgroundRipple(x, y, className, duration = 1500) {
+            const ripple = document.createElement('div');
+            ripple.classList.add(className);
+            ripple.style.left = `${x}px`;
+            ripple.style.top = `${y}px`;
+            waveContainer.appendChild(ripple);
+            setTimeout(() => { ripple.remove(); }, duration);
+        }
+
+        // 1. БЕЛАЯ ВОЛНА НА ПОДХОДЕ ПЛАНЕТЫ
+        setTimeout(() => {
+            const rect = logoElement.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            createBackgroundRipple(centerX, centerY, 'bg-click-ripple');
+        }, 1700);
+
+        // --- ИСПРАВЛЕНО: АВТОМАТИЧЕСКИЕ ВОЛНЫ С ИЗМЕНЕНИЕМ ЦВЕТА ПРИ НАВЕДЕНИИ ---
+        setTimeout(() => {
+            function spawnAmbientWave() {
+                let spawnX = 0;
+                let spawnY = 0;
+                
+                const side = Math.floor(Math.random() * 4);
+                switch(side) {
+                    case 0: spawnX = Math.random() * window.innerWidth; spawnY = -50; break;
+                    case 1: spawnX = window.innerWidth + 50; spawnY = Math.random() * window.innerHeight; break;
+                    case 2: spawnX = Math.random() * window.innerWidth; spawnY = window.innerHeight + 50; break;
+                    case 3: spawnX = -50; spawnY = Math.random() * window.innerHeight; break;
+                }
+
+                // Логика выбора цвета на основе наведения
+                let currentClassName = 'bg-ambient-ripple'; // По умолчанию белая
+                
+                if (isTextHovered) {
+                    // Если наведено, рандомим между красным и зеленым (50/50)
+                    currentClassName = Math.random() > 0.5 ? 'bg-ambient-red' : 'bg-ambient-green';
+                }
+
+                createBackgroundRipple(spawnX, spawnY, currentClassName, 3000);
+
+                const nextDelay = Math.random() * (5000 - 1000) + 1000;
+                setTimeout(spawnAmbientWave, nextDelay);
+            }
+            spawnAmbientWave();
+        }, 3500);
+
+        // 2. КРАСНАЯ ВОЛНА ПРИ НАВЕДЕНИИ НА ТЕКСТ + СМЕНА ФЛАГА ХОВЕРА
         letters.forEach((span, index) => {
             span.addEventListener('mouseenter', (e) => {
+                isTextHovered = true; // Текст под курсором
+
                 letters.forEach((otherSpan, otherIndex) => {
                     const distance = Math.abs(index - otherIndex);
                     const delay = distance * 0.04;
@@ -77,37 +129,27 @@
                     otherSpan.style.transform = `translateY(${Math.max(-4, -6 + distance * 0.5)}px)`;
                 });
 
-                // ГЕНЕРАЦИЯ ВОЛНЫ ПО ФОНУ (Только при первом касании букв)
                 if (!isWaveTriggered) {
-                    isWaveTriggered = true; // Блокируем повторный спам волн внутри текста
-
-                    const ripple = document.createElement('div');
-                    ripple.classList.add('bg-wave-ripple');
-                    
-                    const x = e.clientX;
-                    const y = e.clientY;
-                    
-                    ripple.style.left = `${x}px`;
-                    ripple.style.top = `${y}px`;
-                    
-                    waveContainer.appendChild(ripple);
-                    
-                    setTimeout(() => {
-                        ripple.remove();
-                    }, 1500);
+                    isWaveTriggered = true;
+                    createBackgroundRipple(e.clientX, e.clientY, 'bg-wave-ripple');
                 }
             });
         });
 
-        // Полный сброс эффектов при уходе курсора с текста (отпуск текста)
         textContainer.addEventListener('mouseleave', () => {
-            isWaveTriggered = false; // Разблокируем волну для следующего захода
+            isWaveTriggered = false;
+            isTextHovered = false; // Курсор покинул текст, волны снова белые
 
             letters.forEach((span) => {
                 span.style.transitionDelay = '0s';
                 span.style.color = '#ffffff';
                 span.style.transform = 'translateY(0)';
             });
+        });
+
+        // 3. МЯГКАЯ БЕЛОВАТАЯ ВОЛНА ПРИ КЛИКЕ ПО ФОНУ
+        document.body.addEventListener('mousedown', (e) => {
+            createBackgroundRipple(e.clientX, e.clientY, 'bg-click-ripple');
         });
     </script>
 
