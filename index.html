@@ -101,11 +101,9 @@
                     case 3: spawnX = -50; spawnY = Math.random() * window.innerHeight; break;
                 }
 
-                // Выбор класса волны
                 let currentClassName = 'bg-ambient-ripple'; // Белая по умолчанию
                 
                 if (isTextHovered) {
-                    // Рандомный выбор цвета при наведении
                     currentClassName = Math.random() > 0.5 ? 'bg-ambient-red' : 'bg-ambient-green';
                 }
 
@@ -116,6 +114,40 @@
             }
             spawnAmbientWave();
         }, 3500);
+
+        // --- ЛОГИКА ФОНОВОЙ МУЗЫКИ С ИНТЕРВАЛОМ 5 СЕКУНД (ПЕРВЫЙ ВАРИАНТ С ПАПКОЙ audio) ---
+        const audioPath = 'audio/melody_start.mp3'; 
+        const bgMusic = new Audio(audioPath);
+        bgMusic.volume = 0.4; // Громкость 40%
+        let musicStarted = false;
+
+        // Функция запуска музыки с проверкой окончания
+        function playMusicWithInterval() {
+            bgMusic.play().then(() => {
+                musicStarted = true;
+            }).catch(err => {
+                console.log("Автозапуск заблокирован браузером. Музыка запустится после клика по экрану.");
+            });
+        }
+
+        // Когда песня заканчивается, ждем 5 секунд и запускаем заново
+        bgMusic.addEventListener('ended', () => {
+            setTimeout(() => {
+                bgMusic.play();
+            }, 5000); // 5 секунд задержки
+        });
+
+        // Запуск музыки после появления всех элементов (примерно через 3.5 секунды)
+        setTimeout(() => {
+            playMusicWithInterval();
+        }, 3500);
+
+        // Резервный запуск музыки при первом клике (если autoplay заблокирован)
+        document.body.addEventListener('click', () => {
+            if (!musicStarted) {
+                playMusicWithInterval();
+            }
+        }, { once: true }); // Сработает только один раз
 
         // 2. КРАСНАЯ ВОЛНА ПРИ НАВЕДЕНИИ НА ТЕКСТ
         letters.forEach((span, index) => {
