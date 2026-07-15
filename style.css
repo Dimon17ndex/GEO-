@@ -60,6 +60,76 @@ body {
     overflow: visible; 
 }
 
+/* СТИЛИ ТУМАННОЙ ПОДСКАЗКИ */
+.prompt-text {
+    position: fixed;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 1); 
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    pointer-events: none;
+    z-index: 2; 
+    
+    /* Изначально текст абсолютно невидим */
+    opacity: 0;
+    filter: blur(15px); 
+    transform: rotate(-4deg) translateY(10px); 
+}
+
+/* Запуск единого умного цикла анимации */
+.prompt-text.animate-prompt {
+    animation: initiateAndBreathe 10s ease-in-out forwards infinite;
+}
+
+/* КИНЕМАТОГРАФИЧНЫЙ ЦИКЛ ПОЯВЛЕНИЯ И МЕРЦАНИЯ */
+@keyframes initiateAndBreathe {
+    /* 0% - Абсолютная невидимость и сильное размытие на старте */
+    0% {
+        opacity: 0;
+        filter: blur(15px);
+        transform: rotate(-4deg) translateY(15px);
+    }
+    /* 20% - Текст плавно выходит в максимальную сочность */
+    20% {
+        opacity: 1;
+        filter: blur(0px);
+        transform: rotate(-4deg) translateY(0px);
+    }
+    /* 35% - Короткое удержание внимания пользователя */
+    35% {
+        opacity: 1;
+        filter: blur(0px);
+        transform: rotate(-4deg) translateY(-2px);
+    }
+    /* 55% - Первое мягкое погружение в "туманное" мерцание */
+    55% {
+        opacity: 0.15;
+        filter: blur(5px);
+        transform: rotate(-4deg) translateY(-10px);
+    }
+    /* 75% - Возврат к хорошей читаемости */
+    75% {
+        opacity: 0.85;
+        filter: blur(0.5px);
+        transform: rotate(-4deg) translateY(-4px);
+    }
+    /* 92% - Возврат к невидимости */
+    92% {
+        opacity: 0.15;
+        filter: blur(5px);
+        transform: rotate(-4deg) translateY(4px);
+    }
+    /* 100% - Возврат к исходной точке */
+    100% {
+        opacity: 0;
+        filter: blur(15px);
+        transform: rotate(-4deg) translateY(15px);
+    }
+}
+
 /* Красная волна (при наведении на текст) */
 .bg-wave-ripple {
     position: absolute;
@@ -130,7 +200,7 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    z-index: 2; 
+    z-index: 3; 
     pointer-events: none;
     box-sizing: border-box;
     padding: 20px;
@@ -233,7 +303,7 @@ body {
     white-space: nowrap;
 }
 
-/* 4. ИКОНКА В НИЖНЕМ ПРАВОМ УГЛУ И ЕЁ ФИЛЬТРЫ */
+/* ИКОНКА В НИЖНЕМ ПРАВОМ УГЛУ И ЕЁ ФИЛЬТРЫ */
 .corner-icon-floating-wrapper {
     position: fixed;
     bottom: 40px; 
@@ -259,8 +329,7 @@ body {
                 filter 0.8s ease-in-out;
 }
 
-/* 5. МАГИЯ ВЗАИМОДЕЙСТВИЯ ПРИ НАВЕДЕНИИ */
-
+/* МАГИЯ ВЗАИМОДЕЙСТВИЯ ПРИ НАВЕДЕНИИ */
 body:has(.bottom-credits-wrapper:hover) .corner-icon {
     opacity: 0.95;
     transform: translateY(0) scale(1);
@@ -276,7 +345,7 @@ body:has(.bottom-credits-wrapper:hover) .brand-block {
     transform: translate(-40px, -30px); 
 }
 
-/* 6. КЛЮЧЕВЫЕ КАДРЫ (АНИМАЦИИ) */
+/* КЛЮЧЕВЫЕ КАДРЫ (АНИМАЦИИ) */
 @keyframes fadeInShadow {
     from { opacity: 0; }
     to { opacity: 1; }
