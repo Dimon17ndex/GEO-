@@ -20,6 +20,8 @@
 
     <div id="bg-wave-container"></div>
 
+    <div id="click-prompt" class="prompt-text">Нажмите на экран</div>
+
     <div class="main-container">
         
         <div class="brand-block">
@@ -49,11 +51,13 @@
         const textContainer = document.getElementById('wave-text');
         const waveContainer = document.getElementById('bg-wave-container');
         const logoElement = document.getElementById('main-logo');
+        const promptElement = document.getElementById('click-prompt');
         const text = textContainer.innerText;
         textContainer.innerHTML = '';
 
         let isWaveTriggered = false;
         let isTextHovered = false; 
+        let hasUserClicked = false; 
 
         // Разделяем строку на буквы
         const letters = Array.from(text).map((char) => {
@@ -79,7 +83,7 @@
             setTimeout(() => { ripple.remove(); }, duration);
         }
 
-        // 1. БЕЛАЯ ВОЛНА НА ПОДХОДЕ ПЛАНЕТЫ
+        // БЕЛАЯ ВОЛНА НА ПОДХОДЕ ПЛАНЕТЫ
         setTimeout(() => {
             const rect = logoElement.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
@@ -101,7 +105,7 @@
                     case 3: spawnX = -50; spawnY = Math.random() * window.innerHeight; break;
                 }
 
-                let currentClassName = 'bg-ambient-ripple'; // Белая по умолчанию
+                let currentClassName = 'bg-ambient-ripple';
                 
                 if (isTextHovered) {
                     currentClassName = Math.random() > 0.5 ? 'bg-ambient-red' : 'bg-ambient-green';
@@ -115,41 +119,104 @@
             spawnAmbientWave();
         }, 3500);
 
-        // --- ЛОГИКА ФОНОВОЙ МУЗЫКИ С ИНТЕРВАЛОМ 5 СЕКУНД (ПЕРВЫЙ ВАРИАНТ С ПАПКОЙ audio) ---
+        // ЛОГИКА ФОНОВОЙ МУЗЫКИ
         const audioPath = 'audio/melody_start.mp3'; 
         const bgMusic = new Audio(audioPath);
-        bgMusic.volume = 0.4; // Громкость 40%
+        bgMusic.volume = 0.4; 
         let musicStarted = false;
 
-        // Функция запуска музыки с проверкой окончания
         function playMusicWithInterval() {
             bgMusic.play().then(() => {
                 musicStarted = true;
             }).catch(err => {
-                console.log("Автозапуск заблокирован браузером. Музыка запустится после клика по экрану.");
+                console.log("Автозапуск заблокирован браузером. Музыка запустится после клика.");
             });
         }
 
-        // Когда песня заканчивается, ждем 5 секунд и запускаем заново
         bgMusic.addEventListener('ended', () => {
             setTimeout(() => {
                 bgMusic.play();
-            }, 5000); // 5 секунд задержки
+            }, 5000); 
         });
 
-        // Запуск музыки после появления всех элементов (примерно через 3.5 секунды)
         setTimeout(() => {
             playMusicWithInterval();
         }, 3500);
 
-        // Резервный запуск музыки при первом клике (если autoplay заблокирован)
-        document.body.addEventListener('click', () => {
+
+        // --- ИНТЕЛЛЕКТУАЛЬНАЯ ЛОГИКА ПОДСКАЗКИ ---
+        function showClickPrompt() {
+            if (hasUserClicked) return; 
+
+            const corners = [
+                { top: '60px', left: '60px', bottom: 'auto', right: 'auto' },     
+                { top: '60px', right: '60px', bottom: 'auto', left: 'auto' },    
+                { bottom: '120px', left: '60px', top: 'auto', right: 'auto' },   
+                { bottom: '150px', right: '60px', top: 'auto', left: 'auto' }   
+            ];
+
+            const chosenCorner = corners[Math.floor(Math.random() * corners.length)];
+
+            promptElement.style.top = chosenCorner.top;
+            promptElement.style.bottom = chosenCorner.bottom;
+            promptElement.style.left = chosenCorner.left;
+            promptElement.style.right = chosenCorner.right;
+
+            // Активируем анимацию
+            promptElement.classList.add('animate-prompt');
+        }
+
+        // Появление подсказки
+        setTimeout(() => {
+            if (!hasUserClicked) {
+                showClickPrompt();
+            }
+        }, 4500); 
+
+
+        // Клик по экрану
+        document.body.addEventListener('mousedown', (e) => {
+            if (!hasUserClicked) {
+                hasUserClicked = true;
+
+                // 1. "Фотографируем" текущее состояние анимации на момент клика
+                const computedStyle = window.getComputedStyle(promptElement);
+                const currentOpacity = computedStyle.opacity;
+                const currentFilter = computedStyle.filter;
+                const currentTransform = computedStyle.transform;
+
+                // 2. Мгновенно фиксируем эти значения в инлайн-стилях, чтобы не было скачка
+                promptElement.style.opacity = currentOpacity;
+                promptElement.style.filter = currentFilter;
+                promptElement.style.transform = currentTransform;
+
+                // 3. Отключаем бесконечную CSS-анимацию
+                promptElement.classList.remove('animate-prompt');
+
+                // 4. Форсируем перерасчет стилей браузером (триггерим reflow)
+                void promptElement.offsetWidth;
+
+                // 5. Задаем плавный переход (transition) и целевые значения ухода в ноль
+                // Время ухода (2.5s) идеально совпадает со скоростью штатного угасания мерцания!
+                promptElement.style.transition = 'opacity 2.5s ease-in-out, filter 2.5s ease-in-out, transform 2.5s ease-in-out';
+                promptElement.style.opacity = '0';
+                promptElement.style.filter = 'blur(15px)';
+                promptElement.style.transform = 'rotate(-4deg) translateY(15px)';
+
+                // 6. Ровно через 2.5 секунды полностью убираем элемент из DOM
+                setTimeout(() => {
+                    promptElement.style.display = 'none';
+                }, 2500);
+            }
+
             if (!musicStarted) {
                 playMusicWithInterval();
             }
-        }, { once: true }); // Сработает только один раз
 
-        // 2. КРАСНАЯ ВОЛНА ПРИ НАВЕДЕНИИ НА ТЕКСТ
+            createBackgroundRipple(e.clientX, e.clientY, 'bg-click-ripple');
+        });
+
+        // КРАСНАЯ ВОЛНА ПРИ НАВЕДЕНИИ НА ТЕКСТ
         letters.forEach((span, index) => {
             span.addEventListener('mouseenter', (e) => {
                 isTextHovered = true; 
@@ -179,11 +246,6 @@
                 span.style.color = '#ffffff';
                 span.style.transform = 'translateY(0)';
             });
-        });
-
-        // 3. МЯГКАЯ БЕЛОВАТАЯ ВОЛНА ПРИ КЛИКЕ ПО ФОНУ
-        document.body.addEventListener('mousedown', (e) => {
-            createBackgroundRipple(e.clientX, e.clientY, 'bg-click-ripple');
         });
     </script>
 
