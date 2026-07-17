@@ -1,4 +1,6 @@
-/* 1. БАЗА И ФОН */
+/* ==========================================================================
+   1. БАЗА И ФОН
+   ========================================================================== */
 html, body {
     margin: 0;
     padding: 0;
@@ -19,7 +21,9 @@ body {
     background-attachment: fixed; 
 }
 
-/* 2. АНИМИРОВАННАЯ ТЕНЬ */
+/* ==========================================================================
+   2. АНИМИРОВАННАЯ ТЕНЬ И ФОНОВЫЙ ГЕРБ
+   ========================================================================== */
 .shadow-layer {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -32,7 +36,6 @@ body {
                breathe 8s ease-in-out 1.5s infinite; 
 }
 
-/* КРУПНЫЙ ФОНОВЫЙ ГЕРБ НА ЗАДНЕМ ПЛАНЕ */
 .bg-blur-gerb {
     position: fixed;
     top: -20%;
@@ -50,7 +53,6 @@ body {
                 transform 0.9s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* СТИЛИ ДЛЯ КОНТЕЙНЕРА ВСЕХ ВОЛН */
 #bg-wave-container {
     position: fixed;
     top: 0; left: 0;
@@ -60,7 +62,229 @@ body {
     overflow: visible; 
 }
 
-/* СТИЛИ ТУМАННОЙ ПОДСКАЗКИ */
+/* ==========================================================================
+   3. СТИЛИ ВСПЛЫВАЮЩЕЙ КАПСУЛЫ НАСТРОЕК И ТЕКСТОВЫХ БИРОК
+   ========================================================================== */
+.settings-trigger-zone {
+    position: fixed;
+    top: 40px;
+    right: 40px;
+    z-index: 15;
+    pointer-events: none; 
+    opacity: 0;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    animation: fadeInElement 1.2s ease-out 2.7s forwards,
+               enablePointerEvents 0s linear 4.5s forwards;
+}
+
+.settings-container-box {
+    width: 48px;
+    height: 48px; 
+    border: 1px solid rgba(255, 255, 255, 0);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    overflow: visible; 
+    cursor: default;
+    
+    transition: height 0.5s cubic-bezier(0.25, 1, 0.5, 1) 0s,
+                border-color 0.4s ease,
+                background-color 0.4s ease,
+                box-shadow 0.4s ease;
+}
+
+.settings-container-box:hover {
+    height: 124px; 
+    border-color: rgba(255, 255, 255, 0.35);
+    background-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    
+    transition-delay: 1s, 0s, 0s, 0s;
+}
+
+.settings-icon-box {
+    position: relative; 
+    width: 48px;
+    height: 48px;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    
+    /* Теперь за вращение на ховер отвечает этот промежуточный блок */
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* При наведении крутим контейнер иконки, в котором лежит шестеренка */
+.settings-container-box:hover .settings-icon-box,
+.settings-icon-box:hover {
+    transform: rotate(90deg);
+}
+
+.gear-svg {
+    width: 24px;
+    height: 24px;
+    color: #ffffff;
+    opacity: 0; 
+    
+    transform-origin: center; 
+    
+    /* Убираем отсюда transform transition, чтобы не ломать анимацию въезда */
+    transition: opacity 0.4s ease;
+    
+    /* Стартовая анимация эффектного въезда */
+    animation: gearIntroSpin 2.2s cubic-bezier(0.25, 1, 0.5, 1) 2.7s forwards;
+}
+
+/* При наведении шестеренка просто плавно загорается на полную яркость */
+.settings-container-box:hover .gear-svg,
+.settings-icon-box:hover .gear-svg {
+    opacity: 1 !important;
+}
+
+.settings-divider {
+    width: 32px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.15);
+    opacity: 0;
+    transition: opacity 0.4s ease 0s;
+}
+
+.settings-container-box:hover .settings-divider {
+    opacity: 1;
+    transition-delay: 1s; 
+}
+
+.volume-btn {
+    position: relative; 
+    width: 48px;
+    height: 48px;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    
+    opacity: 0;
+    transform: translateY(-10px) scale(0);
+    pointer-events: none;
+    visibility: hidden;
+    
+    transition: opacity 0.4s ease 0s, 
+                transform 0.4s ease 0s, 
+                visibility 0.4s ease 0s;
+}
+
+.volume-svg {
+    width: 24px;
+    height: 24px;
+    color: #ffffff;
+    opacity: 0.5;
+    transition: opacity 0.4s ease, transform 0.3s ease;
+}
+
+.volume-btn:hover .volume-svg {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.settings-container-box:hover .volume-btn {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+    visibility: visible;
+    transition-delay: 1s;
+}
+
+/* Бирка зафиксирована по высоте и не вращается вместе с иконкой */
+.settings-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    
+    position: absolute;
+    right: 64px; 
+    top: 24px; 
+    transform: translateY(-50%) translateX(15px); 
+    white-space: nowrap;
+    pointer-events: none;
+    
+    opacity: 0;
+    filter: blur(12px);
+    
+    transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+                filter 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+                transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.settings-container-box:hover .settings-label {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(-50%) translateX(0px);
+}
+
+.volume-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    
+    position: absolute;
+    right: 64px; 
+    top: 50%;
+    transform: translateY(-50%) translateX(15px); 
+    white-space: nowrap;
+    pointer-events: none;
+    
+    opacity: 0;
+    filter: blur(12px);
+    
+    transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+                filter 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+                transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.volume-btn:hover .volume-label {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(-50%) translateX(0px);
+}
+
+.volume-label .status-on,
+.volume-label .status-off {
+    transition: opacity 0.3s ease;
+}
+
+.volume-label .status-off {
+    opacity: 0.4;
+}
+
+.volume-label.muted-mode .status-on {
+    opacity: 0.4;
+}
+
+.volume-label.muted-mode .status-off {
+    opacity: 1;
+}
+
+/* ==========================================================================
+   4. СТИЛИ ТУМАННОЙ ПОДСКАЗКИ "НАЖМИТЕ НА ЭКРАН"
+   ========================================================================== */
 .prompt-text {
     position: fixed;
     font-family: 'Montserrat', sans-serif;
@@ -73,64 +297,36 @@ body {
     pointer-events: none;
     z-index: 2; 
     
-    /* Изначально текст абсолютно невидим */
     opacity: 0;
     filter: blur(15px); 
     transform: rotate(-4deg) translateY(10px); 
+    
+    transition: opacity 0.5s ease, filter 0.5s ease; 
 }
 
-/* Запуск единого умного цикла анимации */
 .prompt-text.animate-prompt {
     animation: initiateAndBreathe 10s ease-in-out forwards infinite;
 }
 
-/* КИНЕМАТОГРАФИЧНЫЙ ЦИКЛ ПОЯВЛЕНИЯ И МЕРЦАНИЯ */
 @keyframes initiateAndBreathe {
-    /* 0% - Абсолютная невидимость и сильное размытие на старте */
-    0% {
-        opacity: 0;
-        filter: blur(15px);
-        transform: rotate(-4deg) translateY(15px);
-    }
-    /* 20% - Текст плавно выходит в максимальную сочность */
-    20% {
-        opacity: 1;
-        filter: blur(0px);
-        transform: rotate(-4deg) translateY(0px);
-    }
-    /* 35% - Короткое удержание внимания пользователя */
-    35% {
-        opacity: 1;
-        filter: blur(0px);
-        transform: rotate(-4deg) translateY(-2px);
-    }
-    /* 55% - Первое мягкое погружение в "туманное" мерцание */
-    55% {
-        opacity: 0.15;
-        filter: blur(5px);
-        transform: rotate(-4deg) translateY(-10px);
-    }
-    /* 75% - Возврат к хорошей читаемости */
-    75% {
-        opacity: 0.85;
-        filter: blur(0.5px);
-        transform: rotate(-4deg) translateY(-4px);
-    }
-    /* 92% - Возврат к невидимости */
-    92% {
-        opacity: 0.15;
-        filter: blur(5px);
-        transform: rotate(-4deg) translateY(4px);
-    }
-    /* 100% - Возврат к исходной точке */
-    100% {
-        opacity: 0;
-        filter: blur(15px);
-        transform: rotate(-4deg) translateY(15px);
-    }
+    0% { opacity: 0; filter: blur(15px); transform: rotate(-4deg) translateY(15px); }
+    20% { opacity: 1; filter: blur(0px); transform: rotate(-4deg) translateY(0px); }
+    35% { opacity: 1; filter: blur(0px); transform: rotate(-4deg) translateY(-2px); }
+    55% { opacity: 0.15; filter: blur(5px); transform: rotate(-4deg) translateY(-10px); }
+    75% { opacity: 0.85; filter: blur(0.5px); transform: rotate(-4deg) translateY(-4px); }
+    92% { opacity: 0.15; filter: blur(5px); transform: rotate(-4deg) translateY(4px); }
+    100% { opacity: 0; filter: blur(15px); transform: rotate(-4deg) translateY(15px); }
 }
 
-/* Красная волна (при наведении на текст) */
+body:has(.bottom-credits-wrapper:hover) .prompt-text.in-bottom-right {
+    opacity: 0 !important;
+    filter: blur(15px) !important;
+    transition: opacity 0.5s ease, filter 0.5s ease;
+}
+
+/* ==========================================================================
+   5. ЭФФЕКТЫ ВОЛН (RIPPLES)
+   ========================================================================== */
 .bg-wave-ripple {
     position: absolute;
     width: 10px;
@@ -142,7 +338,6 @@ body {
     animation: screenRippleBlast 1.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
 }
 
-/* Беловатая волна (при клике и приземлении планеты) */
 .bg-click-ripple {
     position: absolute;
     width: 10px;
@@ -154,7 +349,6 @@ body {
     animation: screenRippleBlast 1.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
 }
 
-/* Медленная эмбиент-волна: СТАНДАРТНАЯ БЕЛАЯ */
 .bg-ambient-ripple {
     position: absolute;
     width: 10px;
@@ -166,7 +360,6 @@ body {
     animation: slowAmbientBlast 3s cubic-bezier(0.2, 0.5, 0.4, 1) forwards;
 }
 
-/* ЯРКАЯ КРАСНОВАТАЯ ЭМБИЕНТ-ВОЛНА (при наведении) */
 .bg-ambient-red {
     position: absolute;
     width: 10px;
@@ -178,7 +371,6 @@ body {
     animation: slowAmbientBlast 3s cubic-bezier(0.2, 0.5, 0.4, 1) forwards;
 }
 
-/* ЯРКАЯ ЗЕЛЕНОВАТАЯ ЭМБИЕНТ-ВОЛНА (при наведении) */
 .bg-ambient-green {
     position: absolute;
     width: 10px;
@@ -190,7 +382,9 @@ body {
     animation: slowAmbientBlast 3s cubic-bezier(0.2, 0.5, 0.4, 1) forwards;
 }
 
-/* 3. ГЛАВНЫЙ КОНТЕЙНЕР (ЦЕНТРИРОВАНИЕ) */
+/* ==========================================================================
+   6. ГЛАВНЫЙ КОНТЕНТ (ЦЕНТРИРОВАНИЕ)
+   ========================================================================== */
 .main-container {
     position: fixed;
     top: 0; left: 0;
@@ -206,7 +400,6 @@ body {
     padding: 20px;
 }
 
-/* Блок с логотипом и правым текстом */
 .brand-block {
     display: flex;
     align-items: center;
@@ -215,7 +408,6 @@ body {
     animation: mainFloat 6s ease-in-out infinite;
 }
 
-/* Картинка-иконка */
 .logo-icon {
     height: auto;
     max-width: 240px; 
@@ -225,7 +417,6 @@ body {
     animation: planetFlyIn 1.8s cubic-bezier(0.25, 1, 0.5, 1) 0.5s forwards;
 }
 
-/* Блок текста справа */
 .text-right {
     display: flex;
     flex-direction: column;
@@ -235,7 +426,6 @@ body {
     flex-shrink: 0; 
 }
 
-/* Заголовок GEOГРАФИЯ */
 .main-title {
     margin: 0;
     font-family: 'Unbounded', sans-serif;
@@ -246,7 +436,6 @@ body {
     display: flex; 
 }
 
-/* ПОБУКВЕННАЯ АНИМАЦИЯ ПРИ СТАРТЕ */
 .main-title span {
     display: inline-block;
     opacity: 0;
@@ -255,7 +444,6 @@ body {
                letterFlyUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
-/* Очередь появления букв */
 .main-title span:nth-child(1) { animation-delay: 1.0s, 1.0s; }
 .main-title span:nth-child(2) { animation-delay: 1.1s, 1.1s; }
 .main-title span:nth-child(3) { animation-delay: 1.2s, 1.2s; }
@@ -266,7 +454,6 @@ body {
 .main-title span:nth-child(8) { animation-delay: 1.7s, 1.7s; }
 .main-title span:nth-child(9) { animation-delay: 1.8s, 1.8s; }
 
-/* Плашка с подзаголовком */
 .subtitle-badge {
     margin-top: 15px;
     background-color: #ffffff;
@@ -280,15 +467,12 @@ body {
     animation: fadeInElement 1.2s ease-out 2.2s forwards; 
 }
 
-/* НАСТРОЙКИ ДЛЯ НИЖНЕГО ТЕКСТА-ТРИГГЕРА */
 .bottom-credits-wrapper {
     position: absolute;
     bottom: 50px;
     z-index: 5;
-    
     pointer-events: none; 
     cursor: pointer;
-    
     opacity: 0;
     animation: fadeInElement 1.5s ease-out 2.7s forwards,
                enablePointerEvents 0s linear 4.2s forwards; 
@@ -303,11 +487,13 @@ body {
     white-space: nowrap;
 }
 
-/* ИКОНКА В НИЖНЕМ ПРАВОМ УГЛУ И ЕЁ ФИЛЬТРЫ */
+/* ==========================================================================
+   7. ИКОНКА В НИЖНЕМ ПРАВОМ УГЛУ И ЕЁ ВЗАИМОДЕЙСТВИЯ
+   ========================================================================== */
 .corner-icon-floating-wrapper {
     position: fixed;
     bottom: 40px; 
-    right: 40px;  
+    right: 40px;    
     max-width: 500px; 
     width: 100%;
     height: auto;
@@ -319,7 +505,6 @@ body {
 .corner-icon {
     width: 100%;
     height: auto;
-    
     opacity: 0;
     transform: translateY(100px) scale(0.9);
     filter: drop-shadow(0 0 0 rgba(255, 30, 30, 0));
@@ -329,7 +514,6 @@ body {
                 filter 0.8s ease-in-out;
 }
 
-/* МАГИЯ ВЗАИМОДЕЙСТВИЯ ПРИ НАВЕДЕНИИ */
 body:has(.bottom-credits-wrapper:hover) .corner-icon {
     opacity: 0.95;
     transform: translateY(0) scale(1);
@@ -345,7 +529,9 @@ body:has(.bottom-credits-wrapper:hover) .brand-block {
     transform: translate(-40px, -30px); 
 }
 
-/* КЛЮЧЕВЫЕ КАДРЫ (АНИМАЦИИ) */
+/* ==========================================================================
+   8. ВСЕ КЛЮЧЕВЫЕ КАДРЫ (KEYFRAMES)
+   ========================================================================== */
 @keyframes fadeInShadow {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -383,10 +569,6 @@ body:has(.bottom-credits-wrapper:hover) .brand-block {
     to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes enablePointerEvents {
-    to { pointer-events: auto; }
-}
-
 @keyframes mainFloat {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-8px); }
@@ -397,30 +579,24 @@ body:has(.bottom-credits-wrapper:hover) .brand-block {
     50% { transform: translate(-6px, -10px); }
 }
 
-/* Стандартная динамичная волна */
 @keyframes screenRippleBlast {
-    0% {
-        width: 0px;
-        height: 0px;
-        opacity: 1;
-    }
-    100% {
-        width: 1600px; 
-        height: 1600px;
-        opacity: 0; 
-    }
+    0% { width: 0px; height: 0px; opacity: 1; }
+    100% { width: 1600px; height: 1600px; opacity: 0; }
 }
 
-/* Медленная раскатистая анимация для фонового эмбиента */
 @keyframes slowAmbientBlast {
-    0% {
-        width: 0px;
-        height: 0px;
-        opacity: 1;
-    }
-    100% {
-        width: 1800px; 
-        height: 1800px;
-        opacity: 0; 
-    }
+    0% { width: 0px; height: 0px; opacity: 1; }
+    100% { width: 1800px; height: 1800px; opacity: 0; }
+}
+
+/* Стартовая анимация крутит шестеренку на 360deg, но не блокирует дальнейший transform ховера */
+@keyframes gearIntroSpin {
+    0% { transform: rotate(0deg); opacity: 0; }
+    50% { opacity: 0.5; }
+    100% { transform: rotate(360deg); opacity: 0.5; }
+}
+
+/* Включение обработки событий мыши */
+@keyframes enablePointerEvents {
+    to { pointer-events: auto; }
 }
