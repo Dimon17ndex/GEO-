@@ -20,10 +20,35 @@
 
     <div id="bg-wave-container"></div>
 
+    <div class="settings-trigger-zone" id="settings-btn">
+        <div class="settings-container-box">
+            
+            <div class="settings-icon-box">
+                <svg class="gear-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.15a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+            </div>
+            
+            <span class="settings-label">Настройки</span> 
+            
+            <div class="settings-divider"></div>
+            
+            <div class="volume-btn" id="volume-toggle-btn">
+                <svg class="volume-svg" id="volume-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                    <path class="volume-wave-1" d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                    <path class="volume-wave-2" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                </svg>
+                <div class="volume-label" id="volume-status-label">музыка <span class="status-on">on</span> / <span class="status-off">off</span></div>
+            </div>
+
+        </div>
+    </div>
+
     <div id="click-prompt" class="prompt-text">Нажмите на экран</div>
 
     <div class="main-container">
-        
         <div class="brand-block">
             <img src="images/geo_logo.png" alt="Geo Logo" class="logo-icon" id="main-logo">
             
@@ -40,7 +65,6 @@
         <div class="bottom-credits-wrapper">
             <p class="bottom-credits" id="wave-text">проект Запорожской области</p>
         </div>
-        
     </div>
 
     <div class="corner-icon-floating-wrapper">
@@ -52,6 +76,7 @@
         const waveContainer = document.getElementById('bg-wave-container');
         const logoElement = document.getElementById('main-logo');
         const promptElement = document.getElementById('click-prompt');
+        const volumeStatusLabel = document.getElementById('volume-status-label');
         const text = textContainer.innerText;
         textContainer.innerHTML = '';
 
@@ -59,7 +84,6 @@
         let isTextHovered = false; 
         let hasUserClicked = false; 
 
-        // Разделяем строку на буквы
         const letters = Array.from(text).map((char) => {
             const span = document.createElement('span');
             span.style.display = 'inline-block';
@@ -73,7 +97,6 @@
             return span;
         });
 
-        // Базовая функция генерации волн бэкграунда
         function createBackgroundRipple(x, y, className, duration = 1500) {
             const ripple = document.createElement('div');
             ripple.classList.add(className);
@@ -83,7 +106,6 @@
             setTimeout(() => { ripple.remove(); }, duration);
         }
 
-        // БЕЛАЯ ВОЛНА НА ПОДХОДЕ ПЛАНЕТЫ
         setTimeout(() => {
             const rect = logoElement.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
@@ -91,7 +113,6 @@
             createBackgroundRipple(centerX, centerY, 'bg-click-ripple');
         }, 1700);
 
-        // АВТОМАТИЧЕСКИЕ ВОЛНЫ С ИЗМЕНЕНИЕМ ЦВЕТА И СПАВНОМ У КРАЕВ
         setTimeout(() => {
             function spawnAmbientWave() {
                 let spawnX = 0;
@@ -119,7 +140,6 @@
             spawnAmbientWave();
         }, 3500);
 
-        // ЛОГИКА ФОНОВОЙ МУЗЫКИ
         const audioPath = 'audio/melody_start.mp3'; 
         const bgMusic = new Audio(audioPath);
         bgMusic.volume = 0.4; 
@@ -143,67 +163,62 @@
             playMusicWithInterval();
         }, 3500);
 
-
-        // --- ИНТЕЛЛЕКТУАЛЬНАЯ ЛОГИКА ПОДСКАЗКИ ---
         function showClickPrompt() {
             if (hasUserClicked) return; 
 
             const corners = [
                 { top: '60px', left: '60px', bottom: 'auto', right: 'auto' },     
-                { top: '60px', right: '60px', bottom: 'auto', left: 'auto' },    
-                { bottom: '120px', left: '60px', top: 'auto', right: 'auto' },   
-                { bottom: '150px', right: '60px', top: 'auto', left: 'auto' }   
+                { bottom: '120px', left: '60px', top: 'auto', right: 'auto' },    
+                { bottom: '150px', right: '60px', top: 'auto', left: 'auto' }      
             ];
 
-            const chosenCorner = corners[Math.floor(Math.random() * corners.length)];
+            const randomIndex = Math.floor(Math.random() * corners.length);
+            const chosenCorner = corners[randomIndex];
 
             promptElement.style.top = chosenCorner.top;
             promptElement.style.bottom = chosenCorner.bottom;
             promptElement.style.left = chosenCorner.left;
             promptElement.style.right = chosenCorner.right;
 
-            // Активируем анимацию
+            if (randomIndex === 2) {
+                promptElement.classList.add('in-bottom-right');
+            } else {
+                promptElement.classList.remove('in-bottom-right');
+            }
+
             promptElement.classList.add('animate-prompt');
         }
 
-        // Появление подсказки
         setTimeout(() => {
             if (!hasUserClicked) {
                 showClickPrompt();
             }
         }, 4500); 
 
-
-        // Клик по экрану
         document.body.addEventListener('mousedown', (e) => {
+            if (e.target.closest('#settings-btn') || e.target.closest('.settings-trigger-zone')) return;
+
             if (!hasUserClicked) {
                 hasUserClicked = true;
 
-                // 1. "Фотографируем" текущее состояние анимации на момент клика
                 const computedStyle = window.getComputedStyle(promptElement);
                 const currentOpacity = computedStyle.opacity;
                 const currentFilter = computedStyle.filter;
                 const currentTransform = computedStyle.transform;
 
-                // 2. Мгновенно фиксируем эти значения в инлайн-стилях, чтобы не было скачка
                 promptElement.style.opacity = currentOpacity;
                 promptElement.style.filter = currentFilter;
                 promptElement.style.transform = currentTransform;
 
-                // 3. Отключаем бесконечную CSS-анимацию
                 promptElement.classList.remove('animate-prompt');
 
-                // 4. Форсируем перерасчет стилей браузером (триггерим reflow)
                 void promptElement.offsetWidth;
 
-                // 5. Задаем плавный переход (transition) и целевые значения ухода в ноль
-                // Время ухода (2.5s) идеально совпадает со скоростью штатного угасания мерцания!
                 promptElement.style.transition = 'opacity 2.5s ease-in-out, filter 2.5s ease-in-out, transform 2.5s ease-in-out';
                 promptElement.style.opacity = '0';
                 promptElement.style.filter = 'blur(15px)';
                 promptElement.style.transform = 'rotate(-4deg) translateY(15px)';
 
-                // 6. Ровно через 2.5 секунды полностью убираем элемент из DOM
                 setTimeout(() => {
                     promptElement.style.display = 'none';
                 }, 2500);
@@ -216,7 +231,40 @@
             createBackgroundRipple(e.clientX, e.clientY, 'bg-click-ripple');
         });
 
-        // КРАСНАЯ ВОЛНА ПРИ НАВЕДЕНИИ НА ТЕКСТ
+        const volumeBtn = document.getElementById('volume-toggle-btn');
+        const volumeIcon = document.getElementById('volume-icon');
+        let isMuted = false;
+
+        volumeBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            
+            isMuted = !isMuted;
+            bgMusic.muted = isMuted;
+
+            if (isMuted) {
+                volumeStatusLabel.classList.add('muted-mode');
+                volumeIcon.innerHTML = `
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                    <line x1="23" y1="9" x2="17" y2="15" stroke-width="1.5"></line>
+                    <line x1="17" y1="9" x2="23" y2="15" stroke-width="1.5"></line>
+                `;
+            } else {
+                volumeStatusLabel.classList.remove('muted-mode');
+                volumeIcon.innerHTML = `
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                    <path class="volume-wave-1" d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                    <path class="volume-wave-2" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                `;
+                if (!musicStarted) {
+                    playMusicWithInterval();
+                }
+            }
+        });
+
+        document.querySelector('.settings-icon-box').addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
         letters.forEach((span, index) => {
             span.addEventListener('mouseenter', (e) => {
                 isTextHovered = true; 
@@ -248,6 +296,5 @@
             });
         });
     </script>
-
 </body>
 </html>
