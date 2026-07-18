@@ -44,11 +44,9 @@ body {
     height: auto;
     z-index: 1; 
     pointer-events: none;
-    
     filter: blur(8px);
     opacity: 0;
     transform: scale(0.85) rotate(-5deg);
-    
     transition: opacity 0.9s cubic-bezier(0.25, 1, 0.5, 1),
                 transform 0.9s cubic-bezier(0.25, 1, 0.5, 1);
 }
@@ -72,11 +70,9 @@ body {
     z-index: 15;
     pointer-events: none; 
     opacity: 0;
-    
     display: flex;
     align-items: center;
     justify-content: center;
-    
     animation: fadeInElement 1.2s ease-out 2.7s forwards,
                enablePointerEvents 0s linear 4.5s forwards;
 }
@@ -90,10 +86,8 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    
     overflow: visible; 
     cursor: default;
-    
     transition: height 0.5s cubic-bezier(0.25, 1, 0.5, 1) 0s,
                 border-color 0.4s ease,
                 background-color 0.4s ease,
@@ -105,8 +99,7 @@ body {
     border-color: rgba(255, 255, 255, 0.35);
     background-color: rgba(255, 255, 255, 0.08);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    
-    transition-delay: 1s, 0s, 0s, 0s;
+    transition-delay: 0.5s, 0s, 0s, 0s;
 }
 
 .settings-icon-box {
@@ -118,7 +111,6 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    
     /* Теперь за вращение на ховер отвечает этот промежуточный блок */
     transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
 }
@@ -134,12 +126,9 @@ body {
     height: 24px;
     color: #ffffff;
     opacity: 0; 
-    
     transform-origin: center; 
-    
     /* Убираем отсюда transform transition, чтобы не ломать анимацию въезда */
     transition: opacity 0.4s ease;
-    
     /* Стартовая анимация эффектного въезда */
     animation: gearIntroSpin 2.2s cubic-bezier(0.25, 1, 0.5, 1) 2.7s forwards;
 }
@@ -160,7 +149,7 @@ body {
 
 .settings-container-box:hover .settings-divider {
     opacity: 1;
-    transition-delay: 1s; 
+    transition-delay: 0.5s; 
 }
 
 .volume-btn {
@@ -172,12 +161,10 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    
     opacity: 0;
     transform: translateY(-10px) scale(0);
     pointer-events: none;
     visibility: hidden;
-    
     transition: opacity 0.4s ease 0s, 
                 transform 0.4s ease 0s, 
                 visibility 0.4s ease 0s;
@@ -201,7 +188,7 @@ body {
     transform: translateY(0) scale(1);
     pointer-events: auto;
     visibility: visible;
-    transition-delay: 1s;
+    transition-delay: 0.5s;
 }
 
 /* Бирка зафиксирована по высоте и не вращается вместе с иконкой */
@@ -213,17 +200,14 @@ body {
     text-transform: uppercase;
     color: #ffffff;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-    
     position: absolute;
     right: 64px; 
     top: 24px; 
     transform: translateY(-50%) translateX(15px); 
     white-space: nowrap;
     pointer-events: none;
-    
     opacity: 0;
     filter: blur(12px);
-    
     transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1),
                 filter 0.4s cubic-bezier(0.25, 1, 0.5, 1),
                 transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
@@ -243,17 +227,14 @@ body {
     text-transform: uppercase;
     color: #ffffff;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-    
     position: absolute;
     right: 64px; 
     top: 50%;
     transform: translateY(-50%) translateX(15px); 
     white-space: nowrap;
     pointer-events: none;
-    
     opacity: 0;
     filter: blur(12px);
-    
     transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1),
                 filter 0.4s cubic-bezier(0.25, 1, 0.5, 1),
                 transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
@@ -282,6 +263,41 @@ body {
     opacity: 1;
 }
 
+/* --------------------------------------------------------------------------
+   НОВЫЙ ЭЛЕМЕНТ: КРАСНЫЙ РАЗДЕЛИТЕЛЬ С ЭФФЕКТОМ СПРАВА НАЛЕВО
+   -------------------------------------------------------------------------- */
+.settings-horizontal-line {
+    position: absolute;
+    right: 64px; 
+    top: 48px; 
+    /* Шаг 1: Базовая длина под "НАСТРОЙКИ" (оставляем 120px) */
+    width: 120px; 
+    height: 1px;
+    background-color: #ffffff;
+    transform-origin: right;
+    /* Изначально линия скрыта */
+    transform: scaleX(0);
+    opacity: 0;
+    /* Плавное изменение длины (width) и появление */
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1) 0s,
+                width 0.4s cubic-bezier(0.25, 1, 0.5, 1) 0s,
+                opacity 0.4s ease 0s;
+}
+
+/* Навели на шестерёнку — вылетает базовая линия 120px */
+.settings-container-box:hover .settings-horizontal-line {
+    transform: scaleX(1);
+    opacity: 1;
+    transition-delay: 0s; 
+}
+
+/* Шаг 2: Навели на музыку — линия удлиняется до новой аккуратной длины */
+.settings-container-box:hover .volume-btn:hover ~ .settings-horizontal-line,
+.settings-container-box:hover:has(.volume-btn:hover) .settings-horizontal-line {
+    /* Уменьшили финальную длину на ~1 см (было 215px) */
+    width: 175px;
+}
+
 /* ==========================================================================
    4. СТИЛИ ТУМАННОЙ ПОДСКАЗКИ "НАЖМИТЕ НА ЭКРАН"
    ========================================================================== */
@@ -296,11 +312,9 @@ body {
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
     pointer-events: none;
     z-index: 2; 
-    
     opacity: 0;
     filter: blur(15px); 
     transform: rotate(-4deg) translateY(10px); 
-    
     transition: opacity 0.5s ease, filter 0.5s ease; 
 }
 
@@ -508,7 +522,6 @@ body:has(.bottom-credits-wrapper:hover) .prompt-text.in-bottom-right {
     opacity: 0;
     transform: translateY(100px) scale(0.9);
     filter: drop-shadow(0 0 0 rgba(255, 30, 30, 0));
-    
     transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), 
                 transform 0.8s cubic-bezier(0.25, 1, 0.5, 1),
                 filter 0.8s ease-in-out;
