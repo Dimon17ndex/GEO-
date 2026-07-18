@@ -95,7 +95,7 @@ body {
 }
 
 .settings-container-box:hover {
-    height: 150px; /* Изначально увеличиваем только под иконки, без учета ползунка */
+    height: 150px; 
     border-color: rgba(255, 255, 255, 0.35);
     background-color: rgba(255, 255, 255, 0.08);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
@@ -258,7 +258,7 @@ body {
 }
 
 /* ==========================================================================
-   НОВЫЕ СТИЛИ: Управление интенсивностью эффектов (ПОЯВЛЕНИЕ ПОЛЗУНКА НА ХОВЕР)
+   Управление интенсивностью эффектов
    ========================================================================== */
 .intensity-control-box {
     width: 48px;
@@ -269,7 +269,6 @@ body {
     transform: translateY(-10px) scale(0);
     pointer-events: none;
     visibility: hidden;
-    /* Анимация появления самой кнопки "солнышка" при раскрытии капсулы */
     transition: opacity 0.4s ease 0s, 
                 transform 0.4s ease 0s, 
                 visibility 0.4s ease 0s;
@@ -332,7 +331,6 @@ body {
     transform: translateY(-50%) translateX(0px);
 }
 
-/* --- Ползунок скрыт по умолчанию --- */
 .slider-wrapper {
     width: 48px;
     height: 0px;
@@ -344,27 +342,22 @@ body {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    /* Убрали задержку (0s в конце), анимация начнется мгновенно */
     transition: opacity 0.4s ease 0s, 
                 height 0.4s cubic-bezier(0.25, 1, 0.5, 1) 0s,
                 margin-top 0.4s ease 0s,
                 visibility 0.4s ease 0s;
 }
 
-/* Ползунок мгновенно реагирует на наведение на блок интенсивности */
 .intensity-control-box:hover .slider-wrapper {
     height: 80px;
     margin-top: 5px;
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-    /* transition-delay больше нет */
 }
 
-/* Контейнер мгновенно удлиняется под ползунок без задержки */
 .settings-container-box:hover:has(.intensity-control-box:hover) {
     height: 230px;
-    /* transition-delay убран для мгновенного отклика */
 }
 
 #wave-intensity-slider {
@@ -389,7 +382,6 @@ body {
     background: rgba(255, 255, 255, 0.35);
 }
 
-/* Ползунок в Chrome/Safari */
 #wave-intensity-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
@@ -405,7 +397,6 @@ body {
     transform: scale(1.4);
 }
 
-/* Ползунок в Firefox */
 #wave-intensity-slider::-moz-range-thumb {
     width: 10px;
     height: 10px;
@@ -419,8 +410,6 @@ body {
 #wave-intensity-slider::-moz-range-thumb:hover {
     transform: scale(1.4);
 }
-
-/* ========================================================================== */
 
 .settings-horizontal-line {
     position: absolute;
@@ -443,7 +432,6 @@ body {
     transition-delay: 0s; 
 }
 
-/* ИЗМЕНЕНО: Адаптивное удлинение линии (175px) срабатывает ИСКЛЮЧИТЕЛЬНО на кнопку музыки */
 .settings-container-box:hover .volume-btn:hover ~ .settings-horizontal-line,
 .settings-container-box:hover:has(.volume-btn:hover) .settings-horizontal-line {
     width: 175px;
@@ -483,7 +471,7 @@ body {
     100% { opacity: 0; filter: blur(15px); transform: rotate(-4deg) translateY(15px); }
 }
 
-body:has(.bottom-credits-wrapper:hover) .prompt-text.in-bottom-right {
+body:has(.bottom-credits:hover) .prompt-text.in-bottom-right {
     opacity: 0 !important;
     filter: blur(15px) !important;
     transition: opacity 0.5s ease, filter 0.5s ease;
@@ -563,6 +551,7 @@ body:has(.bottom-credits-wrapper:hover) .prompt-text.in-bottom-right {
     pointer-events: none;
     box-sizing: border-box;
     padding: 20px;
+    transition: transform 0.9s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .brand-block {
@@ -650,6 +639,7 @@ body:has(.bottom-credits-wrapper:hover) .prompt-text.in-bottom-right {
     letter-spacing: 1px;
     display: inline-block;
     white-space: nowrap;
+    pointer-events: auto; /* Разрешаем ховер для самого текста внутри обертки */
 }
 
 /* ==========================================================================
@@ -678,18 +668,19 @@ body:has(.bottom-credits-wrapper:hover) .prompt-text.in-bottom-right {
                 filter 0.8s ease-in-out;
 }
 
-body:has(.bottom-credits-wrapper:hover) .corner-icon {
+/* ИСПРАВЛЕНО: Ховер срабатывает на .bottom-credits, только если НЕТ класса .secret-active */
+body:has(.bottom-credits:hover:not(.secret-active)) .corner-icon {
     opacity: 0.95;
     transform: translateY(0) scale(1);
     filter: drop-shadow(0 0 35px rgba(255, 30, 30, 0.6));
 }
 
-body:has(.bottom-credits-wrapper:hover) .bg-blur-gerb {
+body:has(.bottom-credits:hover:not(.secret-active)) .bg-blur-gerb {
     opacity: 0.12; 
     transform: scale(1) rotate(0deg);
 }
 
-body:has(.bottom-credits-wrapper:hover) .brand-block {
+body:has(.bottom-credits:hover:not(.secret-active)) .brand-block {
     transform: translate(-40px, -30px); 
 }
 
@@ -761,4 +752,202 @@ body:has(.bottom-credits-wrapper:hover) .brand-block {
 
 @keyframes enablePointerEvents {
     to { pointer-events: auto; }
+}
+
+/* ==========================================================================
+   9. НОВАЯ ФИЧА: СТИЛИ СТРОКИ ВВОДА ПОД ЛОГОТИПОМ
+   ========================================================================== */
+.input-container-box {
+    margin-top: 35px;
+    position: relative;
+    width: 320px;
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(15px);
+    pointer-events: none;
+    transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1),
+                filter 0.8s cubic-bezier(0.25, 1, 0.5, 1),
+                transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.input-container-box.active {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0px);
+    pointer-events: auto;
+}
+
+.custom-input {
+    width: 100%;
+    box-sizing: border-box;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 10px 0;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #ffffff;
+    outline: none;
+    text-align: center; 
+}
+
+.custom-input::placeholder {
+    color: rgba(255, 255, 255, 0.4); 
+    font-weight: 400;
+    text-transform: none;
+    text-align: center; 
+    transition: opacity 0.3s ease;
+}
+
+.custom-input:focus::placeholder {
+    opacity: 0;
+}
+
+.input-underline {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #ffffff;
+    transform: scaleX(0);
+    transform-origin: center; 
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.custom-input:focus ~ .input-underline {
+    transform: scaleX(1);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* ==========================================================================
+   10. СИНХРОННЫЙ СДВИГ ИНТЕРФЕЙСА ВВЕРХ
+   ========================================================================== */
+body:has(.input-container-box.active) .main-container {
+    transform: translateY(-40px); 
+}
+
+/* ==========================================================================
+   11. БЛОКИРОВКА СЕКРЕТНОГО ХОВЕРА
+   ========================================================================== */
+/* Полностью отключаем любые CSS-эффекты наведения, когда включен секретный текст */
+#wave-text.secret-active,
+#wave-text.secret-active * {
+    pointer-events: none !important;
+}
+
+/* ==========================================================================
+   12. КНОПКА ОТПРАВКИ КОДА (ПРОЗРАЧНЫЙ ДИЗАЙН БЕЗ ПОДСВЕТКИ)
+   ========================================================================== */
+.input-submit-btn {
+    position: absolute;
+    right: -60px;
+    top: 50%;
+    /* Смещение, уменьшение, размытие и поворот для анимации */
+    transform: translateY(-50%) translateX(30px) scale(0.8) rotate(180deg); 
+    width: 40px;
+    height: 40px;
+    background: transparent; /* Полностью прозрачный фон */
+    border: 2px solid rgba(255, 255, 255, 1); /* Толщина 2px, как у линии */
+    border-radius: 8px;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    filter: blur(8px);
+    /* Никаких box-shadow и подсветки */
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity 0.4s ease,
+                filter 0.4s ease,
+                background-color 0.3s ease,
+                border-color 0.3s ease;
+}
+
+/* Эффект при наведении: только легкое проявление белого фона для отклика */
+.input-submit-btn:hover {
+    background: rgba(255, 255, 255, 0.08); 
+}
+
+.input-submit-btn svg {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.3s ease;
+}
+
+.input-submit-btn:hover svg {
+    transform: translateX(2px);
+}
+
+/* Класс активации: возвращаем кнопку в нормальное положение */
+.input-submit-btn.btn-active {
+    opacity: 1;
+    filter: blur(0px);
+    pointer-events: auto;
+    transform: translateY(-50%) translateX(0) scale(1) rotate(0deg);
+}
+
+/* ==========================================================================
+   13. СОСТОЯНИЯ КНОПКИ ПРОВЕРКИ И ОШИБКИ
+   ========================================================================== */
+/* По умолчанию показываем только стрелку */
+.input-submit-btn .icon-loading,
+.input-submit-btn .icon-error {
+    display: none;
+    position: absolute;
+}
+
+/* Красный текст при ошибке в инпуте */
+.custom-input.input-error-state {
+    color: #ff3333 !important;
+    text-shadow: 0 0 10px rgba(255, 51, 51, 0.3);
+}
+
+/* Состояние ЗАГРУЗКИ */
+.input-submit-btn.state-loading {
+    pointer-events: none !important;
+}
+.input-submit-btn.state-loading .icon-arrow { display: none; }
+.input-submit-btn.state-loading .icon-loading { 
+    display: block; 
+    animation: btnSpinner 1s linear infinite; 
+}
+
+/* Состояние ОШИБКИ: вибрирует ровно 0.3 секунды 1 раз */
+.input-submit-btn.state-error {
+    border-color: #ff3333;
+    color: #ff3333;
+    animation: btnVibrate 0.3s ease-in-out 1;
+}
+.input-submit-btn.state-error .icon-arrow { display: none; }
+.input-submit-btn.state-error .icon-error { display: block; }
+
+/* Анимация вращения спиннера */
+@keyframes btnSpinner {
+    100% { transform: rotate(360deg); }
+}
+
+/* Анимация вибрации крестика (укладывается ровно в 0.3 секунды) */
+@keyframes btnVibrate {
+    0%, 100% { transform: translateY(-50%) translateX(0); }
+    15% { transform: translateY(-50%) translateX(-4px) rotate(-4deg); }
+    30% { transform: translateY(-50%) translateX(4px) rotate(4deg); }
+    45% { transform: translateY(-50%) translateX(-3px) rotate(-2deg); }
+    60% { transform: translateY(-50%) translateX(3px) rotate(2deg); }
+    75% { transform: translateY(-50%) translateX(-1px) rotate(-1deg); }
+    90% { transform: translateY(-50%) translateX(1px) rotate(1deg); }
+}
+
+/* Плавное исчезновение интерфейса при успехе */
+.fade-out-element {
+    opacity: 0 !important;
+    filter: blur(15px) !important;
+    transform: translateY(-20px) !important;
+    pointer-events: none !important;
+    transition: opacity 0.8s ease, filter 0.8s ease, transform 0.8s cubic-bezier(0.25, 1, 0.5, 1) !important;
 }
