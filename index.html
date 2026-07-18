@@ -77,6 +77,30 @@
             </div>
         </div>
 
+        <div class="input-container-box">
+            <input type="text" class="custom-input" placeholder="ввести..." id="user-text-input">
+            <div class="input-underline"></div>
+<button class="input-submit-btn" id="submit-auth-btn">
+    <svg class="icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+        <polyline points="12 5 19 12 12 19"></polyline>
+    </svg>
+    <svg class="icon-loading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="2" x2="12" y2="6"></line>
+        <line x1="12" y1="18" x2="12" y2="22"></line>
+        <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+        <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+        <line x1="2" y1="12" x2="6" y2="12"></line>
+        <line x1="18" y1="12" x2="22" y2="12"></line>
+        <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+        <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+    </svg>
+    <svg class="icon-error" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+</button>        </div>
+
         <div class="bottom-credits-wrapper">
             <p class="bottom-credits" id="wave-text">проект Запорожской области</p>
         </div>
@@ -94,26 +118,87 @@
         const volumeStatusLabel = document.getElementById('volume-status-label');
         const intensitySlider = document.getElementById('wave-intensity-slider');
         const intensityValueLabel = document.getElementById('intensity-value');
+        const textInput = document.getElementById('user-text-input');
+        const inputContainer = document.querySelector('.input-container-box');
         
-        const text = textContainer.innerText;
-        textContainer.innerHTML = '';
-
+        let initialText = "проект Запорожской области";
         let isWaveTriggered = false;
         let isTextHovered = false; 
         let hasUserClicked = false; 
         let intensityPercent = 20;
+        let isClickAllowed = false;
+        let isSecretTextActive = false; 
+        let letters = [];
 
-        const letters = Array.from(text).map((char) => {
-            const span = document.createElement('span');
-            span.style.display = 'inline-block';
-            span.style.transition = 'color 0.3s ease, transform 0.3s ease';
-            if (char === ' ') {
-                span.innerHTML = '&nbsp;';
-            } else {
-                span.innerText = char;
-            }
-            textContainer.appendChild(span);
-            return span;
+        setTimeout(() => {
+            isClickAllowed = true;
+        }, 3000);
+
+        function buildWaveText(newText) {
+    textContainer.innerHTML = '';
+    letters = Array.from(newText).map((char) => {
+        const span = document.createElement('span');
+        span.style.display = 'inline-block';
+        span.style.transition = 'color 0.3s ease, transform 0.3s ease, opacity 0.5s ease, filter 0.5s ease';
+        
+        // ЕСЛИ мы переключаемся на секретный текст, создаем буквы ИЗНАЧАЛЬНО невидимыми
+        if (isSecretTextActive) {
+            span.style.opacity = '0';
+            span.style.filter = 'blur(6px)';
+            span.style.transform = 'translateY(10px)';
+        }
+
+        if (char === ' ') {
+            span.innerHTML = '&nbsp;';
+        } else {
+            span.innerText = char;
+        }
+        textContainer.appendChild(span);
+        return span;
+    });
+    
+    bindLettersHover();
+}
+
+        buildWaveText(initialText);
+
+        function bindLettersHover() {
+            letters.forEach((span, index) => {
+                span.addEventListener('mouseenter', (e) => {
+                    // ГРАНДИОЗНЫЙ БЛОК: если секретный текст активен, герб и иконка не появятся
+                    if (isSecretTextActive) {
+                        isTextHovered = false;
+                        return;
+                    }
+
+                    isTextHovered = true; 
+                    letters.forEach((otherSpan, otherIndex) => {
+                        const distance = Math.abs(index - otherIndex);
+                        const delay = distance * 0.04;
+                        
+                        otherSpan.style.transitionDelay = `${delay}s`;
+                        otherSpan.style.color = `rgba(255, 50, 50, ${Math.max(0.3, 1 - distance * 0.08)})`;
+                        otherSpan.style.transform = `translateY(${Math.max(-4, -6 + distance * 0.5)}px)`;
+                    });
+
+                    if (!isWaveTriggered) {
+                        isWaveTriggered = true;
+                        createBackgroundRipple(e.clientX, e.clientY, 'bg-wave-ripple');
+                    }
+                });
+            });
+        }
+
+        textContainer.addEventListener('mouseleave', () => {
+            if (isSecretTextActive) return;
+
+            isWaveTriggered = false;
+            isTextHovered = false; 
+            letters.forEach((span) => {
+                span.style.transitionDelay = '0s';
+                span.style.color = '#ffffff';
+                span.style.transform = 'translateY(0)';
+            });
         });
 
         function createBackgroundRipple(x, y, className, duration = 1500) {
@@ -133,15 +218,11 @@
         }, 1700);
 
         function spawnAmbientWave() {
-            // Если выкручено на 0%, волны не генерируются
             if (intensityPercent === 0) {
                 setTimeout(spawnAmbientWave, 1000);
                 return;
             }
-
-            let spawnX = 0;
-            let spawnY = 0;
-            
+            let spawnX = 0, spawnY = 0;
             const side = Math.floor(Math.random() * 4);
             switch(side) {
                 case 0: spawnX = Math.random() * window.innerWidth; spawnY = -50; break;
@@ -149,27 +230,19 @@
                 case 2: spawnX = Math.random() * window.innerWidth; spawnY = window.innerHeight + 50; break;
                 case 3: spawnX = -50; spawnY = Math.random() * window.innerHeight; break;
             }
-
             let currentClassName = 'bg-ambient-ripple';
             
-            if (isTextHovered) {
+            // Если мы уже ввели секретное состояние, амбиентные волны тоже защищаем от превращения в красно-зеленые
+            if (isTextHovered && !isSecretTextActive) {
                 currentClassName = Math.random() > 0.5 ? 'bg-ambient-red' : 'bg-ambient-green';
             }
-
             createBackgroundRipple(spawnX, spawnY, currentClassName, 3000);
-
-            // Тайминг зависит от интенсивности слайдера
-            const baseDelay = 500; 
-            const maxAdditionalDelay = 8000; 
+            const baseDelay = 500, maxAdditionalDelay = 8000; 
             const factor = (100 - intensityPercent) / 100;
-            const nextDelay = baseDelay + (Math.random() * maxAdditionalDelay * factor);
-            
-            setTimeout(spawnAmbientWave, nextDelay);
+            setTimeout(spawnAmbientWave, baseDelay + (Math.random() * maxAdditionalDelay * factor));
         }
 
-        setTimeout(() => {
-            spawnAmbientWave();
-        }, 3500);
+        setTimeout(() => { spawnAmbientWave(); }, 3500);
 
         const audioPath = 'audio/melody_start.mp3'; 
         const bgMusic = new Audio(audioPath);
@@ -178,73 +251,88 @@
 
         function playMusic() {
             if (musicStarted || bgMusic.muted) return;
-            bgMusic.play().then(() => {
-                musicStarted = true;
-            }).catch(err => {
-                console.log("Автозапуск ожидает взаимодействия с экраном.");
-            });
+            bgMusic.play().then(() => { musicStarted = true; }).catch(err => {});
         }
 
         bgMusic.addEventListener('ended', () => {
-            setTimeout(() => {
-                if (!bgMusic.muted) bgMusic.play();
-            }, 5000); 
+            setTimeout(() => { if (!bgMusic.muted) bgMusic.play(); }, 5000); 
         });
 
         function showClickPrompt() {
             if (hasUserClicked) return; 
-
             const corners = [
                 { top: '60px', left: '60px', bottom: 'auto', right: 'auto' },     
                 { bottom: '120px', left: '60px', top: 'auto', right: 'auto' },    
                 { bottom: '150px', right: '60px', top: 'auto', left: 'auto' }      
             ];
-
             const randomIndex = Math.floor(Math.random() * corners.length);
             const chosenCorner = corners[randomIndex];
-
             promptElement.style.top = chosenCorner.top;
             promptElement.style.bottom = chosenCorner.bottom;
             promptElement.style.left = chosenCorner.left;
             promptElement.style.right = chosenCorner.right;
-
-            if (randomIndex === 2) {
-                promptElement.classList.add('in-bottom-right');
-            } else {
-                promptElement.classList.remove('in-bottom-right');
-            }
-
+            if (randomIndex === 2) promptElement.classList.add('in-bottom-right');
+            else promptElement.classList.remove('in-bottom-right');
             promptElement.classList.add('animate-prompt');
         }
 
-        setTimeout(() => {
-            if (!hasUserClicked) {
-                showClickPrompt();
-            }
-        }, 4500); 
+        setTimeout(() => { if (!hasUserClicked) showClickPrompt(); }, 4500); 
+
+        textInput.addEventListener('mousedown', (e) => { e.stopPropagation(); });
+        textInput.addEventListener('keydown', (e) => { e.stopPropagation(); });
 
         document.body.addEventListener('mousedown', (e) => {
+            if (!isClickAllowed) return;
             if (e.target.closest('#settings-btn') || e.target.closest('.settings-trigger-zone')) return;
 
             if (!hasUserClicked) {
                 hasUserClicked = true;
-
                 const computedStyle = window.getComputedStyle(promptElement);
                 promptElement.style.opacity = computedStyle.opacity;
                 promptElement.style.filter = computedStyle.filter;
                 promptElement.style.transform = computedStyle.transform;
-
                 promptElement.classList.remove('animate-prompt');
                 void promptElement.offsetWidth;
-
                 promptElement.style.transition = 'opacity 2.5s ease-in-out, filter 2.5s ease-in-out, transform 2.5s ease-in-out';
                 promptElement.style.opacity = '0';
                 promptElement.style.filter = 'blur(15px)';
                 promptElement.style.transform = 'rotate(-4deg) translateY(15px)';
+                setTimeout(() => { promptElement.style.display = 'none'; }, 2500);
+            }
 
-                setTimeout(() => {
-                    promptElement.style.display = 'none';
-                }, 2500);
+            if (inputContainer && !inputContainer.classList.contains('active')) {
+                if (!e.target.closest('.bottom-credits-wrapper')) {
+                    inputContainer.classList.add('active');
+                    
+                    isSecretTextActive = true; 
+                    // Добавляем класс-заглушку на сам текстовый блок, чтобы CSS-ховеры герба тоже отключились
+                    textContainer.classList.add('secret-active');
+
+                    letters.forEach((span, i) => {
+                        setTimeout(() => {
+                            span.style.opacity = '0';
+                            span.style.filter = 'blur(6px)';
+                            span.style.transform = `translateY(${Math.random() > 0.5 ? -10 : 10}px)`;
+                        }, i * 20); 
+                    });
+
+                    setTimeout(() => {
+                        buildWaveText("введите код доступа к сессии");
+                        
+                        // Буквы уже созданы невидимыми, теперь просто плавно включаем их по очереди:
+                        letters.forEach((span, i) => {
+                            setTimeout(() => {
+                                span.style.opacity = '1';
+                                span.style.filter = 'blur(0px)';
+                                span.style.transform = 'translateY(0px)';
+                            }, i * 20);
+                        });
+                    }, 600);
+
+                    if (textInput) {
+                        setTimeout(() => textInput.focus(), 100);
+                    }
+                }
             }
 
             playMusic();
@@ -259,69 +347,135 @@
             e.stopPropagation(); 
             isMuted = !isMuted;
             bgMusic.muted = isMuted;
-
             if (isMuted) {
                 volumeStatusLabel.classList.add('muted-mode');
-                volumeIcon.innerHTML = `
-                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                    <line x1="23" y1="9" x2="17" y2="15" stroke-width="1.5"></line>
-                    <line x1="17" y1="9" x2="23" y2="15" stroke-width="1.5"></line>
-                `;
+                volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15" stroke-width="1.5"></line><line x1="17" y1="9" x2="23" y2="15" stroke-width="1.5"></line>`;
             } else {
                 volumeStatusLabel.classList.remove('muted-mode');
-                volumeIcon.innerHTML = `
-                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                    <path class="volume-wave-1" d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-                    <path class="volume-wave-2" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                `;
+                volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path class="volume-wave-1" d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path class="volume-wave-2" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>`;
                 playMusic();
             }
         });
 
-        // Слушатель для ползунка интенсивности волн
-        intensitySlider.addEventListener('mousedown', (e) => {
-            e.stopPropagation();
-        });
-
+        intensitySlider.addEventListener('mousedown', (e) => { e.stopPropagation(); });
         intensitySlider.addEventListener('input', (e) => {
             intensityPercent = parseInt(e.target.value);
             intensityValueLabel.innerText = `${intensityPercent}%`;
         });
+        document.querySelector('.settings-icon-box').addEventListener('click', (e) => { e.stopPropagation(); });
 
-        document.querySelector('.settings-icon-box').addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
+        const submitBtn = document.getElementById('submit-auth-btn');
+// На всякий случай убедись, что переменная для инпута объявлена правильным именем (textInput или как у тебя в коде)
+const myInput = document.getElementById('user-text-input'); 
 
-        letters.forEach((span, index) => {
-            span.addEventListener('mouseenter', (e) => {
-                isTextHovered = true; 
+// Состояние, чтобы знать, была ли уже совершена проверка с ошибкой
+let livesInErrorState = false;
 
-                letters.forEach((otherSpan, otherIndex) => {
-                    const distance = Math.abs(index - otherIndex);
-                    const delay = distance * 0.04;
-                    
-                    otherSpan.style.transitionDelay = `${delay}s`;
-                    otherSpan.style.color = `rgba(255, 50, 50, ${Math.max(0.3, 1 - distance * 0.08)})`;
-                    otherSpan.style.transform = `translateY(${Math.max(-4, -6 + distance * 0.5)}px)`;
+// 1. Отслеживание ввода текста и сброс ошибок
+myInput.addEventListener('input', () => {
+    const textLength = myInput.value.trim().length;
+
+    // Управление вылетом кнопки (как и раньше)
+    if (textLength > 0) {
+        submitBtn.classList.add('btn-active');
+    } else {
+        submitBtn.classList.remove('btn-active');
+    }
+
+    // Если пользователь удалил хотя бы один символ во время ошибки
+    if (livesInErrorState) {
+        livesInErrorState = false;
+        myInput.classList.remove('input-error-state'); // Возвращаем белый цвет текста
+        submitBtn.classList.remove('state-error');     // Возвращаем стрелку
+    }
+});
+
+// 2. Логика проверки по клику на кнопку
+submitBtn.addEventListener('click', () => {
+    // Защита: если кнопка уже в режиме загрузки или ошибки — клик не работает
+    if (submitBtn.classList.contains('state-loading') || submitBtn.classList.contains('state-error')) {
+        return;
+    }
+
+    const password = myInput.value.trim();
+
+    // Включаем режим загрузки
+    submitBtn.classList.add('state-loading');
+
+    // Имитируем "проверку" длительностью 1 секунду (чтобы спиннер успел покрутиться)
+    setTimeout(() => {
+        // Выключаем загрузку
+        submitBtn.classList.remove('state-loading');
+
+      if (password === "489634") {
+    // --- ИСХОД УСПЕХА ---
+    setTimeout(() => {
+        // 1. Прячем старый интерфейс
+        const mainContainer = document.querySelector('.main-container');
+        const cornerWrapper = document.querySelector('.corner-icon-floating-wrapper');
+        const promptText = document.querySelector('.prompt-text');
+
+        if (mainContainer) mainContainer.classList.add('fade-out-element');
+        if (cornerWrapper) cornerWrapper.classList.add('fade-out-element');
+        if (promptText) promptText.classList.add('fade-out-element');
+        
+        // 2. Загружаем и вставляем HTML вместе с его внутренним скриптом
+        setTimeout(() => {
+            
+            // Вот она — магия одной строки загрузки:
+            loadExternalFramework('./dashboard.html'); 
+            
+        }, 600);
+    }, 500);
+
+        } else {
+            // --- ИСХОД ОШИБКИ ---
+            setTimeout(() => {
+                livesInErrorState = true;
+                myInput.classList.add('input-error-state'); // Текст становится красным
+                submitBtn.classList.add('state-error');       // Кнопка вибрирует с крестиком
+            }, 500); // Задержка 0.5 сек по условию
+        }
+
+    }, 1000); // Время вращения загрузки (1 секунда). Можно поменять на 600 или любое другое.
+});
+
+// Защита от ripples при клике по кнопке
+submitBtn.addEventListener('mousedown', (e) => {
+    e.stopPropagation();
+});
+
+function loadExternalFramework(url) {
+    // 1. Подключаем стили
+    if (!document.querySelector('link[href*="dashboard.css"]')) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = './dashboard.css';
+        document.head.appendChild(link);
+    }
+
+    // 2. Загружаем HTML
+    fetch(url)
+        .then(response => response.text())
+        .then(htmlText => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlText, 'text/html');
+            const dashboard = doc.querySelector('.session-dashboard');
+
+            if (dashboard) {
+                // Добавляем сам HTML-каркас
+                document.body.appendChild(dashboard);
+
+                // Принудительно запускаем анимацию появления прямо отсюда
+                requestAnimationFrame(() => {
+                    setTimeout(() => {
+                        dashboard.classList.add('show-framework');
+                    }, 50);
                 });
-
-                if (!isWaveTriggered) {
-                    isWaveTriggered = true;
-                    createBackgroundRipple(e.clientX, e.clientY, 'bg-wave-ripple');
-                }
-            });
-        });
-
-        textContainer.addEventListener('mouseleave', () => {
-            isWaveTriggered = false;
-            isTextHovered = false; 
-
-            letters.forEach((span) => {
-                span.style.transitionDelay = '0s';
-                span.style.color = '#ffffff';
-                span.style.transform = 'translateY(0)';
-            });
-        });
+            }
+        })
+        .catch(err => console.error("Ошибка загрузки фреймворка:", err));
+}
     </script>
 </body>
 </html>
