@@ -33,7 +33,7 @@ body {
     pointer-events: none; 
     z-index: 1;
     animation: fadeInShadow 1.5s ease-out forwards, 
-               breathe 8s ease-in-out 1.5s infinite; 
+                breathe 8s ease-in-out 1.5s infinite; 
 }
 
 .bg-blur-gerb {
@@ -61,7 +61,7 @@ body {
 }
 
 /* ==========================================================================
-   3. СТИЛИ ВСПЛЫВАЮЩЕЙ КАПСУЛЫ НАСТРОЕК И ТЕКСТОВЫХ БИРОК
+   3. СТИЛИ ВСПЛЫВАЮЩЕЙ КАПСУЛЫ НАСТРОЕК
    ========================================================================== */
 .settings-trigger-zone {
     position: fixed;
@@ -94,8 +94,9 @@ body {
                 box-shadow 0.4s ease;
 }
 
+/* Увеличена высота с 124px до 210px, чтобы поместился новый слайдер */
 .settings-container-box:hover {
-    height: 124px; 
+    height: 210px; 
     border-color: rgba(255, 255, 255, 0.35);
     background-color: rgba(255, 255, 255, 0.08);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
@@ -111,11 +112,9 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    /* Теперь за вращение на ховер отвечает этот промежуточный блок */
     transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* При наведении крутим контейнер иконки, в котором лежит шестеренка */
 .settings-container-box:hover .settings-icon-box,
 .settings-icon-box:hover {
     transform: rotate(90deg);
@@ -125,15 +124,12 @@ body {
     width: 24px;
     height: 24px;
     color: #ffffff;
-    opacity: 0; 
+    opacity: 0.5; 
     transform-origin: center; 
-    /* Убираем отсюда transform transition, чтобы не ломать анимацию въезда */
     transition: opacity 0.4s ease;
-    /* Стартовая анимация эффектного въезда */
     animation: gearIntroSpin 2.2s cubic-bezier(0.25, 1, 0.5, 1) 2.7s forwards;
 }
 
-/* При наведении шестеренка просто плавно загорается на полную яркость */
 .settings-container-box:hover .gear-svg,
 .settings-icon-box:hover .gear-svg {
     opacity: 1 !important;
@@ -191,7 +187,6 @@ body {
     transition-delay: 0.5s;
 }
 
-/* Бирка зафиксирована по высоте и не вращается вместе с иконкой */
 .settings-label {
     font-family: 'Montserrat', sans-serif;
     font-size: 14px;
@@ -263,43 +258,168 @@ body {
     opacity: 1;
 }
 
-/* --------------------------------------------------------------------------
-   НОВЫЙ ЭЛЕМЕНТ: КРАСНЫЙ РАЗДЕЛИТЕЛЬ С ЭФФЕКТОМ СПРАВА НАЛЕВО
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   НОВЫЕ СТИЛИ: Управление интенсивностью эффектов
+   ========================================================================== */
+.intensity-control-box {
+    width: 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0;
+    transform: translateY(-10px) scale(0);
+    pointer-events: none;
+    visibility: hidden;
+    transition: opacity 0.4s ease 0s, 
+                transform 0.4s ease 0s, 
+                visibility 0.4s ease 0s;
+}
+
+.settings-container-box:hover .intensity-control-box {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+    visibility: visible;
+    transition-delay: 0.55s; /* Появляется на долю секунды позже звука для плавного каскада */
+}
+
+.intensity-btn {
+    position: relative;
+    width: 48px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.intensity-svg {
+    width: 24px;
+    height: 24px;
+    color: #ffffff;
+    opacity: 0.5;
+    transition: opacity 0.4s ease, transform 0.3s ease;
+}
+
+.intensity-control-box:hover .intensity-svg {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.intensity-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    position: absolute;
+    right: 64px;
+    top: 50%;
+    transform: translateY(-50%) translateX(15px);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    filter: blur(12px);
+    transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+                filter 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+                transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.intensity-control-box:hover .intensity-label {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(-50%) translateX(0px);
+}
+
+.slider-wrapper {
+    width: 48px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+#wave-intensity-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 50px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    outline: none;
+    transform: rotate(-90deg); /* Разворачиваем ползунок вертикально */
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+#wave-intensity-slider:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+/* Ползунок в Chrome/Safari */
+#wave-intensity-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+#wave-intensity-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.4);
+}
+
+/* Ползунок в Firefox */
+#wave-intensity-slider::-moz-range-thumb {
+    width: 10px;
+    height: 10px;
+    border: none;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+#wave-intensity-slider::-moz-range-thumb:hover {
+    transform: scale(1.4);
+}
+
+/* ========================================================================== */
+
 .settings-horizontal-line {
     position: absolute;
     right: 64px; 
     top: 48px; 
-    /* Шаг 1: Базовая длина под "НАСТРОЙКИ" (оставляем 120px) */
     width: 120px; 
     height: 1px;
     background-color: #ffffff;
     transform-origin: right;
-    /* Изначально линия скрыта */
     transform: scaleX(0);
     opacity: 0;
-    /* Плавное изменение длины (width) и появление */
     transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1) 0s,
                 width 0.4s cubic-bezier(0.25, 1, 0.5, 1) 0s,
                 opacity 0.4s ease 0s;
 }
 
-/* Навели на шестерёнку — вылетает базовая линия 120px */
 .settings-container-box:hover .settings-horizontal-line {
     transform: scaleX(1);
     opacity: 1;
     transition-delay: 0s; 
 }
 
-/* Шаг 2: Навели на музыку — линия удлиняется до новой аккуратной длины */
+/* Адаптивное удлинение линии подписи при наведении на громкость */
 .settings-container-box:hover .volume-btn:hover ~ .settings-horizontal-line,
 .settings-container-box:hover:has(.volume-btn:hover) .settings-horizontal-line {
-    /* Уменьшили финальную длину на ~1 см (было 215px) */
     width: 175px;
 }
 
 /* ==========================================================================
-   4. СТИЛИ ТУМАННОЙ ПОДСКАЗКИ "НАЖМИТЕ НА ЭКРАН"
+   4. СТИЛИ ПОДСКАЗКИ "НАЖМИТЕ НА ЭКРАН"
    ========================================================================== */
 .prompt-text {
     position: fixed;
@@ -455,7 +575,7 @@ body:has(.bottom-credits-wrapper:hover) .prompt-text.in-bottom-right {
     opacity: 0;
     transform: translateY(40px);
     animation: letterGlitchIn 0.5s linear forwards, 
-               letterFlyUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+                letterFlyUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 .main-title span:nth-child(1) { animation-delay: 1.0s, 1.0s; }
@@ -602,14 +722,12 @@ body:has(.bottom-credits-wrapper:hover) .brand-block {
     100% { width: 1800px; height: 1800px; opacity: 0; }
 }
 
-/* Стартовая анимация крутит шестеренку на 360deg, но не блокирует дальнейший transform ховера */
 @keyframes gearIntroSpin {
     0% { transform: rotate(0deg); opacity: 0; }
     50% { opacity: 0.5; }
     100% { transform: rotate(360deg); opacity: 0.5; }
 }
 
-/* Включение обработки событий мыши */
 @keyframes enablePointerEvents {
     to { pointer-events: auto; }
 }
