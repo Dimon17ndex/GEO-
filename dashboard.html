@@ -1,0 +1,36 @@
+<div class="session-dashboard" id="session-dashboard">
+    <div class="dashboard-sidebar">
+        <div class="sidebar-logo">Сессия настроена</div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active">Главная</a>
+            <a href="#" class="nav-item">Данные проекта</a>
+            <a href="#" class="nav-item">Безопасность</a>
+        </nav>
+    </div>
+    <div class="dashboard-content">
+        <header class="content-header">
+            <h2>Система управления: Запорожская область</h2>
+            <div class="status-indicator">Online</div>
+        </header>
+        <div class="content-body">
+            <div class="data-card">
+                <h3>Статус авторизации</h3>
+                <p>Доступ успешно верифицирован. Защищенный рабочий сеанс запущен в штатном режиме. Все модули криптографии активны.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const dashboard = document.getElementById('session-dashboard');
+        if (dashboard) {
+            // Запускаем плавное проявление встроенным скриптом
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    dashboard.classList.add('show-framework');
+                }, 50);
+            });
+        }
+    })();
+</script>
