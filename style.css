@@ -344,7 +344,7 @@ body {
 #wave-intensity-slider {
     -webkit-appearance: none;
     appearance: none;
-    width: 65px;          /* Будущая высота ползунка после разворота */
+    width: 65px;          
     height: 3px;
     background: rgba(255, 255, 255, 0.2);
     border-radius: 2px;
@@ -352,7 +352,10 @@ body {
     cursor: pointer;
     transition: background 0.3s ease;
     
-    /* Идеальное позиционирование по центру перед поворотом */
+    /* ФИКС ЦЕНТРИРОВАНИЯ: сбрасываем дефолтные отступы браузера */
+    margin: 0;
+    padding: 0;
+    
     position: absolute;
     top: 50%;
     left: 50%;
