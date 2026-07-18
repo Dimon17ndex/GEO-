@@ -95,11 +95,11 @@ body {
 }
 
 .settings-container-box:hover {
-    height: 230px; /* Слегка увеличили общую высоту капсулы для свободного размещения */
+    height: 150px; /* Изначально увеличиваем только под иконки, без учета ползунка */
     border-color: rgba(255, 255, 255, 0.35);
     background-color: rgba(255, 255, 255, 0.08);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    transition-delay: 0.5s, 0s, 0s, 0s;
+    transition-delay: 0s, 0s, 0s, 0s;
 }
 
 .settings-icon-box {
@@ -258,7 +258,7 @@ body {
 }
 
 /* ==========================================================================
-   НОВЫЕ СТИЛИ: Управление интенсивностью эффектов (ФИКС ОРИЕНТАЦИИ И КОНТЕЙНЕРА)
+   НОВЫЕ СТИЛИ: Управление интенсивностью эффектов (ПОЯВЛЕНИЕ ПОЛЗУНКА НА ХОВЕР)
    ========================================================================== */
 .intensity-control-box {
     width: 48px;
@@ -269,6 +269,7 @@ body {
     transform: translateY(-10px) scale(0);
     pointer-events: none;
     visibility: hidden;
+    /* Анимация появления самой кнопки "солнышка" при раскрытии капсулы */
     transition: opacity 0.4s ease 0s, 
                 transform 0.4s ease 0s, 
                 visibility 0.4s ease 0s;
@@ -331,14 +332,39 @@ body {
     transform: translateY(-50%) translateX(0px);
 }
 
+/* --- Ползунок скрыт по умолчанию --- */
 .slider-wrapper {
     width: 48px;
-    height: 80px;         /* Зафиксировали вертикальную высоту, спасая солнце от сжатия */
+    height: 0px;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
-    margin-top: 5px;      /* Отодвигаем физический трек от иконки */
+    margin-top: 0px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    /* Убрали задержку (0s в конце), анимация начнется мгновенно */
+    transition: opacity 0.4s ease 0s, 
+                height 0.4s cubic-bezier(0.25, 1, 0.5, 1) 0s,
+                margin-top 0.4s ease 0s,
+                visibility 0.4s ease 0s;
+}
+
+/* Ползунок мгновенно реагирует на наведение на блок интенсивности */
+.intensity-control-box:hover .slider-wrapper {
+    height: 80px;
+    margin-top: 5px;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    /* transition-delay больше нет */
+}
+
+/* Контейнер мгновенно удлиняется под ползунок без задержки */
+.settings-container-box:hover:has(.intensity-control-box:hover) {
+    height: 230px;
+    /* transition-delay убран для мгновенного отклика */
 }
 
 #wave-intensity-slider {
@@ -351,11 +377,8 @@ body {
     outline: none;
     cursor: pointer;
     transition: background 0.3s ease;
-    
-    /* ФИКС ЦЕНТРИРОВАНИЯ: сбрасываем дефолтные отступы браузера */
     margin: 0;
     padding: 0;
-    
     position: absolute;
     top: 50%;
     left: 50%;
