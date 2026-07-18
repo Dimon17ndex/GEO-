@@ -94,9 +94,8 @@ body {
                 box-shadow 0.4s ease;
 }
 
-/* Увеличена высота с 124px до 210px, чтобы поместился новый слайдер */
 .settings-container-box:hover {
-    height: 210px; 
+    height: 230px; /* Слегка увеличили общую высоту капсулы для свободного размещения */
     border-color: rgba(255, 255, 255, 0.35);
     background-color: rgba(255, 255, 255, 0.08);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
@@ -259,7 +258,7 @@ body {
 }
 
 /* ==========================================================================
-   НОВЫЕ СТИЛИ: Управление интенсивностью эффектов
+   НОВЫЕ СТИЛИ: Управление интенсивностью эффектов (ФИКС ОРИЕНТАЦИИ И КОНТЕЙНЕРА)
    ========================================================================== */
 .intensity-control-box {
     width: 48px;
@@ -280,7 +279,7 @@ body {
     transform: translateY(0) scale(1);
     pointer-events: auto;
     visibility: visible;
-    transition-delay: 0.55s; /* Появляется на долю секунды позже звука для плавного каскада */
+    transition-delay: 0.55s;
 }
 
 .intensity-btn {
@@ -334,24 +333,30 @@ body {
 
 .slider-wrapper {
     width: 48px;
-    height: 60px;
+    height: 80px;         /* Зафиксировали вертикальную высоту, спасая солнце от сжатия */
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
+    margin-top: 5px;      /* Отодвигаем физический трек от иконки */
 }
 
 #wave-intensity-slider {
     -webkit-appearance: none;
     appearance: none;
-    width: 50px;
+    width: 65px;          /* Будущая высота ползунка после разворота */
     height: 3px;
     background: rgba(255, 255, 255, 0.2);
     border-radius: 2px;
     outline: none;
-    transform: rotate(-90deg); /* Разворачиваем ползунок вертикально */
     cursor: pointer;
     transition: background 0.3s ease;
+    
+    /* Идеальное позиционирование по центру перед поворотом */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-90deg); 
 }
 
 #wave-intensity-slider:hover {
@@ -412,7 +417,7 @@ body {
     transition-delay: 0s; 
 }
 
-/* Адаптивное удлинение линии подписи при наведении на громкость */
+/* ИЗМЕНЕНО: Адаптивное удлинение линии (175px) срабатывает ИСКЛЮЧИТЕЛЬНО на кнопку музыки */
 .settings-container-box:hover .volume-btn:hover ~ .settings-horizontal-line,
 .settings-container-box:hover:has(.volume-btn:hover) .settings-horizontal-line {
     width: 175px;
