@@ -1,190 +1,204 @@
 /* ==========================================================================
-   ФРЕЙМВОРК СЕССИИ (DASHBOARD FRAMEWORK)
+   ГЛАВНЫЙ КОНТЕЙНЕР ФРЕЙМА (ЦЕНТРИРУЕТ ВСЁ САМ)
    ========================================================================== */
 .session-dashboard {
-    position: absolute;
-    
-    /* Идеальное центрирование карточки на экране */
-    top: 50%;
-    left: 50%;
-    
-    /* Фиксированные размеры центрального окна фреймворка */
-    width: 900px;
-    height: 550px;
-    
-    /* Начальное смещение и уменьшение для сочного эффекта вылета */
-    transform: translate(-50%, -45%) scale(0.95);
-    
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
     z-index: 100;
-    display: flex; /* Основной контейнер делит окно на левую и правую часть */
-    color: #ffffff;
-    font-family: 'Montserrat', 'Segoe UI', sans-serif;
-    
-    /* Форма карточки */
-    border-radius: 20px;
+    pointer-events: none;
     overflow: hidden;
     
-    /* Внешние эффекты: тонкий неоновый контур и глубокая тень */
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     
-    /* Начальное состояние для плавной анимации */
-    opacity: 0;
-    filter: blur(15px);
-    pointer-events: none;
-    
-    /* Настройка плавности появления */
-    transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1),
-                filter 0.8s cubic-bezier(0.25, 1, 0.5, 1),
-                transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
-/* Класс активации: возвращает карточку в центр и оригинальный масштаб */
-.session-dashboard.show-framework {
+/* ==========================================================================
+   ЗЕЛЕНАЯ ВОЛНА СНИЗУ ФРЕЙМА
+   ========================================================================== */
+.session-dashboard::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    transform: translate(-50%, 50%) scale(1);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 255, 110, 0.45) 0%, rgba(0, 255, 0, 0) 70%);
+    pointer-events: none;
+    opacity: 0;
+    z-index: 1;
+}
+
+.session-dashboard.show-framework::before {
+    animation: fullscreenGreenBlast 1.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes fullscreenGreenBlast {
+    0% { transform: translate(-50%, 50%) scale(1); opacity: 0; }
+    10% { opacity: 1; }
+    100% { transform: translate(-50%, 50%) scale(250); opacity: 0; }
+}
+
+/* ==========================================================================
+   ОБЕРТКА КОНТЕНТА
+   ========================================================================== */
+.dashboard-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 35px;
+    width: 100%;
+    max-width: 800px;
+    z-index: 2;
+}
+
+/* ==========================================================================
+   БРЕНД-БЛОК ВНУТРИ ФРЕЙМА (ПЛАВНОЕ ПОЯВЛЕНИЕ)
+   ========================================================================== */
+.db-brand-block {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(-10px);
+    transition: opacity 0.6s ease-out, filter 0.8s ease-out, transform 0.6s ease-out;
+}
+
+.session-dashboard.show-framework .db-brand-block {
     opacity: 1;
     filter: blur(0px);
-    transform: translate(-50%, -50%) scale(1);
-    pointer-events: auto;
+    transform: translateY(0);
+    transition-delay: 0.3s;
 }
 
-/* Левая панель (Сайдбар) */
-.dashboard-sidebar {
-    width: 280px;
-    background: rgba(10, 12, 18, 0.6);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 40px 24px;
+.db-logo-icon {
+    width: 65px;  
+    height: 65px;
+    object-fit: contain;
+}
+
+.db-text-right {
     display: flex;
     flex-direction: column;
-    gap: 35px;
-    box-sizing: border-box; /* Защита от раздувания ширины из-за padding */
+    align-items: flex-start;
+    gap: 4px;
 }
 
-.sidebar-logo {
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    color: #00ffcc;
-    text-transform: uppercase;
-    text-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+.db-main-title {
     font-family: 'Unbounded', sans-serif;
-}
-
-.sidebar-nav {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.nav-item {
-    display: block;
-    color: rgba(255, 255, 255, 0.6);
-    text-decoration: none;
-    padding: 12px 16px;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    border: 1px solid transparent;
-}
-
-.nav-item:hover {
+    font-size: 32px; 
+    font-weight: 900;
     color: #ffffff;
-    background: rgba(255, 255, 255, 0.05);
+    margin: 0;
+    line-height: 1;
+    letter-spacing: 1px;
 }
 
-.nav-item.active {
-    color: #ffffff;
+.db-subtitle-badge {
     background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 4px 12px;
+    border-radius: 50px;
 }
 
-/* Правая область (Основной контент карточки) */
-.dashboard-content {
-    flex: 1; /* Автоматически занимает всё оставшееся пространство */
-    background: rgba(5, 7, 12, 0.25);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-    padding: 40px;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    box-sizing: border-box;
-    overflow-y: auto; /* Внутренний вертикальный скролл, если контент не влезет */
-}
-
-/* Шапка контента */
-.content-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    padding-bottom: 20px;
-}
-
-.content-header h2 {
-    font-size: 22px;
-    font-weight: 400;
-    margin: 0;
-    letter-spacing: 0.5px;
-}
-
-/* Индикатор Online */
-.status-indicator {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(0, 255, 204, 0.1);
-    color: #00ffcc;
-    padding: 6px 16px;
-    border-radius: 30px;
-    border: 1px solid rgba(0, 255, 204, 0.3);
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
-
-.status-indicator::before {
-    content: '';
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    background: #00ffcc;
-    border-radius: 50%;
-    box-shadow: 0 0 8px #00ffcc;
-}
-
-/* Сетка для внутренних карточек данных */
-.content-body {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-/* Информационная карточка внутри фреймворка */
-.data-card {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 30px;
-    border-radius: 16px;
-    flex: 1;
-    min-width: 280px;
-    max-width: 100%;
-    backdrop-filter: blur(10px);
-    box-sizing: border-box;
-}
-
-.data-card h3 {
-    margin: 0 0 12px 0;
-    font-size: 18px;
+.db-subtitle-badge span {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px; 
     font-weight: 500;
-    color: rgba(255, 255, 255, 0.9);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: rgba(255, 255, 255, 0.8);
 }
 
-.data-card p {
-    margin: 0;
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.5);
-    line-height: 1.6;
+/* ==========================================================================
+   ПОБУКВЕННАЯ СБОРКА ТЕКСТА
+   ========================================================================== */
+.success-message {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    width: 100%;
+    
+    /* Отказываемся от flex, чтобы текстовые переносы строк в HTML не ломали анимацию спанов */
+    display: block;
+}
+
+/* Базовое состояние каждой буквы ДО старта анимации */
+.success-message span {
+    display: inline-block;
+    opacity: 0;
+    filter: blur(8px);
+    transform: scale(1.4) translateY(-10px);
+    text-shadow: 0 0 10px rgba(0, 255, 110, 0.8);
+    
+    /* Переносим параметры анимации в базовый класс, подготавливая их для браузера заранее */
+    animation-duration: 0.5s;
+    animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation-fill-mode: forwards;
+}
+
+/* Активация триггера анимации при добавлении класса фрейму */
+.session-dashboard.show-framework .success-message span {
+    animation-name: assembleLetter;
+}
+
+/* Чистый от битых пробелов тайминг на базе :nth-of-type */
+.session-dashboard.show-framework .success-message span:nth-of-type(1)  { animation-delay: 0.40s; }
+.session-dashboard.show-framework .success-message span:nth-of-type(2)  { animation-delay: 0.44s; }
+.session-dashboard.show-framework .success-message span:nth-of-type(3)  { animation-delay: 0.48s; }
+.session-dashboard.show-framework .success-message span:nth-of-type(4)  { animation-delay: 0.52s; }
+.session-dashboard.show-framework .success-message span:nth-of-type(5)  { animation-delay: 0.56s; }
+.session-dashboard.show-framework .success-message span:nth-of-type(6)  { animation-delay: 0.60s; }
+.session-dashboard.show-framework .success-message span:nth-of-type(7)  { animation-delay: 0.64s; }
+.session-dashboard.show-framework .success-message span:nth-of-type(8)  { animation-delay: 0.68s; }
+.session-dashboard.show-framework .success-message span:nth-of-type(9)  { animation-delay: 0.72s; }
+.session-dashboard.show-framework .success-message span:nth-of-type(10) { animation-delay: 0.76s; }
+.session-dashboard.show-framework .success-message span:nth-of-type(11) { animation-delay: 0.80s; }
+.session-dashboard.show-framework .success-message span:nth-of-type(12) { animation-delay: 0.84s; }
+.session-dashboard.show-framework .success-message span:nth-of-type(13) { animation-delay: 0.88s; }
+.session-dashboard.show-framework .success-message span:nth-of-type(14) { animation-delay: 0.92s; }
+.session-dashboard.show-framework .success-message span:nth-of-type(15) { animation-delay: 0.96s; }
+.session-dashboard.show-framework .success-message span:nth-of-type(16) { animation-delay: 1.00s; }
+.session-dashboard.show-framework .success-message span:nth-of-type(17) { animation-delay: 1.04s; }
+.session-dashboard.show-framework .success-message span:nth-of-type(18) { animation-delay: 1.08s; }
+.session-dashboard.show-framework .success-message span:nth-of-type(19) { animation-delay: 1.12s; }
+.session-dashboard.show-framework .success-message span:nth-of-type(20) { animation-delay: 1.16s; }
+.session-dashboard.show-framework .success-message span:nth-of-type(21) { animation-delay: 1.20s; }
+.session-dashboard.show-framework .success-message span:nth-of-type(22) { animation-delay: 1.24s; }
+.session-dashboard.show-framework .success-message span:nth-of-type(23) { animation-delay: 1.28s; }
+.session-dashboard.show-framework .success-message span:nth-of-type(24) { animation-delay: 1.32s; }
+
+/* Ключевые кадры эффекта сборки */
+@keyframes assembleLetter {
+    0% {
+        opacity: 0;
+        filter: blur(8px);
+        transform: scale(1.4) translateY(-10px);
+        text-shadow: 0 0 20px rgba(0, 255, 110, 1);
+    }
+    100% {
+        opacity: 1;
+        filter: blur(0px);
+        transform: scale(1) translateY(0);
+        text-shadow: 0 0 10px rgba(0, 255, 110, 0.4), 
+                     0 0 20px rgba(0, 255, 110, 0.1);
+    }
 }
