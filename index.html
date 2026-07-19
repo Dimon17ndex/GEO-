@@ -392,22 +392,19 @@
                 submitBtn.classList.remove('state-loading');
 
                 if (password === "489634") {
-    const mainContainer = document.querySelector('.main-container');
-    const cornerWrapper = document.querySelector('.corner-icon-floating-wrapper');
-    const promptText = document.querySelector('.prompt-text');
+                    const mainContainer = document.querySelector('.main-container');
+                    const cornerWrapper = document.querySelector('.corner-icon-floating-wrapper');
+                    const promptText = document.getElementById('click-prompt');
 
-    if (mainContainer) mainContainer.classList.add('fade-out-element');
-    if (cornerWrapper) cornerWrapper.classList.add('fade-out-element');
-    if (promptText) promptText.classList.add('fade-out-element');
-    
-    // Честный и надежный переход на отдельную страницу дашборда
-    setTimeout(() => {
-        window.location.href = './dashboard.html';
-    }, 600); // Даем 0.6 сек, чтобы старая страница красиво растворилась (fade-out)
-} 
+                    if (mainContainer) mainContainer.classList.add('fade-out-element');
+                    if (cornerWrapper) cornerWrapper.classList.add('fade-out-element');
+                    if (promptText) promptText.classList.add('fade-out-element');
+                    
+                    setTimeout(() => {
+                        window.location.href = './dashboard.html';
+                    }, 600); 
 
                 } else {
-                    // --- ИСХОД ОШИБКИ ---
                     setTimeout(() => {
                         livesInErrorState = true;
                         myInput.classList.add('input-error-state'); 
