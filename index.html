@@ -80,26 +80,27 @@
         <div class="input-container-box">
             <input type="text" class="custom-input" placeholder="ввести..." id="user-text-input">
             <div class="input-underline"></div>
-<button class="input-submit-btn" id="submit-auth-btn">
-    <svg class="icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="5" y1="12" x2="19" y2="12"></line>
-        <polyline points="12 5 19 12 12 19"></polyline>
-    </svg>
-    <svg class="icon-loading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="12" y1="2" x2="12" y2="6"></line>
-        <line x1="12" y1="18" x2="12" y2="22"></line>
-        <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
-        <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
-        <line x1="2" y1="12" x2="6" y2="12"></line>
-        <line x1="18" y1="12" x2="22" y2="12"></line>
-        <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
-        <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
-    </svg>
-    <svg class="icon-error" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-    </svg>
-</button>        </div>
+            <button class="input-submit-btn" id="submit-auth-btn">
+                <svg class="icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+                <svg class="icon-loading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="2" x2="12" y2="6"></line>
+                    <line x1="12" y1="18" x2="12" y2="22"></line>
+                    <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+                    <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+                    <line x1="2" y1="12" x2="6" y2="12"></line>
+                    <line x1="18" y1="12" x2="22" y2="12"></line>
+                    <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+                    <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+                </svg>
+                <svg class="icon-error" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
 
         <div class="bottom-credits-wrapper">
             <p class="bottom-credits" id="wave-text">проект Запорожской области</p>
@@ -135,37 +136,35 @@
         }, 3000);
 
         function buildWaveText(newText) {
-    textContainer.innerHTML = '';
-    letters = Array.from(newText).map((char) => {
-        const span = document.createElement('span');
-        span.style.display = 'inline-block';
-        span.style.transition = 'color 0.3s ease, transform 0.3s ease, opacity 0.5s ease, filter 0.5s ease';
-        
-        // ЕСЛИ мы переключаемся на секретный текст, создаем буквы ИЗНАЧАЛЬНО невидимыми
-        if (isSecretTextActive) {
-            span.style.opacity = '0';
-            span.style.filter = 'blur(6px)';
-            span.style.transform = 'translateY(10px)';
-        }
+            textContainer.innerHTML = '';
+            letters = Array.from(newText).map((char) => {
+                const span = document.createElement('span');
+                span.style.display = 'inline-block';
+                span.style.transition = 'color 0.3s ease, transform 0.3s ease, opacity 0.5s ease, filter 0.5s ease';
+                
+                if (isSecretTextActive) {
+                    span.style.opacity = '0';
+                    span.style.filter = 'blur(6px)';
+                    span.style.transform = 'translateY(10px)';
+                }
 
-        if (char === ' ') {
-            span.innerHTML = '&nbsp;';
-        } else {
-            span.innerText = char;
+                if (char === ' ') {
+                    span.innerHTML = '&nbsp;';
+                } else {
+                    span.innerText = char;
+                }
+                textContainer.appendChild(span);
+                return span;
+            });
+            
+            bindLettersHover();
         }
-        textContainer.appendChild(span);
-        return span;
-    });
-    
-    bindLettersHover();
-}
 
         buildWaveText(initialText);
 
         function bindLettersHover() {
             letters.forEach((span, index) => {
                 span.addEventListener('mouseenter', (e) => {
-                    // ГРАНДИОЗНЫЙ БЛОК: если секретный текст активен, герб и иконка не появятся
                     if (isSecretTextActive) {
                         isTextHovered = false;
                         return;
@@ -232,7 +231,6 @@
             }
             let currentClassName = 'bg-ambient-ripple';
             
-            // Если мы уже ввели секретное состояние, амбиентные волны тоже защищаем от превращения в красно-зеленые
             if (isTextHovered && !isSecretTextActive) {
                 currentClassName = Math.random() > 0.5 ? 'bg-ambient-red' : 'bg-ambient-green';
             }
@@ -305,7 +303,6 @@
                     inputContainer.classList.add('active');
                     
                     isSecretTextActive = true; 
-                    // Добавляем класс-заглушку на сам текстовый блок, чтобы CSS-ховеры герба тоже отключились
                     textContainer.classList.add('secret-active');
 
                     letters.forEach((span, i) => {
@@ -319,7 +316,6 @@
                     setTimeout(() => {
                         buildWaveText("введите код доступа к сессии");
                         
-                        // Буквы уже созданы невидимыми, теперь просто плавно включаем их по очереди:
                         letters.forEach((span, i) => {
                             setTimeout(() => {
                                 span.style.opacity = '1';
@@ -365,88 +361,68 @@
         document.querySelector('.settings-icon-box').addEventListener('click', (e) => { e.stopPropagation(); });
 
         const submitBtn = document.getElementById('submit-auth-btn');
-// На всякий случай убедись, что переменная для инпута объявлена правильным именем (textInput или как у тебя в коде)
-const myInput = document.getElementById('user-text-input'); 
+        const myInput = document.getElementById('user-text-input'); 
+        let livesInErrorState = false;
 
-// Состояние, чтобы знать, была ли уже совершена проверка с ошибкой
-let livesInErrorState = false;
+        myInput.addEventListener('input', () => {
+            const textLength = myInput.value.trim().length;
 
-// 1. Отслеживание ввода текста и сброс ошибок
-myInput.addEventListener('input', () => {
-    const textLength = myInput.value.trim().length;
+            if (textLength > 0) {
+                submitBtn.classList.add('btn-active');
+            } else {
+                submitBtn.classList.remove('btn-active');
+            }
 
-    // Управление вылетом кнопки (как и раньше)
-    if (textLength > 0) {
-        submitBtn.classList.add('btn-active');
-    } else {
-        submitBtn.classList.remove('btn-active');
-    }
+            if (livesInErrorState) {
+                livesInErrorState = false;
+                myInput.classList.remove('input-error-state'); 
+                submitBtn.classList.remove('state-error');     
+            }
+        });
 
-    // Если пользователь удалил хотя бы один символ во время ошибки
-    if (livesInErrorState) {
-        livesInErrorState = false;
-        myInput.classList.remove('input-error-state'); // Возвращаем белый цвет текста
-        submitBtn.classList.remove('state-error');     // Возвращаем стрелку
-    }
-});
+        submitBtn.addEventListener('click', () => {
+            if (submitBtn.classList.contains('state-loading') || submitBtn.classList.contains('state-error')) {
+                return;
+            }
 
-// 2. Логика проверки по клику на кнопку
-submitBtn.addEventListener('click', () => {
-    // Защита: если кнопка уже в режиме загрузки или ошибки — клик не работает
-    if (submitBtn.classList.contains('state-loading') || submitBtn.classList.contains('state-error')) {
-        return;
-    }
+            const password = myInput.value.trim();
+            submitBtn.classList.add('state-loading');
 
-    const password = myInput.value.trim();
-
-    // Включаем режим загрузки
-    submitBtn.classList.add('state-loading');
-
-    // Имитируем "проверку" длительностью 1 секунду (чтобы спиннер успел покрутиться)
-    setTimeout(() => {
-        // Выключаем загрузку
-        submitBtn.classList.remove('state-loading');
-
-      if (password === "489634") {
-    // --- ИСХОД УСПЕХА ---
-    setTimeout(() => {
-        // 1. Прячем старый интерфейс
-        const mainContainer = document.querySelector('.main-container');
-        const cornerWrapper = document.querySelector('.corner-icon-floating-wrapper');
-        const promptText = document.querySelector('.prompt-text');
-
-        if (mainContainer) mainContainer.classList.add('fade-out-element');
-        if (cornerWrapper) cornerWrapper.classList.add('fade-out-element');
-        if (promptText) promptText.classList.add('fade-out-element');
-        
-        // 2. Загружаем и вставляем HTML вместе с его внутренним скриптом
-        setTimeout(() => {
-            
-            // Вот она — магия одной строки загрузки:
-            loadExternalFramework('./dashboard.html'); 
-            
-        }, 600);
-    }, 500);
-
-        } else {
-            // --- ИСХОД ОШИБКИ ---
             setTimeout(() => {
-                livesInErrorState = true;
-                myInput.classList.add('input-error-state'); // Текст становится красным
-                submitBtn.classList.add('state-error');       // Кнопка вибрирует с крестиком
-            }, 500); // Задержка 0.5 сек по условию
-        }
+                submitBtn.classList.remove('state-loading');
 
-    }, 1000); // Время вращения загрузки (1 секунда). Можно поменять на 600 или любое другое.
-});
+                if (password === "489634") {
+                    // --- МГНОВЕННЫЙ ИСХОД УСПЕХА ---
+                    const mainContainer = document.querySelector('.main-container');
+                    const cornerWrapper = document.querySelector('.corner-icon-floating-wrapper');
+                    const promptText = document.querySelector('.prompt-text');
 
-// Защита от ripples при клике по кнопке
-submitBtn.addEventListener('mousedown', (e) => {
-    e.stopPropagation();
-});
+                    // 1. Сразу активируем скрытие элементов
+                    if (mainContainer) mainContainer.classList.add('fade-out-element');
+                    if (cornerWrapper) cornerWrapper.classList.add('fade-out-element');
+                    if (promptText) promptText.classList.add('fade-out-element');
+                    
+                    // 2. В эту же миллисекунду разворачиваем фрейм и запускаем волну
+                    loadExternalFramework('./dashboard.html'); 
 
-function loadExternalFramework(url) {
-    // 1. Подключаем стили
+                } else {
+                    // --- ИСХОД ОШИБКИ ---
+                    setTimeout(() => {
+                        livesInErrorState = true;
+                        myInput.classList.add('input-error-state'); 
+                        submitBtn.classList.add('state-error');       
+                    }, 500); 
+                }
+
+            }, 1000); 
+        });
+
+        submitBtn.addEventListener('mousedown', (e) => {
+            e.stopPropagation();
+        });
+
+        function loadExternalFramework(url) {
+    // 1. Динамически подключаем стили dashboard.css
     if (!document.querySelector('link[href*="dashboard.css"]')) {
         const link = document.createElement('link');
         link.rel = 'stylesheet';
@@ -454,27 +430,31 @@ function loadExternalFramework(url) {
         document.head.appendChild(link);
     }
 
-    // 2. Загружаем HTML
+    // 2. Загружаем разметку из dashboard.html
     fetch(url)
-        .then(response => response.text())
-        .then(htmlText => {
+        .then(response => {
+            if (!response.ok) throw new Error('Сеть ответила с ошибкой');
+            return response.text();
+        })
+        .then(htmlContent => {
+            // Парсим строку в DOM-структуру
             const parser = new DOMParser();
-            const doc = parser.parseFromString(htmlText, 'text/html');
-            const dashboard = doc.querySelector('.session-dashboard');
+            const doc = parser.parseFromString(htmlContent, 'text/html');
+            const dashboardStructure = doc.querySelector('.session-dashboard');
 
-            if (dashboard) {
-                // Добавляем сам HTML-каркас
-                document.body.appendChild(dashboard);
+            if (dashboardStructure) {
+                // Добавляем полноценный дашборд со спанами на страницу
+                document.body.appendChild(dashboardStructure);
 
-                // Принудительно запускаем анимацию появления прямо отсюда
-                requestAnimationFrame(() => {
-                    setTimeout(() => {
-                        dashboard.classList.add('show-framework');
-                    }, 50);
-                });
+                // Даем браузеру 50мс отрендерить спаны в памяти и запускаем сборку букв!
+                setTimeout(() => {
+                    dashboardStructure.classList.add('show-framework');
+                }, 50);
             }
         })
-        .catch(err => console.error("Ошибка загрузки фреймворка:", err));
+        .catch(err => {
+            console.error("Ошибка загрузки фреймворка через GitHub Pages:", err);
+        });
 }
     </script>
 </body>
