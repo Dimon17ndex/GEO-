@@ -392,18 +392,19 @@
                 submitBtn.classList.remove('state-loading');
 
                 if (password === "489634") {
-                    // --- МГНОВЕННЫЙ ИСХОД УСПЕХА ---
-                    const mainContainer = document.querySelector('.main-container');
-                    const cornerWrapper = document.querySelector('.corner-icon-floating-wrapper');
-                    const promptText = document.querySelector('.prompt-text');
+    const mainContainer = document.querySelector('.main-container');
+    const cornerWrapper = document.querySelector('.corner-icon-floating-wrapper');
+    const promptText = document.querySelector('.prompt-text');
 
-                    // 1. Сразу активируем скрытие элементов
-                    if (mainContainer) mainContainer.classList.add('fade-out-element');
-                    if (cornerWrapper) cornerWrapper.classList.add('fade-out-element');
-                    if (promptText) promptText.classList.add('fade-out-element');
-                    
-                    // 2. В эту же миллисекунду разворачиваем фрейм и запускаем волну
-                    loadExternalFramework('./dashboard.html'); 
+    if (mainContainer) mainContainer.classList.add('fade-out-element');
+    if (cornerWrapper) cornerWrapper.classList.add('fade-out-element');
+    if (promptText) promptText.classList.add('fade-out-element');
+    
+    // Честный и надежный переход на отдельную страницу дашборда
+    setTimeout(() => {
+        window.location.href = './dashboard.html';
+    }, 600); // Даем 0.6 сек, чтобы старая страница красиво растворилась (fade-out)
+} 
 
                 } else {
                     // --- ИСХОД ОШИБКИ ---
@@ -420,68 +421,6 @@
         submitBtn.addEventListener('mousedown', (e) => {
             e.stopPropagation();
         });
-
-        function loadExternalFramework(url) {
-    // 1. Динамически подключаем стили, если их еще нет
-    if (!document.querySelector('link[href*="dashboard.css"]')) {
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = './dashboard.css';
-        document.head.appendChild(link);
-    }
-
-    // 2. Создаем контейнер дашборда
-    const dashboard = document.createElement('div');
-    dashboard.className = 'session-dashboard';
-    dashboard.id = 'session-dashboard';
-
-    // Разметка бренд-блока (заголовок мы тоже разобьем на спаны автоматическим циклом ниже)
-    dashboard.innerHTML = `
-        <div class="dashboard-content-wrapper">
-            <div class="db-brand-block">
-                <img src="images/geo_logo.png" alt="Geo Logo" class="db-logo-icon">
-                <div class="db-text-right">
-                    <h1 class="db-main-title" id="db-animate-title">GEОГРАФИЯ</h1>
-                    <div class="db-subtitle-badge">
-                        <span>наука • образование • естествознание</span>
-                    </div>
-                </div>
-            </div>
-            <div class="success-message" id="db-animate-message">Вы успешно вошли в сессию</div>
-        </div>
-    `;
-
-    document.body.appendChild(dashboard);
-
-    // 3. Функция-помощник для автоматического превращения текста в спаны с анимацией
-    const transformToSpans = (elementId, startDelay) => {
-        const el = document.getElementById(elementId);
-        if (!el) return;
-        const text = el.innerText;
-        el.innerHTML = ''; // Очищаем текст
-
-        Array.from(text).forEach((char, index) => {
-            const span = document.createElement('span');
-            if (char === ' ') {
-                span.innerHTML = '&nbsp;';
-            } else {
-                span.innerText = char;
-            }
-            // Рассчитываем индивидуальную задержку для каждой буквы
-            span.style.animationDelay = `${startDelay + (index * 0.04)}s`;
-            el.appendChild(span);
-        });
-    };
-
-    // Превращаем текст в анимированные буквы (настраиваем стартовые задержки)
-    transformToSpans('db-animate-title', 0.30);   // Заголовок начнет собираться через 0.3с
-    transformToSpans('db-animate-message', 0.60); // Сообщение начнет собираться через 0.6с
-
-    // 4. Включаем главный триггер анимации фрейма
-    setTimeout(() => {
-        dashboard.classList.add('show-framework');
-    }, 50);
-}
     </script>
 </body>
 </html>
