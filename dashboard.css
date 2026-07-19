@@ -1,5 +1,5 @@
 /* ==========================================================================
-   ГЛАВНЫЙ КОНТЕЙНЕР ФРЕЙМА (ЦЕНТРИРУЕТ ВСЁ САМ)
+   ГЛАВНЫЙ КОНТЕЙНЕР ФРЕЙМА
    ========================================================================== */
 .session-dashboard {
     position: fixed;
@@ -52,7 +52,7 @@
 }
 
 /* ==========================================================================
-   ОБЕРТКА КОНТЕНТА
+   ОБЕРТКА КОНТЕНТА И БРЕНД-БЛОК
    ========================================================================== */
 .dashboard-content-wrapper {
     display: flex;
@@ -64,14 +64,10 @@
     z-index: 2;
 }
 
-/* ==========================================================================
-   БРЕНД-БЛОК ВНУТРИ ФРЕЙМА (ПЛАВНОЕ ПОЯВЛЕНИЕ)
-   ========================================================================== */
 .db-brand-block {
     display: flex;
     align-items: center;
     gap: 20px;
-    
     opacity: 0;
     filter: blur(10px);
     transform: translateY(-10px);
@@ -82,7 +78,7 @@
     opacity: 1;
     filter: blur(0px);
     transform: translateY(0);
-    transition-delay: 0.3s;
+    transition-delay: 0.2s;
 }
 
 .db-logo-icon {
@@ -98,14 +94,48 @@
     gap: 4px;
 }
 
-.db-main-title {
+/* ==========================================================================
+   СТИЛИ ДЛЯ АНИМАЦИИ БУКВ (ОБЩИЕ ДЛЯ ЗАГОЛОВКА И СООБЩЕНИЯ)
+   ========================================================================== */
+.db-main-title, .success-message {
     font-family: 'Unbounded', sans-serif;
-    font-size: 32px; 
-    font-weight: 900;
     color: #ffffff;
     margin: 0;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.db-main-title {
+    font-size: 32px; 
+    font-weight: 900;
     line-height: 1;
     letter-spacing: 1px;
+}
+
+.success-message {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    width: 100%;
+}
+
+/* Общий класс для всех генерируемых букв-спанов */
+.db-main-title span, .success-message span {
+    display: inline-block;
+    opacity: 0;
+    filter: blur(8px);
+    transform: scale(1.4) translateY(-10px);
+    text-shadow: 0 0 10px rgba(0, 255, 110, 0.8);
+    
+    animation-duration: 0.5s;
+    animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation-fill-mode: forwards;
+}
+
+/* Запуск сборки при активации общего класса */
+.session-dashboard.show-framework .db-main-title span,
+.session-dashboard.show-framework .success-message span {
+    animation-name: assembleLetter;
 }
 
 .db-subtitle-badge {
@@ -123,68 +153,6 @@
     letter-spacing: 1.5px;
     color: rgba(255, 255, 255, 0.8);
 }
-
-/* ==========================================================================
-   ПОБУКВЕННАЯ СБОРКА ТЕКСТА
-   ========================================================================== */
-.success-message {
-    font-family: 'Unbounded', sans-serif;
-    font-size: 24px;
-    font-weight: 700;
-    color: #ffffff;
-    text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 2.5px;
-    width: 100%;
-    
-    /* Отказываемся от flex, чтобы текстовые переносы строк в HTML не ломали анимацию спанов */
-    display: block;
-}
-
-/* Базовое состояние каждой буквы ДО старта анимации */
-.success-message span {
-    display: inline-block;
-    opacity: 0;
-    filter: blur(8px);
-    transform: scale(1.4) translateY(-10px);
-    text-shadow: 0 0 10px rgba(0, 255, 110, 0.8);
-    
-    /* Переносим параметры анимации в базовый класс, подготавливая их для браузера заранее */
-    animation-duration: 0.5s;
-    animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    animation-fill-mode: forwards;
-}
-
-/* Активация триггера анимации при добавлении класса фрейму */
-.session-dashboard.show-framework .success-message span {
-    animation-name: assembleLetter;
-}
-
-/* Чистый от битых пробелов тайминг на базе :nth-of-type */
-.session-dashboard.show-framework .success-message span:nth-of-type(1)  { animation-delay: 0.40s; }
-.session-dashboard.show-framework .success-message span:nth-of-type(2)  { animation-delay: 0.44s; }
-.session-dashboard.show-framework .success-message span:nth-of-type(3)  { animation-delay: 0.48s; }
-.session-dashboard.show-framework .success-message span:nth-of-type(4)  { animation-delay: 0.52s; }
-.session-dashboard.show-framework .success-message span:nth-of-type(5)  { animation-delay: 0.56s; }
-.session-dashboard.show-framework .success-message span:nth-of-type(6)  { animation-delay: 0.60s; }
-.session-dashboard.show-framework .success-message span:nth-of-type(7)  { animation-delay: 0.64s; }
-.session-dashboard.show-framework .success-message span:nth-of-type(8)  { animation-delay: 0.68s; }
-.session-dashboard.show-framework .success-message span:nth-of-type(9)  { animation-delay: 0.72s; }
-.session-dashboard.show-framework .success-message span:nth-of-type(10) { animation-delay: 0.76s; }
-.session-dashboard.show-framework .success-message span:nth-of-type(11) { animation-delay: 0.80s; }
-.session-dashboard.show-framework .success-message span:nth-of-type(12) { animation-delay: 0.84s; }
-.session-dashboard.show-framework .success-message span:nth-of-type(13) { animation-delay: 0.88s; }
-.session-dashboard.show-framework .success-message span:nth-of-type(14) { animation-delay: 0.92s; }
-.session-dashboard.show-framework .success-message span:nth-of-type(15) { animation-delay: 0.96s; }
-.session-dashboard.show-framework .success-message span:nth-of-type(16) { animation-delay: 1.00s; }
-.session-dashboard.show-framework .success-message span:nth-of-type(17) { animation-delay: 1.04s; }
-.session-dashboard.show-framework .success-message span:nth-of-type(18) { animation-delay: 1.08s; }
-.session-dashboard.show-framework .success-message span:nth-of-type(19) { animation-delay: 1.12s; }
-.session-dashboard.show-framework .success-message span:nth-of-type(20) { animation-delay: 1.16s; }
-.session-dashboard.show-framework .success-message span:nth-of-type(21) { animation-delay: 1.20s; }
-.session-dashboard.show-framework .success-message span:nth-of-type(22) { animation-delay: 1.24s; }
-.session-dashboard.show-framework .success-message span:nth-of-type(23) { animation-delay: 1.28s; }
-.session-dashboard.show-framework .success-message span:nth-of-type(24) { animation-delay: 1.32s; }
 
 /* Ключевые кадры эффекта сборки */
 @keyframes assembleLetter {
