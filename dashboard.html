@@ -1,26 +1,66 @@
-<div class="session-dashboard" id="session-dashboard" style="display: none;">
-        <div class="dashboard-content-wrapper">
-            <div class="db-brand-block">
-                <img src="images/geo_logo.png" alt="Geo Logo" class="db-logo-icon">
-                <div class="db-text-right">
-                    <h1 class="db-main-title">
-                        <span>G</span><span>E</span><span>O</span><span>Г</span><span>Р</span><span>А</span><span>Ф</span><span>И</span><span>Я</span>
-                    </h1>
-                    <div class="db-subtitle-badge">
-                        <span>наука • образование • естествознание</span>
-                    </div>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEOГРАФИЯ — Панель сессии</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./dashboard.css">
+</head>
+<body>
+
+<div class="session-dashboard" id="session-dashboard">
+    <div class="dashboard-content-wrapper">
+        <div class="db-brand-block">
+            <img src="images/geo_logo.png" alt="Geo Logo" class="db-logo-icon">
+            <div class="db-text-right">
+                <h1 class="db-main-title" id="db-animate-title">GEОГРАФИЯ</h1>
+                <div class="db-subtitle-badge">
+                    <span>наука • образование • естествознание</span>
                 </div>
             </div>
-            
-            <div class="success-message">
-                <span>В</span><span>ы</span><span>&nbsp;</span>
-                <span>у</span><span>с</span><span>п</span><span>е</span><span>ш</span><span>н</span><span>о</span><span>&nbsp;</span>
-                <span>в</span><span>о</span><span>ш</span><span>л</span><span>и</span><span>&nbsp;</span>
-                <span>в</span><span>&nbsp;</span>
-                <span>с</span><span>е</span><span>с</span><span>с</span><span>и</span><span>ю</span>
-            </div>
         </div>
+        
+        <div class="success-message" id="db-animate-message">Вы успешно вошли в сессию</div>
     </div>
+</div>
 
-    <script>
-        // Твой JavaScript код...
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const dashboard = document.getElementById('session-dashboard');
+
+        // Функция автоматического разбиения текста на анимированные буквы
+        const transformToSpans = (elementId, startDelay) => {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            const text = el.innerText;
+            el.innerHTML = '';
+
+            Array.from(text).forEach((char, index) => {
+                const span = document.createElement('span');
+                if (char === ' ') {
+                    span.innerHTML = '&nbsp;';
+                } else {
+                    span.innerText = char;
+                }
+                span.style.animationDelay = `${startDelay + (index * 0.04)}s`;
+                el.appendChild(span);
+            });
+        };
+
+        // Запускаем нарезку букв с нужными задержками
+        transformToSpans('db-animate-title', 0.20);
+        transformToSpans('db-animate-message', 0.50);
+
+        // Включаем анимацию (волну и появление блоков) сразу после отрисовки
+        requestAnimationFrame(() => {
+            dashboard.classList.add('show-framework');
+        });
+    });
+</script>
+
+</body>
+</html>
