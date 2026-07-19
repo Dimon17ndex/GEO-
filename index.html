@@ -422,7 +422,7 @@
         });
 
         function loadExternalFramework(url) {
-    // 1. Динамически подключаем стили dashboard.css
+    // 1. Динамически подключаем стили, если их еще нет
     if (!document.querySelector('link[href*="dashboard.css"]')) {
         const link = document.createElement('link');
         link.rel = 'stylesheet';
@@ -430,31 +430,57 @@
         document.head.appendChild(link);
     }
 
-    // 2. Загружаем разметку из dashboard.html
-    fetch(url)
-        .then(response => {
-            if (!response.ok) throw new Error('Сеть ответила с ошибкой');
-            return response.text();
-        })
-        .then(htmlContent => {
-            // Парсим строку в DOM-структуру
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(htmlContent, 'text/html');
-            const dashboardStructure = doc.querySelector('.session-dashboard');
+    // 2. Создаем контейнер дашборда
+    const dashboard = document.createElement('div');
+    dashboard.className = 'session-dashboard';
+    dashboard.id = 'session-dashboard';
 
-            if (dashboardStructure) {
-                // Добавляем полноценный дашборд со спанами на страницу
-                document.body.appendChild(dashboardStructure);
+    // Разметка бренд-блока (заголовок мы тоже разобьем на спаны автоматическим циклом ниже)
+    dashboard.innerHTML = `
+        <div class="dashboard-content-wrapper">
+            <div class="db-brand-block">
+                <img src="images/geo_logo.png" alt="Geo Logo" class="db-logo-icon">
+                <div class="db-text-right">
+                    <h1 class="db-main-title" id="db-animate-title">GEОГРАФИЯ</h1>
+                    <div class="db-subtitle-badge">
+                        <span>наука • образование • естествознание</span>
+                    </div>
+                </div>
+            </div>
+            <div class="success-message" id="db-animate-message">Вы успешно вошли в сессию</div>
+        </div>
+    `;
 
-                // Даем браузеру 50мс отрендерить спаны в памяти и запускаем сборку букв!
-                setTimeout(() => {
-                    dashboardStructure.classList.add('show-framework');
-                }, 50);
+    document.body.appendChild(dashboard);
+
+    // 3. Функция-помощник для автоматического превращения текста в спаны с анимацией
+    const transformToSpans = (elementId, startDelay) => {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        const text = el.innerText;
+        el.innerHTML = ''; // Очищаем текст
+
+        Array.from(text).forEach((char, index) => {
+            const span = document.createElement('span');
+            if (char === ' ') {
+                span.innerHTML = '&nbsp;';
+            } else {
+                span.innerText = char;
             }
-        })
-        .catch(err => {
-            console.error("Ошибка загрузки фреймворка через GitHub Pages:", err);
+            // Рассчитываем индивидуальную задержку для каждой буквы
+            span.style.animationDelay = `${startDelay + (index * 0.04)}s`;
+            el.appendChild(span);
         });
+    };
+
+    // Превращаем текст в анимированные буквы (настраиваем стартовые задержки)
+    transformToSpans('db-animate-title', 0.30);   // Заголовок начнет собираться через 0.3с
+    transformToSpans('db-animate-message', 0.60); // Сообщение начнет собираться через 0.6с
+
+    // 4. Включаем главный триггер анимации фрейма
+    setTimeout(() => {
+        dashboard.classList.add('show-framework');
+    }, 50);
 }
     </script>
 </body>
