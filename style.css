@@ -969,16 +969,14 @@ body:has(.input-container-box.active) .logo-icon {
     display: none !important;
 }
 
-/* ==========================================================================
-   СБЛИЖЕНИЕ ЛОГОТИПА И НАДПИСИ НА ЭКРАНЕ УСПЕХА
-   ========================================================================== */
-/* Применяем правила к блоку бренда, когда активен экран успеха */
+/* Статичный сдвиг логотипа ближе к тексту на экране успеха */
 body:has(.secret-active) .brand-block,
 body:has(#wave-text.secret-active) .brand-block {
-    gap: 15px !important; /* Уменьшаем стандартный зазор (был 40px) */
+    gap: 10px !important;
+    transition: none !important; /* Полностью отключаем любую анимацию */
 }
 
 body:has(.secret-active) .logo-icon,
 body:has(#wave-text.secret-active) .logo-icon {
-    transform: translateX(10px) !important; /* Дополнительно сдвигаем логотип вправо к тексту */
+    transition: none !important; /* Полностью отключаем любую анимацию */
 }
