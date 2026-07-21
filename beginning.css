@@ -64,8 +64,8 @@ body.page-loaded {
 
 .top-left-brand .db-brand-block {
     display: flex;
-    align-items: center;
-    gap: 20px;
+    align-items: center; /* Центрирование логотипа по вертикали относительно текста */
+    gap: 10px; /* Уменьшенный отступ (был 20px) */
 }
 
 .top-left-brand .db-logo-icon {
