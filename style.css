@@ -970,18 +970,22 @@ body:has(.input-container-box.active) .logo-icon {
 }
 
 /* ==========================================================================
-   ПРИБЛИЖЕНИЕ ЛОГОТИПА К ТЕКСТУ ПРИ АКТИВАЦИИ СТРОКИ ВВОДА
+   ПРИБЛИЖЕНИЕ ЛОГОТИПА К ТЕКСТУ ПРИ УСПЕШНОМ ВХОДЕ
    ========================================================================== */
-/* Плавный переход для расстояния между логотипом и текстом */
+/* Включаем плавный переход для отступа и трансформации */
 .brand-block {
-    transition: gap 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: gap 0.8s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* При появлении строки ввода уменьшаем зазор и двигаем логотип ближе */
-body:has(.input-container-box.active) .brand-block {
-    gap: 10px; /* Уменьшаем отступ с 40px до 10px */
+.logo-icon {
+    transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-body:has(.input-container-box.active) .logo-icon {
-    transform: scale(1.3) translateX(15px); /* Увеличиваем и сдвигаем логотип правее к тексту */
+/* Когда активен экран успеха (секретный режим) */
+body:has(.secret-active) .brand-block {
+    gap: 10px; /* Уменьшаем расстояние между лого и текстом (было 40px) */
+}
+
+body:has(.secret-active) .logo-icon {
+    transform: scale(1.25) translateX(15px); /* Увеличиваем лого и придвигаем вправо к «GEOГРАФИЯ» */
 }
