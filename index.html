@@ -65,109 +65,121 @@
             z-index: 2;
         }
 
-        .db-brand-block {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            opacity: 0;
-            filter: blur(10px);
-            transform: translateY(-10px);
-            transition: opacity 0.6s ease-out, filter 0.8s ease-out, transform 0.6s ease-out;
-        }
+        /* beginning.css — Обновленный блок для логотипа и плашки */
 
-        .session-dashboard.show-framework .db-brand-block {
-            opacity: 1;
-            filter: blur(0px);
-            transform: translateY(0);
-            transition-delay: 0.2s;
-        }
+.db-brand-block {
+    display: flex;
+    align-items: center;
+    gap: 25px; /* Немного увеличили отступ между лого и текстом */
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(-10px);
+    transition: opacity 0.6s ease-out, filter 0.8s ease-out, transform 0.6s ease-out;
+}
 
-        .db-logo-icon {
-            width: 65px;  
-            height: 65px;
-            object-fit: contain;
-        }
+.session-dashboard.show-framework .db-brand-block {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0);
+    transition-delay: 0.2s;
+}
 
-        .db-text-right {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 4px;
-        }
+/* ЛОГОТИП: Сделали покрупнее (был 65px, стал 90px) */
+.db-logo-icon {
+    width: 90px;  
+    height: 90px;
+    object-fit: contain;
+}
 
-        .db-main-title, .success-message {
-            font-family: 'Unbounded', sans-serif;
-            margin: 0;
-            text-transform: uppercase;
-            text-align: center;
-        }
+/* Правый блок: выравнивает заголовок и плашку строго по левому краю друг под другом */
+.db-text-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Выравнивание по левому краю текста */
+    gap: 8px; /* Отступ между надписью и плашкой */
+}
 
-        /* Заголовок: обычный белый цвет БЕЗ свечения */
-        .db-main-title {
-            color: #ffffff;
-            font-size: 32px; 
-            font-weight: 900;
-            line-height: 1;
-            letter-spacing: 1px;
-        }
+.db-main-title, .success-message {
+    font-family: 'Unbounded', sans-serif;
+    margin: 0;
+    text-transform: uppercase;
+}
 
-        /* Текст про сессию: ЗЕЛЕНЫЙ цвет */
-        .success-message {
-            color: #00ff6e; /* Тот самый фирменный зеленый */
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: 2.5px;
-            width: 100%;
-        }
+.db-main-title {
+    color: #ffffff;
+    font-size: 32px; 
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 1px;
+    text-align: left; /* Текст внутри заголовка прижат влево */
+}
 
-        /* Общие базовые стили для появления букв */
-        .db-main-title span, .success-message span {
-            display: inline-block;
-            opacity: 0;
-            filter: blur(8px);
-            transform: scale(1.4) translateY(-10px);
-            animation-duration: 0.5s;
-            animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            animation-fill-mode: forwards;
-        }
+.success-message {
+    color: #00ff6e; 
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    width: 100%;
+    text-align: center; /* Само сообщение о сессии остается по центру экрана */
+}
 
-        /* Анимация появления для заголовка (просто собирается из блюра) */
-        .session-dashboard.show-framework .db-main-title span {
-            animation-name: assembleLetterSimple;
-        }
+/* ПЛАШКА: Без заливки, с белой границей, подстраивается под размер текста */
+.db-subtitle-badge {
+    background: transparent; /* Убрали заливку */
+    border: 1px solid rgba(255, 255, 255, 0.6); /* Четкая белая граница (60% непрозрачности для эстетики) */
+    padding: 5px 14px;
+    border-radius: 50px;
+    display: inline-block; /* Чтобы плашка не тянулась шире, чем текст внутри нее */
+}
 
-        /* Анимация появления для зеленого текста (собирается + легкое зеленое свечение) */
-        .session-dashboard.show-framework .success-message span {
-            animation-name: assembleLetterGreen;
-        }
+.db-subtitle-badge span {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px; 
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #ffffff; /* Сделали текст внутри плашки чисто белым */
+    display: block;
+    line-height: 1;
+}
 
-        .db-subtitle-badge {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 4px 12px;
-            border-radius: 50px;
-        }
+/* Базовые стили для анимации букв */
+.db-main-title span, .success-message span {
+    display: inline-block;
+    opacity: 0;
+    filter: blur(8px);
+    transform: scale(1.4) translateY(-10px);
+    animation-duration: 0.5s;
+    animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation-fill-mode: forwards;
+}
 
-        .db-subtitle-badge span {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 10px; 
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: rgba(255, 255, 255, 0.8);
-        }
+.session-dashboard.show-framework .db-main-title span {
+    animation-name: assembleLetterSimple;
+}
 
-        /* Анимация для "GEOГРАФИЯ" (чистый белый, без неона) */
-        @keyframes assembleLetterSimple {
-            0% { opacity: 0; filter: blur(8px); transform: scale(1.4) translateY(-10px); }
-            100% { opacity: 1; filter: blur(0px); transform: scale(1) translateY(0); }
-        }
+.session-dashboard.show-framework .success-message span {
+    animation-name: assembleLetterGreen;
+}
 
-        /* Анимация для текста сессии (зеленый + мягкий неоновый акцент) */
-        @keyframes assembleLetterGreen {
-            0% { opacity: 0; filter: blur(8px); transform: scale(1.4) translateY(-10px); text-shadow: 0 0 20px rgba(0, 255, 110, 1); }
-            100% { opacity: 1; filter: blur(0px); transform: scale(1) translateY(0); text-shadow: 0 0 10px rgba(0, 255, 110, 0.3); }
-        }
+/* Анимации появления */
+@keyframes assembleLetterSimple {
+    0% { opacity: 0; filter: blur(8px); transform: scale(1.4) translateY(-10px); }
+    100% { opacity: 1; filter: blur(0px); transform: scale(1) translateY(0); }
+}
+
+@keyframes assembleLetterGreen {
+    0% { opacity: 0; filter: blur(8px); transform: scale(1.4) translateY(-10px); text-shadow: 0 0 20px rgba(0, 255, 110, 1); }
+    100% { opacity: 1; filter: blur(0px); transform: scale(1) translateY(0); text-shadow: 0 0 10px rgba(0, 255, 110, 0.3); }
+}
+
+/* Класс для плавного исчезновения всей накладки */
+.session-dashboard.fade-out-fast {
+    opacity: 0;
+    filter: blur(10px);
+    transform: scale(0.95);
+    transition: opacity 0.5s ease-in-out, filter 0.5s ease-in-out, transform 0.5s ease-in-out;
+}
     </style>
 </head>
 <body>
@@ -277,305 +289,332 @@
     </div>
 
     <script>
-        const textContainer = document.getElementById('wave-text');
-        const waveContainer = document.getElementById('bg-wave-container');
-        const logoElement = document.getElementById('main-logo');
-        const promptElement = document.getElementById('click-prompt');
-        const volumeStatusLabel = document.getElementById('volume-status-label');
-        const intensitySlider = document.getElementById('wave-intensity-slider');
-        const intensityValueLabel = document.getElementById('intensity-value');
-        const textInput = document.getElementById('user-text-input');
-        const inputContainer = document.querySelector('.input-container-box');
-        
-        let initialText = "проект Запорожской области";
-        let isWaveTriggered = false;
-        let isTextHovered = false; 
-        let hasUserClicked = false; 
-        let intensityPercent = 20;
-        let isClickAllowed = false;
-        let isSecretTextActive = false; 
-        let letters = [];
+    const textContainer = document.getElementById('wave-text');
+    const waveContainer = document.getElementById('bg-wave-container');
+    const logoElement = document.getElementById('main-logo');
+    const promptElement = document.getElementById('click-prompt');
+    const volumeStatusLabel = document.getElementById('volume-status-label');
+    const intensitySlider = document.getElementById('wave-intensity-slider');
+    const intensityValueLabel = document.getElementById('intensity-value');
+    const textInput = document.getElementById('user-text-input');
+    const inputContainer = document.querySelector('.input-container-box');
+    
+    let initialText = "проект Запорожской области";
+    let isWaveTriggered = false;
+    let isTextHovered = false; 
+    let hasUserClicked = false; 
+    let intensityPercent = 20;
+    let isClickAllowed = false;
+    let isSecretTextActive = false; 
+    let letters = [];
 
-        setTimeout(() => { isClickAllowed = true; }, 3000);
+    // Хеш пароля "489634"
+    const TARGET_HASH = 1438962691;
 
-        function buildWaveText(newText) {
-            textContainer.innerHTML = '';
-            letters = Array.from(newText).map((char) => {
-                const span = document.createElement('span');
-                span.style.display = 'inline-block';
-                span.style.transition = 'color 0.3s ease, transform 0.3s ease, opacity 0.5s ease, filter 0.5s ease';
-                if (isSecretTextActive) {
-                    span.style.opacity = '0';
-                    span.style.filter = 'blur(6px)';
-                    span.style.transform = 'translateY(10px)';
-                }
-                if (char === ' ') { span.innerHTML = '&nbsp;'; } else { span.innerText = char; }
-                textContainer.appendChild(span);
-                return span;
-            });
-            bindLettersHover();
+    // Надежная функция хеширования, работающая локально (DJB2)
+    function hashPassword(str) {
+        let hash = 5381;
+        for (let i = 0; i < str.length; i++) {
+            hash = ((hash << 5) + hash) + str.charCodeAt(i);
         }
+        return hash >>> 0;
+    }
 
-        buildWaveText(initialText);
+    setTimeout(() => { isClickAllowed = true; }, 3000);
 
-        function bindLettersHover() {
-            letters.forEach((span, index) => {
-                span.addEventListener('mouseenter', (e) => {
-                    if (isSecretTextActive) { isTextHovered = false; return; }
-                    isTextHovered = true; 
-                    letters.forEach((otherSpan, otherIndex) => {
-                        const distance = Math.abs(index - otherIndex);
-                        const delay = distance * 0.04;
-                        otherSpan.style.transitionDelay = `${delay}s`;
-                        otherSpan.style.color = `rgba(255, 50, 50, ${Math.max(0.3, 1 - distance * 0.08)})`;
-                        otherSpan.style.transform = `translateY(${Math.max(-4, -6 + distance * 0.5)}px)`;
-                    });
-                    if (!isWaveTriggered) {
-                        isWaveTriggered = true;
-                        createBackgroundRipple(e.clientX, e.clientY, 'bg-wave-ripple');
-                    }
+    function buildWaveText(newText) {
+        textContainer.innerHTML = '';
+        letters = Array.from(newText).map((char) => {
+            const span = document.createElement('span');
+            span.style.display = 'inline-block';
+            span.style.transition = 'color 0.3s ease, transform 0.3s ease, opacity 0.5s ease, filter 0.5s ease';
+            if (isSecretTextActive) {
+                span.style.opacity = '0';
+                span.style.filter = 'blur(6px)';
+                span.style.transform = 'translateY(10px)';
+            }
+            if (char === ' ') { span.innerHTML = '&nbsp;'; } else { span.innerText = char; }
+            textContainer.appendChild(span);
+            return span;
+        });
+        bindLettersHover();
+    }
+
+    buildWaveText(initialText);
+
+    function bindLettersHover() {
+        letters.forEach((span, index) => {
+            span.addEventListener('mouseenter', (e) => {
+                if (isSecretTextActive) { isTextHovered = false; return; }
+                isTextHovered = true; 
+                letters.forEach((otherSpan, otherIndex) => {
+                    const distance = Math.abs(index - otherIndex);
+                    const delay = distance * 0.04;
+                    otherSpan.style.transitionDelay = `${delay}s`;
+                    otherSpan.style.color = `rgba(255, 50, 50, ${Math.max(0.3, 1 - distance * 0.08)})`;
+                    otherSpan.style.transform = `translateY(${Math.max(-4, -6 + distance * 0.5)}px)`;
                 });
-            });
-        }
-
-        textContainer.addEventListener('mouseleave', () => {
-            if (isSecretTextActive) return;
-            isWaveTriggered = false;
-            isTextHovered = false; 
-            letters.forEach((span) => {
-                span.style.transitionDelay = '0s';
-                span.style.color = '#ffffff';
-                span.style.transform = 'translateY(0)';
+                if (!isWaveTriggered) {
+                    isWaveTriggered = true;
+                    createBackgroundRipple(e.clientX, e.clientY, 'bg-wave-ripple');
+                }
             });
         });
+    }
 
-        function createBackgroundRipple(x, y, className, duration = 1500) {
-            const ripple = document.createElement('div');
-            ripple.classList.add(className);
-            ripple.style.left = `${x}px`;
-            ripple.style.top = `${y}px`;
-            waveContainer.appendChild(ripple);
-            setTimeout(() => { ripple.remove(); }, duration);
-        }
-
-        setTimeout(() => {
-            const rect = logoElement.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            createBackgroundRipple(centerX, centerY, 'bg-click-ripple');
-        }, 1700);
-
-        function spawnAmbientWave() {
-            if (intensityPercent === 0) { setTimeout(spawnAmbientWave, 1000); return; }
-            let spawnX = 0, spawnY = 0;
-            const side = Math.floor(Math.random() * 4);
-            switch(side) {
-                case 0: spawnX = Math.random() * window.innerWidth; spawnY = -50; break;
-                case 1: spawnX = window.innerWidth + 50; spawnY = Math.random() * window.innerHeight; break;
-                case 2: spawnX = Math.random() * window.innerWidth; spawnY = window.innerHeight + 50; break;
-                case 3: spawnX = -50; spawnY = Math.random() * window.innerHeight; break;
-            }
-            let currentClassName = 'bg-ambient-ripple';
-            if (isTextHovered && !isSecretTextActive) {
-                currentClassName = Math.random() > 0.5 ? 'bg-ambient-red' : 'bg-ambient-green';
-            }
-            createBackgroundRipple(spawnX, spawnY, currentClassName, 3000);
-            const baseDelay = 500, maxAdditionalDelay = 8000; 
-            const factor = (100 - intensityPercent) / 100;
-            setTimeout(spawnAmbientWave, baseDelay + (Math.random() * maxAdditionalDelay * factor));
-        }
-
-        setTimeout(() => { spawnAmbientWave(); }, 3500);
-
-        const bgMusic = new Audio('audio/melody_start.mp3');
-        bgMusic.volume = 0.4; 
-        let musicStarted = false;
-
-        function playMusic() {
-            if (musicStarted || bgMusic.muted) return;
-            bgMusic.play().then(() => { musicStarted = true; }).catch(err => {});
-        }
-
-        bgMusic.addEventListener('ended', () => {
-            setTimeout(() => { if (!bgMusic.muted) bgMusic.play(); }, 5000); 
+    textContainer.addEventListener('mouseleave', () => {
+        if (isSecretTextActive) return;
+        isWaveTriggered = false;
+        isTextHovered = false; 
+        letters.forEach((span) => {
+            span.style.transitionDelay = '0s';
+            span.style.color = '#ffffff';
+            span.style.transform = 'translateY(0)';
         });
+    });
 
-        function showClickPrompt() {
-            if (hasUserClicked) return; 
-            const corners = [
-                { top: '60px', left: '60px', bottom: 'auto', right: 'auto' },     
-                { bottom: '120px', left: '60px', top: 'auto', right: 'auto' },    
-                { bottom: '150px', right: '60px', top: 'auto', left: 'auto' }      
-            ];
-            const randomIndex = Math.floor(Math.random() * corners.length);
-            const chosenCorner = corners[randomIndex];
-            promptElement.style.top = chosenCorner.top;
-            promptElement.style.bottom = chosenCorner.bottom;
-            promptElement.style.left = chosenCorner.left;
-            promptElement.style.right = chosenCorner.right;
-            if (randomIndex === 2) promptElement.classList.add('in-bottom-right');
-            else promptElement.classList.remove('in-bottom-right');
-            promptElement.classList.add('animate-prompt');
+    function createBackgroundRipple(x, y, className, duration = 1500) {
+        const ripple = document.createElement('div');
+        ripple.classList.add(className);
+        ripple.style.left = `${x}px`;
+        ripple.style.top = `${y}px`;
+        waveContainer.appendChild(ripple);
+        setTimeout(() => { ripple.remove(); }, duration);
+    }
+
+    setTimeout(() => {
+        const rect = logoElement.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        createBackgroundRipple(centerX, centerY, 'bg-click-ripple');
+    }, 1700);
+
+    function spawnAmbientWave() {
+        if (intensityPercent === 0) { setTimeout(spawnAmbientWave, 1000); return; }
+        let spawnX = 0, spawnY = 0;
+        const side = Math.floor(Math.random() * 4);
+        switch(side) {
+            case 0: spawnX = Math.random() * window.innerWidth; spawnY = -50; break;
+            case 1: spawnX = window.innerWidth + 50; spawnY = Math.random() * window.innerHeight; break;
+            case 2: spawnX = Math.random() * window.innerWidth; spawnY = window.innerHeight + 50; break;
+            case 3: spawnX = -50; spawnY = Math.random() * window.innerHeight; break;
+        }
+        let currentClassName = 'bg-ambient-ripple';
+        if (isTextHovered && !isSecretTextActive) {
+            currentClassName = Math.random() > 0.5 ? 'bg-ambient-red' : 'bg-ambient-green';
+        }
+        createBackgroundRipple(spawnX, spawnY, currentClassName, 3000);
+        const baseDelay = 500, maxAdditionalDelay = 8000; 
+        const factor = (100 - intensityPercent) / 100;
+        setTimeout(spawnAmbientWave, baseDelay + (Math.random() * maxAdditionalDelay * factor));
+    }
+
+    setTimeout(() => { spawnAmbientWave(); }, 3500);
+
+    const bgMusic = new Audio('audio/melody_start.mp3');
+    bgMusic.volume = 0.4; 
+    let musicStarted = false;
+
+    function playMusic() {
+        if (musicStarted || bgMusic.muted) return;
+        bgMusic.play().then(() => { musicStarted = true; }).catch(err => {});
+    }
+
+    bgMusic.addEventListener('ended', () => {
+        setTimeout(() => { if (!bgMusic.muted) bgMusic.play(); }, 5000); 
+    });
+
+    function showClickPrompt() {
+        if (hasUserClicked) return; 
+        const corners = [
+            { top: '60px', left: '60px', bottom: 'auto', right: 'auto' },     
+            { bottom: '120px', left: '60px', top: 'auto', right: 'auto' },    
+            { bottom: '150px', right: '60px', top: 'auto', left: 'auto' }      
+        ];
+        const randomIndex = Math.floor(Math.random() * corners.length);
+        const chosenCorner = corners[randomIndex];
+        promptElement.style.top = chosenCorner.top;
+        promptElement.style.bottom = chosenCorner.bottom;
+        promptElement.style.left = chosenCorner.left;
+        promptElement.style.right = chosenCorner.right;
+        if (randomIndex === 2) promptElement.classList.add('in-bottom-right');
+        else promptElement.classList.remove('in-bottom-right');
+        promptElement.classList.add('animate-prompt');
+    }
+
+    setTimeout(() => { if (!hasUserClicked) showClickPrompt(); }, 4500); 
+
+    textInput.addEventListener('mousedown', (e) => { e.stopPropagation(); });
+    textInput.addEventListener('keydown', (e) => { e.stopPropagation(); });
+
+    document.body.addEventListener('mousedown', (e) => {
+        if (!isClickAllowed) return;
+        if (e.target.closest('#settings-btn') || e.target.closest('.settings-trigger-zone')) return;
+
+        if (!hasUserClicked) {
+            hasUserClicked = true;
+            const computedStyle = window.getComputedStyle(promptElement);
+            promptElement.style.opacity = computedStyle.opacity;
+            promptElement.style.filter = computedStyle.filter;
+            promptElement.style.transform = computedStyle.transform;
+            promptElement.classList.remove('animate-prompt');
+            void promptElement.offsetWidth;
+            promptElement.style.transition = 'opacity 2.5s ease-in-out, filter 2.5s ease-in-out, transform 2.5s ease-in-out';
+            promptElement.style.opacity = '0';
+            promptElement.style.filter = 'blur(15px)';
+            promptElement.style.transform = 'rotate(-4deg) translateY(15px)';
+            setTimeout(() => { promptElement.style.display = 'none'; }, 2500);
         }
 
-        setTimeout(() => { if (!hasUserClicked) showClickPrompt(); }, 4500); 
+        if (inputContainer && !inputContainer.classList.contains('active')) {
+            if (!e.target.closest('.bottom-credits-wrapper')) {
+                inputContainer.classList.add('active');
+                isSecretTextActive = true; 
+                textContainer.classList.add('secret-active');
 
-        textInput.addEventListener('mousedown', (e) => { e.stopPropagation(); });
-        textInput.addEventListener('keydown', (e) => { e.stopPropagation(); });
+                letters.forEach((span, i) => {
+                    setTimeout(() => {
+                        span.style.opacity = '0';
+                        span.style.filter = 'blur(6px)';
+                        span.style.transform = `translateY(${Math.random() > 0.5 ? -10 : 10}px)`;
+                    }, i * 20); 
+                });
 
-        document.body.addEventListener('mousedown', (e) => {
-            if (!isClickAllowed) return;
-            if (e.target.closest('#settings-btn') || e.target.closest('.settings-trigger-zone')) return;
-
-            if (!hasUserClicked) {
-                hasUserClicked = true;
-                const computedStyle = window.getComputedStyle(promptElement);
-                promptElement.style.opacity = computedStyle.opacity;
-                promptElement.style.filter = computedStyle.filter;
-                promptElement.style.transform = computedStyle.transform;
-                promptElement.classList.remove('animate-prompt');
-                void promptElement.offsetWidth;
-                promptElement.style.transition = 'opacity 2.5s ease-in-out, filter 2.5s ease-in-out, transform 2.5s ease-in-out';
-                promptElement.style.opacity = '0';
-                promptElement.style.filter = 'blur(15px)';
-                promptElement.style.transform = 'rotate(-4deg) translateY(15px)';
-                setTimeout(() => { promptElement.style.display = 'none'; }, 2500);
-            }
-
-            if (inputContainer && !inputContainer.classList.contains('active')) {
-                if (!e.target.closest('.bottom-credits-wrapper')) {
-                    inputContainer.classList.add('active');
-                    isSecretTextActive = true; 
-                    textContainer.classList.add('secret-active');
-
+                setTimeout(() => {
+                    buildWaveText("введите код доступа к сессии");
                     letters.forEach((span, i) => {
                         setTimeout(() => {
-                            span.style.opacity = '0';
-                            span.style.filter = 'blur(6px)';
-                            span.style.transform = `translateY(${Math.random() > 0.5 ? -10 : 10}px)`;
-                        }, i * 20); 
+                            span.style.opacity = '1';
+                            span.style.filter = 'blur(0px)';
+                            span.style.transform = 'translateY(0px)';
+                        }, i * 20);
                     });
+                }, 600);
 
-                    setTimeout(() => {
-                        buildWaveText("введите код доступа к сессии");
-                        letters.forEach((span, i) => {
-                            setTimeout(() => {
-                                span.style.opacity = '1';
-                                span.style.filter = 'blur(0px)';
-                                span.style.transform = 'translateY(0px)';
-                            }, i * 20);
-                        });
-                    }, 600);
-
-                    if (textInput) { setTimeout(() => textInput.focus(), 100); }
-                }
+                if (textInput) { setTimeout(() => textInput.focus(), 100); }
             }
-
-            playMusic();
-            createBackgroundRipple(e.clientX, e.clientY, 'bg-click-ripple');
-        });
-
-        const volumeBtn = document.getElementById('volume-toggle-btn');
-        const volumeIcon = document.getElementById('volume-icon');
-        let isMuted = false;
-
-        volumeBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); 
-            isMuted = !isMuted;
-            bgMusic.muted = isMuted;
-            if (isMuted) {
-                volumeStatusLabel.classList.add('muted-mode');
-                volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15" stroke-width="1.5"></line><line x1="17" y1="9" x2="23" y2="15" stroke-width="1.5"></line>`;
-            } else {
-                volumeStatusLabel.classList.remove('muted-mode');
-                volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path class="volume-wave-1" d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path class="volume-wave-2" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>`;
-                playMusic();
-            }
-        });
-
-        intensitySlider.addEventListener('mousedown', (e) => { e.stopPropagation(); });
-        intensitySlider.addEventListener('input', (e) => {
-            intensityPercent = parseInt(e.target.value);
-            intensityValueLabel.innerText = `${intensityPercent}%`;
-        });
-
-        const submitBtn = document.getElementById('submit-auth-btn');
-        const myInput = document.getElementById('user-text-input'); 
-        let livesInErrorState = false;
-
-        myInput.addEventListener('input', () => {
-            const textLength = myInput.value.trim().length;
-            if (textLength > 0) { submitBtn.classList.add('btn-active'); } 
-            else { submitBtn.classList.remove('btn-active'); }
-
-            if (livesInErrorState) {
-                livesInErrorState = false;
-                myInput.classList.remove('input-error-state'); 
-                submitBtn.classList.remove('state-error');     
-            }
-        });
-
-        // Функция разбиения текста накладки на спаны
-        function prepareDashboardSpans(elementId, startDelay) {
-            const el = document.getElementById(elementId);
-            if (!el) return;
-            const text = el.innerText;
-            el.innerHTML = '';
-            Array.from(text).forEach((char, index) => {
-                const span = document.createElement('span');
-                if (char === ' ') { span.innerHTML = '&nbsp;'; } else { span.innerText = char; }
-                span.style.animationDelay = `${startDelay + (index * 0.04)}s`;
-                el.appendChild(span);
-            });
         }
 
-        submitBtn.addEventListener('click', () => {
-            if (submitBtn.classList.contains('state-loading') || submitBtn.classList.contains('state-error')) return;
+        playMusic();
+        createBackgroundRipple(e.clientX, e.clientY, 'bg-click-ripple');
+    });
 
-            const password = myInput.value.trim();
-            submitBtn.classList.add('state-loading');
+    const volumeBtn = document.getElementById('volume-toggle-btn');
+    const volumeIcon = document.getElementById('volume-icon');
+    let isMuted = false;
 
-            setTimeout(() => {
-                submitBtn.classList.remove('state-loading');
+    volumeBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); 
+        isMuted = !isMuted;
+        bgMusic.muted = isMuted;
+        if (isMuted) {
+            volumeStatusLabel.classList.add('muted-mode');
+            volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15" stroke-width="1.5"></line><line x1="17" y1="9" x2="23" y2="15" stroke-width="1.5"></line>`;
+        } else {
+            volumeStatusLabel.classList.remove('muted-mode');
+            volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path class="volume-wave-1" d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path class="volume-wave-2" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>`;
+            playMusic();
+        }
+    });
 
-                if (password === "489634") {
-                    const mainContainer = document.querySelector('.main-container');
-                    const cornerWrapper = document.querySelector('.corner-icon-floating-wrapper');
-                    const promptText = document.getElementById('click-prompt');
-                    const dashboardOverlay = document.getElementById('session-dashboard');
+    intensitySlider.addEventListener('mousedown', (e) => { e.stopPropagation(); });
+    intensitySlider.addEventListener('input', (e) => {
+        intensityPercent = parseInt(e.target.value);
+        intensityValueLabel.innerText = `${intensityPercent}%`;
+    });
 
-                    // 1. Растворяем старый интерфейс
-                    if (mainContainer) mainContainer.classList.add('fade-out-element');
-                    if (cornerWrapper) cornerWrapper.classList.add('fade-out-element');
-                    if (promptText) promptText.classList.add('fade-out-element');
-                    
-                    // 2. Включаем отображение накладки, нарезаем буквы и активируем анимацию волны
-                    if (dashboardOverlay) {
-                        dashboardOverlay.style.display = 'flex';
-                        prepareDashboardSpans('db-animate-title', 0.20);
-                        prepareDashboardSpans('db-animate-message', 0.50);
-                        
-                        requestAnimationFrame(() => {
-                            dashboardOverlay.classList.add('show-framework');
-                        });
-                    }
-                    
-                    // Внутри обработчика кнопки в index.html измени путь для перехода:
-                    setTimeout(() => {
-                    window.location.href = './beginning.html'; // <--- Меняем здесь название файла
-                    }, 2500); 
+    const submitBtn = document.getElementById('submit-auth-btn');
+    const myInput = document.getElementById('user-text-input'); 
+    let livesInErrorState = false;
 
-                } else {
-                    setTimeout(() => {
-                        livesInErrorState = true;
-                        myInput.classList.add('input-error-state'); 
-                        submitBtn.classList.add('state-error');       
-                    }, 500); 
-                }
-            }, 1000); 
+    myInput.addEventListener('input', () => {
+        const textLength = myInput.value.trim().length;
+        if (textLength > 0) { submitBtn.classList.add('btn-active'); } 
+        else { submitBtn.classList.remove('btn-active'); }
+
+        if (livesInErrorState) {
+            livesInErrorState = false;
+            myInput.classList.remove('input-error-state'); 
+            submitBtn.classList.remove('state-error');     
+        }
+    });
+
+    // Вход по нажатию клавиши Enter
+    myInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            submitBtn.click();
+        }
+    });
+
+    function prepareDashboardSpans(elementId, startDelay) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        const text = el.innerText;
+        el.innerHTML = '';
+        Array.from(text).forEach((char, index) => {
+            const span = document.createElement('span');
+            if (char === ' ') { span.innerHTML = '&nbsp;'; } else { span.innerText = char; }
+            span.style.animationDelay = `${startDelay + (index * 0.04)}s`;
+            el.appendChild(span);
         });
+    }
 
-        submitBtn.addEventListener('mousedown', (e) => { e.stopPropagation(); });
-    </script>
+    // Обработка кнопки входа
+    submitBtn.addEventListener('click', () => {
+        if (submitBtn.classList.contains('state-loading') || submitBtn.classList.contains('state-error')) return;
+
+        const rawPassword = myInput.value.trim();
+        submitBtn.classList.add('state-loading');
+
+        // Небольшая задержка 600 мс для демонстрации анимации загрузки
+        setTimeout(() => {
+            submitBtn.classList.remove('state-loading');
+
+            // Проверка хеша
+            if (hashPassword(rawPassword) === TARGET_HASH) {
+                const mainContainer = document.querySelector('.main-container');
+                const cornerWrapper = document.querySelector('.corner-icon-floating-wrapper');
+                const promptText = document.getElementById('click-prompt');
+                const dashboardOverlay = document.getElementById('session-dashboard');
+
+                // 1. Растворяем старый интерфейс
+                if (mainContainer) mainContainer.classList.add('fade-out-element');
+                if (cornerWrapper) cornerWrapper.classList.add('fade-out-element');
+                if (promptText) promptText.classList.add('fade-out-element');
+                
+                // 2. Показываем панель входа
+                if (dashboardOverlay) {
+                    dashboardOverlay.style.display = 'flex';
+                    prepareDashboardSpans('db-animate-title', 0.20);
+                    prepareDashboardSpans('db-animate-message', 0.50);
+                    
+                    requestAnimationFrame(() => {
+                        dashboardOverlay.classList.add('show-framework');
+                    });
+                }
+                
+                // 3. Плавно скрываем через 2 секунды
+                setTimeout(() => {
+                    if (dashboardOverlay) {
+                        dashboardOverlay.classList.add('fade-out-fast');
+                    }
+                }, 2000);
+
+                // 4. Переходим на следующую страницу
+                setTimeout(() => {
+                    window.location.href = './beginning.html';
+                }, 2500); 
+
+            } else {
+                // Ошибка: подсвечиваем полем красным
+                livesInErrorState = true;
+                myInput.classList.add('input-error-state'); 
+                submitBtn.classList.add('state-error');       
+            }
+        }, 600); 
+    });
+
+    submitBtn.addEventListener('mousedown', (e) => { e.stopPropagation(); });
+</script>
 </body>
 </html>
