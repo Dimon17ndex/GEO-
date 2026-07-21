@@ -3,10 +3,20 @@ import bcrypt from 'bcryptjs';
 
 const SUPABASE_URL = 'https://ptzsoijqgqekenjjonrl.supabase.co';
 
-// ⚠️ УБЕДИТЕСЬ, ЧТО ЗДЕСЬ СТОИТ ВАШ КЛЮЧ
-const SUPABASE_ANON_KEY = 'sb_publishable_ZPrRJS8ZQPQm9yZXTPYn8A_agcDr...'; 
+// ⚠️ Укажите ваш ключ Publishable Key (начинается на sb_publishable_...)
+const SUPABASE_ANON_KEY = 'ВАШ_PUBLISHABLE_KEY_ИЗ_SUPABASE'; 
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Отключаем лишние механизмы (Realtime/WebSockets), чтобы Node.js 20 не выдавал ошибку
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    persistSession: false,
+    autoRefreshToken: false,
+    detectSessionInUrl: false
+  },
+  global: {
+    fetch: globalThis.fetch
+  }
+});
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
@@ -34,7 +44,7 @@ export default async function handler(req: any, res: any) {
       .single();
 
     if (error || !user) {
-      console.error('Ошибка базы данных:', error);
+      console.error('Ошибка Supabase:', error);
       return res.status(401).json({ success: false, error: 'Пользователь не найден' });
     }
 
@@ -49,6 +59,6 @@ export default async function handler(req: any, res: any) {
 
   } catch (err: any) {
     console.error('Server error:', err);
-    return res.status(500).json({ success: false, error: err?.message || 'Server error' });
+    return res.status(500).json({ success: false, error: 'Internal Server Error' });
   }
 }
