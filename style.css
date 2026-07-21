@@ -1067,16 +1067,15 @@ body:has(.input-container-box.active) .logo-icon {
     animation: fadeInElement 0.4s ease-out forwards;
 }
 
-/* Стили и подсветка крупной SVG Галочки */
+/* Стили и яркая неоновая подсветка SVG Галочки */
 .success-checkmark {
-    width: 42px;             /* Увеличен размер */
-    height: 42px;            /* Увеличен размер */
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     display: block;
     stroke-width: 4;
     stroke: #00ff6e;
     stroke-miterlimit: 10;
-    /* Неоновая подсветка галочки, аналогичная тексту */
     filter: drop-shadow(0 0 12px rgba(0, 255, 110, 0.8)) drop-shadow(0 0 25px rgba(0, 255, 110, 0.4));
     opacity: 0;
 }
@@ -1094,9 +1093,9 @@ body:has(.input-container-box.active) .logo-icon {
     fill: none;
 }
 
-/* Задержка 1.8s — рисует окружность строго ПОСЛЕ полного появления всех букв */
+/* Задержка 2.02s — СТРОГО в момент окончания проявления последней буквы */
 .session-dashboard.show-framework .checkmark-circle {
-    animation: strokeCircle 0.5s cubic-bezier(0.65, 0, 0.45, 1) 1.8s forwards;
+    animation: strokeCircle 0.45s cubic-bezier(0.65, 0, 0.45, 1) 2.02s forwards;
 }
 
 .success-checkmark .checkmark-check {
@@ -1109,12 +1108,12 @@ body:has(.input-container-box.active) .logo-icon {
     stroke-linejoin: round;
 }
 
-/* Задержка 2.3s — галочка рисуется сразу после окружности */
+/* Задержка 2.47s — Галочка отрисовывается сразу после окружности */
 .session-dashboard.show-framework .checkmark-check {
-    animation: strokeCheck 0.3s cubic-bezier(0.65, 0, 0.45, 1) 2.3s forwards;
+    animation: strokeCheck 0.25s cubic-bezier(0.65, 0, 0.45, 1) 2.47s forwards;
 }
 
-/* Анимация рисования линии точкой */
+/* Анимация движения линии/точки */
 @keyframes strokeCircle {
     100% {
         stroke-dashoffset: 0;
