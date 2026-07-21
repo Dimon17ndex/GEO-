@@ -575,7 +575,6 @@
         submitBtn.classList.add('state-loading');
 
         try {
-            // Отправляем пароль на Vercel Backend
             const response = await fetch('/api/login', {
                 method: 'POST',
                 headers: {
@@ -593,12 +592,12 @@
                 const promptText = document.getElementById('click-prompt');
                 const dashboardOverlay = document.getElementById('session-dashboard');
 
-                // 1. Растворяем первичные элементы интерфейса
+                // 1. Растворяем элементы
                 if (mainContainer) mainContainer.classList.add('fade-out-element');
                 if (cornerWrapper) cornerWrapper.classList.add('fade-out-element');
                 if (promptText) promptText.classList.add('fade-out-element');
                 
-                // 2. Запускаем панель сессии (появление элементов)
+                // 2. Запускаем панель сессии
                 if (dashboardOverlay) {
                     dashboardOverlay.style.display = 'flex';
                     prepareDashboardSpans('db-animate-title', 0.20);
@@ -609,20 +608,19 @@
                     });
                 }
                 
-                // 3. Плавное затухание (быстрый показ: 2.2 секунды)
+                // 3. Затухание: уходит через 2.8с (после текста ~1.2s и галочки ~0.8s остаётся пауза 0.8s)
                 setTimeout(() => {
                     if (dashboardOverlay) {
                         dashboardOverlay.classList.add('fade-out-fast');
                     }
-                }, 2200); 
+                }, 2800); 
 
-                // 4. Переход на следующую страницу (2.6 секунды)
+                // 4. Переход на следующую страницу
                 setTimeout(() => {
                     window.location.href = '/beginning.html';
-                }, 2600); 
+                }, 3200); 
 
             } else {
-                // Ошибка с сервера (неверный пароль)
                 livesInErrorState = true;
                 myInput.classList.add('input-error-state'); 
                 submitBtn.classList.add('state-error');       
