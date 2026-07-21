@@ -1067,7 +1067,7 @@ body:has(.input-container-box.active) .logo-icon {
     animation: fadeInElement 0.4s ease-out forwards;
 }
 
-/* Стили и неоновая подсветка SVG Галочки */
+/* Стили и яркая неоновая подсветка SVG Галочки */
 .success-checkmark {
     width: 42px;
     height: 42px;
@@ -1082,7 +1082,7 @@ body:has(.input-container-box.active) .logo-icon {
 
 .session-dashboard.show-framework .success-checkmark {
     opacity: 1;
-    /* Увеличена длительность вращения с 0.7s до 1.4s для более плавного и медленного оборота */
+    /* Плановое, нежное вращение на 360 градусов за 1.4 секунды */
     animation: gentleSpin 1.4s cubic-bezier(0.25, 1, 0.5, 1) 1.6s forwards;
 }
 
@@ -1095,7 +1095,7 @@ body:has(.input-container-box.active) .logo-icon {
     fill: none;
 }
 
-/* Окружность рисуется плавно вместе с начавшимся вращением (1.6s) */
+/* Окружность начинает рисоваться вместе со стартом вращения (1.6s) */
 .session-dashboard.show-framework .checkmark-circle {
     animation: strokeCircle 0.6s cubic-bezier(0.65, 0, 0.45, 1) 1.6s forwards;
 }
@@ -1110,12 +1110,25 @@ body:has(.input-container-box.active) .logo-icon {
     stroke-linejoin: round;
 }
 
-/* Галочка завершает рисунок ближе к концу вращения (2.2s) */
+/* Отрисовка самой птички к завершению вращения (2.2s) */
 .session-dashboard.show-framework .checkmark-check {
     animation: strokeCheck 0.35s cubic-bezier(0.65, 0, 0.45, 1) 2.2s forwards;
 }
 
-/* Нежное медленное вращение иконки на 360 градусов */
+/* Ключевые кадры прорисовки */
+@keyframes strokeCircle {
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes strokeCheck {
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+/* Ключевые кадры плавного медленного вращения */
 @keyframes gentleSpin {
     0% {
         transform: rotate(0deg) scale(0.85);
@@ -1125,7 +1138,7 @@ body:has(.input-container-box.active) .logo-icon {
     }
 }
 
-/* Плавное затухание дашборда при переходе */
+/* Плавное затухание всего дашборда перед переходом */
 .session-dashboard.fade-out-fast {
     opacity: 0 !important;
     filter: blur(15px) !important;
