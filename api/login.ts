@@ -1,4 +1,5 @@
 export default async function handler(req: any, res: any) {
+  // Разрешаем только POST запросы
   if (req.method !== 'POST') {
     return res.status(405).json({ success: false, error: 'Method not allowed' });
   }
@@ -6,6 +7,7 @@ export default async function handler(req: any, res: any) {
   try {
     let body = req.body;
 
+    // Парсим body, если он пришел строкой
     if (typeof body === 'string') {
       try {
         body = JSON.parse(body);
@@ -20,16 +22,11 @@ export default async function handler(req: any, res: any) {
       return res.status(400).json({ success: false, error: 'Пароль не указан' });
     }
 
-    // Читаем переменную из Vercel (используем (globalThis as any).process для обхода жесткой проверки типов)
-    const env = (globalThis as any).process?.env || {};
-    const correctPassword = env.ADMIN_PASSWORD;
+    // Очищаем введенный пароль от пробелов
+    const cleanPassword = String(password).trim();
 
-    if (!correctPassword) {
-      console.error('ADMIN_PASSWORD не задан в Vercel!');
-      return res.status(500).json({ success: false, error: 'Ошибка конфигурации сервера' });
-    }
-
-    if (String(password).trim() === String(correctPassword).trim()) {
+    // Прямая проверка пароля
+    if (cleanPassword === '489634') {
       return res.status(200).json({ success: true });
     } else {
       return res.status(401).json({ success: false, error: 'Неверный пароль' });
