@@ -968,15 +968,3 @@ body:has(.input-container-box.active) .logo-icon {
 .db-subtitle-badge {
     display: none !important;
 }
-
-/* Статичный сдвиг логотипа ближе к тексту на экране успеха */
-body:has(.secret-active) .brand-block,
-body:has(#wave-text.secret-active) .brand-block {
-    gap: 10px !important;
-    transition: none !important; /* Полностью отключаем любую анимацию */
-}
-
-body:has(.secret-active) .logo-icon,
-body:has(#wave-text.secret-active) .logo-icon {
-    transition: none !important; /* Полностью отключаем любую анимацию */
-}
