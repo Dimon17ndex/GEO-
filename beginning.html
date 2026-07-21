@@ -150,5 +150,14 @@
         intensityValueLabel.innerText = `${intensityPercent}%`;
     });
 </script>
+
+<script>
+    // Как только DOM готов, запускаем плавное проявление из темноты
+    document.addEventListener('DOMContentLoaded', () => {
+        requestAnimationFrame(() => {
+            document.body.classList.add('page-loaded');
+        });
+    });
+</script>
 </body>
 </html>
