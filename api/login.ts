@@ -1,11 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 import bcrypt from 'bcryptjs';
 
-// URL базы данных Supabase
 const SUPABASE_URL = 'https://ptzsoijqgqekenjjonrl.supabase.co';
 
-// ⚠️ Вставьте сюда ваш ключ Publishable Key из Supabase (Settings -> API Keys)
-const SUPABASE_ANON_KEY = 'ВАШ_PUBLISHABLE_KEY';
+// ⚠️ УБЕДИТЕСЬ, ЧТО ЗДЕСЬ СТОИТ ВАШ КЛЮЧ
+const SUPABASE_ANON_KEY = 'sb_publishable_ZPrRJS8ZQPQm9yZXTPYn8A_agcDr...'; 
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -27,7 +26,7 @@ export default async function handler(req: any, res: any) {
 
     const cleanPassword = password.trim();
 
-    // Запрашиваем из базы данных Supabase
+    // Запрос к Supabase
     const { data: user, error } = await supabase
       .from('users')
       .select('password_hash')
@@ -35,11 +34,11 @@ export default async function handler(req: any, res: any) {
       .single();
 
     if (error || !user) {
-      console.error('Ошибка Supabase:', error);
+      console.error('Ошибка базы данных:', error);
       return res.status(401).json({ success: false, error: 'Пользователь не найден' });
     }
 
-    // Проверяем пароль через bcrypt
+    // Проверка bcrypt
     const isMatch = await bcrypt.compare(cleanPassword, user.password_hash);
 
     if (!isMatch) {
@@ -50,6 +49,6 @@ export default async function handler(req: any, res: any) {
 
   } catch (err: any) {
     console.error('Server error:', err);
-    return res.status(500).json({ success: false, error: 'Internal Server Error' });
+    return res.status(500).json({ success: false, error: err?.message || 'Server error' });
   }
 }
