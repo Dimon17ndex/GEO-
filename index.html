@@ -558,20 +558,29 @@
         });
     }
 
-    // Проверка пароля через SHA-256
+    // Проверка пароля через Vercel Serverless API (/api/auth)
     submitBtn.addEventListener('click', async () => {
         if (submitBtn.classList.contains('state-loading') || submitBtn.classList.contains('state-error')) return;
 
         const rawPassword = myInput.value.trim();
+        if (!rawPassword) return;
+
         submitBtn.classList.add('state-loading');
 
         try {
-            // Генерируем хеш для введенного текста
-            const enteredHash = await hashPassword(rawPassword);
-            
+            // Отправляем пароль на Vercel Backend
+            const response = await fetch('/api/auth', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ password: rawPassword })
+            });
+
+            const data = await response.json();
             submitBtn.classList.remove('state-loading');
 
-            if (enteredHash === TARGET_HASH) {
+            if (response.ok && data.success) {
                 const mainContainer = document.querySelector('.main-container');
                 const cornerWrapper = document.querySelector('.corner-icon-floating-wrapper');
                 const promptText = document.getElementById('click-prompt');
@@ -606,12 +615,13 @@
                 }, 2500); 
 
             } else {
+                // Ошибка с сервера (неверный пароль)
                 livesInErrorState = true;
                 myInput.classList.add('input-error-state'); 
                 submitBtn.classList.add('state-error');       
             }
         } catch (err) {
-            console.error("Ошибка хеширования:", err);
+            console.error("Ошибка сети или сервера:", err);
             submitBtn.classList.remove('state-loading');
             livesInErrorState = true;
             myInput.classList.add('input-error-state'); 
