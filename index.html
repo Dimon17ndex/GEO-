@@ -610,16 +610,17 @@
                 
                 // 3. Затухание: запускаем на 3.4с
 // 3. Плавное затухание (начинается на 4.2с)
+// 3. Плавное затухание дашборда (4.5 секунды)
 setTimeout(() => {
     if (dashboardOverlay) {
         dashboardOverlay.classList.add('fade-out-fast');
     }
-}, 4200); 
+}, 4500); 
 
-// 4. Переход на следующую страницу (на 4.7с)
+// 4. Переход на следующую страницу (5.0 секунд)
 setTimeout(() => {
     window.location.href = '/beginning.html';
-}, 4700); 
+}, 5000); 
 
             } else {
                 livesInErrorState = true;
