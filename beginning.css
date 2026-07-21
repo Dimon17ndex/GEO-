@@ -1,12 +1,111 @@
-/* beginning.css */
-
-body {
+/* ==========================================================================
+   1. БАЗА И ФОН
+   ========================================================================== */
+html, body {
     margin: 0;
     padding: 0;
-    background: #000; /* Черный фон для бесшовного слияния с index.html */
+    width: 100%;
+    height: 100%;
+    background-color: #0b0b0b;
+    font-family: 'Montserrat', sans-serif;
+    color: #ffffff;
     overflow: hidden;
+    user-select: none;
 }
 
+body {
+    background-image: url('images/grafit_bg.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+/* ==========================================================================
+   2. ТЕНИ И КОНТЕЙНЕР ВОЛН
+   ========================================================================== */
+.shadow-layer {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url('images/shadow.png');
+    background-size: cover;
+    background-position: center;
+    pointer-events: none;
+    z-index: 1;
+    animation: fadeInShadow 1.5s ease-out forwards,
+               breathe 8s ease-in-out 1.5s infinite;
+}
+
+#bg-wave-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    overflow: visible;
+}
+
+/* ==========================================================================
+   3. РАДИАЛЬНЫЕ ВОЛНЫ (RIPPLES)
+   ========================================================================== */
+.bg-wave-ripple {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: radial-gradient(circle, rgba(255, 30, 30, 0.25) 0%, rgba(255, 0, 0, 0) 70%);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: none;
+    animation: screenRippleBlast 1.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+
+.bg-click-ripple {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 70%);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: none;
+    animation: screenRippleBlast 1.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+
+.bg-ambient-ripple {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: none;
+    animation: slowAmbientBlast 3s cubic-bezier(0.2, 0.5, 0.4, 1) forwards;
+}
+
+.bg-ambient-red {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: radial-gradient(circle, rgba(255, 35, 35, 0.4) 0%, rgba(255, 0, 0, 0) 70%);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: none;
+    animation: slowAmbientBlast 3s cubic-bezier(0.2, 0.5, 0.4, 1) forwards;
+}
+
+.bg-ambient-green {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: radial-gradient(circle, rgba(0, 255, 110, 0.35) 0%, rgba(0, 255, 0, 0) 70%);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: none;
+    animation: slowAmbientBlast 3s cubic-bezier(0.2, 0.5, 0.4, 1) forwards;
+}
+
+/* ==========================================================================
+   4. ДАШБОРД И АНИМАЦИИ ПОЯВЛЕНИЯ
+   ========================================================================== */
 .session-dashboard {
     position: fixed;
     top: 0;
@@ -41,12 +140,6 @@ body {
     animation: fullscreenGreenBlast 1.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
 }
 
-@keyframes fullscreenGreenBlast {
-    0% { transform: translate(-50%, 50%) scale(1); opacity: 0; }
-    10% { opacity: 1; }
-    100% { transform: translate(-50%, 50%) scale(250); opacity: 0; }
-}
-
 .dashboard-content-wrapper {
     display: flex;
     flex-direction: column;
@@ -60,7 +153,7 @@ body {
 .db-brand-block {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 25px; 
     opacity: 0;
     filter: blur(10px);
     transform: translateY(-10px);
@@ -75,44 +168,59 @@ body {
 }
 
 .db-logo-icon {
-    width: 65px;  
-    height: 65px;
+    width: 90px;  
+    height: 90px;
     object-fit: contain;
 }
 
 .db-text-right {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
+    justify-content: center;
 }
 
-.db-main-title, .success-message {
+.db-main-title {
     font-family: 'Unbounded', sans-serif;
     margin: 0;
     text-transform: uppercase;
-    text-align: center;
-}
-
-/* Заголовок: обычный белый цвет БЕЗ свечения */
-.db-main-title {
     color: #ffffff;
-    font-size: 32px; 
+    font-size: 36px;
     font-weight: 900;
     line-height: 1;
     letter-spacing: 1px;
+    text-align: left;
 }
 
-/* Текст про сессию: яркий ЗЕЛЕНЫЙ цвет */
 .success-message {
     color: #00ff6e; 
     font-size: 24px;
     font-weight: 700;
     letter-spacing: 2.5px;
     width: 100%;
+    text-align: center;
 }
 
-/* Базовые стили для анимации букв */
+/* Плашка */
+.db-subtitle-badge {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    padding: 5px 14px;
+    border-radius: 50px;
+    display: inline-block;
+}
+
+.db-subtitle-badge span {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px; 
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #ffffff;
+    display: block;
+    line-height: 1;
+}
+
+/* Анимация букв */
 .db-main-title span, .success-message span {
     display: inline-block;
     opacity: 0;
@@ -131,29 +239,49 @@ body {
     animation-name: assembleLetterGreen;
 }
 
-.db-subtitle-badge {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    padding: 4px 12px;
-    border-radius: 50px;
+/* Исчезновение */
+.session-dashboard.fade-out-fast {
+    opacity: 0;
+    filter: blur(10px);
+    transform: scale(0.95);
+    transition: opacity 0.5s ease-in-out, filter 0.5s ease-in-out, transform 0.5s ease-in-out;
 }
 
-.db-subtitle-badge span {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 10px; 
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: rgba(255, 255, 255, 0.8);
+/* ==========================================================================
+   5. KEYFRAMES
+   ========================================================================== */
+@keyframes fadeInShadow {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
-/* Анимация для "GEOГРАФИЯ" (чистый белый появление) */
+@keyframes breathe {
+    0%, 100%, 70% { opacity: 1; transform: scale(1); }
+    25% { opacity: 0.6; transform: scale(1.04); }
+    85% { opacity: 0.75; transform: scale(1.02); }
+}
+
+@keyframes fullscreenGreenBlast {
+    0% { transform: translate(-50%, 50%) scale(1); opacity: 0; }
+    10% { opacity: 1; }
+    100% { transform: translate(-50%, 50%) scale(250); opacity: 0; }
+}
+
+@keyframes screenRippleBlast {
+    0% { width: 0px; height: 0px; opacity: 1; }
+    100% { width: 1600px; height: 1600px; opacity: 0; }
+}
+
+@keyframes slowAmbientBlast {
+    0% { width: 0px; height: 0px; opacity: 1; }
+    100% { width: 1800px; height: 1800px; opacity: 0; }
+}
+
 @keyframes assembleLetterSimple {
     0% { opacity: 0; filter: blur(8px); transform: scale(1.4) translateY(-10px); }
     100% { opacity: 1; filter: blur(0px); transform: scale(1) translateY(0); }
 }
 
-/* Анимация для текста сессии (зеленый + мягкий неон) */
 @keyframes assembleLetterGreen {
     0% { opacity: 0; filter: blur(8px); transform: scale(1.4) translateY(-10px); text-shadow: 0 0 20px rgba(0, 255, 110, 1); }
     100% { opacity: 1; filter: blur(0px); transform: scale(1) translateY(0); text-shadow: 0 0 10px rgba(0, 255, 110, 0.3); }
