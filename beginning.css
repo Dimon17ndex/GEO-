@@ -671,3 +671,14 @@ body {
     0% { opacity: 0; filter: blur(8px); transform: scale(1.4) translateY(-10px); text-shadow: 0 0 20px rgba(0, 255, 110, 1); }
     100% { opacity: 1; filter: blur(0px); transform: scale(1) translateY(0); text-shadow: 0 0 10px rgba(0, 255, 110, 0.3); }
 }
+
+/* Изначально скрываем тело новой страницы */
+body {
+    opacity: 0;
+    transition: opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Класс для плавного проявления */
+body.page-loaded {
+    opacity: 1;
+}
