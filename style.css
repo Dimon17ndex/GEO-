@@ -970,22 +970,15 @@ body:has(.input-container-box.active) .logo-icon {
 }
 
 /* ==========================================================================
-   ПРИБЛИЖЕНИЕ ЛОГОТИПА К ТЕКСТУ ПРИ УСПЕШНОМ ВХОДЕ
+   СБЛИЖЕНИЕ ЛОГОТИПА И НАДПИСИ НА ЭКРАНЕ УСПЕХА
    ========================================================================== */
-/* Включаем плавный переход для отступа и трансформации */
-.brand-block {
-    transition: gap 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+/* Применяем правила к блоку бренда, когда активен экран успеха */
+body:has(.secret-active) .brand-block,
+body:has(#wave-text.secret-active) .brand-block {
+    gap: 15px !important; /* Уменьшаем стандартный зазор (был 40px) */
 }
 
-.logo-icon {
-    transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-/* Когда активен экран успеха (секретный режим) */
-body:has(.secret-active) .brand-block {
-    gap: 10px; /* Уменьшаем расстояние между лого и текстом (было 40px) */
-}
-
-body:has(.secret-active) .logo-icon {
-    transform: scale(1.25) translateX(15px); /* Увеличиваем лого и придвигаем вправо к «GEOГРАФИЯ» */
+body:has(.secret-active) .logo-icon,
+body:has(#wave-text.secret-active) .logo-icon {
+    transform: translateX(10px) !important; /* Дополнительно сдвигаем логотип вправо к тексту */
 }
