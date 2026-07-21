@@ -19,7 +19,7 @@
 
     <div id="bg-wave-container"></div>
 
-    <div class="settings-trigger-zone" id="settings-btn">
+    <div class="settings-trigger-zone" id="settings-btn" style="opacity: 1; pointer-events: auto;">
         <div class="settings-container-box">
             <div class="settings-icon-box">
                 <svg class="gear-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -53,9 +53,9 @@
         </div>
     </div>
 
-    <div class="session-dashboard" id="session-dashboard">
+    <div class="session-dashboard show-framework" id="session-dashboard" style="display: flex; opacity: 1; pointer-events: auto;">
         <div class="dashboard-content-wrapper">
-            <div class="db-brand-block">
+            <div class="db-brand-block" style="opacity: 1; filter: blur(0px); transform: translateY(0);">
                 <img src="images/geo_logo.png" alt="Geo Logo" class="db-logo-icon">
                 <div class="db-text-right">
                     <h1 class="db-main-title" id="db-animate-title">GEOГРАФИЯ</h1>
@@ -148,39 +148,6 @@
     intensitySlider.addEventListener('input', (e) => {
         intensityPercent = parseInt(e.target.value);
         intensityValueLabel.innerText = `${intensityPercent}%`;
-    });
-
-    // Анимация дашборда при входе на страницу
-    function prepareDashboardSpans(elementId, startDelay) {
-        const el = document.getElementById(elementId);
-        if (!el) return;
-        const text = el.innerText;
-        el.innerHTML = '';
-        Array.from(text).forEach((char, index) => {
-            const span = document.createElement('span');
-            if (char === ' ') { span.innerHTML = '&nbsp;'; } else { span.innerText = char; }
-            span.style.animationDelay = `${startDelay + (index * 0.04)}s`;
-            el.appendChild(span);
-        });
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-        const dashboardOverlay = document.getElementById('session-dashboard');
-        if (dashboardOverlay) {
-            prepareDashboardSpans('db-animate-title', 0.20);
-            prepareDashboardSpans('db-animate-message', 0.50);
-            
-            requestAnimationFrame(() => {
-                dashboardOverlay.classList.add('show-framework');
-            });
-
-            setTimeout(() => {
-                dashboardOverlay.classList.add('fade-out-fast');
-                setTimeout(() => {
-                    dashboardOverlay.style.display = 'none';
-                }, 500);
-            }, 2200);
-        }
     });
 </script>
 </body>
