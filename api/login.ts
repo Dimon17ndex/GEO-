@@ -1,5 +1,4 @@
-import bcrypt from 'bcrypt';
-// Импортируем файл напрямую из корня проекта:
+import bcrypt from 'bcryptjs';
 import usersData from '../users.json';
 
 export default async function handler(req: any, res: any) {
@@ -14,20 +13,24 @@ export default async function handler(req: any, res: any) {
     }
 
     const users = usersData as Record<string, { passwordHash: string }>;
+    // Ищем именно пользователя 'admin'
     const user = users['admin'];
 
     if (!user) {
-      return res.status(401).json({ success: false, error: 'Неверный логин или пароль' });
+      return res.status(401).json({ success: false, error: 'Пользователь не найден' });
     }
 
-    const isMatch = await bcrypt.compare(password, user.passwordHash);
+    // Очищаем введенный пароль от случайных пробелов по краям
+    const cleanPassword = password.trim();
+
+    const isMatch = await bcrypt.compare(cleanPassword, user.passwordHash);
     if (!isMatch) {
-      return res.status(401).json({ success: false, error: 'Неверный логин или пароль' });
+      return res.status(401).json({ success: false, error: 'Неверный пароль' });
     }
 
     return res.status(200).json({ success: true });
   } catch (err: any) {
-    console.error('Ошибка на сервере:', err);
-    return res.status(500).json({ success: false, error: err.message || 'Server error' });
+    console.error('Ошибка сервера:', err);
+    return res.status(500).json({ success: false, error: 'Internal server error' });
   }
 }
