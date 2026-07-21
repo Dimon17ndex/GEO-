@@ -12,6 +12,67 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="beginning.css">
+
+    <style>
+        /* Плавное проявление страницы при загрузке */
+        body {
+            opacity: 0;
+            transition: opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        body.page-loaded {
+            opacity: 1;
+        }
+
+        /* Позиционирование бренд-блока в верхнем левом углу */
+        .top-left-brand {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            z-index: 10;
+        }
+
+        .top-left-brand .db-brand-block {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .top-left-brand .db-logo-icon {
+            height: auto;
+            max-width: 110px;
+            width: 100%;
+        }
+
+        .top-left-brand .db-text-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .top-left-brand .db-main-title {
+            margin: 0;
+            font-family: 'Unbounded', sans-serif;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            line-height: 1;
+            display: flex;
+            color: #ffffff;
+        }
+
+        /* Серый статус "ЗДЕСЬ ПОКА ПУСТО" */
+        .empty-status-message {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+            margin-top: 8px;
+        }
+    </style>
 </head>
 <body>
 
@@ -48,7 +109,7 @@
                 </svg>
                 <div class="volume-label" id="volume-status-label">музыка <span class="status-on">on</span> / <span class="status-off">off</span></div>
             </div>
-            <div class="intensity-control-box" id="intensity-box">
+            <div class="intensity-control-box">
                 <div class="intensity-btn">
                     <svg class="intensity-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
@@ -66,7 +127,6 @@
     <script>
     const waveContainer = document.getElementById('bg-wave-container');
     const volumeStatusLabel = document.getElementById('volume-status-label');
-    const intensityControlBox = document.getElementById('intensity-box');
     const intensitySlider = document.getElementById('wave-intensity-slider');
     const intensityValueLabel = document.getElementById('intensity-value');
     
@@ -139,14 +199,14 @@
         }
     });
 
-    // Исключаем прогибание клика на область слайдера
-    intensityControlBox.addEventListener('mousedown', (e) => { e.stopPropagation(); });
+    // Управление интенсивностью
+    intensitySlider.addEventListener('mousedown', (e) => { e.stopPropagation(); });
     intensitySlider.addEventListener('input', (e) => {
         intensityPercent = parseInt(e.target.value);
         intensityValueLabel.innerText = `${intensityPercent}%`;
     });
 
-    // Плавное проявление страницы при загрузке
+    // Запуск мягкого проявления из темноты при загрузке
     document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(() => {
             document.body.classList.add('page-loaded');
