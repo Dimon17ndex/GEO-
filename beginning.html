@@ -34,7 +34,7 @@
 
         .top-left-brand .db-brand-block {
             display: flex;
-            align-items: center;
+            align-items: center; /* Центрирование логотипа относительно текста */
             gap: 20px;
         }
 
@@ -47,7 +47,7 @@
         .top-left-brand .db-text-right {
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
+            justify-content: center;
         }
 
         .top-left-brand .db-main-title {
@@ -57,20 +57,29 @@
             font-weight: 900;
             letter-spacing: -0.5px;
             line-height: 1;
-            display: flex;
             color: #ffffff;
+        }
+
+        /* Контейнер для размещения статуса строго по центру экрана */
+        .center-status-wrapper {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+            pointer-events: none;
+            text-align: center;
         }
 
         /* Серый статус "ЗДЕСЬ ПОКА ПУСТО" */
         .empty-status-message {
             font-family: 'Montserrat', sans-serif;
-            font-size: 11px;
+            font-size: 13px;
             font-weight: 700;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             text-transform: uppercase;
             color: rgba(255, 255, 255, 0.4);
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
-            margin-top: 8px;
         }
     </style>
 </head>
@@ -85,9 +94,12 @@
             <img src="images/geo_logo.png" alt="Geo Logo" class="db-logo-icon">
             <div class="db-text-right">
                 <h1 class="db-main-title">GEOГРАФИЯ</h1>
-                <div class="empty-status-message">ЗДЕСЬ ПОКА ПУСТО</div>
             </div>
         </div>
+    </div>
+
+    <div class="center-status-wrapper">
+        <div class="empty-status-message">ЗДЕСЬ ПОКА ПУСТО</div>
     </div>
 
     <div class="settings-trigger-zone" id="settings-btn" style="opacity: 1; pointer-events: auto;">
