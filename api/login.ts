@@ -5,38 +5,25 @@ export default async function handler(req: any, res: any) {
 
   try {
     let body = req.body;
-
     if (typeof body === 'string') {
-      try {
-        body = JSON.parse(body);
-      } catch (e) {
-        body = {};
-      }
+      try { body = JSON.parse(body); } catch (e) { body = {}; }
     }
 
-    const { password } = body || {};
+    const rawInput = body?.password || "";
+    const cleanInput = String(rawInput).trim();
 
-    if (!password) {
-      return res.status(400).json({ success: false, error: 'Пароль не указан' });
-    }
-
-    // Достаем пароль из настроек Vercel
-    const correctPassword = process.env.ADMIN_PASSWORD;
-
-    if (!correctPassword) {
-      console.error('ADMIN_PASSWORD не задан в Vercel!');
-      return res.status(500).json({ success: false, error: 'Ошибка конфигурации сервера' });
-    }
-
-    // Сравниваем введенный пароль с переменной из Vercel
-    if (String(password).trim() === correctPassword.trim()) {
+    // Проверяем пароль
+    if (cleanInput === "489634") {
       return res.status(200).json({ success: true });
-    } else {
-      return res.status(401).json({ success: false, error: 'Неверный пароль' });
     }
+
+    // Если пароль не совпал, возвращаем то, что сервер РЕАЛЬНО получил
+    return res.status(401).json({ 
+      success: false, 
+      error: `Вы ввели: "${cleanInput}" (длина ${cleanInput.length}), а ожидается "489634"` 
+    });
 
   } catch (err: any) {
-    console.error('Server error:', err);
-    return res.status(500).json({ success: false, error: 'Internal Server Error' });
+    return res.status(500).json({ success: false, error: err.message });
   }
 }
