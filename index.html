@@ -608,17 +608,17 @@
                     });
                 }
                 
-                // 3. Затухание: уходит через 2.8с (после текста ~1.2s и галочки ~0.8s остаётся пауза 0.8s)
-                setTimeout(() => {
-                    if (dashboardOverlay) {
-                        dashboardOverlay.classList.add('fade-out-fast');
-                    }
-                }, 2800); 
+                // 3. Затухание: запускаем на 3.4с
+setTimeout(() => {
+    if (dashboardOverlay) {
+        dashboardOverlay.classList.add('fade-out-fast');
+    }
+}, 3400); 
 
-                // 4. Переход на следующую страницу
-                setTimeout(() => {
-                    window.location.href = '/beginning.html';
-                }, 3200); 
+// 4. Переход на следующую страницу на 3.8с
+setTimeout(() => {
+    window.location.href = '/beginning.html';
+}, 3800); 
 
             } else {
                 livesInErrorState = true;
