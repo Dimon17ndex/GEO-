@@ -608,19 +608,17 @@
                     });
                 }
                 
-                // 3. Затухание: запускаем на 3.4с
-// 3. Плавное затухание (начинается на 4.2с)
-// 3. Плавное затухание дашборда (4.5 секунды)
-setTimeout(() => {
-    if (dashboardOverlay) {
-        dashboardOverlay.classList.add('fade-out-fast');
-    }
-}, 4500); 
+                // 3. Плавное затухание дашборда (начинается на 4.5 секунды)
+                setTimeout(() => {
+                    if (dashboardOverlay) {
+                        dashboardOverlay.classList.add('fade-out-fast');
+                    }
+                }, 4500); 
 
-// 4. Переход на следующую страницу (5.0 секунд)
-setTimeout(() => {
-    window.location.href = '/beginning.html';
-}, 5000); 
+                // 4. Пауза после полного исчезновения элементов и переход на новую страницу (6.0 секунд)
+                setTimeout(() => {
+                    window.location.href = '/beginning.html';
+                }, 6000);
 
             } else {
                 livesInErrorState = true;
