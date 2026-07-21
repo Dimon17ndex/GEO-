@@ -608,17 +608,15 @@
                     });
                 }
                 
-                // 3. Плавное затухание дашборда (начинается на 4.5 секунды)
-                setTimeout(() => {
-                    if (dashboardOverlay) {
-                        dashboardOverlay.classList.add('fade-out-fast');
-                    }
-                }, 4500); 
+                // 3. Запускаем полное затухание ВСЕЙ страницы (спустя 4.0 секунды)
+setTimeout(() => {
+    document.body.classList.add('page-fade-out');
+}, 4000); 
 
-                // 4. Пауза после полного исчезновения элементов и переход на новую страницу (6.0 секунд)
-                setTimeout(() => {
-                    window.location.href = '/beginning.html';
-                }, 6000);
+// 4. Пауза в полной темноте и переход на новую страницу (спустя 5.4 секунды)
+setTimeout(() => {
+    window.location.href = '/beginning.html';
+}, 5400);
 
             } else {
                 livesInErrorState = true;
