@@ -1,5 +1,5 @@
 {
   "admin": {
-    "passwordHash": "$2b$12$ВашBcryptХешЗдесь"
+    "passwordHash": "$2b$12$ВашНастоящийХеш..."
   }
 }
