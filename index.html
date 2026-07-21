@@ -569,7 +569,8 @@
 
         try {
             // Отправляем пароль на Vercel Backend
-            const response = await fetch('/api/login', {                method: 'POST',
+            const response = await fetch('/api/login', {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -585,12 +586,12 @@
                 const promptText = document.getElementById('click-prompt');
                 const dashboardOverlay = document.getElementById('session-dashboard');
 
-                // 1. Растворяем элементы интерфейса
+                // 1. Растворяем первичные элементы интерфейса
                 if (mainContainer) mainContainer.classList.add('fade-out-element');
                 if (cornerWrapper) cornerWrapper.classList.add('fade-out-element');
                 if (promptText) promptText.classList.add('fade-out-element');
                 
-                // 2. Запускаем панель сессии
+                // 2. Запускаем панель сессии (появление элементов)
                 if (dashboardOverlay) {
                     dashboardOverlay.style.display = 'flex';
                     prepareDashboardSpans('db-animate-title', 0.20);
@@ -601,17 +602,17 @@
                     });
                 }
                 
-                // 3. Плавно скрываем
+                // 3. Плавное затухание (увеличена задержка с 2000мс до 5000мс)
                 setTimeout(() => {
                     if (dashboardOverlay) {
                         dashboardOverlay.classList.add('fade-out-fast');
                     }
-                }, 2000);
+                }, 5000); // 5 секунд объекты остаются на экране
 
-                // 4. Переходим на следующую страницу
+                // 4. Переход на следующую страницу (увеличено с 2500мс до 5500мс)
                 setTimeout(() => {
                     window.location.href = '/beginning.html';
-                }, 2500); 
+                }, 5500); 
 
             } else {
                 // Ошибка с сервера (неверный пароль)
@@ -627,8 +628,6 @@
             submitBtn.classList.add('state-error');
         }
     });
-
-    submitBtn.addEventListener('mousedown', (e) => { e.stopPropagation(); });
 </script>
 </body>
 </html>
