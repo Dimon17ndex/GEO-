@@ -15,7 +15,7 @@ html, body {
 
 body {
     background-image: url('images/grafit_bg.png'); 
-    background-size: cover;       
+    background-size: cover;        
     background-position: center;  
     background-repeat: no-repeat; 
     background-attachment: fixed; 
@@ -950,4 +950,11 @@ body:has(.input-container-box.active) .main-container {
     transform: translateY(-20px) !important;
     pointer-events: none !important;
     transition: opacity 0.8s ease, filter 0.8s ease, transform 0.8s cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+
+/* ==========================================================================
+   14. СКРЫТИЕ ПЛАШКИ В СЕССИИ АВТОРИЗАЦИИ
+   ========================================================================== */
+.db-subtitle-badge {
+    display: none !important;
 }
