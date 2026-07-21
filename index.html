@@ -308,16 +308,15 @@
     let isSecretTextActive = false; 
     let letters = [];
 
-    // Хеш пароля "489634"
-    const TARGET_HASH = 1438962691;
+    // Хеш SHA-256 для пароля "489634"
+    const TARGET_HASH = "7cb1bd7cbbd841e21b7a2d4f3b7fdded949c836a0d0144983a5e8dbbcbe23687";
 
-    // Надежная функция хеширования, работающая локально (DJB2)
-    function hashPassword(str) {
-        let hash = 5381;
-        for (let i = 0; i < str.length; i++) {
-            hash = ((hash << 5) + hash) + str.charCodeAt(i);
-        }
-        return hash >>> 0;
+    // Функция хеширования Web Crypto API (SHA-256)
+    async function hashPassword(message) {
+        const msgBuffer = new TextEncoder().encode(message);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
     setTimeout(() => { isClickAllowed = true; }, 3000);
@@ -539,7 +538,7 @@
         }
     });
 
-    // Вход по нажатию клавиши Enter
+    // Обработка клавиши Enter
     myInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             submitBtn.click();
@@ -559,30 +558,31 @@
         });
     }
 
-    // Обработка кнопки входа
-    submitBtn.addEventListener('click', () => {
+    // Проверка пароля через SHA-256
+    submitBtn.addEventListener('click', async () => {
         if (submitBtn.classList.contains('state-loading') || submitBtn.classList.contains('state-error')) return;
 
         const rawPassword = myInput.value.trim();
         submitBtn.classList.add('state-loading');
 
-        // Небольшая задержка 600 мс для демонстрации анимации загрузки
-        setTimeout(() => {
+        try {
+            // Генерируем хеш для введенного текста
+            const enteredHash = await hashPassword(rawPassword);
+            
             submitBtn.classList.remove('state-loading');
 
-            // Проверка хеша
-            if (hashPassword(rawPassword) === TARGET_HASH) {
+            if (enteredHash === TARGET_HASH) {
                 const mainContainer = document.querySelector('.main-container');
                 const cornerWrapper = document.querySelector('.corner-icon-floating-wrapper');
                 const promptText = document.getElementById('click-prompt');
                 const dashboardOverlay = document.getElementById('session-dashboard');
 
-                // 1. Растворяем старый интерфейс
+                // 1. Растворяем элементы интерфейса
                 if (mainContainer) mainContainer.classList.add('fade-out-element');
                 if (cornerWrapper) cornerWrapper.classList.add('fade-out-element');
                 if (promptText) promptText.classList.add('fade-out-element');
                 
-                // 2. Показываем панель входа
+                // 2. Запускаем панель сессии
                 if (dashboardOverlay) {
                     dashboardOverlay.style.display = 'flex';
                     prepareDashboardSpans('db-animate-title', 0.20);
@@ -593,7 +593,7 @@
                     });
                 }
                 
-                // 3. Плавно скрываем через 2 секунды
+                // 3. Плавно скрываем
                 setTimeout(() => {
                     if (dashboardOverlay) {
                         dashboardOverlay.classList.add('fade-out-fast');
@@ -606,12 +606,17 @@
                 }, 2500); 
 
             } else {
-                // Ошибка: подсвечиваем полем красным
                 livesInErrorState = true;
                 myInput.classList.add('input-error-state'); 
                 submitBtn.classList.add('state-error');       
             }
-        }, 600); 
+        } catch (err) {
+            console.error("Ошибка хеширования:", err);
+            submitBtn.classList.remove('state-loading');
+            livesInErrorState = true;
+            myInput.classList.add('input-error-state'); 
+            submitBtn.classList.add('state-error');
+        }
     });
 
     submitBtn.addEventListener('mousedown', (e) => { e.stopPropagation(); });
