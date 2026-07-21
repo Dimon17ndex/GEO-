@@ -68,67 +68,13 @@
         </div>
     </div>
 
-    <div class="bottom-credits-wrapper" style="position: fixed; bottom: 30px; width: 100%; text-align: center; z-index: 2;">
-        <p class="bottom-credits" id="wave-text" style="font-size: 11px; letter-spacing: 2px; text-transform: uppercase; opacity: 0.7; margin: 0; cursor: default;">проект Запорожской области</p>
-    </div>
-
     <script>
-    const textContainer = document.getElementById('wave-text');
     const waveContainer = document.getElementById('bg-wave-container');
     const volumeStatusLabel = document.getElementById('volume-status-label');
     const intensitySlider = document.getElementById('wave-intensity-slider');
     const intensityValueLabel = document.getElementById('intensity-value');
     
-    let initialText = "проект Запорожской области";
-    let isWaveTriggered = false;
-    let isTextHovered = false; 
     let intensityPercent = 20;
-    let letters = [];
-
-    // Построение интерактивного волнового текста
-    function buildWaveText(newText) {
-        textContainer.innerHTML = '';
-        letters = Array.from(newText).map((char) => {
-            const span = document.createElement('span');
-            span.style.display = 'inline-block';
-            span.style.transition = 'color 0.3s ease, transform 0.3s ease, opacity 0.5s ease, filter 0.5s ease';
-            if (char === ' ') { span.innerHTML = '&nbsp;'; } else { span.innerText = char; }
-            textContainer.appendChild(span);
-            return span;
-        });
-        bindLettersHover();
-    }
-
-    buildWaveText(initialText);
-
-    function bindLettersHover() {
-        letters.forEach((span, index) => {
-            span.addEventListener('mouseenter', (e) => {
-                isTextHovered = true; 
-                letters.forEach((otherSpan, otherIndex) => {
-                    const distance = Math.abs(index - otherIndex);
-                    const delay = distance * 0.04;
-                    otherSpan.style.transitionDelay = `${delay}s`;
-                    otherSpan.style.color = `rgba(255, 50, 50, ${Math.max(0.3, 1 - distance * 0.08)})`;
-                    otherSpan.style.transform = `translateY(${Math.max(-4, -6 + distance * 0.5)}px)`;
-                });
-                if (!isWaveTriggered) {
-                    isWaveTriggered = true;
-                    createBackgroundRipple(e.clientX, e.clientY, 'bg-wave-ripple');
-                }
-            });
-        });
-    }
-
-    textContainer.addEventListener('mouseleave', () => {
-        isWaveTriggered = false;
-        isTextHovered = false; 
-        letters.forEach((span) => {
-            span.style.transitionDelay = '0s';
-            span.style.color = '#ffffff';
-            span.style.transform = 'translateY(0)';
-        });
-    });
 
     function createBackgroundRipple(x, y, className, duration = 1500) {
         const ripple = document.createElement('div');
@@ -150,11 +96,7 @@
             case 2: spawnX = Math.random() * window.innerWidth; spawnY = window.innerHeight + 50; break;
             case 3: spawnX = -50; spawnY = Math.random() * window.innerHeight; break;
         }
-        let currentClassName = 'bg-ambient-ripple';
-        if (isTextHovered) {
-            currentClassName = Math.random() > 0.5 ? 'bg-ambient-red' : 'bg-ambient-green';
-        }
-        createBackgroundRipple(spawnX, spawnY, currentClassName, 3000);
+        createBackgroundRipple(spawnX, spawnY, 'bg-ambient-ripple', 3000);
         const baseDelay = 500, maxAdditionalDelay = 8000; 
         const factor = (100 - intensityPercent) / 100;
         setTimeout(spawnAmbientWave, baseDelay + (Math.random() * maxAdditionalDelay * factor));
