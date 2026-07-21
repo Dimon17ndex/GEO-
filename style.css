@@ -968,24 +968,3 @@ body:has(.input-container-box.active) .logo-icon {
 .db-subtitle-badge {
     display: none !important;
 }
-
-/* ==========================================================================
-   ПРИБЛИЖЕНИЕ ЛОГОТИПА К ТЕКСТУ ПРИ УСПЕШНОМ ВХОДЕ
-   ========================================================================== */
-/* Включаем плавный переход для отступа и трансформации */
-.brand-block {
-    transition: gap 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.logo-icon {
-    transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-/* Когда активен экран успеха (секретный режим) */
-body:has(.secret-active) .brand-block {
-    gap: 10px; /* Уменьшаем расстояние между лого и текстом (было 40px) */
-}
-
-body:has(.secret-active) .logo-icon {
-    transform: scale(1.25) translateX(15px); /* Увеличиваем лого и придвигаем вправо к «GEOГРАФИЯ» */
-}
