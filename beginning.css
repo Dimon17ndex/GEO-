@@ -1,684 +1,217 @@
-/* ==========================================================================
-   1. БАЗА И ФОН
-   ========================================================================== */
-html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #0b0b0b;
-    font-family: 'Montserrat', sans-serif;
-    color: #ffffff;
-    overflow: hidden;
-    user-select: none;
-}
-
-body {
-    background-image: url('images/grafit_bg.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-}
-
-/* ==========================================================================
-   2. ТЕНИ И КОНТЕЙНЕР ВОЛН
-   ========================================================================== */
-.shadow-layer {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-image: url('images/shadow.png');
-    background-size: cover;
-    background-position: center;
-    pointer-events: none;
-    z-index: 1;
-    animation: fadeInShadow 1.5s ease-out forwards,
-               breathe 8s ease-in-out 1.5s infinite;
-}
-
-#bg-wave-container {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    z-index: 1;
-    pointer-events: none;
-    overflow: visible;
-}
-
-/* ==========================================================================
-   3. ВСПЛЫВАЮЩАЯ КАПСУЛА НАСТРОЕК С БИРКАМИ
-   ========================================================================== */
-.settings-trigger-zone {
-    position: fixed;
-    top: 40px;
-    right: 40px;
-    z-index: 10000;
-    pointer-events: none; 
-    opacity: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: fadeInElement 1.2s ease-out 0.5s forwards,
-               enablePointerEvents 0s linear 0.5s forwards;
-}
-
-.settings-container-box {
-    width: 48px;
-    height: 48px; 
-    border: 1px solid rgba(255, 255, 255, 0);
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow: visible; 
-    cursor: default;
-    transition: height 0.5s cubic-bezier(0.25, 1, 0.5, 1) 0s,
-                border-color 0.4s ease,
-                background-color 0.4s ease,
-                box-shadow 0.4s ease;
-}
-
-.settings-container-box:hover {
-    height: 150px; 
-    border-color: rgba(255, 255, 255, 0.35);
-    background-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    transition-delay: 0s, 0s, 0s, 0s;
-}
-
-.settings-icon-box {
-    position: relative; 
-    width: 48px;
-    height: 48px;
-    min-height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.settings-container-box:hover .settings-icon-box,
-.settings-icon-box:hover {
-    transform: rotate(90deg);
-}
-
-.gear-svg {
-    width: 24px;
-    height: 24px;
-    color: #ffffff;
-    opacity: 0.5; 
-    transform-origin: center; 
-    transition: opacity 0.4s ease;
-}
-
-.settings-container-box:hover .gear-svg,
-.settings-icon-box:hover .gear-svg {
-    opacity: 1 !important;
-}
-
-.settings-divider {
-    width: 32px;
-    height: 1px;
-    background: rgba(255, 255, 255, 0.15);
-    opacity: 0;
-    transition: opacity 0.4s ease 0s;
-}
-
-.settings-container-box:hover .settings-divider {
-    opacity: 1;
-    transition-delay: 0.5s; 
-}
-
-/* Кнопка звука */
-.volume-btn {
-    position: relative; 
-    width: 48px;
-    height: 48px;
-    min-height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    opacity: 0;
-    transform: translateY(-10px) scale(0);
-    pointer-events: none;
-    visibility: hidden;
-    transition: opacity 0.4s ease 0s, 
-                transform 0.4s ease 0s, 
-                visibility 0.4s ease 0s;
-}
-
-.volume-svg {
-    width: 24px;
-    height: 24px;
-    color: #ffffff;
-    opacity: 0.5;
-    transition: opacity 0.4s ease, transform 0.3s ease;
-}
-
-.volume-btn:hover .volume-svg {
-    opacity: 1;
-    transform: scale(1.1);
-}
-
-.settings-container-box:hover .volume-btn {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    pointer-events: auto;
-    visibility: visible;
-    transition-delay: 0.5s;
-}
-
-/* Бирки (Метки) */
-.settings-label {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #ffffff;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-    position: absolute;
-    right: 64px; 
-    top: 24px; 
-    transform: translateY(-50%) translateX(15px); 
-    white-space: nowrap;
-    pointer-events: none;
-    opacity: 0;
-    filter: blur(12px);
-    transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1),
-                filter 0.4s cubic-bezier(0.25, 1, 0.5, 1),
-                transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.settings-container-box:hover .settings-label {
-    opacity: 1;
-    filter: blur(0px);
-    transform: translateY(-50%) translateX(0px);
-}
-
-.volume-label {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #ffffff;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-    position: absolute;
-    right: 64px; 
-    top: 50%;
-    transform: translateY(-50%) translateX(15px); 
-    white-space: nowrap;
-    pointer-events: none;
-    opacity: 0;
-    filter: blur(12px);
-    transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1),
-                filter 0.4s cubic-bezier(0.25, 1, 0.5, 1),
-                transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.volume-btn:hover .volume-label {
-    opacity: 1;
-    filter: blur(0px);
-    transform: translateY(-50%) translateX(0px);
-}
-
-.volume-label .status-on,
-.volume-label .status-off {
-    transition: opacity 0.3s ease;
-}
-
-.volume-label .status-off {
-    opacity: 0.4;
-}
-
-.volume-label.muted-mode .status-on {
-    opacity: 0.4;
-}
-
-.volume-label.muted-mode .status-off {
-    opacity: 1;
-}
-
-/* Интенсивность */
-.intensity-control-box {
-    width: 48px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    opacity: 0;
-    transform: translateY(-10px) scale(0);
-    pointer-events: none;
-    visibility: hidden;
-    transition: opacity 0.4s ease 0s, 
-                transform 0.4s ease 0s, 
-                visibility 0.4s ease 0s;
-}
-
-.settings-container-box:hover .intensity-control-box {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    pointer-events: auto;
-    visibility: visible;
-    transition-delay: 0.55s;
-}
-
-.intensity-btn {
-    position: relative;
-    width: 48px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.intensity-svg {
-    width: 24px;
-    height: 24px;
-    color: #ffffff;
-    opacity: 0.5;
-    transition: opacity 0.4s ease, transform 0.3s ease;
-}
-
-.intensity-control-box:hover .intensity-svg {
-    opacity: 1;
-    transform: scale(1.1);
-}
-
-.intensity-label {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #ffffff;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-    position: absolute;
-    right: 64px;
-    top: 50%;
-    transform: translateY(-50%) translateX(15px);
-    white-space: nowrap;
-    pointer-events: none;
-    opacity: 0;
-    filter: blur(12px);
-    transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
-                filter 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
-                transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.intensity-control-box:hover .intensity-label {
-    opacity: 1;
-    filter: blur(0px);
-    transform: translateY(-50%) translateX(0px);
-}
-
-.slider-wrapper {
-    width: 48px;
-    height: 0px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    margin-top: 0px;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: opacity 0.4s ease 0s, 
-                height 0.4s cubic-bezier(0.25, 1, 0.5, 1) 0s,
-                margin-top 0.4s ease 0s,
-                visibility 0.4s ease 0s;
-}
-
-.intensity-control-box:hover .slider-wrapper {
-    height: 80px;
-    margin-top: 5px;
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-}
-
-.settings-container-box:hover:has(.intensity-control-box:hover) {
-    height: 230px;
-}
-
-#wave-intensity-slider {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 65px;          
-    height: 3px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 2px;
-    outline: none;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    margin: 0;
-    padding: 0;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(-90deg); 
-}
-
-#wave-intensity-slider:hover {
-    background: rgba(255, 255, 255, 0.35);
-}
-
-#wave-intensity-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #ffffff;
-    box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
-    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-#wave-intensity-slider::-webkit-slider-thumb:hover {
-    transform: scale(1.4);
-}
-
-#wave-intensity-slider::-moz-range-thumb {
-    width: 10px;
-    height: 10px;
-    border: none;
-    border-radius: 50%;
-    background: #ffffff;
-    box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
-    transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-#wave-intensity-slider::-moz-range-thumb:hover {
-    transform: scale(1.4);
-}
-
-.settings-horizontal-line {
-    position: absolute;
-    right: 64px; 
-    top: 48px; 
-    width: 120px; 
-    height: 1px;
-    background-color: #ffffff;
-    transform-origin: right;
-    transform: scaleX(0);
-    opacity: 0;
-    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1) 0s,
-                width 0.4s cubic-bezier(0.25, 1, 0.5, 1) 0s,
-                opacity 0.4s ease 0s;
-}
-
-.settings-container-box:hover .settings-horizontal-line {
-    transform: scaleX(1);
-    opacity: 1;
-    transition-delay: 0s; 
-}
-
-.settings-container-box:hover .volume-btn:hover ~ .settings-horizontal-line,
-.settings-container-box:hover:has(.volume-btn:hover) .settings-horizontal-line {
-    width: 175px;
-}
-
-/* ==========================================================================
-   4. РАДИАЛЬНЫЕ ВОЛНЫ (RIPPLES)
-   ========================================================================== */
-.bg-wave-ripple {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background: radial-gradient(circle, rgba(255, 30, 30, 0.25) 0%, rgba(255, 0, 0, 0) 70%);
-    border-radius: 50%;
-    transform: translate(-50%, -50%) scale(1);
-    pointer-events: none;
-    animation: screenRippleBlast 1.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
-}
-
-.bg-click-ripple {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 70%);
-    border-radius: 50%;
-    transform: translate(-50%, -50%) scale(1);
-    pointer-events: none;
-    animation: screenRippleBlast 1.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
-}
-
-.bg-ambient-ripple {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
-    border-radius: 50%;
-    transform: translate(-50%, -50%) scale(1);
-    pointer-events: none;
-    animation: slowAmbientBlast 3s cubic-bezier(0.2, 0.5, 0.4, 1) forwards;
-}
-
-.bg-ambient-red {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background: radial-gradient(circle, rgba(255, 35, 35, 0.4) 0%, rgba(255, 0, 0, 0) 70%);
-    border-radius: 50%;
-    transform: translate(-50%, -50%) scale(1);
-    pointer-events: none;
-    animation: slowAmbientBlast 3s cubic-bezier(0.2, 0.5, 0.4, 1) forwards;
-}
-
-.bg-ambient-green {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background: radial-gradient(circle, rgba(0, 255, 110, 0.35) 0%, rgba(0, 255, 0, 0) 70%);
-    border-radius: 50%;
-    transform: translate(-50%, -50%) scale(1);
-    pointer-events: none;
-    animation: slowAmbientBlast 3s cubic-bezier(0.2, 0.5, 0.4, 1) forwards;
-}
-
-/* ==========================================================================
-   5. ДАШБОРД И АНИМАЦИИ ПОЯВЛЕНИЯ
-   ========================================================================== */
-.session-dashboard {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 9999; 
-    display: flex; 
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background: transparent;
-}
-
-/* Зеленый взрыв/волна снизу экрана при загрузке страницы */
-.session-dashboard::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    width: 10px;
-    height: 10px;
-    transform: translate(-50%, 50%) scale(1);
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(0, 255, 110, 0.5) 0%, rgba(0, 255, 0, 0) 70%);
-    pointer-events: none;
-    opacity: 0;
-    z-index: 1;
-}
-
-.session-dashboard.show-framework::before {
-    animation: fullscreenGreenBlast 1.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
-}
-
-.dashboard-content-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 35px;
-    width: 100%;
-    max-width: 800px;
-    z-index: 2;
-}
-
-.db-brand-block {
-    display: flex;
-    align-items: center;
-    gap: 25px; 
-    opacity: 0;
-    filter: blur(10px);
-    transform: translateY(-10px);
-    transition: opacity 0.6s ease-out, filter 0.8s ease-out, transform 0.6s ease-out;
-}
-
-.session-dashboard.show-framework .db-brand-block {
-    opacity: 1;
-    filter: blur(0px);
-    transform: translateY(0);
-    transition-delay: 0.2s;
-}
-
-.db-logo-icon {
-    width: 90px;  
-    height: 90px;
-    object-fit: contain;
-}
-
-.db-text-right {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.db-main-title {
-    font-family: 'Unbounded', sans-serif;
-    margin: 0;
-    text-transform: uppercase;
-    color: #ffffff;
-    font-size: 36px;
-    font-weight: 900;
-    line-height: 1;
-    letter-spacing: 1px;
-    text-align: left;
-}
-
-.success-message {
-    color: #00ff6e; 
-    font-size: 24px;
-    font-weight: 700;
-    letter-spacing: 2.5px;
-    width: 100%;
-    text-align: center;
-}
-
-/* Плашка */
-.db-subtitle-badge {
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    padding: 5px 14px;
-    border-radius: 50px;
-    display: inline-block;
-}
-
-.db-subtitle-badge span {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 10px; 
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: #ffffff;
-    display: block;
-    line-height: 1;
-}
-
-/* Анимация букв */
-.db-main-title span, .success-message span {
-    display: inline-block;
-    opacity: 0;
-    filter: blur(8px);
-    transform: scale(1.4) translateY(-10px);
-    animation-duration: 0.5s;
-    animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    animation-fill-mode: forwards;
-}
-
-.session-dashboard.show-framework .db-main-title span {
-    animation-name: assembleLetterSimple;
-}
-
-.session-dashboard.show-framework .success-message span {
-    animation-name: assembleLetterGreen;
-}
-
-/* Исчезновение */
-.session-dashboard.fade-out-fast {
-    opacity: 0;
-    filter: blur(10px);
-    transform: scale(0.95);
-    transition: opacity 0.5s ease-in-out, filter 0.5s ease-in-out, transform 0.5s ease-in-out;
-}
-
-/* ==========================================================================
-   6. KEYFRAMES
-   ========================================================================== */
-@keyframes fadeInShadow {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes breathe {
-    0%, 100%, 70% { opacity: 1; transform: scale(1); }
-    25% { opacity: 0.6; transform: scale(1.04); }
-    85% { opacity: 0.75; transform: scale(1.02); }
-}
-
-@keyframes fadeInElement {
-    from { opacity: 0; transform: translateY(15px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes enablePointerEvents {
-    to { pointer-events: auto; }
-}
-
-@keyframes fullscreenGreenBlast {
-    0% { transform: translate(-50%, 50%) scale(1); opacity: 0; }
-    10% { opacity: 1; }
-    100% { transform: translate(-50%, 50%) scale(250); opacity: 0; }
-}
-
-@keyframes screenRippleBlast {
-    0% { width: 0px; height: 0px; opacity: 1; }
-    100% { width: 1600px; height: 1600px; opacity: 0; }
-}
-
-@keyframes slowAmbientBlast {
-    0% { width: 0px; height: 0px; opacity: 1; }
-    100% { width: 1800px; height: 1800px; opacity: 0; }
-}
-
-@keyframes assembleLetterSimple {
-    0% { opacity: 0; filter: blur(8px); transform: scale(1.4) translateY(-10px); }
-    100% { opacity: 1; filter: blur(0px); transform: scale(1) translateY(0); }
-}
-
-@keyframes assembleLetterGreen {
-    0% { opacity: 0; filter: blur(8px); transform: scale(1.4) translateY(-10px); text-shadow: 0 0 20px rgba(0, 255, 110, 1); }
-    100% { opacity: 1; filter: blur(0px); transform: scale(1) translateY(0); text-shadow: 0 0 10px rgba(0, 255, 110, 0.3); }
-}
-
-/* Изначально скрываем тело новой страницы */
-body {
-    opacity: 0;
-    transition: opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-/* Класс для плавного проявления */
-body.page-loaded {
-    opacity: 1;
-}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEOГРАФИЯ — Сессия</title>
+    
+    <link rel="icon" type="image/png" href="images/favicon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="beginning.css">
+
+    <style>
+        /* Плавное проявление страницы при загрузке */
+        body {
+            opacity: 0;
+            transition: opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        body.page-loaded {
+            opacity: 1;
+        }
+
+        /* Позиционирование бренд-блока в верхнем левом углу */
+        .top-left-brand {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            z-index: 10;
+        }
+
+        .top-left-brand .db-brand-block {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .top-left-brand .db-logo-icon {
+            height: auto;
+            max-width: 110px;
+            width: 100%;
+        }
+
+        .top-left-brand .db-text-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .top-left-brand .db-main-title {
+            margin: 0;
+            font-family: 'Unbounded', sans-serif;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            line-height: 1;
+            display: flex;
+            color: #ffffff;
+        }
+
+        /* Серый статус "ЗДЕСЬ ПОКА ПУСТО" */
+        .empty-status-message {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="shadow-layer"></div>
+
+    <div id="bg-wave-container"></div>
+
+    <div class="top-left-brand">
+        <div class="db-brand-block">
+            <img src="images/geo_logo.png" alt="Geo Logo" class="db-logo-icon">
+            <div class="db-text-right">
+                <h1 class="db-main-title">GEOГРАФИЯ</h1>
+                <div class="empty-status-message">ЗДЕСЬ ПОКА ПУСТО</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="settings-trigger-zone" id="settings-btn" style="opacity: 1; pointer-events: auto;">
+        <div class="settings-container-box">
+            <div class="settings-icon-box">
+                <svg class="gear-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.15a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+            </div>
+            <span class="settings-label">Настройки</span> 
+            <div class="settings-horizontal-line"></div>
+            <div class="settings-divider"></div>
+            <div class="volume-btn" id="volume-toggle-btn">
+                <svg class="volume-svg" id="volume-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                    <path class="volume-wave-1" d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                    <path class="volume-wave-2" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                </svg>
+                <div class="volume-label" id="volume-status-label">музыка <span class="status-on">on</span> / <span class="status-off">off</span></div>
+            </div>
+            <div class="intensity-control-box">
+                <div class="intensity-btn">
+                    <svg class="intensity-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+                        <circle cx="12" cy="12" r="4"/>
+                    </svg>
+                    <div class="intensity-label">интенсивность эмбиентных волн <span id="intensity-value">20%</span></div>
+                </div>
+                <div class="slider-wrapper">
+                    <input type="range" id="wave-intensity-slider" min="0" max="100" value="20">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const waveContainer = document.getElementById('bg-wave-container');
+    const volumeStatusLabel = document.getElementById('volume-status-label');
+    const intensitySlider = document.getElementById('wave-intensity-slider');
+    const intensityValueLabel = document.getElementById('intensity-value');
+    
+    let intensityPercent = 20;
+
+    function createBackgroundRipple(x, y, className, duration = 1500) {
+        const ripple = document.createElement('div');
+        ripple.classList.add(className);
+        ripple.style.left = `${x}px`;
+        ripple.style.top = `${y}px`;
+        waveContainer.appendChild(ripple);
+        setTimeout(() => { ripple.remove(); }, duration);
+    }
+
+    // Фоновые амбиентные волны
+    function spawnAmbientWave() {
+        if (intensityPercent === 0) { setTimeout(spawnAmbientWave, 1000); return; }
+        let spawnX = 0, spawnY = 0;
+        const side = Math.floor(Math.random() * 4);
+        switch(side) {
+            case 0: spawnX = Math.random() * window.innerWidth; spawnY = -50; break;
+            case 1: spawnX = window.innerWidth + 50; spawnY = Math.random() * window.innerHeight; break;
+            case 2: spawnX = Math.random() * window.innerWidth; spawnY = window.innerHeight + 50; break;
+            case 3: spawnX = -50; spawnY = Math.random() * window.innerHeight; break;
+        }
+        createBackgroundRipple(spawnX, spawnY, 'bg-ambient-ripple', 3000);
+        const baseDelay = 500, maxAdditionalDelay = 8000; 
+        const factor = (100 - intensityPercent) / 100;
+        setTimeout(spawnAmbientWave, baseDelay + (Math.random() * maxAdditionalDelay * factor));
+    }
+
+    setTimeout(() => { spawnAmbientWave(); }, 1000);
+
+    // Аудио сопровождение
+    const bgMusic = new Audio('audio/melody_start.mp3');
+    bgMusic.volume = 0.4; 
+    let musicStarted = false;
+
+    function playMusic() {
+        if (musicStarted || bgMusic.muted) return;
+        bgMusic.play().then(() => { musicStarted = true; }).catch(() => {});
+    }
+
+    bgMusic.addEventListener('ended', () => {
+        setTimeout(() => { if (!bgMusic.muted) bgMusic.play(); }, 5000); 
+    });
+
+    document.body.addEventListener('mousedown', (e) => {
+        if (e.target.closest('#settings-btn') || e.target.closest('.settings-trigger-zone')) return;
+        playMusic();
+        createBackgroundRipple(e.clientX, e.clientY, 'bg-click-ripple');
+    });
+
+    // Управление звуком
+    const volumeBtn = document.getElementById('volume-toggle-btn');
+    const volumeIcon = document.getElementById('volume-icon');
+    let isMuted = false;
+
+    volumeBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); 
+        isMuted = !isMuted;
+        bgMusic.muted = isMuted;
+        if (isMuted) {
+            volumeStatusLabel.classList.add('muted-mode');
+            volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15" stroke-width="1.5"></line><line x1="17" y1="9" x2="23" y2="15" stroke-width="1.5"></line>`;
+        } else {
+            volumeStatusLabel.classList.remove('muted-mode');
+            volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path class="volume-wave-1" d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path class="volume-wave-2" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>`;
+            playMusic();
+        }
+    });
+
+    // Управление интенсивностью
+    intensitySlider.addEventListener('mousedown', (e) => { e.stopPropagation(); });
+    intensitySlider.addEventListener('input', (e) => {
+        intensityPercent = parseInt(e.target.value);
+        intensityValueLabel.innerText = `${intensityPercent}%`;
+    });
+
+    // Запуск мягкого проявления из темноты при загрузке
+    document.addEventListener('DOMContentLoaded', () => {
+        requestAnimationFrame(() => {
+            document.body.classList.add('page-loaded');
+        });
+    });
+    </script>
+</body>
+</html>
