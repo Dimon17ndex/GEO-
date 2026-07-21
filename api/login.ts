@@ -1,12 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 import bcrypt from 'bcryptjs';
 
+// URL вашей базы данных Supabase
 const SUPABASE_URL = 'https://ptzsoijqgqekenjjonrl.supabase.co';
 
-// ⚠️ Укажите ваш ключ Publishable Key (начинается на sb_publishable_...)
-const SUPABASE_ANON_KEY = 'ВАШ_PUBLISHABLE_KEY_ИЗ_SUPABASE'; 
+// ВСТАВЬТЕ СЮДА ВАШ PUBLISHABLE KEY СО СКРИНШОТА
+const SUPABASE_ANON_KEY = 'sb_publishable_СЮДА_ВСТАВЬТЕ_ВЕСЬ_КЛЮЧ';
 
-// Отключаем лишние механизмы (Realtime/WebSockets), чтобы Node.js 20 не выдавал ошибку
+// Настройка клиента без WebSockets, чтобы Vercel не выдавал ошибку 500
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
     persistSession: false,
@@ -36,7 +37,7 @@ export default async function handler(req: any, res: any) {
 
     const cleanPassword = password.trim();
 
-    // Запрос к Supabase
+    // Запрос к Supabase за хешем
     const { data: user, error } = await supabase
       .from('users')
       .select('password_hash')
@@ -48,7 +49,7 @@ export default async function handler(req: any, res: any) {
       return res.status(401).json({ success: false, error: 'Пользователь не найден' });
     }
 
-    // Проверка bcrypt
+    // Сравниваем введенный пароль с хешем из базы
     const isMatch = await bcrypt.compare(cleanPassword, user.password_hash);
 
     if (!isMatch) {
