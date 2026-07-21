@@ -12,52 +12,96 @@
 </head>
 <body>
 
-<div class="session-dashboard" id="session-dashboard">
-    <div class="dashboard-content-wrapper">
-        <div class="db-brand-block">
-            <img src="images/geo_logo.png" alt="Geo Logo" class="db-logo-icon">
-            <div class="db-text-right">
-                <h1 class="db-main-title" id="db-animate-title">GEОГРАФИЯ</h1>
+    <div class="shadow-layer"></div>
+
+    <div id="bg-wave-container"></div>
+
+    <div class="settings-trigger-zone">
+        <div class="settings-container-box">
+            
+            <div class="settings-icon-box">
+                <svg class="gear-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
             </div>
+            
+            <span class="settings-label">НАСТРОИ́КИ</span>
+            <div class="settings-horizontal-line"></div>
+            <div class="settings-divider"></div>
+
+            <div class="volume-btn" id="sound-toggle-btn">
+                <svg class="volume-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                </svg>
+                <div class="volume-label" id="volume-label-text">
+                    ЗВУК: <span class="status-on">ВКЛ</span><span class="status-off">ВЫКЛ</span>
+                </div>
+            </div>
+
+            <div class="intensity-control-box">
+                <div class="intensity-btn">
+                    <svg class="intensity-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 12h20M2 12l5-5m-5 5l5 5M22 12l-5-5m5 5l-5 5"></path>
+                    </svg>
+                    <div class="intensity-label">ИНТЕНСИВНОСТЬ ВОЛН</div>
+                </div>
+                
+                <div class="slider-wrapper">
+                    <input type="range" id="wave-intensity-slider" min="1" max="10" value="5">
+                </div>
+            </div>
+
         </div>
-        
-        <div class="success-message" id="db-animate-message">пока что здесь пусто</div>
     </div>
-</div>
 
-<script>
-    window.addEventListener('DOMContentLoaded', () => {
-        const dashboard = document.getElementById('session-dashboard');
+    <div class="session-dashboard" id="session-dashboard">
+        <div class="dashboard-content-wrapper">
+            <div class="db-brand-block">
+                <img src="images/geo_logo.png" alt="Geo Logo" class="db-logo-icon">
+                <div class="db-text-right">
+                    <h1 class="db-main-title" id="db-animate-title">GEОГРАФИЯ</h1>
+                </div>
+            </div>
+            
+            <div class="success-message" id="db-animate-message">пока что здесь пусто</div>
+        </div>
+    </div>
 
-        // Функция автоматического разбиения текста на анимированные буквы
-        const transformToSpans = (elementId, startDelay) => {
-            const el = document.getElementById(elementId);
-            if (!el) return;
-            const text = el.innerText;
-            el.innerHTML = '';
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const dashboard = document.getElementById('session-dashboard');
 
-            Array.from(text).forEach((char, index) => {
-                const span = document.createElement('span');
-                if (char === ' ') {
-                    span.innerHTML = '&nbsp;';
-                } else {
-                    span.innerText = char;
-                }
-                span.style.animationDelay = `${startDelay + (index * 0.04)}s`;
-                el.appendChild(span);
+            // Функция автоматического разбиения текста на анимированные буквы
+            const transformToSpans = (elementId, startDelay) => {
+                const el = document.getElementById(elementId);
+                if (!el) return;
+                const text = el.innerText;
+                el.innerHTML = '';
+
+                Array.from(text).forEach((char, index) => {
+                    const span = document.createElement('span');
+                    if (char === ' ') {
+                        span.innerHTML = '&nbsp;';
+                    } else {
+                        span.innerText = char;
+                    }
+                    span.style.animationDelay = `${startDelay + (index * 0.04)}s`;
+                    el.appendChild(span);
+                });
+            };
+
+            // Запускаем нарезку букв с нужными задержками
+            transformToSpans('db-animate-title', 0.20);
+            transformToSpans('db-animate-message', 0.50);
+
+            // Включаем анимацию появления блоков
+            requestAnimationFrame(() => {
+                dashboard.classList.add('show-framework');
             });
-        };
-
-        // Запускаем нарезку букв с нужными задержками
-        transformToSpans('db-animate-title', 0.20);
-        transformToSpans('db-animate-message', 0.50);
-
-        // Включаем анимацию (волну и появление блоков) сразу после отрисовки
-        requestAnimationFrame(() => {
-            dashboard.classList.add('show-framework');
         });
-    });
-</script>
+    </script>
 
 </body>
 </html>
