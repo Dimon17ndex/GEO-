@@ -14,74 +14,75 @@
     <link rel="stylesheet" href="beginning.css">
 
     <style>
-        /* Плавное проявление страницы при загрузке */
-        body {
-            opacity: 0;
-            transition: opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1);
-        }
+    /* Плавное проявление страницы при загрузке */
+    body {
+        opacity: 0;
+        transition: opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+    }
 
-        body.page-loaded {
-            opacity: 1;
-        }
+    body.page-loaded {
+        opacity: 1;
+    }
 
-        /* Позиционирование бренд-блока в верхнем левом углу */
-        .top-left-brand {
-            position: fixed;
-            top: 40px;
-            left: 40px;
-            z-index: 10;
-        }
+    /* Позиционирование бренд-блока в верхнем левом углу */
+    .top-left-brand {
+        position: fixed;
+        top: 40px;
+        left: 40px;
+        z-index: 10;
+    }
 
-        .top-left-brand .db-brand-block {
-            display: flex;
-            align-items: center; /* Центрирование логотипа относительно текста */
-            gap: 20px;
-        }
+    .top-left-brand .db-brand-block {
+        display: flex;
+        align-items: center; /* Центрируем логотип вертикально */
+        gap: 10px; /* Логотип сдвинут ближе к тексту */
+    }
 
-        .top-left-brand .db-logo-icon {
-            height: auto;
-            max-width: 110px;
-            width: 100%;
-        }
+    .top-left-brand .db-logo-icon {
+        height: auto;
+        max-width: 110px;
+        width: 100%;
+        display: block;
+    }
 
-        .top-left-brand .db-text-right {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
+    .top-left-brand .db-text-right {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
 
-        .top-left-brand .db-main-title {
-            margin: 0;
-            font-family: 'Unbounded', sans-serif;
-            font-size: 32px;
-            font-weight: 900;
-            letter-spacing: -0.5px;
-            line-height: 1;
-            color: #ffffff;
-        }
+    .top-left-brand .db-main-title {
+        margin: 0;
+        font-family: 'Unbounded', sans-serif;
+        font-size: 32px;
+        font-weight: 900;
+        letter-spacing: -0.5px;
+        line-height: 1;
+        color: #ffffff;
+    }
 
-        /* Контейнер для размещения статуса строго по центру экрана */
-        .center-status-wrapper {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 5;
-            pointer-events: none;
-            text-align: center;
-        }
+    /* Контейнер для размещения статуса строго по центру экрана */
+    .center-status-wrapper {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 5;
+        pointer-events: none;
+        text-align: center;
+    }
 
-        /* Серый статус "ЗДЕСЬ ПОКА ПУСТО" */
-        .empty-status-message {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 13px;
-            font-weight: 700;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.4);
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
-        }
-    </style>
+    /* Серый статус "ЗДЕСЬ ПОКА ПУСТО" */
+    .empty-status-message {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.4);
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+    }
+</style>
 </head>
 <body>
 
