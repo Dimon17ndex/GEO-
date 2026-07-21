@@ -1,23 +1,10 @@
-import { createClient } from '@supabase/supabase-js';
 import bcrypt from 'bcryptjs';
 
-// URL вашей базы данных Supabase
+// Данные вашей базы Supabase
 const SUPABASE_URL = 'https://ptzsoijqgqekenjjonrl.supabase.co';
 
-// ВСТАВЬТЕ СЮДА ВАШ PUBLISHABLE KEY СО СКРИНШОТА
-const SUPABASE_ANON_KEY = 'sb_publishable_СЮДА_ВСТАВЬТЕ_ВЕСЬ_КЛЮЧ';
-
-// Настройка клиента без WebSockets, чтобы Vercel не выдавал ошибку 500
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: {
-    persistSession: false,
-    autoRefreshToken: false,
-    detectSessionInUrl: false
-  },
-  global: {
-    fetch: globalThis.fetch
-  }
-});
+// ⚠️ Скопируйте ваш Publishable Key из Supabase (со страницы API Keys)
+const SUPABASE_ANON_KEY = 'sb_publishable_ZPrRJS8ZQPQm9yZXTPYn8A_agcDr...';
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
@@ -37,29 +24,41 @@ export default async function handler(req: any, res: any) {
 
     const cleanPassword = password.trim();
 
-    // Запрос к Supabase за хешем
-    const { data: user, error } = await supabase
-      .from('users')
-      .select('password_hash')
-      .eq('username', 'admin')
-      .single();
+    // Запрашиваем хеш юзера 'admin' напрямую из REST API Supabase
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/users?username=eq.admin&select=password_hash`, {
+      method: 'GET',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
 
-    if (error || !user) {
-      console.error('Ошибка Supabase:', error);
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error('Ошибка Supabase REST:', errText);
+      return res.status(500).json({ success: false, error: ' Ошибка подключения к базе' });
+    }
+
+    const users = await response.json();
+    const user = users[0];
+
+    if (!user || !user.password_hash) {
       return res.status(401).json({ success: false, error: 'Пользователь не найден' });
     }
 
-    // Сравниваем введенный пароль с хешем из базы
+    // Сверяем введенный пароль с bcrypt-хешем из базы данных
     const isMatch = await bcrypt.compare(cleanPassword, user.password_hash);
 
     if (!isMatch) {
       return res.status(401).json({ success: false, error: 'Неверный пароль' });
     }
 
+    // Если всё верно — пускаем!
     return res.status(200).json({ success: true });
 
   } catch (err: any) {
     console.error('Server error:', err);
-    return res.status(500).json({ success: false, error: 'Internal Server Error' });
+    return res.status(500).json({ success: false, error: err?.message || 'Server error' });
   }
 }
