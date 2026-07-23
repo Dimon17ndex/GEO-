@@ -179,6 +179,23 @@
     transform: scale(0.95);
     transition: opacity 0.5s ease-in-out, filter 0.5s ease-in-out, transform 0.5s ease-in-out;
 }
+
+/* Плавный уход в темноту всей страницы перед переходом */
+body.page-fade-out {
+    opacity: 0;
+    filter: blur(10px);
+    transition: opacity 1.4s ease, filter 1.4s ease;
+    pointer-events: none;
+}
+
+/* Исчезновение элементов главной страницы */
+.fade-out-element {
+    opacity: 0 !important;
+    filter: blur(15px) !important;
+    transform: translateY(-20px) !important;
+    pointer-events: none !important;
+    transition: opacity 0.8s ease, filter 0.8s ease, transform 0.8s ease !important;
+}
     </style>
 </head>
 <body>
