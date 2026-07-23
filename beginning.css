@@ -106,7 +106,7 @@ body.page-loaded {
 }
 
 /* ==========================================================================
-   4. ВСПЛЫВАЮЩАЯ КАПСУЛА НАСТРОЕК С БИРКАМИ
+   4. ВСПЛЫВАЮЩАЯ КАПСУЛА НАСТРОЕК С БИРКАМИ (ИСПРАВЛЕНО ДРЕБЕЗЖАНИЕ)
    ========================================================================== */
 .settings-trigger-zone {
     position: fixed;
@@ -116,8 +116,10 @@ body.page-loaded {
     pointer-events: none; 
     opacity: 0;
     display: flex;
-    align-items: center;
+    align-items: flex-start; /* Прижимаем плашку к верхнему краю зоны */
     justify-content: center;
+    padding: 10px; /* Создаем безопасный буфер вокруг всей капсулы */
+    margin: -10px; /* Компенсируем сдвиг от padding */
     animation: fadeInElement 1.2s ease-out 0.5s forwards,
                enablePointerEvents 0s linear 0.5s forwards;
 }
@@ -139,7 +141,7 @@ body.page-loaded {
                 box-shadow 0.4s ease;
 }
 
-.settings-container-box:hover {
+.settings-trigger-zone:hover .settings-container-box {
     height: 150px; 
     border-color: rgba(255, 255, 255, 0.35);
     background-color: rgba(255, 255, 255, 0.08);
@@ -159,7 +161,7 @@ body.page-loaded {
     transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-.settings-container-box:hover .settings-icon-box,
+.settings-trigger-zone:hover .settings-icon-box,
 .settings-icon-box:hover {
     transform: rotate(90deg);
 }
@@ -173,7 +175,7 @@ body.page-loaded {
     transition: opacity 0.4s ease;
 }
 
-.settings-container-box:hover .gear-svg,
+.settings-trigger-zone:hover .gear-svg,
 .settings-icon-box:hover .gear-svg {
     opacity: 1 !important;
 }
@@ -186,7 +188,7 @@ body.page-loaded {
     transition: opacity 0.4s ease 0s;
 }
 
-.settings-container-box:hover .settings-divider {
+.settings-trigger-zone:hover .settings-divider {
     opacity: 1;
     transition-delay: 0.5s; 
 }
@@ -223,7 +225,7 @@ body.page-loaded {
     transform: scale(1.1);
 }
 
-.settings-container-box:hover .volume-btn {
+.settings-trigger-zone:hover .volume-btn {
     opacity: 1;
     transform: translateY(0) scale(1);
     pointer-events: auto;
@@ -253,7 +255,7 @@ body.page-loaded {
                 transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-.settings-container-box:hover .settings-label {
+.settings-trigger-zone:hover .settings-label {
     opacity: 1;
     filter: blur(0px);
     transform: translateY(-50%) translateX(0px);
@@ -318,7 +320,7 @@ body.page-loaded {
                 visibility 0.4s ease 0s;
 }
 
-.settings-container-box:hover .intensity-control-box {
+.settings-trigger-zone:hover .intensity-control-box {
     opacity: 1;
     transform: translateY(0) scale(1);
     pointer-events: auto;
@@ -400,7 +402,7 @@ body.page-loaded {
     pointer-events: auto;
 }
 
-.settings-container-box:hover:has(.intensity-control-box:hover) {
+.settings-trigger-zone:hover:has(.intensity-control-box:hover) .settings-container-box {
     height: 230px;
 }
 
@@ -470,14 +472,14 @@ body.page-loaded {
                 opacity 0.4s ease 0s;
 }
 
-.settings-container-box:hover .settings-horizontal-line {
+.settings-trigger-zone:hover .settings-horizontal-line {
     transform: scaleX(1);
     opacity: 1;
     transition-delay: 0s; 
 }
 
-.settings-container-box:hover .volume-btn:hover ~ .settings-horizontal-line,
-.settings-container-box:hover:has(.volume-btn:hover) .settings-horizontal-line {
+.settings-trigger-zone:hover .volume-btn:hover ~ .settings-horizontal-line,
+.settings-trigger-zone:hover:has(.volume-btn:hover) .settings-horizontal-line {
     width: 175px;
 }
 
