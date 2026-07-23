@@ -61,18 +61,20 @@ body {
 }
 
 /* ==========================================================================
-   3. СТИЛИ ВСПЛЫВАЮЩЕЙ КАПСУЛЫ НАСТРОЕК
+   3. СТИЛИ ВСПЛЫВАЮЩЕЙ КАПСУЛЫ НАСТРОЕК (ИСПРАВЛЕНО ДРЕБЕЗЖАНИЕ)
    ========================================================================== */
 .settings-trigger-zone {
     position: fixed;
     top: 40px;
     right: 40px;
     z-index: 15;
-    pointer-events: none; 
+    pointer-events: none; /* Включается анимацией enablePointerEvents */
     opacity: 0;
     display: flex;
-    align-items: center;
+    align-items: flex-start; /* Прижимаем капсулу к верху зоны */
     justify-content: center;
+    padding: 10px; /* Добавляем "безопасный буфер" вокруг капсулы */
+    margin: -10px; /* Компенсируем padding, чтобы позиция не сдвинулась */
     animation: fadeInElement 1.2s ease-out 2.7s forwards,
                enablePointerEvents 0s linear 4.5s forwards;
 }
@@ -94,12 +96,12 @@ body {
                 box-shadow 0.4s ease;
 }
 
-.settings-container-box:hover {
+/* Ховер навешиваем на ЗОНУ (trigger-zone), а не на само тело капсулы */
+.settings-trigger-zone:hover .settings-container-box {
     height: 150px; 
     border-color: rgba(255, 255, 255, 0.35);
     background-color: rgba(255, 255, 255, 0.08);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    transition-delay: 0s, 0s, 0s, 0s;
 }
 
 .settings-icon-box {
@@ -114,7 +116,7 @@ body {
     transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-.settings-container-box:hover .settings-icon-box,
+.settings-trigger-zone:hover .settings-icon-box,
 .settings-icon-box:hover {
     transform: rotate(90deg);
 }
@@ -129,7 +131,7 @@ body {
     animation: gearIntroSpin 2.2s cubic-bezier(0.25, 1, 0.5, 1) 2.7s forwards;
 }
 
-.settings-container-box:hover .gear-svg,
+.settings-trigger-zone:hover .gear-svg,
 .settings-icon-box:hover .gear-svg {
     opacity: 1 !important;
 }
@@ -142,7 +144,7 @@ body {
     transition: opacity 0.4s ease 0s;
 }
 
-.settings-container-box:hover .settings-divider {
+.settings-trigger-zone:hover .settings-divider {
     opacity: 1;
     transition-delay: 0.5s; 
 }
@@ -178,7 +180,7 @@ body {
     transform: scale(1.1);
 }
 
-.settings-container-box:hover .volume-btn {
+.settings-trigger-zone:hover .volume-btn {
     opacity: 1;
     transform: translateY(0) scale(1);
     pointer-events: auto;
@@ -207,7 +209,7 @@ body {
                 transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-.settings-container-box:hover .settings-label {
+.settings-trigger-zone:hover .settings-label {
     opacity: 1;
     filter: blur(0px);
     transform: translateY(-50%) translateX(0px);
@@ -274,7 +276,7 @@ body {
                 visibility 0.4s ease 0s;
 }
 
-.settings-container-box:hover .intensity-control-box {
+.settings-trigger-zone:hover .intensity-control-box {
     opacity: 1;
     transform: translateY(0) scale(1);
     pointer-events: auto;
@@ -356,7 +358,8 @@ body {
     pointer-events: auto;
 }
 
-.settings-container-box:hover:has(.intensity-control-box:hover) {
+/* Расширение высоты при открытии ползунка */
+.settings-trigger-zone:hover:has(.intensity-control-box:hover) .settings-container-box {
     height: 230px;
 }
 
@@ -426,14 +429,14 @@ body {
                 opacity 0.4s ease 0s;
 }
 
-.settings-container-box:hover .settings-horizontal-line {
+.settings-trigger-zone:hover .settings-horizontal-line {
     transform: scaleX(1);
     opacity: 1;
     transition-delay: 0s; 
 }
 
-.settings-container-box:hover .volume-btn:hover ~ .settings-horizontal-line,
-.settings-container-box:hover:has(.volume-btn:hover) .settings-horizontal-line {
+.settings-trigger-zone:hover .volume-btn:hover ~ .settings-horizontal-line,
+.settings-trigger-zone:hover:has(.volume-btn:hover) .settings-horizontal-line {
     width: 175px;
 }
 
