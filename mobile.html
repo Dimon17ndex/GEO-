@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>GEOГРАФИЯ</title>
     
     <script>
@@ -24,13 +24,27 @@
     <link rel="stylesheet" href="style.css">
     
     <style>
+        /* Обнуление отступов и сброс размеров */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Исключает случайный скролл */
+            touch-action: manipulation; /* Убирает задержку клика на тачскринах */
+        }
+
         /* Специфичные стили для мобильного интерфейса */
         .session-dashboard {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            height: 100dvh; /* Использование динамической высоты для мобильных браузеров */
             z-index: 9999; 
             pointer-events: none;
             overflow: hidden;
@@ -70,9 +84,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 25px;
+            gap: 20px;
             width: 90%;
-            max-width: 400px;
+            max-width: 360px;
             z-index: 2;
         }
 
@@ -95,8 +109,8 @@
         }
 
         .db-logo-icon {
-            width: 75px;  
-            height: 75px;
+            width: 65px;  
+            height: 65px;
             object-fit: contain;
         }
 
@@ -115,18 +129,18 @@
 
         .db-main-title {
             color: #ffffff;
-            font-size: 26px; 
+            font-size: 22px; 
             font-weight: 900;
-            line-height: 1;
+            line-height: 1.1;
             letter-spacing: 1px;
             text-align: center;
         }
 
         .success-message {
             color: #00ff6e; 
-            font-size: 18px;
+            font-size: 15px;
             font-weight: 700;
-            letter-spacing: 1.5px;
+            letter-spacing: 1px;
             width: 100%;
             text-align: center;
         }
@@ -141,7 +155,7 @@
 
         .db-subtitle-badge span {
             font-family: 'Montserrat', sans-serif;
-            font-size: 9px; 
+            font-size: 8px; 
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -198,6 +212,11 @@
             transform: translateY(-20px) !important;
             pointer-events: none !important;
             transition: opacity 0.8s ease, filter 0.8s ease, transform 0.8s ease !important;
+        }
+
+        /* Предотвращение зума на iOS при фокусе в инпут (шрифт должен быть от 16px) */
+        .custom-input {
+            font-size: 16px !important; 
         }
 
         /* Оформление мобильной кнопки интенсивности */
@@ -272,7 +291,7 @@
         </div>
 
         <div class="input-container-box">
-            <input type="text" class="custom-input" placeholder="ввести..." id="user-text-input">
+            <input type="text" class="custom-input" placeholder="ввести..." id="user-text-input" autocomplete="off">
             <div class="input-underline"></div>
             <button class="input-submit-btn" id="submit-auth-btn">
                 <svg class="icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -346,9 +365,8 @@
     let isSecretTextActive = false; 
     let letters = [];
 
-    // 4 мобильных режима интенсивности: 0%, 30%, 60%, 100%
     const intensitySteps = [0, 30, 60, 100];
-    let currentStepIndex = 1; // По умолчанию 30%
+    let currentStepIndex = 1; 
     let intensityPercent = intensitySteps[currentStepIndex];
 
     setTimeout(() => { isClickAllowed = true; }, 3000);
@@ -389,7 +407,7 @@
                     isWaveTriggered = true;
                     createBackgroundRipple(e.touches[0].clientX, e.touches[0].clientY, 'bg-wave-ripple');
                 }
-            });
+            }, { passive: true });
         });
     }
 
@@ -403,13 +421,14 @@
     }
 
     setTimeout(() => {
-        const rect = logoElement.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        createBackgroundRipple(centerX, centerY, 'bg-click-ripple');
+        if(logoElement) {
+            const rect = logoElement.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            createBackgroundRipple(centerX, centerY, 'bg-click-ripple');
+        }
     }, 1700);
 
-    // Облегченное создание волн на мобильных
     function spawnAmbientWave() {
         if (intensityPercent === 0) { setTimeout(spawnAmbientWave, 1000); return; }
         let spawnX = 0, spawnY = 0;
@@ -426,7 +445,6 @@
         }
         createBackgroundRipple(spawnX, spawnY, currentClassName, 3000);
         
-        // Увеличенные задержки для разгрузки мобильного процессора
         const baseDelay = 1200, maxAdditionalDelay = 9000; 
         const factor = (100 - intensityPercent) / 100;
         setTimeout(spawnAmbientWave, baseDelay + (Math.random() * maxAdditionalDelay * factor));
@@ -457,7 +475,7 @@
 
     setTimeout(() => { if (!hasUserClicked) showClickPrompt(); }, 4500); 
 
-    textInput.addEventListener('touchstart', (e) => { e.stopPropagation(); });
+    textInput.addEventListener('touchstart', (e) => { e.stopPropagation(); }, { passive: true });
     textInput.addEventListener('keydown', (e) => { e.stopPropagation(); });
 
     document.body.addEventListener('touchstart', (e) => {
@@ -512,9 +530,8 @@
 
         playMusic();
         if (touch) createBackgroundRipple(touch.clientX, touch.clientY, 'bg-click-ripple');
-    });
+    }, { passive: true });
 
-    // Управление звуком
     const volumeBtn = document.getElementById('volume-toggle-btn');
     const volumeIcon = document.getElementById('volume-icon');
     let isMuted = false;
@@ -533,7 +550,6 @@
         }
     });
 
-    // Обработка кнопки «Солнышко» (кликом меняем режимы 0% -> 30% -> 60% -> 100%)
     intensityToggleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         currentStepIndex = (currentStepIndex + 1) % intensitySteps.length;
@@ -574,7 +590,6 @@
         });
     }
 
-    // Проверка пароля на сервере
     submitBtn.addEventListener('click', async () => {
         if (submitBtn.classList.contains('state-loading') || submitBtn.classList.contains('state-error')) return;
 
