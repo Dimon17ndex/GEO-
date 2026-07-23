@@ -10,6 +10,7 @@
             const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             const isSmallScreen = window.innerWidth <= 768;
             
+            // Перенаправляем мобилки на мобильную версию
             if (isMobileDevice || isSmallScreen) {
                 window.location.replace("mobile.html");
             }
@@ -76,137 +77,128 @@
             z-index: 2;
         }
 
-        /* beginning.css — Обновленный блок для логотипа и плашки */
-.db-brand-block {
-    display: flex;
-    align-items: center;
-    gap: 10px; /* <--- Поставили логотип ближе к тексту */
-    opacity: 0;
-    filter: blur(10px);
-    transform: translateY(-10px);
-    transition: opacity 0.6s ease-out, filter 0.8s ease-out, transform 0.6s ease-out;
-}
+        .db-brand-block {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            filter: blur(10px);
+            transform: translateY(-10px);
+            transition: opacity 0.6s ease-out, filter 0.8s ease-out, transform 0.6s ease-out;
+        }
 
-.session-dashboard.show-framework .db-brand-block {
-    opacity: 1;
-    filter: blur(0px);
-    transform: translateY(0);
-    transition-delay: 0.2s;
-}
+        .session-dashboard.show-framework .db-brand-block {
+            opacity: 1;
+            filter: blur(0px);
+            transform: translateY(0);
+            transition-delay: 0.2s;
+        }
 
-/* ЛОГОТИП: Сделали покрупнее (был 65px, стал 90px) */
-.db-logo-icon {
-    width: 90px;  
-    height: 90px;
-    object-fit: contain;
-}
+        .db-logo-icon {
+            width: 90px;  
+            height: 90px;
+            object-fit: contain;
+        }
 
-/* Правый блок: выравнивает заголовок и плашку строго по левому краю друг под другом */
-.db-text-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start; /* Выравнивание по левому краю текста */
-    gap: 8px; /* Отступ между надписью и плашкой */
-}
+        .db-text-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
 
-.db-main-title, .success-message {
-    font-family: 'Unbounded', sans-serif;
-    margin: 0;
-    text-transform: uppercase;
-}
+        .db-main-title, .success-message {
+            font-family: 'Unbounded', sans-serif;
+            margin: 0;
+            text-transform: uppercase;
+        }
 
-.db-main-title {
-    color: #ffffff;
-    font-size: 32px; 
-    font-weight: 900;
-    line-height: 1;
-    letter-spacing: 1px;
-    text-align: left; /* Текст внутри заголовка прижат влево */
-}
+        .db-main-title {
+            color: #ffffff;
+            font-size: 32px; 
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: 1px;
+            text-align: left;
+        }
 
-.success-message {
-    color: #00ff6e; 
-    font-size: 24px;
-    font-weight: 700;
-    letter-spacing: 2.5px;
-    width: 100%;
-    text-align: center; /* Само сообщение о сессии остается по центру экрана */
-}
+        .success-message {
+            color: #00ff6e; 
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 2.5px;
+            width: 100%;
+            text-align: center;
+        }
 
-/* ПЛАШКА: Без заливки, с белой границей, подстраивается под размер текста */
-.db-subtitle-badge {
-    background: transparent; /* Убрали заливку */
-    border: 1px solid rgba(255, 255, 255, 0.6); /* Четкая белая граница (60% непрозрачности для эстетики) */
-    padding: 5px 14px;
-    border-radius: 50px;
-    display: inline-block; /* Чтобы плашка не тянулась шире, чем текст внутри нее */
-}
+        .db-subtitle-badge {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            padding: 5px 14px;
+            border-radius: 50px;
+            display: inline-block;
+        }
 
-.db-subtitle-badge span {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 10px; 
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: #ffffff; /* Сделали текст внутри плашки чисто белым */
-    display: block;
-    line-height: 1;
-}
+        .db-subtitle-badge span {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 10px; 
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #ffffff;
+            display: block;
+            line-height: 1;
+        }
 
-/* Базовые стили для анимации букв */
-.db-main-title span, .success-message span {
-    display: inline-block;
-    opacity: 0;
-    filter: blur(8px);
-    transform: scale(1.4) translateY(-10px);
-    animation-duration: 0.5s;
-    animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    animation-fill-mode: forwards;
-}
+        .db-main-title span, .success-message span {
+            display: inline-block;
+            opacity: 0;
+            filter: blur(8px);
+            transform: scale(1.4) translateY(-10px);
+            animation-duration: 0.5s;
+            animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation-fill-mode: forwards;
+        }
 
-.session-dashboard.show-framework .db-main-title span {
-    animation-name: assembleLetterSimple;
-}
+        .session-dashboard.show-framework .db-main-title span {
+            animation-name: assembleLetterSimple;
+        }
 
-.session-dashboard.show-framework .success-message span {
-    animation-name: assembleLetterGreen;
-}
+        .session-dashboard.show-framework .success-message span {
+            animation-name: assembleLetterGreen;
+        }
 
-/* Анимации появления */
-@keyframes assembleLetterSimple {
-    0% { opacity: 0; filter: blur(8px); transform: scale(1.4) translateY(-10px); }
-    100% { opacity: 1; filter: blur(0px); transform: scale(1) translateY(0); }
-}
+        @keyframes assembleLetterSimple {
+            0% { opacity: 0; filter: blur(8px); transform: scale(1.4) translateY(-10px); }
+            100% { opacity: 1; filter: blur(0px); transform: scale(1) translateY(0); }
+        }
 
-@keyframes assembleLetterGreen {
-    0% { opacity: 0; filter: blur(8px); transform: scale(1.4) translateY(-10px); text-shadow: 0 0 20px rgba(0, 255, 110, 1); }
-    100% { opacity: 1; filter: blur(0px); transform: scale(1) translateY(0); text-shadow: 0 0 10px rgba(0, 255, 110, 0.3); }
-}
+        @keyframes assembleLetterGreen {
+            0% { opacity: 0; filter: blur(8px); transform: scale(1.4) translateY(-10px); text-shadow: 0 0 20px rgba(0, 255, 110, 1); }
+            100% { opacity: 1; filter: blur(0px); transform: scale(1) translateY(0); text-shadow: 0 0 10px rgba(0, 255, 110, 0.3); }
+        }
 
-/* Класс для плавного исчезновения всей накладки */
-.session-dashboard.fade-out-fast {
-    opacity: 0;
-    filter: blur(10px);
-    transform: scale(0.95);
-    transition: opacity 0.5s ease-in-out, filter 0.5s ease-in-out, transform 0.5s ease-in-out;
-}
+        .session-dashboard.fade-out-fast {
+            opacity: 0;
+            filter: blur(10px);
+            transform: scale(0.95);
+            transition: opacity 0.5s ease-in-out, filter 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
 
-/* Плавный уход в темноту всей страницы перед переходом */
-body.page-fade-out {
-    opacity: 0;
-    filter: blur(10px);
-    transition: opacity 1.4s ease, filter 1.4s ease;
-    pointer-events: none;
-}
+        body.page-fade-out {
+            opacity: 0;
+            filter: blur(10px);
+            transition: opacity 1.4s ease, filter 1.4s ease;
+            pointer-events: none;
+        }
 
-/* Исчезновение элементов главной страницы */
-.fade-out-element {
-    opacity: 0 !important;
-    filter: blur(15px) !important;
-    transform: translateY(-20px) !important;
-    pointer-events: none !important;
-    transition: opacity 0.8s ease, filter 0.8s ease, transform 0.8s ease !important;
-}
+        .fade-out-element {
+            opacity: 0 !important;
+            filter: blur(15px) !important;
+            transform: translateY(-20px) !important;
+            pointer-events: none !important;
+            transition: opacity 0.8s ease, filter 0.8s ease, transform 0.8s ease !important;
+        }
     </style>
 </head>
 <body>
@@ -300,28 +292,27 @@ body.page-fade-out {
         <img src="images/zaporoge_icon.png" alt="Zaporozhye Icon" class="corner-icon">
     </div>
 
-<div class="session-dashboard" id="session-dashboard">
-    <div class="dashboard-content-wrapper">
-        <div class="db-brand-block">
-            <img src="images/geo_logo.png" alt="Geo Logo" class="db-logo-icon">
-            <div class="db-text-right">
-                <h1 class="db-main-title" id="db-animate-title">GEОГРАФИЯ</h1>
-                
-                <div class="db-subtitle-badge">
-                    <span>наука • образование • естествознание</span>
+    <div class="session-dashboard" id="session-dashboard">
+        <div class="dashboard-content-wrapper">
+            <div class="db-brand-block">
+                <img src="images/geo_logo.png" alt="Geo Logo" class="db-logo-icon">
+                <div class="db-text-right">
+                    <h1 class="db-main-title" id="db-animate-title">GEОГРАФИЯ</h1>
+                    <div class="db-subtitle-badge">
+                        <span>наука • образование • естествознание</span>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="success-message-wrapper">
-            <div class="success-message" id="db-animate-message">Вы успешно вошли в сессию</div>
-            <svg class="success-checkmark" viewBox="0 0 52 52">
-                <circle class="checkmark-circle" cx="26" cy="26" r="23" fill="none"/>
-                <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-            </svg>
+            
+            <div class="success-message-wrapper">
+                <div class="success-message" id="db-animate-message">Вы успешно вошли в сессию</div>
+                <svg class="success-checkmark" viewBox="0 0 52 52">
+                    <circle class="checkmark-circle" cx="26" cy="26" r="23" fill="none"/>
+                    <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                </svg>
+            </div>
         </div>
     </div>
-</div>
 
     <script>
     const textContainer = document.getElementById('wave-text');
@@ -342,17 +333,6 @@ body.page-fade-out {
     let isClickAllowed = false;
     let isSecretTextActive = false; 
     let letters = [];
-
-    // Хеш SHA-256 для пароля "489634"
-    const TARGET_HASH = "7cb1bd7cbbd841e21b7a2d4f3b7fdded949c836a0d0144983a5e8dbbcbe23687";
-
-    // Функция хеширования Web Crypto API (SHA-256)
-    async function hashPassword(message) {
-        const msgBuffer = new TextEncoder().encode(message);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    }
 
     setTimeout(() => { isClickAllowed = true; }, 3000);
 
@@ -463,7 +443,7 @@ body.page-fade-out {
         const corners = [
             { top: '60px', left: '60px', bottom: 'auto', right: 'auto' },     
             { bottom: '120px', left: '60px', top: 'auto', right: 'auto' },    
-            { bottom: '150px', right: '60px', top: 'auto', left: 'auto' }      
+            { bottom: '150px', right: '60px', top: 'auto', left: 'auto' }     
         ];
         const randomIndex = Math.floor(Math.random() * corners.length);
         const chosenCorner = corners[randomIndex];
@@ -573,7 +553,6 @@ body.page-fade-out {
         }
     });
 
-    // Обработка клавиши Enter
     myInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             submitBtn.click();
@@ -593,7 +572,7 @@ body.page-fade-out {
         });
     }
 
-    // Проверка пароля через Vercel Serverless API (/api/auth)
+    // Авторизация через Vercel API
     submitBtn.addEventListener('click', async () => {
         if (submitBtn.classList.contains('state-loading') || submitBtn.classList.contains('state-error')) return;
 
@@ -605,9 +584,7 @@ body.page-fade-out {
         try {
             const response = await fetch('/api/login', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ password: rawPassword })
             });
 
@@ -620,12 +597,10 @@ body.page-fade-out {
                 const promptText = document.getElementById('click-prompt');
                 const dashboardOverlay = document.getElementById('session-dashboard');
 
-                // 1. Растворяем элементы
                 if (mainContainer) mainContainer.classList.add('fade-out-element');
                 if (cornerWrapper) cornerWrapper.classList.add('fade-out-element');
                 if (promptText) promptText.classList.add('fade-out-element');
                 
-                // 2. Запускаем панель сессии
                 if (dashboardOverlay) {
                     dashboardOverlay.style.display = 'flex';
                     prepareDashboardSpans('db-animate-title', 0.20);
@@ -636,20 +611,18 @@ body.page-fade-out {
                     });
                 }
                 
-                // 3. Запускаем полное затухание ВСЕЙ страницы (спустя 4.0 секунды)
-setTimeout(() => {
-    document.body.classList.add('page-fade-out');
-}, 4000); 
+                setTimeout(() => {
+                    document.body.classList.add('page-fade-out');
+                }, 4000); 
 
-// 4. Пауза в полной темноте и переход на новую страницу (спустя 5.4 секунды)
-setTimeout(() => {
-    window.location.href = '/beginning.html';
-}, 5400);
+                setTimeout(() => {
+                    window.location.href = '/beginning.html';
+                }, 5400);
 
             } else {
                 livesInErrorState = true;
                 myInput.classList.add('input-error-state'); 
-                submitBtn.classList.add('state-error');       
+                submitBtn.classList.add('state-error');        
             }
         } catch (err) {
             console.error("Ошибка сети или сервера:", err);
