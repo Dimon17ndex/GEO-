@@ -106,7 +106,7 @@ body.page-loaded {
 }
 
 /* ==========================================================================
-   4. ВСПЛЫВАЮЩАЯ КАПСУЛА НАСТРОЕК С БИРКАМИ (ИСПРАВЛЕНО ДРЕБЕЗЖАНИЕ)
+   4. ВСПЛЫВАЮЩАЯ КАПСУЛА НАСТРОЕК С БИРКАМИ (ИСПРАВЛЕНО ДРЕБЕЗЖАНИЕ И ОТСТУПЫ)
    ========================================================================== */
 .settings-trigger-zone {
     position: fixed;
@@ -116,10 +116,10 @@ body.page-loaded {
     pointer-events: none; 
     opacity: 0;
     display: flex;
-    align-items: flex-start; /* Прижимаем плашку к верхнему краю зоны */
+    align-items: flex-start;
     justify-content: center;
-    padding: 10px; /* Создаем безопасный буфер вокруг всей капсулы */
-    margin: -10px; /* Компенсируем сдвиг от padding */
+    padding: 10px;
+    margin: -10px;
     animation: fadeInElement 1.2s ease-out 0.5s forwards,
                enablePointerEvents 0s linear 0.5s forwards;
 }
@@ -243,7 +243,7 @@ body.page-loaded {
     color: #ffffff;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
     position: absolute;
-    right: 64px; 
+    right: 74px; /* Скоректировано отступ слева от капсулы */
     top: 24px; 
     transform: translateY(-50%) translateX(15px); 
     white-space: nowrap;
@@ -270,7 +270,7 @@ body.page-loaded {
     color: #ffffff;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
     position: absolute;
-    right: 64px; 
+    right: 74px; /* Скоректировано */
     top: 50%;
     transform: translateY(-50%) translateX(15px); 
     white-space: nowrap;
@@ -359,7 +359,7 @@ body.page-loaded {
     color: #ffffff;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
     position: absolute;
-    right: 64px;
+    right: 74px; /* Скоректировано */
     top: 50%;
     transform: translateY(-50%) translateX(15px);
     white-space: nowrap;
@@ -457,9 +457,10 @@ body.page-loaded {
     transform: scale(1.4);
 }
 
+/* Линия-разделитель */
 .settings-horizontal-line {
     position: absolute;
-    right: 64px; 
+    right: 74px; /* Скоректировано */
     top: 48px; 
     width: 120px; 
     height: 1px;
