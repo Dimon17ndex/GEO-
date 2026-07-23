@@ -61,7 +61,7 @@ body {
 }
 
 /* ==========================================================================
-   3. СТИЛИ ВСПЛЫВАЮЩЕЙ КАПСУЛЫ НАСТРОЕК (ИСПРАВЛЕНО ДРЕБЕЗЖАНИЕ)
+   3. СТИЛИ ВСПЛЫВАЮЩЕЙ КАПСУЛЫ НАСТРОЕК (ИСПРАВЛЕНО ДРЕБЕЗЖАНИЕ И ОТСТУПЫ)
    ========================================================================== */
 .settings-trigger-zone {
     position: fixed;
@@ -197,7 +197,7 @@ body {
     color: #ffffff;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
     position: absolute;
-    right: 64px; 
+    right: 74px; /* Скоректировано с 64px */
     top: 24px; 
     transform: translateY(-50%) translateX(15px); 
     white-space: nowrap;
@@ -224,7 +224,7 @@ body {
     color: #ffffff;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
     position: absolute;
-    right: 64px; 
+    right: 74px; /* Скоректировано с 64px */
     top: 50%;
     transform: translateY(-50%) translateX(15px); 
     white-space: nowrap;
@@ -315,7 +315,7 @@ body {
     color: #ffffff;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
     position: absolute;
-    right: 64px;
+    right: 74px; /* Скоректировано с 64px */
     top: 50%;
     transform: translateY(-50%) translateX(15px);
     white-space: nowrap;
@@ -416,7 +416,7 @@ body {
 
 .settings-horizontal-line {
     position: absolute;
-    right: 64px; 
+    right: 74px; /* Скоректировано с 64px */
     top: 48px; 
     width: 120px; 
     height: 1px;
@@ -1146,10 +1146,4 @@ body:has(.input-container-box.active) .logo-icon {
     opacity: 0 !important;
     filter: blur(15px) !important;
     transition: opacity 0.5s ease, filter 0.5s ease !important;
-}
-
-/* Полное затухание всего экрана перед переходом */
-body.page-fade-out {
-    opacity: 0 !important;
-    transition: opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1) !important;
 }
