@@ -1233,3 +1233,56 @@ body:has(.input-container-box.active) .logo-icon {
         font-size: 14px; /* Уменьшаем текст "проект Запорожской области" */
     }
 }
+
+/* ==========================================================================
+   ПЛАШКА ПРОВЕРКИ ВЕРСИИ (PC / MOBILE)
+   ========================================================================== */
+.version-debug-badge {
+    position: fixed;
+    z-index: 9999;
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    
+    /* Начальное состояние (скрыто) */
+    opacity: 0;
+    filter: blur(10px);
+    transition: opacity 0.4s ease, filter 0.4s ease, transform 0.4s ease;
+}
+
+/* Позиция для ПК (внизу справа) */
+.version-debug-badge.pc-mode {
+    bottom: 30px;
+    right: 30px;
+    transform: translateY(15px);
+}
+
+/* Позиция для Мобилок (вверху по центру) */
+.version-debug-badge.mobile-mode {
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-15px);
+}
+
+/* Активация появления */
+.version-debug-badge.show {
+    opacity: 1;
+    filter: blur(0px);
+}
+
+.version-debug-badge.pc-mode.show {
+    transform: translateY(0);
+}
+
+.version-debug-badge.mobile-mode.show {
+    transform: translateX(-50%) translateY(0);
+}
