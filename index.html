@@ -632,6 +632,55 @@
             submitBtn.classList.add('state-error');
         }
     });
+
+    (function initVersionChecker() {
+    let clickCount = 0;
+    let clickTimer = null;
+    let hideTimer = null;
+
+    // Определяем мобильную верстку (по ширине экрана или touch-событиям)
+    const isMobile = window.innerWidth <= 768 || 'ontouchstart' in window;
+
+    // Создаем элемент плашки динамически
+    const badge = document.createElement('div');
+    badge.className = `version-debug-badge ${isMobile ? 'mobile-mode' : 'pc-mode'}`;
+    badge.textContent = isMobile ? 'Mobile-Version' : 'PC-Version';
+    document.body.appendChild(badge);
+
+    // Функция обработки клика / тапа
+    function handleTap(e) {
+        // Если кликнули по кнопке, инпуту или интерактивному элементу — игнорируем
+        if (e.target.closest('button, input, a, .settings-trigger-zone, .input-container-box')) {
+            return;
+        }
+
+        clickCount++;
+
+        // Если пауза между кликами больше 1.5 сек — сбрасываем счетчик
+        clearTimeout(clickTimer);
+        clickTimer = setTimeout(() => {
+            clickCount = 0;
+        }, 1500);
+
+        // При 5 кликах/тапах подряд
+        if (clickCount === 5) {
+            clickCount = 0;
+            clearTimeout(clickTimer);
+            clearTimeout(hideTimer);
+
+            // Показываем плашку
+            badge.classList.add('show');
+
+            // Скрываем через 3 секунды
+            hideTimer = setTimeout(() => {
+                badge.classList.remove('show');
+            }, 3000);
+        }
+    }
+
+    // Слушаем клики мышкой и касания пальцем
+    window.addEventListener('click', handleTap);
+})();
 </script>
 </body>
 </html>
