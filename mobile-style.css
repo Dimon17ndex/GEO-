@@ -1,59 +1,143 @@
 /* ==========================================================================
-   МОБИЛЬНЫЕ СТИЛИ (ГЛАВНЫЙ БЛОК: ЛОГОТИП, ЗАГОЛОВОК, ПЛАШКА)
+   1. ГЛОБАЛЬНЫЕ ОГРАНИЧЕНИЯ ЭКРАНА (ФИКС ВЫЛЕЗАНИЯ ЭЛЕМЕНТОВ)
    ========================================================================== */
 
-/* 1. Перестраиваем главный блок под вертикальный экран */
+/* Запрещаем прокрутку по горизонтали для всего сайта */
+html, body {
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+}
+
+/* Главный контейнер строго по размеру экрана */
+.main-container {
+    width: 100% !important;
+    max-width: 100vw !important;
+    padding: 0 16px !important; /* Безопасные отступы слева и справа */
+    box-sizing: border-box !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+
+/* Уменьшаем фоновый герб, чтобы не растягивал ширину */
+.bg-blur-gerb {
+    max-width: 80vw !important;
+    height: auto !important;
+}
+
+
+/* ==========================================================================
+   2. ГЛАВНЫЙ БЛОК (ЛОГОТИП, ЗАГОЛОВОК, ПЛАШКА)
+   ========================================================================== */
+
+/* Перестраиваем главный блок под вертикальный экран */
 .brand-block {
     flex-direction: column !important; /* Ставим элементы в столбик */
-    gap: 15px !important;              /* Уменьшаем расстояние между лого и текстом */
+    gap: 15px !important;              /* Расстояние между лого и текстом */
     align-items: center !important;    /* Центрируем всё по горизонтали */
     text-align: center !important;
 }
 
-/* 2. Уменьшаем сам логотип (geo_logo.png) */
+/* Уменьшаем сам логотип (geo_logo.png) */
 .logo-icon {
-    max-width: 110px !important;       /* Уменьшили ширину (на ПК 240px) */
+    max-width: 110px !important;       /* Уменьшили ширину */
     height: auto !important;
 }
 
-/* 3. Центрируем контейнер с текстом справа */
+/* Центрируем контейнер с текстом справа */
 .text-right {
     align-items: center !important;    /* Центрируем заголовок и плашку */
 }
 
-/* 4. Уменьшаем размер шрифта "GEOГРАФИЯ" */
+/* Уменьшаем размер шрифта "GEOГРАФИЯ" */
 .main-title {
-    font-size: 32px !important;        /* Уменьшили размер букв (на ПК 64px) */
-    letter-spacing: 1px !important;    /* Слегка уменьшили межбуквенный интервал */
+    font-size: clamp(26px, 8vw, 32px) !important; /* Адаптивный размер */
+    letter-spacing: 1px !important;    
     justify-content: center !important;
+    max-width: 100% !important;
 }
 
-/* 5. Уменьшаем плашку "наука • образование..." */
+/* Уменьшаем плашку "наука • образование..." */
 .subtitle-badge {
-    margin-top: 10px !important;       /* Отступ сверху от заголовка */
-    padding: 6px 16px !important;      /* Внутренние отступы плашки */
-    font-size: 11px !important;        /* Размер текста внутри плашки */
-    letter-spacing: 0.5px !important;  /* Интервал между буквами */
+    margin-top: 10px !important;       
+    padding: 6px 16px !important;      
+    font-size: 11px !important;        
+    letter-spacing: 0.5px !important;  
+    white-space: normal !important;   /* Разрешаем перенос текста, если экран очень узкий */
+    text-align: center !important;
 }
+
 
 /* ==========================================================================
-   ОТКЛЮЧЕНИЕ ВОЛН (RIPPLES) НА МОБИЛЬНЫХ УСТРОЙСТВАХ
+   3. ИНПУТ ВВОДА И КНОПКА ОТПРАВКИ
    ========================================================================== */
 
-/* Скрываем все типы фоновых волн при нажатии и авто-волны */
+.input-container-box {
+    width: 100% !important;
+    max-width: 240px !important; /* Безопасная ширина для смартфона */
+    margin-top: 25px !important;
+}
+
+.input-submit-btn {
+    right: -45px !important; /* Придвигаем кнопку ближе к полю */
+    width: 36px !important;
+    height: 36px !important;
+}
+
+
+/* ==========================================================================
+   4. ВЕРХНИЕ НАСТРОЙКИ (КАНАЛЫ/ШЕСТЕРЕНКА) И ТЕКСТ ВНИЗУ
+   ========================================================================== */
+
+/* Сдвигаем иконку настроек ближе к углу экрана */
+.settings-trigger-zone {
+    top: 15px !important;
+    right: 15px !important;
+}
+
+/* Прячем длинную белую линию под шестеренкой */
+.settings-horizontal-line {
+    display: none !important;
+}
+
+/* Ужимаем выплывающие плашки настроек */
+.settings-label, 
+.volume-label, 
+.intensity-label {
+    font-size: 11px !important;
+    right: 55px !important;
+}
+
+/* Текст внизу "проект Запорожской области" */
+.bottom-credits-wrapper {
+    bottom: 20px !important;
+    width: 100% !important;
+    text-align: center !important;
+}
+
+.bottom-credits {
+    font-size: 13px !important;
+    white-space: normal !important;
+}
+
+
+/* ==========================================================================
+   5. ЖЕСТКАЯ БЛОКИРОВКА ВОЛН ДЛЯ МОБИЛОК
+   ========================================================================== */
+
+/* Блокируем отображение всех типов волн */
 .bg-wave-ripple,
 .bg-click-ripple,
 .bg-ambient-ripple,
 .bg-ambient-red,
-.bg-ambient-green {
-    display: none !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    animation: none !important;
-}
-
-/* Скрываем сам контейнер для волн */
+.bg-ambient-green,
 #bg-wave-container {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
     pointer-events: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    animation: none !important;
 }
