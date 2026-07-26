@@ -189,15 +189,26 @@
             font-weight: 700;
         }
 
-        /* --- УМЕНЬШЕННЫЕ РАЗМЕРЫ ЭЛЕМЕНТОВ ДЛЯ МОБИЛКИ --- */
+        /* --- ГОРИЗОНТАЛЬНАЯ КОМПОНОВКА ЛОГО И ТЕКСТА --- */
         .brand-block {
-            gap: 8px !important;
+            display: flex !important;
+            flex-direction: row !important; /* Ставим лого слева от текста */
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 12px !important;
         }
 
         .logo-icon {
-            width: 50px !important;
-            height: 50px !important;
+            width: 48px !important;
+            height: 48px !important;
             object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        .text-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* Выравнивание текста по левому краю от лого */
         }
 
         .main-title {
@@ -207,12 +218,13 @@
         }
 
         .subtitle-badge {
-            padding: 3px 10px !important;
+            padding: 3px 8px !important;
             border-radius: 30px !important;
+            margin-top: 4px;
         }
 
         .subtitle-badge span {
-            font-size: 8px !important;
+            font-size: 7.5px !important;
             letter-spacing: 0.5px !important;
         }
 
@@ -270,9 +282,9 @@
 
         .db-brand-block {
             display: flex;
-            flex-direction: column;
+            flex-direction: row; /* На экране успешного входа тоже делаем слева */
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             opacity: 0;
             filter: blur(10px);
             transform: translateY(-10px);
@@ -287,16 +299,17 @@
         }
 
         .db-logo-icon {
-            width: 45px;  
-            height: 45px;
+            width: 42px;  
+            height: 42px;
             object-fit: contain;
+            flex-shrink: 0;
         }
 
         .db-text-right {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 6px;
+            align-items: flex-start;
+            gap: 4px;
         }
 
         .db-main-title, .success-message {
@@ -311,7 +324,7 @@
             font-weight: 900;
             line-height: 1.1;
             letter-spacing: 0.5px;
-            text-align: center;
+            text-align: left;
         }
 
         .success-message {
@@ -326,7 +339,7 @@
         .db-subtitle-badge {
             background: transparent;
             border: 1px solid rgba(255, 255, 255, 0.6);
-            padding: 3px 10px;
+            padding: 3px 8px;
             border-radius: 50px;
             display: inline-block;
         }
