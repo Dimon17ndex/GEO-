@@ -35,3 +35,25 @@
     font-size: 11px !important;        /* Размер текста внутри плашки */
     letter-spacing: 0.5px !important;  /* Интервал между буквами */
 }
+
+/* ==========================================================================
+   ОТКЛЮЧЕНИЕ ВОЛН (RIPPLES) НА МОБИЛЬНЫХ УСТРОЙСТВАХ
+   ========================================================================== */
+
+/* Скрываем все типы фоновых волн при нажатии и авто-волны */
+.bg-wave-ripple,
+.bg-click-ripple,
+.bg-ambient-ripple,
+.bg-ambient-red,
+.bg-ambient-green {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    animation: none !important;
+}
+
+/* Скрываем сам контейнер для волн */
+#bg-wave-container {
+    display: none !important;
+    pointer-events: none !important;
+}
