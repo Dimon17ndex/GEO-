@@ -1147,3 +1147,89 @@ body:has(.input-container-box.active) .logo-icon {
     filter: blur(15px) !important;
     transition: opacity 0.5s ease, filter 0.5s ease !important;
 }
+
+/* ==========================================================================
+   16. АДАПТАЦИЯ ПОД МОБИЛЬНЫЕ УСТРОЙСТВА (Ширина экрана до 768px)
+   ========================================================================== */
+@media screen and (max-width: 768px) {
+
+    /* --- Базовые ограничения разрешения --- */
+    html, body {
+        overflow-x: hidden; /* Запрещаем горизонтальную прокрутку */
+        overflow-y: auto;   /* Разрешаем вертикальный скролл, если элемент не влезает */
+    }
+
+    /* --- Фоновый герб --- */
+    .bg-blur-gerb {
+        width: 100vw;       /* Вместо 1100px ставим ширину относительно экрана */
+        left: -10%;
+        top: -10%;
+    }
+
+    /* --- Главный контейнер с логотипом --- */
+    .brand-block, 
+    .db-brand-block {
+        flex-direction: column; /* Разворачиваем логотип и текст в СТОЛБИК */
+        gap: 20px;
+        text-align: center;
+    }
+
+    .logo-icon, 
+    .db-logo-icon {
+        max-width: 160px; /* Уменьшаем логотип для мобилок */
+    }
+
+    .text-right, 
+    .db-text-right {
+        align-items: center; /* Центрируем заголовок */
+    }
+
+    .main-title, 
+    .db-main-title {
+        font-size: 36px; /* Уменьшаем заголовок с 64px до 36px, чтобы влезал */
+    }
+
+    .subtitle-badge {
+        font-size: 12px;
+        padding: 6px 16px;
+    }
+
+    /* --- Инпут и кнопка отправки --- */
+    .input-container-box {
+        width: 85vw; /* Ширина инпута адаптивно под экран */
+        max-width: 280px;
+    }
+
+    .input-submit-btn {
+        right: -45px; /* Придвигаем кнопку смены кода ближе к полю */
+        width: 36px;
+        height: 36px;
+    }
+
+    /* --- Капсула настроек (вверху справа) --- */
+    .settings-trigger-zone {
+        top: 15px;
+        right: 15px;
+    }
+
+    /* Выплывающие подсказки для настроек на мобилке уводим вниз или влево */
+    .settings-label, 
+    .volume-label, 
+    .intensity-label {
+        font-size: 11px;
+        right: 55px;
+    }
+
+    .settings-horizontal-line {
+        display: none; /* Убираем длинную белую линию на мобилках, чтобы не перегружать экран */
+    }
+
+    /* --- Текст внизу экрана --- */
+    .bottom-credits-wrapper {
+        bottom: 25px;
+    }
+
+    .bottom-credits {
+        font-size: 14px; /* Уменьшаем текст "проект Запорожской области" */
+    }
+}
