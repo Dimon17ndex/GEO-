@@ -26,7 +26,6 @@
     <link rel="stylesheet" href="mobile-style.css?v=1">
     
     <style>
-        /* Обнуление отступов и сброс размеров */
         *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
@@ -36,11 +35,14 @@
         html, body {
             width: 100%;
             height: 100%;
-            overflow: hidden; /* Исключает случайный скролл */
-            touch-action: manipulation; /* Убирает задержку клика на тачскринах */
+            overflow: hidden;
+            touch-action: manipulation;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
         }
 
-        /* Специфичные стили для мобильного интерфейса */
         .session-dashboard {
             position: fixed;
             top: 0;
@@ -216,12 +218,10 @@
             transition: opacity 0.8s ease, filter 0.8s ease, transform 0.8s ease !important;
         }
 
-        /* Предотвращение зума на iOS при фокусе в инпут */
         .custom-input {
             font-size: 16px !important; 
         }
 
-        /* Оформление мобильной кнопки интенсивности */
         .mobile-intensity-btn {
             display: flex;
             align-items: center;
@@ -254,16 +254,6 @@
             </div>
             <span class="settings-label">Настройки</span> 
             <div class="settings-horizontal-line"></div>
-            <div class="settings-divider"></div>
-            
-            <div class="volume-btn" id="volume-toggle-btn">
-                <svg class="volume-svg" id="volume-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                    <path class="volume-wave-1" d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-                    <path class="volume-wave-2" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                </svg>
-                <div class="volume-label" id="volume-status-label">музыка <span class="status-on">on</span> / <span class="status-off">off</span></div>
-            </div>
 
             <div class="intensity-control-box">
                 <div class="intensity-btn mobile-intensity-btn" id="intensity-toggle-btn">
@@ -293,7 +283,16 @@
         </div>
 
         <div class="input-container-box">
-            <input type="text" class="custom-input" placeholder="ввести..." id="user-text-input" autocomplete="off">
+            <input 
+                type="text" 
+                class="custom-input" 
+                placeholder="ввести..." 
+                id="user-text-input" 
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="none"
+                spellcheck="false"
+            >
             <div class="input-underline"></div>
             <button class="input-submit-btn" id="submit-auth-btn">
                 <svg class="icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -352,7 +351,6 @@
     const textContainer = document.getElementById('wave-text');
     const logoElement = document.getElementById('main-logo');
     const promptElement = document.getElementById('click-prompt');
-    const volumeStatusLabel = document.getElementById('volume-status-label');
     const intensityToggleBtn = document.getElementById('intensity-toggle-btn');
     const intensityValueLabel = document.getElementById('intensity-value');
     const textInput = document.getElementById('user-text-input');
@@ -389,27 +387,8 @@
 
     buildWaveText(initialText);
 
-    // Полное отключение создания волн на JS-уровне
-    function createBackgroundRipple(x, y, className, duration = 1500) {
-        return; 
-    }
-
-    function spawnAmbientWave() {
-        return; 
-    }
-
-    const bgMusic = new Audio('audio/melody_start.mp3');
-    bgMusic.volume = 0.4; 
-    let musicStarted = false;
-
-    function playMusic() {
-        if (musicStarted || bgMusic.muted) return;
-        bgMusic.play().then(() => { musicStarted = true; }).catch(err => {});
-    }
-
-    bgMusic.addEventListener('ended', () => {
-        setTimeout(() => { if (!bgMusic.muted) bgMusic.play(); }, 5000); 
-    });
+    function createBackgroundRipple(x, y, className, duration = 1500) { return; }
+    function spawnAmbientWave() { return; }
 
     function showClickPrompt() {
         if (hasUserClicked) return; 
@@ -421,10 +400,10 @@
 
     setTimeout(() => { if (!hasUserClicked) showClickPrompt(); }, 4500); 
 
-    textInput.addEventListener('touchstart', (e) => { e.stopPropagation(); }, { passive: true });
+    textInput.addEventListener('pointerdown', (e) => { e.stopPropagation(); });
     textInput.addEventListener('keydown', (e) => { e.stopPropagation(); });
 
-    document.body.addEventListener('touchstart', (e) => {
+    document.body.addEventListener('pointerdown', (e) => {
         if (!isClickAllowed) return;
         if (e.target.closest('#settings-btn') || e.target.closest('.settings-trigger-zone')) return;
 
@@ -470,26 +449,6 @@
 
                 if (textInput) { setTimeout(() => textInput.focus(), 100); }
             }
-        }
-
-        playMusic();
-    }, { passive: true });
-
-    const volumeBtn = document.getElementById('volume-toggle-btn');
-    const volumeIcon = document.getElementById('volume-icon');
-    let isMuted = false;
-
-    volumeBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); 
-        isMuted = !isMuted;
-        bgMusic.muted = isMuted;
-        if (isMuted) {
-            volumeStatusLabel.classList.add('muted-mode');
-            volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15" stroke-width="1.5"></line><line x1="17" y1="9" x2="23" y2="15" stroke-width="1.5"></line>`;
-        } else {
-            volumeStatusLabel.classList.remove('muted-mode');
-            volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path class="volume-wave-1" d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path class="volume-wave-2" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>`;
-            playMusic();
         }
     });
 
