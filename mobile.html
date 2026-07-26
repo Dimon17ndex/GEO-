@@ -102,7 +102,6 @@
                         border-color 0.3s ease;
         }
 
-        /* Состояние открытых настроек */
         .settings-trigger-zone.active .settings-container-box {
             width: 210px;
             height: auto;
@@ -190,6 +189,33 @@
             font-weight: 700;
         }
 
+        /* --- УМЕНЬШЕННЫЕ РАЗМЕРЫ ЭЛЕМЕНТОВ ДЛЯ МОБИЛКИ --- */
+        .brand-block {
+            gap: 8px !important;
+        }
+
+        .logo-icon {
+            width: 50px !important;
+            height: 50px !important;
+            object-fit: contain;
+        }
+
+        .main-title {
+            font-size: 20px !important;
+            letter-spacing: 0.5px !important;
+            line-height: 1.1 !important;
+        }
+
+        .subtitle-badge {
+            padding: 3px 10px !important;
+            border-radius: 30px !important;
+        }
+
+        .subtitle-badge span {
+            font-size: 8px !important;
+            letter-spacing: 0.5px !important;
+        }
+
         /* --- ОСТАЛЬНЫЕ СТИЛИ --- */
         .session-dashboard {
             position: fixed;
@@ -246,7 +272,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             opacity: 0;
             filter: blur(10px);
             transform: translateY(-10px);
@@ -261,8 +287,8 @@
         }
 
         .db-logo-icon {
-            width: 65px;  
-            height: 65px;
+            width: 45px;  
+            height: 45px;
             object-fit: contain;
         }
 
@@ -270,7 +296,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .db-main-title, .success-message {
@@ -281,18 +307,18 @@
 
         .db-main-title {
             color: #ffffff;
-            font-size: 22px; 
+            font-size: 18px; 
             font-weight: 900;
             line-height: 1.1;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             text-align: center;
         }
 
         .success-message {
             color: #00ff6e; 
-            font-size: 15px;
+            font-size: 13px;
             font-weight: 700;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             width: 100%;
             text-align: center;
         }
@@ -300,17 +326,17 @@
         .db-subtitle-badge {
             background: transparent;
             border: 1px solid rgba(255, 255, 255, 0.6);
-            padding: 5px 12px;
+            padding: 3px 10px;
             border-radius: 50px;
             display: inline-block;
         }
 
         .db-subtitle-badge span {
             font-family: 'Montserrat', sans-serif;
-            font-size: 8px; 
+            font-size: 7px; 
             font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             color: #ffffff;
             display: block;
             line-height: 1;
@@ -501,7 +527,6 @@
     let isSecretTextActive = false; 
     let letters = [];
 
-    // Переменные для 5 тапов по фону
     let bgTapCount = 0;
     let bgTapTimer = null;
     let toastTimeout = null;
@@ -512,7 +537,6 @@
 
     setTimeout(() => { isClickAllowed = true; }, 3000);
 
-    // Переключение настроек по тапу на шестеренку
     if (settingsZone) {
         settingsZone.addEventListener('pointerdown', (e) => {
             e.stopPropagation();
@@ -556,12 +580,10 @@
     textInput.addEventListener('keydown', (e) => { e.stopPropagation(); });
 
     document.body.addEventListener('pointerdown', (e) => {
-        // Закрытие настроек при тапе вне блока
         if (settingsZone && settingsZone.classList.contains('active') && !e.target.closest('#settings-btn')) {
             settingsZone.classList.remove('active');
         }
 
-        // 5 быстро тапов по фону для плашки версии
         if (!e.target.closest('#settings-btn') && !e.target.closest('#user-text-input') && !e.target.closest('#submit-auth-btn')) {
             bgTapCount++;
             clearTimeout(bgTapTimer);
