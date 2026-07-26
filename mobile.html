@@ -189,18 +189,18 @@
             font-weight: 700;
         }
 
-        /* --- ГОРИЗОНТАЛЬНАЯ КОМПОНОВКА ЛОГО И ТЕКСТА --- */
+        /* --- КРУПНЫЙ БЛОК БРЕНДА (КАК НА ПК) --- */
         .brand-block {
             display: flex !important;
-            flex-direction: row !important; /* Ставим лого слева от текста */
+            flex-direction: row !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 12px !important;
+            gap: 16px !important;
         }
 
         .logo-icon {
-            width: 48px !important;
-            height: 48px !important;
+            width: 64px !important;
+            height: 64px !important;
             object-fit: contain;
             flex-shrink: 0;
         }
@@ -208,24 +208,27 @@
         .text-right {
             display: flex;
             flex-direction: column;
-            align-items: flex-start; /* Выравнивание текста по левому краю от лого */
+            align-items: flex-start;
+            gap: 6px;
         }
 
         .main-title {
-            font-size: 20px !important;
-            letter-spacing: 0.5px !important;
-            line-height: 1.1 !important;
+            font-size: 26px !important;
+            font-weight: 900 !important;
+            letter-spacing: 1.5px !important;
+            line-height: 1 !important;
         }
 
         .subtitle-badge {
-            padding: 3px 8px !important;
-            border-radius: 30px !important;
-            margin-top: 4px;
+            padding: 5px 12px !important;
+            border-radius: 50px !important;
+            border: 1px solid rgba(255, 255, 255, 0.4) !important;
         }
 
         .subtitle-badge span {
-            font-size: 7.5px !important;
-            letter-spacing: 0.5px !important;
+            font-size: 10px !important;
+            font-weight: 600 !important;
+            letter-spacing: 1px !important;
         }
 
         /* --- ОСТАЛЬНЫЕ СТИЛИ --- */
@@ -276,15 +279,15 @@
             align-items: center;
             gap: 20px;
             width: 90%;
-            max-width: 360px;
+            max-width: 380px;
             z-index: 2;
         }
 
         .db-brand-block {
             display: flex;
-            flex-direction: row; /* На экране успешного входа тоже делаем слева */
+            flex-direction: row;
             align-items: center;
-            gap: 12px;
+            gap: 16px;
             opacity: 0;
             filter: blur(10px);
             transform: translateY(-10px);
@@ -299,8 +302,8 @@
         }
 
         .db-logo-icon {
-            width: 42px;  
-            height: 42px;
+            width: 56px;  
+            height: 56px;
             object-fit: contain;
             flex-shrink: 0;
         }
@@ -309,7 +312,7 @@
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            gap: 4px;
+            gap: 6px;
         }
 
         .db-main-title, .success-message {
@@ -320,36 +323,36 @@
 
         .db-main-title {
             color: #ffffff;
-            font-size: 18px; 
+            font-size: 22px; 
             font-weight: 900;
-            line-height: 1.1;
-            letter-spacing: 0.5px;
+            line-height: 1;
+            letter-spacing: 1px;
             text-align: left;
         }
 
         .success-message {
             color: #00ff6e; 
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 700;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
             width: 100%;
             text-align: center;
         }
 
         .db-subtitle-badge {
             background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            padding: 3px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 4px 10px;
             border-radius: 50px;
             display: inline-block;
         }
 
         .db-subtitle-badge span {
             font-family: 'Montserrat', sans-serif;
-            font-size: 7px; 
-            font-weight: 500;
+            font-size: 8.5px; 
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
             color: #ffffff;
             display: block;
             line-height: 1;
