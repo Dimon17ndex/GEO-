@@ -94,6 +94,10 @@ html, body {
 .settings-trigger-zone {
     top: 15px !important;
     right: 15px !important;
+    z-index: 10000 !important; /* Выводим поверх всех слоёв */
+    touch-action: manipulation !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
 }
 
 /* Прячем длинную белую линию под шестеренкой */
@@ -101,12 +105,37 @@ html, body {
     display: none !important;
 }
 
-/* Ужимаем выплывающие плашки настроек */
+/* Делаем плашку настроек полностью видимой при нажатии */
+.settings-container-box {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    position: relative !important;
+    z-index: 10001 !important;
+}
+
+/* Принудительно показываем выплывающие тексты плашек */
 .settings-label, 
-.volume-label, 
 .intensity-label {
     font-size: 11px !important;
-    right: 55px !important;
+    color: #ffffff !important;
+    white-space: nowrap !important;
+    
+    /* Снимаем блокировку прозрачности и скрытия, если она была */
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    
+    /* Корректное позиционирование для мобильных */
+    position: relative !important;
+    right: 0 !important;
+    margin-top: 5px !important;
+    
+    background: rgba(0, 0, 0, 0.6) !important;
+    backdrop-filter: blur(5px) !important;
+    padding: 4px 10px !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
 /* Текст внизу "проект Запорожской области" */
