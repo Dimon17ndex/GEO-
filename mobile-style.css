@@ -1,0 +1,37 @@
+/* ==========================================================================
+   МОБИЛЬНЫЕ СТИЛИ (ГЛАВНЫЙ БЛОК: ЛОГОТИП, ЗАГОЛОВОК, ПЛАШКА)
+   ========================================================================== */
+
+/* 1. Перестраиваем главный блок под вертикальный экран */
+.brand-block {
+    flex-direction: column !important; /* Ставим элементы в столбик */
+    gap: 15px !important;              /* Уменьшаем расстояние между лого и текстом */
+    align-items: center !important;    /* Центрируем всё по горизонтали */
+    text-align: center !important;
+}
+
+/* 2. Уменьшаем сам логотип (geo_logo.png) */
+.logo-icon {
+    max-width: 110px !important;       /* Уменьшили ширину (на ПК 240px) */
+    height: auto !important;
+}
+
+/* 3. Центрируем контейнер с текстом справа */
+.text-right {
+    align-items: center !important;    /* Центрируем заголовок и плашку */
+}
+
+/* 4. Уменьшаем размер шрифта "GEOГРАФИЯ" */
+.main-title {
+    font-size: 32px !important;        /* Уменьшили размер букв (на ПК 64px) */
+    letter-spacing: 1px !important;    /* Слегка уменьшили межбуквенный интервал */
+    justify-content: center !important;
+}
+
+/* 5. Уменьшаем плашку "наука • образование..." */
+.subtitle-badge {
+    margin-top: 10px !important;       /* Отступ сверху от заголовка */
+    padding: 6px 16px !important;      /* Внутренние отступы плашки */
+    font-size: 11px !important;        /* Размер текста внутри плашки */
+    letter-spacing: 0.5px !important;  /* Интервал между буквами */
+}
