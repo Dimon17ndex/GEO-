@@ -189,7 +189,7 @@
             font-weight: 700;
         }
 
-        /* --- КРУПНЫЙ БЛОК БРЕНДА (КАК НА ПК) --- */
+        /* --- БЛОК БРЕНДА С УВЕЛИЧЕННЫМ ЛОГО И УМЕНЬШЕННОЙ ВЫРАВНЕННОЙ ПЛАШКОЙ --- */
         .brand-block {
             display: flex !important;
             flex-direction: row !important;
@@ -199,8 +199,8 @@
         }
 
         .logo-icon {
-            width: 64px !important;
-            height: 64px !important;
+            width: 76px !important;
+            height: 76px !important;
             object-fit: contain;
             flex-shrink: 0;
         }
@@ -208,7 +208,7 @@
         .text-right {
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
+            align-items: flex-start !important; /* Левый край выравнивает заголовок и плашку */
             gap: 6px;
         }
 
@@ -217,18 +217,25 @@
             font-weight: 900 !important;
             letter-spacing: 1.5px !important;
             line-height: 1 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            text-align: left !important;
         }
 
         .subtitle-badge {
-            padding: 5px 12px !important;
-            border-radius: 50px !important;
+            padding: 3px 8px !important;
+            border-radius: 30px !important;
             border: 1px solid rgba(255, 255, 255, 0.4) !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            margin: 0 !important;
         }
 
         .subtitle-badge span {
-            font-size: 10px !important;
+            font-size: 8px !important;
             font-weight: 600 !important;
-            letter-spacing: 1px !important;
+            letter-spacing: 0.6px !important;
+            line-height: 1 !important;
         }
 
         /* --- ОСТАЛЬНЫЕ СТИЛИ --- */
@@ -302,8 +309,8 @@
         }
 
         .db-logo-icon {
-            width: 56px;  
-            height: 56px;
+            width: 64px;  
+            height: 64px;
             object-fit: contain;
             flex-shrink: 0;
         }
@@ -342,17 +349,17 @@
         .db-subtitle-badge {
             background: transparent;
             border: 1px solid rgba(255, 255, 255, 0.5);
-            padding: 4px 10px;
+            padding: 3px 8px;
             border-radius: 50px;
             display: inline-block;
         }
 
         .db-subtitle-badge span {
             font-family: 'Montserrat', sans-serif;
-            font-size: 8.5px; 
+            font-size: 8px; 
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
+            letter-spacing: 0.6px;
             color: #ffffff;
             display: block;
             line-height: 1;
