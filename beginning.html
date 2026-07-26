@@ -226,5 +226,16 @@
         });
     });
     </script>
+    
+    <script>
+    // Создаем искусственную точку в истории браузера
+    history.pushState(null, null, location.href);
+
+    // Перехватываем нажатие кнопки "Назад" в браузере
+    window.addEventListener('popstate', function () {
+        // Выгружаем beginning.html и возвращаем на index.html
+        window.location.replace('index.html');
+    });
+</script>
 </body>
 </html>
