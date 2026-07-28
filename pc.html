@@ -318,31 +318,35 @@
     </div>
 
     <div class="dev-console">
-    <div class="console-header">
-        <span>DEV CONSOLE v1.0</span>
-        <button type="button" class="console-close" id="console-close-btn">&times;</button>
+        <div class="console-header">
+            <span>DEV CONSOLE v1.0</span>
+            <button type="button" class="console-close" id="console-close-btn">&times;</button>
+        </div>
+
+        <div id="console-auth-screen" class="console-auth-container">
+            <p class="auth-title">ТРЕБУЕТСЯ АВТОРИЗАЦИЯ</p>
+            <div class="console-input-row">
+                <span class="console-prompt">PASS&gt;</span>
+                <input type="password" id="console-pass-input" placeholder="Введите пароль..." autocomplete="new-password">
+                <button type="button" id="console-auth-btn" class="console-btn">Войти</button>
+            </div>
+            <p id="console-auth-error" class="auth-error"></p>
+        </div>
+
+        <div id="console-main-screen" class="console-main-container" style="display: none;">
+            <div class="console-output" id="console-output">
+                <div class="log-item system">[SYSTEM] Доступ разрешен. Сессия активна.</div>
+            </div>
+            <div class="console-input-row">
+                <span class="console-prompt">&gt;</span>
+                <input type="text" id="console-input" placeholder="Введите команду..." autocomplete="off">
+            </div>
+        </div>
     </div>
 
-    <div id="console-auth-screen" class="console-auth-container">
-        <p class="auth-title">ТРЕБУЕТСЯ АВТОРИЗАЦИЯ</p>
-        <div class="console-input-row">
-            <span class="console-prompt">PASS&gt;</span>
-            <input type="password" id="console-pass-input" placeholder="Введите пароль..." autocomplete="new-password">
-            <button type="button" id="console-auth-btn" class="console-btn">Войти</button>
-        </div>
-        <p id="console-auth-error" class="auth-error"></p>
-    </div>
+    <div class="version-badge" id="version-badge">PC-VERSION</div>
 
-    <div id="console-main-screen" class="console-main-container" style="display: none;">
-        <div class="console-output" id="console-output">
-            <div class="log-item system">[SYSTEM] Доступ разрешен. Сессия активна.</div>
-        </div>
-        <div class="console-input-row">
-            <span class="console-prompt">&gt;</span>
-            <input type="text" id="console-input" placeholder="Введите команду..." autocomplete="off">
-        </div>
-    </div>
-</div>
+    <script src="console.js" defer></script>
 
     <script>
         // --- 1. ЛОГИКА ИНТЕРФЕЙСА СТРАНИЦЫ ---
@@ -673,52 +677,40 @@
                 }
             });
         }
-    </script>     
 
-    <script src="console.js" defer></script>
-<div class="version-badge" id="version-badge">PC-VERSION</div>
+        // --- 2. ЛОГИКА ОТОБРАЖЕНИЯ ПЛАШКИ ВЕРСИИ ПО 5 КЛИКАМ ---
+        (function() {
+            const vBadge = document.getElementById('version-badge');
+            let clickCount = 0;
+            let clickTimer = null;
+            let badgeHideTimer = null;
 
-<script>
-(function() {
-    const vBadge = document.getElementById('version-badge');
-    let clickCount = 0;
-    let clickTimer = null;
-    let badgeHideTimer = null;
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('input') || e.target.closest('button') || e.target.closest('.dev-console')) {
+                    return;
+                }
 
-    document.addEventListener('click', (e) => {
-        // Игнорируем клики по кнопкам, инпутам и консоли, чтобы отслеживать клики именно "по фону"
-        if (e.target.closest('input') || e.target.closest('button') || e.target.closest('.dev-console')) {
-            return;
-        }
+                clickCount++;
 
-        clickCount++;
+                clearTimeout(clickTimer);
+                clickTimer = setTimeout(() => {
+                    clickCount = 0;
+                }, 700);
 
-        // Сбрасываем счетчик, если между кликами прошло больше 700 мс
-        clearTimeout(clickTimer);
-        clickTimer = setTimeout(() => {
-            clickCount = 0;
-        }, 700);
+                if (clickCount >= 5) {
+                    clickCount = 0;
+                    clearTimeout(clickTimer);
 
-        // При 5 кликах активируем плашку
-        if (clickCount >= 5) {
-            clickCount = 0;
-            clearTimeout(clickTimer);
-
-            if (vBadge) {
-                // Показываем плашку
-                vBadge.classList.add('show');
-
-                // Очищаем предыдущий таймер скрытия, если он был
-                clearTimeout(badgeHideTimer);
-
-                // Скрываем плашку ровно через 3 секунды (3000 мс)
-                badgeHideTimer = setTimeout(() => {
-                    vBadge.classList.remove('show');
-                }, 3000);
-            }
-        }
-    });
-})();
-</script>
+                    if (vBadge) {
+                        vBadge.classList.add('show');
+                        clearTimeout(badgeHideTimer);
+                        badgeHideTimer = setTimeout(() => {
+                            vBadge.classList.remove('show');
+                        }, 3000);
+                    }
+                }
+            });
+        })();
+    </script>
 </body>
 </html>
