@@ -1286,3 +1286,79 @@ body:has(.input-container-box.active) .logo-icon {
 .version-debug-badge.mobile-mode.show {
     transform: translateX(-50%) translateY(0);
 }
+
+/* ==========================================
+   УНИВЕРСАЛЬНЫЕ ПЛАШКИ-УВЕДОМЛЕНИЯ (BANNERS)
+   ========================================== */
+
+/* Базовый каркас плашки */
+.app-banner {
+    position: fixed;
+    top: calc(env(safe-area-inset-top) + 15px);
+    left: 50%;
+    transform: translateX(-50%);
+    
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    
+    padding: 8px 16px;
+    border-radius: 12px;
+    
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    white-space: nowrap;
+    
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    
+    z-index: 99999;
+    user-select: none;
+    animation: bannerSlideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Анимация появления сверху */
+@keyframes bannerSlideDown {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-40px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* --- ВАРИАНТЫ ОФОРМЛЕНИЯ --- */
+
+/* 1. Оранжевый: Ведутся работы */
+.banner-warning {
+    background: rgba(255, 152, 0, 0.2);
+    color: #ffb74d;
+    border: 1px solid rgba(255, 152, 0, 0.5);
+}
+
+/* 2. Красный: Ограничения / Ошибка */
+.banner-danger {
+    background: rgba(244, 67, 54, 0.2);
+    color: #ff8a80;
+    border: 1px solid rgba(244, 67, 54, 0.5);
+}
+
+/* 3. Синий: Информация / Бета */
+.banner-info {
+    background: rgba(33, 150, 243, 0.2);
+    color: #90caf9;
+    border: 1px solid rgba(33, 150, 243, 0.5);
+}
+
+/* 4. Зеленый: Всё работает / Акция */
+.banner-success {
+    background: rgba(76, 175, 80, 0.2);
+    color: #a5d6a7;
+    border: 1px solid rgba(76, 175, 80, 0.5);
+}
