@@ -172,7 +172,7 @@ html, body {
 }
 
 /* ==========================================================================
-   КОНТЕЙНЕР И ПЛАШКИ УВЕДОМЛЕНИЙ (BANNERS CONTAINER)
+   6. КОНТЕЙНЕР И ПЛАШКИ УВЕДОМЛЕНИЙ (BANNERS CONTAINER)
    ========================================================================== */
 
 /* Общий контейнер, удерживающий плашки стопкой */
@@ -185,18 +185,17 @@ html, body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px; /* Расстояние между плашками */
+    gap: 0px; /* Убрали внутренний отступ между плашками */
     
     z-index: 99998;
-    pointer-events: none; /* Чтобы клики сквозь пустые области контейнера проходили на сайт */
+    pointer-events: none;
     
-    /* Плавность смещения всей стопки вниз */
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* При выплывании плашки версии сдвигаем ВЕСЬ контейнер с плашками вниз */
+/* При выплывании плашки версии сдвигаем контейнер ровно встык без зазора */
 body:has(#version-badge.show) .app-banners-container {
-    transform: translateX(-50%) translateY(50px) !important;
+    transform: translateX(-50%) translateY(32px) !important; /* Уменьшено с 50px до 32px для плотного прилегания */
 }
 
 /* Базовый стиль отдельной плашки */
@@ -223,10 +222,9 @@ body:has(#version-badge.show) .app-banners-container {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     
-    pointer-events: auto; /* Возвращаем кликабельность самой плашке */
+    pointer-events: auto;
     user-select: none;
     
-    /* Анимация плавного появления каждой плашки */
     animation: bannerSlideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
