@@ -753,5 +753,24 @@
         });
     });
 </script>
+
+<script>
+    async function syncBannerVisibility() {
+        try {
+            const res = await fetch('/api/banner');
+            const data = await res.json();
+            
+            const bannerContainer = document.querySelector('.app-banners-container');
+            if (bannerContainer) {
+                bannerContainer.style.display = data.enabled ? 'flex' : 'none';
+            }
+        } catch (e) {
+            console.warn('Не удалось загрузить статус плашки');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', syncBannerVisibility);
+</script>
+</body>
 </body>
 </html>
