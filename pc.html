@@ -345,6 +345,7 @@
 </div>
 
     <script>
+        // --- 1. ЛОГИКА ИНТЕРФЕЙСА СТРАНИЦЫ ---
         const textContainer = document.getElementById('wave-text');
         const waveContainer = document.getElementById('bg-wave-container');
         const logoElement = document.getElementById('main-logo');
@@ -497,7 +498,7 @@
 
         document.body.addEventListener('mousedown', (e) => {
             if (!isClickAllowed) return;
-            if (e.target.closest('#settings-btn') || e.target.closest('.settings-trigger-zone') || e.target.closest('#dev-console')) return;
+            if (e.target.closest('#settings-btn') || e.target.closest('.settings-trigger-zone') || e.target.closest('.dev-console')) return;
 
             if (!hasUserClicked && promptElement) {
                 hasUserClicked = true;
@@ -579,6 +580,19 @@
         const myInput = document.getElementById('user-text-input'); 
         let livesInErrorState = false;
 
+        function prepareDashboardSpans(elementId, startDelay) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            const text = el.innerText;
+            el.innerHTML = '';
+            Array.from(text).forEach((char, index) => {
+                const span = document.createElement('span');
+                if (char === ' ') { span.innerHTML = '&nbsp;'; } else { span.innerText = char; }
+                span.style.animationDelay = `${startDelay + (index * 0.04)}s`;
+                el.appendChild(span);
+            });
+        }
+
         if (myInput && submitBtn) {
             myInput.addEventListener('input', () => {
                 const textLength = myInput.value.trim().length;
@@ -596,19 +610,6 @@
                 if (e.key === 'Enter') {
                     submitBtn.click();
                 }
-            });
-        }
-
-        function prepareDashboardSpans(elementId, startDelay) {
-            const el = document.getElementById(elementId);
-            if (!el) return;
-            const text = el.innerText;
-            el.innerHTML = '';
-            Array.from(text).forEach((char, index) => {
-                const span = document.createElement('span');
-                if (char === ' ') { span.innerHTML = '&nbsp;'; } else { span.innerText = char; }
-                span.style.animationDelay = `${startDelay + (index * 0.04)}s`;
-                el.appendChild(span);
             });
         }
 
@@ -673,277 +674,173 @@
             });
         }
 
-        (function initVersionChecker() {
-            let clickCount = 0;
-            let clickTimer = null;
-            let hideTimer = null;
+        // --- 2. ЕДИНАЯ И ИСПРАВЛЕННАЯ ЛОГИКА КОНСОЛИ ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const devConsole = document.querySelector('.dev-console');
+            const authScreen = document.getElementById('console-auth-screen');
+            const mainScreen = document.getElementById('console-main-screen');
+            const passInput = document.getElementById('console-pass-input');
+            const authBtn = document.getElementById('console-auth-btn');
+            const authError = document.getElementById('console-auth-error');
+            const closeBtn = document.getElementById('console-close-btn');
+            const consoleInput = document.getElementById('console-input');
+            const consoleOutput = document.getElementById('console-output');
 
-            const badge = document.createElement('div');
-            badge.className = 'version-debug-badge pc-mode';
-            badge.textContent = 'PC-Version';
-            document.body.appendChild(badge);
-
-            function handleTap(e) {
-                if (e.target.closest('button, input, a, .settings-trigger-zone, .input-container-box, #dev-console')) {
-                    return;
-                }
-
-                clickCount++;
-                clearTimeout(clickTimer);
-                clickTimer = setTimeout(() => { clickCount = 0; }, 1500);
-
-                if (clickCount === 5) {
-                    clickCount = 0;
-                    clearTimeout(clickTimer);
-                    clearTimeout(hideTimer);
-                    badge.classList.add('show');
-                    hideTimer = setTimeout(() => { badge.classList.remove('show'); }, 3000);
-                }
-            }
-
-            window.addEventListener('click', handleTap);
-        })();
-
-        // --- ЛОГИКА ДЕСКТОПНОЙ КОНСОЛИ ---
-        const devConsole = document.getElementById('dev-console');
-        const consoleInput = document.getElementById('console-input');
-        const consoleOutput = document.getElementById('console-output');
-        const closeConsoleBtn = document.getElementById('close-console-btn');
-
-        function logToConsole(text, type = 'system') {
-            if (!consoleOutput) return;
-            const log = document.createElement('div');
-            log.className = `log-item ${type}`;
-            log.innerHTML = text;
-            consoleOutput.appendChild(log);
-            consoleOutput.scrollTop = consoleOutput.scrollHeight;
-        }
-
-        function toggleConsole() {
             if (!devConsole) return;
-            devConsole.classList.toggle('show');
-            if (devConsole.classList.contains('show') && consoleInput) {
-                setTimeout(() => consoleInput.focus(), 100);
-            }
-        }
 
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Backquote') {
-                e.preventDefault();
-                toggleConsole();
-            }
-        });
-
-        if (closeConsoleBtn) {
-            closeConsoleBtn.addEventListener('click', toggleConsole);
-        }
-
-        if (consoleInput) {
-            consoleInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    const command = consoleInput.value.trim();
-                    if (!command) return;
-
-                    logToConsole(`&gt; ${command}`, 'user');
-                    consoleInput.value = '';
-
-                    processCommand(command);
-                }
-            });
-        }
-
-        function processCommand(cmd) {
-            const parts = cmd.split(' ');
-            const mainCmd = parts[0].toLowerCase();
-
-            switch (mainCmd) {
-                case 'help':
-                    logToConsole('Доступные команды:', 'system');
-                    logToConsole('<span class="cmd-highlight">help</span> — показать список команд', 'system');
-                    logToConsole('<span class="cmd-highlight">clear</span> — очистить консоль', 'system');
-                    logToConsole('<span class="cmd-highlight">status</span> — проверить статус подключения', 'system');
-                    logToConsole('<span class="cmd-highlight">bypass</span> — зайти без пароля', 'system');
-                    logToConsole('<span class="cmd-highlight">exec [js]</span> — выполнить произвольный JS-код', 'system');
-                    break;
-
-                case 'clear':
-                    if (consoleOutput) consoleOutput.innerHTML = '';
-                    break;
-
-                case 'status':
-                    logToConsole('Сервер: ACTIVE | Платформа: Desktop', 'success');
-                    break;
-
-                case 'bypass':
-                    logToConsole('Обход авторизации активирован...', 'success');
-                    setTimeout(() => {
-                        window.location.href = '/beginning.html';
-                    }, 1000);
-                    break;
-
-                case 'exec':
-                    const codeToExec = cmd.substring(5);
-                    try {
-                        const result = new Function(`return ${codeToExec}`)();
-                        logToConsole(`Результат: ${result}`, 'success');
-                    } catch (err) {
-                        logToConsole(`Ошибка выполнения: ${err.message}`, 'error');
-                    }
-                    break;
-
-                default:
-                    logToConsole(`Неизвестная команда "${mainCmd}". Введите "help".`, 'error');
-                    break;
-            }
-        }
-    </script>
-
-    <script>
-document.addEventListener('keydown', async (e) => {
-    // Отслеживаем клавишу тильда (Ё / ` / ~)
-    if (e.code === 'Backquote' || e.key === '`' || e.key === '~' || e.key === 'Ё' || e.key === 'ё') {
-        e.preventDefault();
-
-        const devConsole = document.querySelector('.dev-console');
-        if (!devConsole) return;
-
-        // Если консоль уже была открыта — закрываем
-        if (devConsole.classList.contains('show')) {
-            devConsole.classList.remove('show');
-            return;
-        }
-
-        // Проверяем сессию браузера
-        const isAuth = sessionStorage.getItem('dev_console_authenticated');
-
-        if (isAuth === 'true') {
-            devConsole.classList.add('show');
-        } else {
-            const password = prompt('Введите пароль разработчика:');
-            if (!password) return;
-
-            const success = await checkConsolePassword(password);
-
-            if (success) {
-                // Запоминаем авторизацию на время работы с вкладкой
-                sessionStorage.setItem('dev_console_authenticated', 'true');
-                devConsole.classList.add('show');
-            } else {
-                alert('Неверный пароль доступа!');
-            }
-        }
-    }
-});
-
-// Запрос на бэкенд
-async function checkConsolePassword(password) {
-    try {
-        const response = await fetch('/api/verify-console-pass', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ password })
-        });
-        
-        const data = await response.json();
-        return data.success === true;
-    } catch (err) {
-        console.error('Ошибка проверки пароля:', err);
-        return false;
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    const devConsole = document.querySelector('.dev-console');
-    const authScreen = document.getElementById('console-auth-screen');
-    const mainScreen = document.getElementById('console-main-screen');
-    const passInput = document.getElementById('console-pass-input');
-    const authBtn = document.getElementById('console-auth-btn');
-    const authError = document.getElementById('console-auth-error');
-    const closeBtn = document.getElementById('console-close-btn');
-
-    // Функция проверки авторизации
-    function checkAuthUI() {
-        const isAuth = sessionStorage.getItem('dev_console_authenticated') === 'true';
-        if (isAuth) {
-            authScreen.style.display = 'none';
-            mainScreen.style.display = 'flex';
-        } else {
-            authScreen.style.display = 'flex';
-            mainScreen.style.display = 'none';
-        }
-    }
-
-    // Открытие/закрытие по нажатию клавиши ~ (Ё / `)
-    document.addEventListener('keydown', (e) => {
-        if (e.code === 'Backquote' || e.key === '`' || e.key === '~' || e.key === 'Ё' || e.key === 'ё') {
-            e.preventDefault();
-
-            if (devConsole.classList.contains('show')) {
-                devConsole.classList.remove('show');
-            } else {
-                checkAuthUI();
-                devConsole.classList.add('show');
-                
-                // Ставим фокус в нужное поле ввода
+            function checkAuthUI() {
                 const isAuth = sessionStorage.getItem('dev_console_authenticated') === 'true';
-                if (!isAuth) {
-                    setTimeout(() => passInput.focus(), 100);
+                if (isAuth) {
+                    if (authScreen) authScreen.style.display = 'none';
+                    if (mainScreen) mainScreen.style.display = 'flex';
                 } else {
-                    const cmdInput = document.getElementById('console-input');
-                    if (cmdInput) setTimeout(() => cmdInput.focus(), 100);
+                    if (authScreen) authScreen.style.display = 'flex';
+                    if (mainScreen) mainScreen.style.display = 'none';
                 }
             }
-        }
-    });
 
-    // Обработка кнопки закрытия (крестик)
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            devConsole.classList.remove('show');
-        });
-    }
+            // Вызов консоли по кнопке Ё / ~
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'Backquote' || e.key === '`' || e.key === '~' || e.key === 'Ё' || e.key === 'ё') {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
 
-    // Функция отправки пароля на бэкенд
-    async function submitPassword() {
-        const password = passInput.value.trim();
-        if (!password) return;
+                    if (devConsole.classList.contains('show')) {
+                        devConsole.classList.remove('show');
+                    } else {
+                        checkAuthUI();
+                        devConsole.classList.add('show');
+                        
+                        const isAuth = sessionStorage.getItem('dev_console_authenticated') === 'true';
+                        if (!isAuth && passInput) {
+                            setTimeout(() => passInput.focus(), 100);
+                        } else if (consoleInput) {
+                            setTimeout(() => consoleInput.focus(), 100);
+                        }
+                    }
+                }
+            }, true);
 
-        authError.textContent = ''; // Сбрасываем прошлые ошибки
-
-        try {
-            const response = await fetch('/api/verify-console-pass', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password })
-            });
-
-            const data = await response.json();
-
-            // ОЧИЩАЕМ ПОЛЕ ВВОДА ПАРОЛЯ
-            passInput.value = '';
-
-            if (data.success) {
-                // Успешный вход: сохраняем флаг в текущую сессию
-                sessionStorage.setItem('dev_console_authenticated', 'true');
-                checkAuthUI(); // Переключаем экран на саму консоль
-            } else {
-                authError.textContent = 'Неверный пароль доступа!';
+            // Закрытие по крестику
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    devConsole.classList.remove('show');
+                });
             }
-        } catch (err) {
-            passInput.value = '';
-            authError.textContent = 'Ошибка соединения с сервером';
-        }
-    }
 
-    // Вход по клику или нажатию Enter в поле пароля
-    if (authBtn) authBtn.addEventListener('click', submitPassword);
-    if (passInput) {
-        passInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') submitPassword();
+            // Авторизация консоли
+            async function submitConsolePassword(e) {
+                if (e) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                }
+
+                if (!passInput) return;
+                const password = passInput.value.trim();
+                if (!password) return;
+
+                if (authError) authError.textContent = '';
+
+                try {
+                    const response = await fetch('/api/verify-console-pass', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ password })
+                    });
+
+                    const data = await response.json();
+                    
+                    // Очищаем инпут
+                    passInput.value = '';
+
+                    if (data.success) {
+                        sessionStorage.setItem('dev_console_authenticated', 'true');
+                        checkAuthUI();
+                        if (consoleInput) setTimeout(() => consoleInput.focus(), 100);
+                    } else {
+                        if (authError) authError.textContent = 'Неверный пароль доступа!';
+                    }
+                } catch (err) {
+                    passInput.value = '';
+                    if (authError) authError.textContent = 'Ошибка соединения';
+                }
+            }
+
+            if (authBtn) authBtn.addEventListener('click', submitConsolePassword);
+            if (passInput) {
+                passInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        submitConsolePassword(e);
+                    }
+                });
+            }
+
+            // Вывод сообщений в консоль
+            function logToConsole(text, type = 'system') {
+                if (!consoleOutput) return;
+                const log = document.createElement('div');
+                log.className = `log-item ${type}`;
+                log.innerHTML = text;
+                consoleOutput.appendChild(log);
+                consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            }
+
+            // Выполнение команд внутри консоли
+            if (consoleInput) {
+                consoleInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        const command = consoleInput.value.trim();
+                        if (!command) return;
+
+                        logToConsole(`&gt; ${command}`, 'user');
+                        consoleInput.value = '';
+                        processCommand(command);
+                    }
+                });
+            }
+
+            function processCommand(cmd) {
+                const parts = cmd.split(' ');
+                const mainCmd = parts[0].toLowerCase();
+
+                switch (mainCmd) {
+                    case 'help':
+                        logToConsole('Доступные команды:', 'system');
+                        logToConsole('<span class="cmd-highlight">help</span> — показать список команд', 'system');
+                        logToConsole('<span class="cmd-highlight">clear</span> — очистить консоль', 'system');
+                        logToConsole('<span class="cmd-highlight">status</span> — проверить статус подключения', 'system');
+                        logToConsole('<span class="cmd-highlight">bypass</span> — зайти без пароля', 'system');
+                        logToConsole('<span class="cmd-highlight">exec [js]</span> — выполнить произвольный JS-код', 'system');
+                        break;
+                    case 'clear':
+                        if (consoleOutput) consoleOutput.innerHTML = '';
+                        break;
+                    case 'status':
+                        logToConsole('Сервер: ACTIVE | Платформа: Desktop', 'success');
+                        break;
+                    case 'bypass':
+                        logToConsole('Обход авторизации активирован...', 'success');
+                        setTimeout(() => { window.location.href = '/beginning.html'; }, 1000);
+                        break;
+                    case 'exec':
+                        const codeToExec = cmd.substring(5);
+                        try {
+                            const result = new Function(`return ${codeToExec}`)();
+                            logToConsole(`Результат: ${result}`, 'success');
+                        } catch (err) {
+                            logToConsole(`Ошибка выполнения: ${err.message}`, 'error');
+                        }
+                        break;
+                    default:
+                        logToConsole(`Неизвестная команда "${mainCmd}". Введите "help".`, 'error');
+                        break;
+                }
+            }
         });
-    }
-});
     </script>
-
 </body>
 </html>
