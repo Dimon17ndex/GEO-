@@ -171,59 +171,84 @@ html, body {
     animation: none !important;
 }
 
-/* ==========================================
-   УНИВЕРСАЛЬНЫЕ ПЛАШКИ-УВЕДОМЛЕНИЯ (BANNERS)
-   ========================================== */
+/* ==========================================================================
+   КОНТЕЙНЕР И ПЛАШКИ УВЕДОМЛЕНИЙ (BANNERS CONTAINER)
+   ========================================================================== */
 
-.app-banner {
+/* Общий контейнер, удерживающий плашки стопкой */
+.app-banners-container {
     position: fixed;
     top: calc(env(safe-area-inset-top) + 15px);
     left: 50%;
     transform: translateX(-50%) translateY(0);
     
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px; /* Расстояние между плашками */
+    
+    z-index: 99998;
+    pointer-events: none; /* Чтобы клики сквозь пустые области контейнера проходили на сайт */
+    
+    /* Плавность смещения всей стопки вниз */
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* При выплывании плашки версии сдвигаем ВЕСЬ контейнер с плашками вниз */
+body:has(#version-badge.show) .app-banners-container {
+    transform: translateX(-50%) translateY(50px) !important;
+}
+
+/* Базовый стиль отдельной плашки */
+.app-banner {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
     
-    /* Ограничения ширины */
-    max-width: calc(100vw - 24px); /* Оставляем по 12px по бокам */
+    max-width: calc(100vw - 24px);
     width: max-content;
     
     padding: 8px 14px;
     border-radius: 12px;
     
     font-family: 'Montserrat', sans-serif;
-    /* Резиновый шрифт: подстраивается под ширину экрана */
     font-size: clamp(8px, 2.8vw, 11px);
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    white-space: nowrap; /* Держим в одну строку */
+    white-space: nowrap;
     
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     
-    z-index: 99998;
+    pointer-events: auto; /* Возвращаем кликабельность самой плашке */
     user-select: none;
     
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+    /* Анимация плавного появления каждой плашки */
     animation: bannerSlideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Смещение при выплывании плашки версии */
-body:has(#version-badge.show) .app-banner {
-    transform: translateX(-50%) translateY(50px) !important;
+/* Анимация появления */
+@keyframes bannerSlideDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
-/* === ДОПОЛНИТЕЛЬНОЕ УМЕНЬШЕНИЕ ДЛЯ ОЧЕНЬ УЗКИХ ЭКРАНОВ (до 360px) === */
+/* Мобильная адаптация для узких экранов */
 @media screen and (max-width: 360px) {
     .app-banner {
-        padding: 6px 10px;               /* Уменьшаем отступы плашки */
-        font-size: 8px !important;       /* Фиксируем компактный размер шрифта */
-        letter-spacing: 0.4px !important;/* Сжимаем межбуквенный интервал */
-        gap: 4px;                        /* Сближаем иконку и текст */
+        padding: 6px 10px;
+        font-size: 8px !important;
+        letter-spacing: 0.4px !important;
+        gap: 4px;
     }
 }
 
