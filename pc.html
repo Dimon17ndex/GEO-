@@ -660,6 +660,98 @@
 
         window.addEventListener('click', handleTap);
     })();
+
+    // --- ЛОГИКА ДЕСКТОПНОЙ КОНСОЛИ ---
+const devConsole = document.getElementById('dev-console');
+const consoleInput = document.getElementById('console-input');
+const consoleOutput = document.getElementById('console-output');
+const closeConsoleBtn = document.getElementById('close-console-btn');
+
+// Функция вывода текста в консоль
+function logToConsole(text, type = 'system') {
+    const log = document.createElement('div');
+    log.className = `log-item ${type}`;
+    log.innerHTML = text;
+    consoleOutput.appendChild(log);
+    consoleOutput.scrollTop = consoleOutput.scrollHeight;
+}
+
+// Переключение видимости консоли
+function toggleConsole() {
+    devConsole.classList.toggle('show');
+    if (devConsole.classList.contains('show')) {
+        setTimeout(() => consoleInput.focus(), 100);
+    }
+}
+
+// Вызов консоли по клавише `~` (Ё / Backquote)
+document.addEventListener('keydown', (e) => {
+    if (e.code === 'Backquote') {
+        e.preventDefault();
+        toggleConsole();
+    }
+});
+
+closeConsoleBtn.addEventListener('click', toggleConsole);
+
+// Обработка команд
+consoleInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        const command = consoleInput.value.trim();
+        if (!command) return;
+
+        logToConsole(`&gt; ${command}`, 'user');
+        consoleInput.value = '';
+
+        processCommand(command);
+    }
+});
+
+// Интерпретатор команд
+function processCommand(cmd) {
+    const parts = cmd.split(' ');
+    const mainCmd = parts[0].toLowerCase();
+
+    switch (mainCmd) {
+        case 'help':
+            logToConsole('Доступные команды:', 'system');
+            logToConsole('<span class="cmd-highlight">help</span> — показать список команд', 'system');
+            logToConsole('<span class="cmd-highlight">clear</span> — очистить консоль', 'system');
+            logToConsole('<span class="cmd-highlight">status</span> — проверить статус подключения', 'system');
+            logToConsole('<span class="cmd-highlight">bypass</span> — зайти без пароля', 'system');
+            logToConsole('<span class="cmd-highlight">exec [js]</span> — выполнить произвольный JS-код', 'system');
+            break;
+
+        case 'clear':
+            consoleOutput.innerHTML = '';
+            break;
+
+        case 'status':
+            logToConsole('Сервер: ACTIVE | Платформа: Desktop', 'success');
+            break;
+
+        case 'bypass':
+            logToConsole('Обход авторизации активирован...', 'success');
+            setTimeout(() => {
+                window.location.href = '/beginning.html';
+            }, 1000);
+            break;
+
+        case 'exec':
+            const codeToExec = cmd.substring(5);
+            try {
+                const result = eval(codeToExec);
+                logToConsole(`Результат: ${result}`, 'success');
+            } catch (err) {
+                logToConsole(`Ошибка выполнения: ${err.message}`, 'error');
+            }
+            break;
+
+        default:
+            logToConsole(`Неизвестная команда "${mainCmd}". Введите "help".`, 'error');
+            break;
+    }
+}
 </script>
 
 <div id="dev-console" class="dev-console">
