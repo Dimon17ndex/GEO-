@@ -1235,56 +1235,53 @@ body:has(.input-container-box.active) .logo-icon {
 }
 
 /* ==========================================================================
-   ПЛАШКА ПРОВЕРКИ ВЕРСИИ (PC / MOBILE)
+   ПЛАШКА ПРОВЕРКИ ВЕРСИИ (СНИЗУ СПРАВА)
    ========================================================================== */
 .version-debug-badge {
     position: fixed;
-    z-index: 9999;
-    padding: 10px 20px;
-    background: rgba(0, 0, 0, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 8px;
+    bottom: 24px;
+    right: 24px;
+    z-index: 10000;
+    
+    padding: 8px 18px;
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 30px; /* Капсульная форма, как на скриншоте */
+    
     color: #ffffff;
     font-family: 'Montserrat', sans-serif;
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    
     pointer-events: none;
+    user-select: none;
     
     /* Начальное состояние (скрыто) */
     opacity: 0;
-    filter: blur(10px);
+    filter: blur(8px);
+    transform: translateY(10px);
     transition: opacity 0.4s ease, filter 0.4s ease, transform 0.4s ease;
 }
 
-/* Позиция для ПК (внизу справа) */
-.version-debug-badge.pc-mode {
-    bottom: 30px;
-    right: 30px;
-    transform: translateY(15px);
-}
-
-/* Позиция для Мобилок (вверху по центру) */
+/* Позиция и появление для ПК и Мобилок (внизу справа) */
+.version-debug-badge.pc-mode,
 .version-debug-badge.mobile-mode {
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-15px);
+    bottom: 24px;
+    right: 24px;
+    top: auto;
+    left: auto;
 }
 
 /* Активация появления */
 .version-debug-badge.show {
     opacity: 1;
     filter: blur(0px);
-}
-
-.version-debug-badge.pc-mode.show {
     transform: translateY(0);
-}
-
-.version-debug-badge.mobile-mode.show {
-    transform: translateX(-50%) translateY(0);
 }
 
 /* ==========================================
@@ -1535,4 +1532,3 @@ body:has(.input-container-box.active) .logo-icon {
     font-family: inherit;
     font-size: 14px;
 }
-
