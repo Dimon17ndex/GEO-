@@ -384,99 +384,98 @@
 <body>
 
 <div class="app-banners-container">
-
     <div class="app-banner banner-danger">⚠️ Мобильная версия ограничена</div>
+</div>
+
+<div id="version-badge" class="version-badge">MOBILE-VERSION</div>
+
+<div class="shadow-layer"></div>
+
+<img src="images/zaporozge_gerb.png" alt="Zaporozhye Big Gerb" class="bg-blur-gerb">
+
+<div id="bg-wave-container" style="display: none !important;"></div>
+
+<div id="click-prompt" class="prompt-text">Нажмите на экран</div>
+
+<div class="main-container">
+    <div class="brand-block">
+        <img src="images/geo_logo.png" alt="Geo Logo" class="logo-icon" id="main-logo">
+        <div class="text-right">
+            <h1 class="main-title">
+                <span>G</span><span>E</span><span>O</span><span>Г</span><span>Р</span><span>А</span><span>Ф</span><span>И</span><span>Я</span>
+            </h1>
+            <div class="subtitle-badge">
+                <span>наука • образование • естествознание</span>
+            </div>
+        </div>
     </div>
 
-    <div id="version-badge" class="version-badge">MOBILE-VERSION</div>
+    <div class="input-container-box">
+        <input 
+            type="text" 
+            class="custom-input" 
+            placeholder="ввести..." 
+            id="user-text-input" 
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="none"
+            spellcheck="false"
+        >
+        <div class="input-underline"></div>
+        <button class="input-submit-btn" id="submit-auth-btn">
+            <svg class="icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+            <svg class="icon-loading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="2" x2="12" y2="6"></line>
+                <line x1="12" y1="18" x2="12" y2="22"></line>
+                <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+                <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+                <line x1="2" y1="12" x2="6" y2="12"></line>
+                <line x1="18" y1="12" x2="22" y2="12"></line>
+                <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+                <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+            </svg>
+            <svg class="icon-error" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+    </div>
 
-    <div class="shadow-layer"></div>
+    <div class="bottom-credits-wrapper">
+        <p class="bottom-credits" id="wave-text">проект Запорожской области</p>
+    </div>
+</div>
 
-    <img src="images/zaporozge_gerb.png" alt="Zaporozhye Big Gerb" class="bg-blur-gerb">
+<div class="corner-icon-floating-wrapper">
+    <img src="images/zaporoge_icon.png" alt="Zaporozhye Icon" class="corner-icon">
+</div>
 
-    <div id="bg-wave-container" style="display: none !important;"></div>
-
-    <div id="click-prompt" class="prompt-text">Нажмите на экран</div>
-
-    <div class="main-container">
-        <div class="brand-block">
-            <img src="images/geo_logo.png" alt="Geo Logo" class="logo-icon" id="main-logo">
-            <div class="text-right">
-                <h1 class="main-title">
-                    <span>G</span><span>E</span><span>O</span><span>Г</span><span>Р</span><span>А</span><span>Ф</span><span>И</span><span>Я</span>
-                </h1>
-                <div class="subtitle-badge">
+<div class="session-dashboard" id="session-dashboard">
+    <div class="dashboard-content-wrapper">
+        <div class="db-brand-block">
+            <img src="images/geo_logo.png" alt="Geo Logo" class="db-logo-icon">
+            <div class="db-text-right">
+                <h1 class="db-main-title" id="db-animate-title">GEОГРАФИЯ</h1>
+                <div class="db-subtitle-badge">
                     <span>наука • образование • естествознание</span>
                 </div>
             </div>
         </div>
-
-        <div class="input-container-box">
-            <input 
-                type="text" 
-                class="custom-input" 
-                placeholder="ввести..." 
-                id="user-text-input" 
-                autocomplete="off"
-                autocorrect="off"
-                autocapitalize="none"
-                spellcheck="false"
-            >
-            <div class="input-underline"></div>
-            <button class="input-submit-btn" id="submit-auth-btn">
-                <svg class="icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                    <polyline points="12 5 19 12 12 19"></polyline>
-                </svg>
-                <svg class="icon-loading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="12" y1="2" x2="12" y2="6"></line>
-                    <line x1="12" y1="18" x2="12" y2="22"></line>
-                    <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
-                    <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
-                    <line x1="2" y1="12" x2="6" y2="12"></line>
-                    <line x1="18" y1="12" x2="22" y2="12"></line>
-                    <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
-                    <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
-                </svg>
-                <svg class="icon-error" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
-        </div>
-
-        <div class="bottom-credits-wrapper">
-            <p class="bottom-credits" id="wave-text">проект Запорожской области</p>
+        
+        <div class="success-message-wrapper">
+            <div class="success-message" id="db-animate-message">Вы успешно вошли в сессию</div>
+            <svg class="success-checkmark" viewBox="0 0 52 52">
+                <circle class="checkmark-circle" cx="26" cy="26" r="23" fill="none"/>
+                <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+            </svg>
         </div>
     </div>
+</div>
 
-    <div class="corner-icon-floating-wrapper">
-        <img src="images/zaporoge_icon.png" alt="Zaporozhye Icon" class="corner-icon">
-    </div>
-
-    <div class="session-dashboard" id="session-dashboard">
-        <div class="dashboard-content-wrapper">
-            <div class="db-brand-block">
-                <img src="images/geo_logo.png" alt="Geo Logo" class="db-logo-icon">
-                <div class="db-text-right">
-                    <h1 class="db-main-title" id="db-animate-title">GEОГРАФИЯ</h1>
-                    <div class="db-subtitle-badge">
-                        <span>наука • образование • естествознание</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="success-message-wrapper">
-                <div class="success-message" id="db-animate-message">Вы успешно вошли в сессию</div>
-                <svg class="success-checkmark" viewBox="0 0 52 52">
-                    <circle class="checkmark-circle" cx="26" cy="26" r="23" fill="none"/>
-                    <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-                </svg>
-            </div>
-        </div>
-    </div>
-
-    <script>
+<script>
     const textContainer = document.getElementById('wave-text');
     const logoElement = document.getElementById('main-logo');
     const promptElement = document.getElementById('click-prompt');
