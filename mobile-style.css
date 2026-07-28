@@ -180,7 +180,7 @@ html, body {
     position: fixed;
     top: calc(env(safe-area-inset-top) + 15px);
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) translateY(0);
     
     display: inline-flex;
     align-items: center;
@@ -200,12 +200,20 @@ html, body {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     
-    z-index: 99999;
+    z-index: 99998; /* Чуть ниже, чем у version-badge (99999) */
     user-select: none;
+    
+    /* Плавность сдвига вниз и возвращения обратно */
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
     animation: bannerSlideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Анимация появления сверху */
+/* Смещаем плашку оповещений вниз, когда активна плашка версии */
+body:has(#version-badge.show) .app-banner {
+    transform: translateX(-50%) translateY(50px) !important;
+}
+
+/* Анимация появления сверху при загрузке страницы */
 @keyframes bannerSlideDown {
     0% {
         opacity: 0;
