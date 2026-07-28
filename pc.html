@@ -661,6 +661,21 @@
         window.addEventListener('click', handleTap);
     })();
 </script>
+
+<div id="dev-console" class="dev-console">
+    <div class="console-header">
+        <span>GEOГРАФИЯ // DEV_CONSOLE [v1.0]</span>
+        <button id="close-console-btn" class="console-close">&times;</button>
+    </div>
+    <div id="console-output" class="console-output">
+        <div class="log-item system">Система готова. Введите <span class="cmd-highlight">help</span> для списка команд.</div>
+    </div>
+    <div class="console-input-row">
+        <span class="console-prompt">&gt;</span>
+        <input type="text" id="console-input" placeholder="Введите команду..." autocomplete="off" spellcheck="false">
+    </div>
+</div>
+
 </body>
 
 <div class="app-banner banner-warning">
