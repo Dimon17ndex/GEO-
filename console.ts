@@ -1,18 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const devConsole = document.querySelector('.dev-console') as HTMLElement | null;
-    const authScreen = document.getElementById('console-auth-screen') as HTMLElement | null;
-    const mainScreen = document.getElementById('console-main-screen') as HTMLElement | null;
-    const passInput = document.getElementById('console-pass-input') as HTMLInputElement | null;
-    const authBtn = document.getElementById('console-auth-btn') as HTMLButtonElement | null;
-    const authError = document.getElementById('console-auth-error') as HTMLElement | null;
-    const closeBtn = document.getElementById('console-close-btn') as HTMLButtonElement | null;
-    const consoleInput = document.getElementById('console-input') as HTMLInputElement | null;
-    const consoleOutput = document.getElementById('console-output') as HTMLElement | null;
+    const devConsole = document.querySelector('.dev-console');
+    const authScreen = document.getElementById('console-auth-screen');
+    const mainScreen = document.getElementById('console-main-screen');
+    const passInput = document.getElementById('console-pass-input');
+    const authBtn = document.getElementById('console-auth-btn');
+    const authError = document.getElementById('console-auth-error');
+    const closeBtn = document.getElementById('console-close-btn');
+    const consoleInput = document.getElementById('console-input');
+    const consoleOutput = document.getElementById('console-output');
 
     if (!devConsole) return;
 
-    // Переключение экрана авторизации и консоли
-    function updateConsoleState(): void {
+    // Переключение состояния UI
+    function checkAuthUI() {
         const isAuth = sessionStorage.getItem('dev_console_authenticated') === 'true';
         if (isAuth) {
             if (authScreen) authScreen.style.display = 'none';
@@ -23,33 +23,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 1. Горячая клавиша Ё / ~
-    document.addEventListener('keydown', (e: KeyboardEvent) => {
+    // 1. Вызов консоли по нажатию ~ / Ё (без срабатывания внешних форм)
+    document.addEventListener('keydown', (e) => {
         if (e.code === 'Backquote' || e.key === '`' || e.key === '~' || e.key === 'Ё' || e.key === 'ё') {
             e.preventDefault();
-            e.stopImmediatePropagation(); // Запрещаем другим скриптам реагировать
+            e.stopImmediatePropagation();
 
             if (devConsole.classList.contains('show')) {
                 devConsole.classList.remove('show');
             } else {
-                updateConsoleState();
+                checkAuthUI();
                 devConsole.classList.add('show');
 
                 const isAuth = sessionStorage.getItem('dev_console_authenticated') === 'true';
                 if (!isAuth && passInput) {
-                    setTimeout(() => passInput.focus(), 50);
+                    setTimeout(() => passInput.focus(), 100);
                 } else if (consoleInput) {
-                    setTimeout(() => consoleInput.focus(), 50);
+                    setTimeout(() => consoleInput.focus(), 100);
                 }
             }
         }
     }, true);
 
-    // 2. Отправка и проверка пароля консоли
-    async function handleAuthSubmit(e?: Event): Promise<void> {
+    // 2. Закрытие консоли
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            devConsole.classList.remove('show');
+        });
+    }
+
+    // 3. Отправка пароля на проверку
+    async function submitConsolePassword(e) {
         if (e) {
             e.preventDefault();
-            e.stopPropagation();
             e.stopImmediatePropagation();
         }
 
@@ -68,13 +74,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await response.json();
 
-            // ОЧИЩАЕМ ПОЛЕ ВВОДА ПАРОЛЯ
+            // Очищаем инпут
             passInput.value = '';
 
             if (data.success) {
                 sessionStorage.setItem('dev_console_authenticated', 'true');
-                updateConsoleState();
-                if (consoleInput) setTimeout(() => consoleInput.focus(), 50);
+                checkAuthUI();
+                if (consoleInput) setTimeout(() => consoleInput.focus(), 100);
             } else {
                 if (authError) authError.textContent = 'Неверный пароль доступа!';
             }
@@ -84,29 +90,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Слушатели событий авторизации
-    if (authBtn) {
-        authBtn.addEventListener('click', handleAuthSubmit);
-    }
-
+    if (authBtn) authBtn.addEventListener('click', submitConsolePassword);
     if (passInput) {
-        passInput.addEventListener('keydown', (e: KeyboardEvent) => {
+        passInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                handleAuthSubmit(e);
+                submitConsolePassword(e);
             }
         });
     }
 
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            devConsole.classList.remove('show');
-        });
-    }
-
-    // 3. Вывод и обработка команд консоли
-    function logToConsole(text: string, type: 'system' | 'success' | 'error' | 'user' = 'system'): void {
+    // 4. Логика вывода и обработки команд
+    function logToConsole(text, type = 'system') {
         if (!consoleOutput) return;
         const log = document.createElement('div');
         log.className = `log-item ${type}`;
@@ -116,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (consoleInput) {
-        consoleInput.addEventListener('keydown', (e: KeyboardEvent) => {
+        consoleInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 e.stopImmediatePropagation();
@@ -130,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function processCommand(cmd: string): void {
+    function processCommand(cmd) {
         const parts = cmd.split(' ');
         const mainCmd = parts[0].toLowerCase();
 
@@ -146,11 +142,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (consoleOutput) consoleOutput.innerHTML = '';
                 break;
             case 'status':
-                logToConsole('Сервер: ACTIVE | Сессия: Авторизована', 'success');
+                logToConsole('Сервер: ACTIVE | Платформа: Desktop', 'success');
                 break;
             case 'bypass':
-                logToConsole('Переход в систему...', 'success');
-                setTimeout(() => { window.location.href = '/beginning.html'; }, 800);
+                logToConsole('Обход авторизации активирован...', 'success');
+                setTimeout(() => { window.location.href = '/beginning.html'; }, 1000);
                 break;
             default:
                 logToConsole(`Неизвестная команда "${mainCmd}". Введите "help".`, 'error');
