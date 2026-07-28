@@ -20,7 +20,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800;900&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="mobile-style.css?v=1">
@@ -41,6 +41,29 @@
             padding-bottom: env(safe-area-inset-bottom);
             padding-left: env(safe-area-inset-left);
             padding-right: env(safe-area-inset-right);
+        }
+
+        /* --- ПЛАШКА ВЕРСИИ СО СКРИНШОТА --- */
+        .version-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.75);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 9999;
+            user-select: none;
+            pointer-events: none;
         }
 
         /* --- БЛОК БРЕНДА --- */
@@ -275,6 +298,8 @@
     </style>
 </head>
 <body>
+
+    <div class="version-badge">MOBILE-VERSION</div>
 
     <div class="shadow-layer"></div>
 
@@ -513,10 +538,12 @@
                 const cornerWrapper = document.querySelector('.corner-icon-floating-wrapper');
                 const promptText = document.getElementById('click-prompt');
                 const dashboardOverlay = document.getElementById('session-dashboard');
+                const versionBadge = document.querySelector('.version-badge');
 
                 if (mainContainer) mainContainer.classList.add('fade-out-element');
                 if (cornerWrapper) cornerWrapper.classList.add('fade-out-element');
                 if (promptText) promptText.classList.add('fade-out-element');
+                if (versionBadge) versionBadge.classList.add('fade-out-element');
                 
                 if (dashboardOverlay) {
                     dashboardOverlay.style.display = 'flex';
