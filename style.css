@@ -1241,14 +1241,14 @@ body:has(.input-container-box.active) .logo-icon {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    z-index: 100; /* Чтобы плашка была поверх фоновых элементов */
+    z-index: 100;
     
     font-family: 'Montserrat', sans-serif;
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.5);
     
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1256,8 +1256,20 @@ body:has(.input-container-box.active) .logo-icon {
     border-radius: 6px;
     backdrop-filter: blur(5px);
     
-    pointer-events: none; /* Чтобы не мешала кликам */
+    /* Изначально скрываем */
+    opacity: 0;
+    pointer-events: none;
     user-select: none;
+    
+    /* Плавное появление и исчезновение */
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    transform: translateY(5px);
+}
+
+/* Класс для отображения */
+.version-badge.visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .version-debug-badge {
