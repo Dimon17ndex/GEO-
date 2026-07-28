@@ -784,5 +784,61 @@
             }
         }
     </script>
+
+    <script>
+document.addEventListener('keydown', async (e) => {
+    // Отслеживаем клавишу тильда (Ё / ` / ~)
+    if (e.code === 'Backquote' || e.key === '`' || e.key === '~' || e.key === 'Ё' || e.key === 'ё') {
+        e.preventDefault();
+
+        const devConsole = document.querySelector('.dev-console');
+        if (!devConsole) return;
+
+        // Если консоль уже была открыта — закрываем
+        if (devConsole.classList.contains('show')) {
+            devConsole.classList.remove('show');
+            return;
+        }
+
+        // Проверяем сессию браузера
+        const isAuth = sessionStorage.getItem('dev_console_authenticated');
+
+        if (isAuth === 'true') {
+            devConsole.classList.add('show');
+        } else {
+            const password = prompt('Введите пароль разработчика:');
+            if (!password) return;
+
+            const success = await checkConsolePassword(password);
+
+            if (success) {
+                // Запоминаем авторизацию на время работы с вкладкой
+                sessionStorage.setItem('dev_console_authenticated', 'true');
+                devConsole.classList.add('show');
+            } else {
+                alert('Неверный пароль доступа!');
+            }
+        }
+    }
+});
+
+// Запрос на бэкенд
+async function checkConsolePassword(password) {
+    try {
+        const response = await fetch('/api/verify-console-pass', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password })
+        });
+        
+        const data = await response.json();
+        return data.success === true;
+    } catch (err) {
+        console.error('Ошибка проверки пароля:', err);
+        return false;
+    }
+}
+    </script>
+
 </body>
 </html>
