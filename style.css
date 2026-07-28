@@ -1373,11 +1373,11 @@ body:has(.input-container-box.active) .logo-icon {
 @keyframes bannerSlideDown {
     0% {
         opacity: 0;
-        transform: translateX(-50%) translateY(-40px);
+        transform: translateY(-40px);
     }
     100% {
         opacity: 1;
-        transform: translateX(-50%) translateY(0);
+        transform: translateY(0);
     }
 }
 
