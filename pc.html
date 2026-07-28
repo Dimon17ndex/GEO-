@@ -201,6 +201,11 @@
 </head>
 <body>
 
+    <div class="app-banner banner-warning">
+        <span class="banner-icon">🛠</span>
+        <span>Ведется разработка сайта в раннем доступе</span>
+    </div>
+
     <div class="shadow-layer"></div>
 
     <img src="images/zaporozge_gerb.png" alt="Zaporozhye Big Gerb" class="bg-blur-gerb">
@@ -312,467 +317,472 @@
         </div>
     </div>
 
+    <div id="dev-console" class="dev-console">
+        <div class="console-header">
+            <span>GEOГРАФИЯ // DEV_CONSOLE [v1.0]</span>
+            <button id="close-console-btn" class="console-close">&times;</button>
+        </div>
+        <div id="console-output" class="console-output">
+            <div class="log-item system">Система готова. Введите <span class="cmd-highlight">help</span> для списка команд.</div>
+        </div>
+        <div class="console-input-row">
+            <span class="console-prompt">&gt;</span>
+            <input type="text" id="console-input" placeholder="Введите команду..." autocomplete="off" spellcheck="false">
+        </div>
+    </div>
+
     <script>
-    const textContainer = document.getElementById('wave-text');
-    const waveContainer = document.getElementById('bg-wave-container');
-    const logoElement = document.getElementById('main-logo');
-    const promptElement = document.getElementById('click-prompt');
-    const volumeStatusLabel = document.getElementById('volume-status-label');
-    const intensitySlider = document.getElementById('wave-intensity-slider');
-    const intensityValueLabel = document.getElementById('intensity-value');
-    const textInput = document.getElementById('user-text-input');
-    const inputContainer = document.querySelector('.input-container-box');
-    
-    let initialText = "проект Запорожской области";
-    let isWaveTriggered = false;
-    let isTextHovered = false; 
-    let hasUserClicked = false; 
-    let intensityPercent = 20;
-    let isClickAllowed = false;
-    let isSecretTextActive = false; 
-    let letters = [];
+        const textContainer = document.getElementById('wave-text');
+        const waveContainer = document.getElementById('bg-wave-container');
+        const logoElement = document.getElementById('main-logo');
+        const promptElement = document.getElementById('click-prompt');
+        const volumeStatusLabel = document.getElementById('volume-status-label');
+        const intensitySlider = document.getElementById('wave-intensity-slider');
+        const intensityValueLabel = document.getElementById('intensity-value');
+        const textInput = document.getElementById('user-text-input');
+        const inputContainer = document.querySelector('.input-container-box');
+        
+        let initialText = "проект Запорожской области";
+        let isWaveTriggered = false;
+        let isTextHovered = false; 
+        let hasUserClicked = false; 
+        let intensityPercent = 20;
+        let isClickAllowed = false;
+        let isSecretTextActive = false; 
+        let letters = [];
 
-    setTimeout(() => { isClickAllowed = true; }, 3000);
+        setTimeout(() => { isClickAllowed = true; }, 3000);
 
-    function buildWaveText(newText) {
-        textContainer.innerHTML = '';
-        letters = Array.from(newText).map((char) => {
-            const span = document.createElement('span');
-            span.style.display = 'inline-block';
-            span.style.transition = 'color 0.3s ease, transform 0.3s ease, opacity 0.5s ease, filter 0.5s ease';
-            if (isSecretTextActive) {
-                span.style.opacity = '0';
-                span.style.filter = 'blur(6px)';
-                span.style.transform = 'translateY(10px)';
-            }
-            if (char === ' ') { span.innerHTML = '&nbsp;'; } else { span.innerText = char; }
-            textContainer.appendChild(span);
-            return span;
-        });
-        bindLettersHover();
-    }
-
-    buildWaveText(initialText);
-
-    function bindLettersHover() {
-        letters.forEach((span, index) => {
-            span.addEventListener('mouseenter', (e) => {
-                if (isSecretTextActive) { isTextHovered = false; return; }
-                isTextHovered = true; 
-                letters.forEach((otherSpan, otherIndex) => {
-                    const distance = Math.abs(index - otherIndex);
-                    const delay = distance * 0.04;
-                    otherSpan.style.transitionDelay = `${delay}s`;
-                    otherSpan.style.color = `rgba(255, 50, 50, ${Math.max(0.3, 1 - distance * 0.08)})`;
-                    otherSpan.style.transform = `translateY(${Math.max(-4, -6 + distance * 0.5)}px)`;
-                });
-                if (!isWaveTriggered) {
-                    isWaveTriggered = true;
-                    createBackgroundRipple(e.clientX, e.clientY, 'bg-wave-ripple');
+        function buildWaveText(newText) {
+            textContainer.innerHTML = '';
+            letters = Array.from(newText).map((char) => {
+                const span = document.createElement('span');
+                span.style.display = 'inline-block';
+                span.style.transition = 'color 0.3s ease, transform 0.3s ease, opacity 0.5s ease, filter 0.5s ease';
+                if (isSecretTextActive) {
+                    span.style.opacity = '0';
+                    span.style.filter = 'blur(6px)';
+                    span.style.transform = 'translateY(10px)';
                 }
+                if (char === ' ') { span.innerHTML = '&nbsp;'; } else { span.innerText = char; }
+                textContainer.appendChild(span);
+                return span;
+            });
+            bindLettersHover();
+        }
+
+        buildWaveText(initialText);
+
+        function bindLettersHover() {
+            letters.forEach((span, index) => {
+                span.addEventListener('mouseenter', (e) => {
+                    if (isSecretTextActive) { isTextHovered = false; return; }
+                    isTextHovered = true; 
+                    letters.forEach((otherSpan, otherIndex) => {
+                        const distance = Math.abs(index - otherIndex);
+                        const delay = distance * 0.04;
+                        otherSpan.style.transitionDelay = `${delay}s`;
+                        otherSpan.style.color = `rgba(255, 50, 50, ${Math.max(0.3, 1 - distance * 0.08)})`;
+                        otherSpan.style.transform = `translateY(${Math.max(-4, -6 + distance * 0.5)}px)`;
+                    });
+                    if (!isWaveTriggered) {
+                        isWaveTriggered = true;
+                        createBackgroundRipple(e.clientX, e.clientY, 'bg-wave-ripple');
+                    }
+                });
+            });
+        }
+
+        textContainer.addEventListener('mouseleave', () => {
+            if (isSecretTextActive) return;
+            isWaveTriggered = false;
+            isTextHovered = false; 
+            letters.forEach((span) => {
+                span.style.transitionDelay = '0s';
+                span.style.color = '#ffffff';
+                span.style.transform = 'translateY(0)';
             });
         });
-    }
 
-    textContainer.addEventListener('mouseleave', () => {
-        if (isSecretTextActive) return;
-        isWaveTriggered = false;
-        isTextHovered = false; 
-        letters.forEach((span) => {
-            span.style.transitionDelay = '0s';
-            span.style.color = '#ffffff';
-            span.style.transform = 'translateY(0)';
+        function createBackgroundRipple(x, y, className, duration = 1500) {
+            const ripple = document.createElement('div');
+            ripple.classList.add(className);
+            ripple.style.left = `${x}px`;
+            ripple.style.top = `${y}px`;
+            waveContainer.appendChild(ripple);
+            setTimeout(() => { ripple.remove(); }, duration);
+        }
+
+        setTimeout(() => {
+            if (logoElement) {
+                const rect = logoElement.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                createBackgroundRipple(centerX, centerY, 'bg-click-ripple');
+            }
+        }, 1700);
+
+        function spawnAmbientWave() {
+            if (intensityPercent === 0) { setTimeout(spawnAmbientWave, 1000); return; }
+            let spawnX = 0, spawnY = 0;
+            const side = Math.floor(Math.random() * 4);
+            switch(side) {
+                case 0: spawnX = Math.random() * window.innerWidth; spawnY = -50; break;
+                case 1: spawnX = window.innerWidth + 50; spawnY = Math.random() * window.innerHeight; break;
+                case 2: spawnX = Math.random() * window.innerWidth; spawnY = window.innerHeight + 50; break;
+                case 3: spawnX = -50; spawnY = Math.random() * window.innerHeight; break;
+            }
+            let currentClassName = 'bg-ambient-ripple';
+            if (isTextHovered && !isSecretTextActive) {
+                currentClassName = Math.random() > 0.5 ? 'bg-ambient-red' : 'bg-ambient-green';
+            }
+            createBackgroundRipple(spawnX, spawnY, currentClassName, 3000);
+            const baseDelay = 500, maxAdditionalDelay = 8000; 
+            const factor = (100 - intensityPercent) / 100;
+            setTimeout(spawnAmbientWave, baseDelay + (Math.random() * maxAdditionalDelay * factor));
+        }
+
+        setTimeout(() => { spawnAmbientWave(); }, 3500);
+
+        const bgMusic = new Audio('audio/melody_start.mp3');
+        bgMusic.volume = 0.4; 
+        let musicStarted = false;
+
+        function playMusic() {
+            if (musicStarted || bgMusic.muted) return;
+            bgMusic.play().then(() => { musicStarted = true; }).catch(err => {});
+        }
+
+        bgMusic.addEventListener('ended', () => {
+            setTimeout(() => { if (!bgMusic.muted) bgMusic.play(); }, 5000); 
         });
-    });
 
-    function createBackgroundRipple(x, y, className, duration = 1500) {
-        const ripple = document.createElement('div');
-        ripple.classList.add(className);
-        ripple.style.left = `${x}px`;
-        ripple.style.top = `${y}px`;
-        waveContainer.appendChild(ripple);
-        setTimeout(() => { ripple.remove(); }, duration);
-    }
-
-    setTimeout(() => {
-        const rect = logoElement.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        createBackgroundRipple(centerX, centerY, 'bg-click-ripple');
-    }, 1700);
-
-    function spawnAmbientWave() {
-        if (intensityPercent === 0) { setTimeout(spawnAmbientWave, 1000); return; }
-        let spawnX = 0, spawnY = 0;
-        const side = Math.floor(Math.random() * 4);
-        switch(side) {
-            case 0: spawnX = Math.random() * window.innerWidth; spawnY = -50; break;
-            case 1: spawnX = window.innerWidth + 50; spawnY = Math.random() * window.innerHeight; break;
-            case 2: spawnX = Math.random() * window.innerWidth; spawnY = window.innerHeight + 50; break;
-            case 3: spawnX = -50; spawnY = Math.random() * window.innerHeight; break;
-        }
-        let currentClassName = 'bg-ambient-ripple';
-        if (isTextHovered && !isSecretTextActive) {
-            currentClassName = Math.random() > 0.5 ? 'bg-ambient-red' : 'bg-ambient-green';
-        }
-        createBackgroundRipple(spawnX, spawnY, currentClassName, 3000);
-        const baseDelay = 500, maxAdditionalDelay = 8000; 
-        const factor = (100 - intensityPercent) / 100;
-        setTimeout(spawnAmbientWave, baseDelay + (Math.random() * maxAdditionalDelay * factor));
-    }
-
-    setTimeout(() => { spawnAmbientWave(); }, 3500);
-
-    const bgMusic = new Audio('audio/melody_start.mp3');
-    bgMusic.volume = 0.4; 
-    let musicStarted = false;
-
-    function playMusic() {
-        if (musicStarted || bgMusic.muted) return;
-        bgMusic.play().then(() => { musicStarted = true; }).catch(err => {});
-    }
-
-    bgMusic.addEventListener('ended', () => {
-        setTimeout(() => { if (!bgMusic.muted) bgMusic.play(); }, 5000); 
-    });
-
-    function showClickPrompt() {
-        if (hasUserClicked) return; 
-        const corners = [
-            { top: '60px', left: '60px', bottom: 'auto', right: 'auto' },     
-            { bottom: '120px', left: '60px', top: 'auto', right: 'auto' },    
-            { bottom: '150px', right: '60px', top: 'auto', left: 'auto' }     
-        ];
-        const randomIndex = Math.floor(Math.random() * corners.length);
-        const chosenCorner = corners[randomIndex];
-        promptElement.style.top = chosenCorner.top;
-        promptElement.style.bottom = chosenCorner.bottom;
-        promptElement.style.left = chosenCorner.left;
-        promptElement.style.right = chosenCorner.right;
-        if (randomIndex === 2) promptElement.classList.add('in-bottom-right');
-        else promptElement.classList.remove('in-bottom-right');
-        promptElement.classList.add('animate-prompt');
-    }
-
-    setTimeout(() => { if (!hasUserClicked) showClickPrompt(); }, 4500); 
-
-    textInput.addEventListener('mousedown', (e) => { e.stopPropagation(); });
-    textInput.addEventListener('keydown', (e) => { e.stopPropagation(); });
-
-    document.body.addEventListener('mousedown', (e) => {
-        if (!isClickAllowed) return;
-        if (e.target.closest('#settings-btn') || e.target.closest('.settings-trigger-zone')) return;
-
-        if (!hasUserClicked) {
-            hasUserClicked = true;
-            const computedStyle = window.getComputedStyle(promptElement);
-            promptElement.style.opacity = computedStyle.opacity;
-            promptElement.style.filter = computedStyle.filter;
-            promptElement.style.transform = computedStyle.transform;
-            promptElement.classList.remove('animate-prompt');
-            void promptElement.offsetWidth;
-            promptElement.style.transition = 'opacity 2.5s ease-in-out, filter 2.5s ease-in-out, transform 2.5s ease-in-out';
-            promptElement.style.opacity = '0';
-            promptElement.style.filter = 'blur(15px)';
-            promptElement.style.transform = 'rotate(-4deg) translateY(15px)';
-            setTimeout(() => { promptElement.style.display = 'none'; }, 2500);
+        function showClickPrompt() {
+            if (hasUserClicked || !promptElement) return; 
+            const corners = [
+                { top: '60px', left: '60px', bottom: 'auto', right: 'auto' },     
+                { bottom: '120px', left: '60px', top: 'auto', right: 'auto' },    
+                { bottom: '150px', right: '60px', top: 'auto', left: 'auto' }     
+            ];
+            const randomIndex = Math.floor(Math.random() * corners.length);
+            const chosenCorner = corners[randomIndex];
+            promptElement.style.top = chosenCorner.top;
+            promptElement.style.bottom = chosenCorner.bottom;
+            promptElement.style.left = chosenCorner.left;
+            promptElement.style.right = chosenCorner.right;
+            if (randomIndex === 2) promptElement.classList.add('in-bottom-right');
+            else promptElement.classList.remove('in-bottom-right');
+            promptElement.classList.add('animate-prompt');
         }
 
-        if (inputContainer && !inputContainer.classList.contains('active')) {
-            if (!e.target.closest('.bottom-credits-wrapper')) {
-                inputContainer.classList.add('active');
-                isSecretTextActive = true; 
-                textContainer.classList.add('secret-active');
+        setTimeout(() => { if (!hasUserClicked) showClickPrompt(); }, 4500); 
 
-                letters.forEach((span, i) => {
-                    setTimeout(() => {
-                        span.style.opacity = '0';
-                        span.style.filter = 'blur(6px)';
-                        span.style.transform = `translateY(${Math.random() > 0.5 ? -10 : 10}px)`;
-                    }, i * 20); 
-                });
+        if (textInput) {
+            textInput.addEventListener('mousedown', (e) => { e.stopPropagation(); });
+            textInput.addEventListener('keydown', (e) => { e.stopPropagation(); });
+        }
 
-                setTimeout(() => {
-                    buildWaveText("введите код доступа к сессии");
+        document.body.addEventListener('mousedown', (e) => {
+            if (!isClickAllowed) return;
+            if (e.target.closest('#settings-btn') || e.target.closest('.settings-trigger-zone') || e.target.closest('#dev-console')) return;
+
+            if (!hasUserClicked && promptElement) {
+                hasUserClicked = true;
+                const computedStyle = window.getComputedStyle(promptElement);
+                promptElement.style.opacity = computedStyle.opacity;
+                promptElement.style.filter = computedStyle.filter;
+                promptElement.style.transform = computedStyle.transform;
+                promptElement.classList.remove('animate-prompt');
+                void promptElement.offsetWidth;
+                promptElement.style.transition = 'opacity 2.5s ease-in-out, filter 2.5s ease-in-out, transform 2.5s ease-in-out';
+                promptElement.style.opacity = '0';
+                promptElement.style.filter = 'blur(15px)';
+                promptElement.style.transform = 'rotate(-4deg) translateY(15px)';
+                setTimeout(() => { promptElement.style.display = 'none'; }, 2500);
+            }
+
+            if (inputContainer && !inputContainer.classList.contains('active')) {
+                if (!e.target.closest('.bottom-credits-wrapper')) {
+                    inputContainer.classList.add('active');
+                    isSecretTextActive = true; 
+                    textContainer.classList.add('secret-active');
+
                     letters.forEach((span, i) => {
                         setTimeout(() => {
-                            span.style.opacity = '1';
-                            span.style.filter = 'blur(0px)';
-                            span.style.transform = 'translateY(0px)';
-                        }, i * 20);
+                            span.style.opacity = '0';
+                            span.style.filter = 'blur(6px)';
+                            span.style.transform = `translateY(${Math.random() > 0.5 ? -10 : 10}px)`;
+                        }, i * 20); 
                     });
-                }, 600);
 
-                if (textInput) { setTimeout(() => textInput.focus(), 100); }
+                    setTimeout(() => {
+                        buildWaveText("введите код доступа к сессии");
+                        letters.forEach((span, i) => {
+                            setTimeout(() => {
+                                span.style.opacity = '1';
+                                span.style.filter = 'blur(0px)';
+                                span.style.transform = 'translateY(0px)';
+                            }, i * 20);
+                        });
+                    }, 600);
+
+                    if (textInput) { setTimeout(() => textInput.focus(), 100); }
+                }
             }
-        }
 
-        playMusic();
-        createBackgroundRipple(e.clientX, e.clientY, 'bg-click-ripple');
-    });
-
-    const volumeBtn = document.getElementById('volume-toggle-btn');
-    const volumeIcon = document.getElementById('volume-icon');
-    let isMuted = false;
-
-    volumeBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); 
-        isMuted = !isMuted;
-        bgMusic.muted = isMuted;
-        if (isMuted) {
-            volumeStatusLabel.classList.add('muted-mode');
-            volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15" stroke-width="1.5"></line><line x1="17" y1="9" x2="23" y2="15" stroke-width="1.5"></line>`;
-        } else {
-            volumeStatusLabel.classList.remove('muted-mode');
-            volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path class="volume-wave-1" d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path class="volume-wave-2" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>`;
             playMusic();
-        }
-    });
-
-    intensitySlider.addEventListener('mousedown', (e) => { e.stopPropagation(); });
-    intensitySlider.addEventListener('input', (e) => {
-        intensityPercent = parseInt(e.target.value);
-        intensityValueLabel.innerText = `${intensityPercent}%`;
-    });
-
-    const submitBtn = document.getElementById('submit-auth-btn');
-    const myInput = document.getElementById('user-text-input'); 
-    let livesInErrorState = false;
-
-    myInput.addEventListener('input', () => {
-        const textLength = myInput.value.trim().length;
-        if (textLength > 0) { submitBtn.classList.add('btn-active'); } 
-        else { submitBtn.classList.remove('btn-active'); }
-
-        if (livesInErrorState) {
-            livesInErrorState = false;
-            myInput.classList.remove('input-error-state'); 
-            submitBtn.classList.remove('state-error');     
-        }
-    });
-
-    myInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            submitBtn.click();
-        }
-    });
-
-    function prepareDashboardSpans(elementId, startDelay) {
-        const el = document.getElementById(elementId);
-        if (!el) return;
-        const text = el.innerText;
-        el.innerHTML = '';
-        Array.from(text).forEach((char, index) => {
-            const span = document.createElement('span');
-            if (char === ' ') { span.innerHTML = '&nbsp;'; } else { span.innerText = char; }
-            span.style.animationDelay = `${startDelay + (index * 0.04)}s`;
-            el.appendChild(span);
+            createBackgroundRipple(e.clientX, e.clientY, 'bg-click-ripple');
         });
-    }
 
-    submitBtn.addEventListener('click', async () => {
-        if (submitBtn.classList.contains('state-loading') || submitBtn.classList.contains('state-error')) return;
+        const volumeBtn = document.getElementById('volume-toggle-btn');
+        const volumeIcon = document.getElementById('volume-icon');
+        let isMuted = false;
 
-        const rawPassword = myInput.value.trim();
-        if (!rawPassword) return;
+        if (volumeBtn) {
+            volumeBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); 
+                isMuted = !isMuted;
+                bgMusic.muted = isMuted;
+                if (isMuted) {
+                    volumeStatusLabel.classList.add('muted-mode');
+                    volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15" stroke-width="1.5"></line><line x1="17" y1="9" x2="23" y2="15" stroke-width="1.5"></line>`;
+                } else {
+                    volumeStatusLabel.classList.remove('muted-mode');
+                    volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path class="volume-wave-1" d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path class="volume-wave-2" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>`;
+                    playMusic();
+                }
+            });
+        }
 
-        submitBtn.classList.add('state-loading');
+        if (intensitySlider) {
+            intensitySlider.addEventListener('mousedown', (e) => { e.stopPropagation(); });
+            intensitySlider.addEventListener('input', (e) => {
+                intensityPercent = parseInt(e.target.value);
+                if (intensityValueLabel) intensityValueLabel.innerText = `${intensityPercent}%`;
+            });
+        }
 
-        try {
-            const response = await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password: rawPassword })
+        const submitBtn = document.getElementById('submit-auth-btn');
+        const myInput = document.getElementById('user-text-input'); 
+        let livesInErrorState = false;
+
+        if (myInput && submitBtn) {
+            myInput.addEventListener('input', () => {
+                const textLength = myInput.value.trim().length;
+                if (textLength > 0) { submitBtn.classList.add('btn-active'); } 
+                else { submitBtn.classList.remove('btn-active'); }
+
+                if (livesInErrorState) {
+                    livesInErrorState = false;
+                    myInput.classList.remove('input-error-state'); 
+                    submitBtn.classList.remove('state-error');     
+                }
             });
 
-            const data = await response.json();
-            submitBtn.classList.remove('state-loading');
-
-            if (response.ok && data.success) {
-                const mainContainer = document.querySelector('.main-container');
-                const cornerWrapper = document.querySelector('.corner-icon-floating-wrapper');
-                const promptText = document.getElementById('click-prompt');
-                const dashboardOverlay = document.getElementById('session-dashboard');
-
-                if (mainContainer) mainContainer.classList.add('fade-out-element');
-                if (cornerWrapper) cornerWrapper.classList.add('fade-out-element');
-                if (promptText) promptText.classList.add('fade-out-element');
-                
-                if (dashboardOverlay) {
-                    dashboardOverlay.style.display = 'flex';
-                    prepareDashboardSpans('db-animate-title', 0.20);
-                    prepareDashboardSpans('db-animate-message', 0.50);
-                    
-                    requestAnimationFrame(() => {
-                        dashboardOverlay.classList.add('show-framework');
-                    });
+            myInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    submitBtn.click();
                 }
-                
-                setTimeout(() => {
-                    document.body.classList.add('page-fade-out');
-                }, 4000); 
-
-                setTimeout(() => {
-                    window.location.replace('/beginning.html');
-                }, 5400);
-
-            } else {
-                livesInErrorState = true;
-                myInput.classList.add('input-error-state'); 
-                submitBtn.classList.add('state-error');        
-            }
-        } catch (err) {
-            console.error("Ошибка сети или сервера:", err);
-            submitBtn.classList.remove('state-loading');
-            livesInErrorState = true;
-            myInput.classList.add('input-error-state'); 
-            submitBtn.classList.add('state-error');
+            });
         }
-    });
 
-    (function initVersionChecker() {
-        let clickCount = 0;
-        let clickTimer = null;
-        let hideTimer = null;
+        function prepareDashboardSpans(elementId, startDelay) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            const text = el.innerText;
+            el.innerHTML = '';
+            Array.from(text).forEach((char, index) => {
+                const span = document.createElement('span');
+                if (char === ' ') { span.innerHTML = '&nbsp;'; } else { span.innerText = char; }
+                span.style.animationDelay = `${startDelay + (index * 0.04)}s`;
+                el.appendChild(span);
+            });
+        }
 
-        const badge = document.createElement('div');
-        badge.className = 'version-debug-badge pc-mode';
-        badge.textContent = 'PC-Version';
-        document.body.appendChild(badge);
+        if (submitBtn) {
+            submitBtn.addEventListener('click', async () => {
+                if (submitBtn.classList.contains('state-loading') || submitBtn.classList.contains('state-error')) return;
 
-        function handleTap(e) {
-            if (e.target.closest('button, input, a, .settings-trigger-zone, .input-container-box')) {
-                return;
-            }
+                const rawPassword = myInput ? myInput.value.trim() : '';
+                if (!rawPassword) return;
 
-            clickCount++;
-            clearTimeout(clickTimer);
-            clickTimer = setTimeout(() => { clickCount = 0; }, 1500);
+                submitBtn.classList.add('state-loading');
 
-            if (clickCount === 5) {
-                clickCount = 0;
+                try {
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ password: rawPassword })
+                    });
+
+                    const data = await response.json();
+                    submitBtn.classList.remove('state-loading');
+
+                    if (response.ok && data.success) {
+                        const mainContainer = document.querySelector('.main-container');
+                        const cornerWrapper = document.querySelector('.corner-icon-floating-wrapper');
+                        const dashboardOverlay = document.getElementById('session-dashboard');
+
+                        if (mainContainer) mainContainer.classList.add('fade-out-element');
+                        if (cornerWrapper) cornerWrapper.classList.add('fade-out-element');
+                        if (promptElement) promptElement.classList.add('fade-out-element');
+                        
+                        if (dashboardOverlay) {
+                            dashboardOverlay.style.display = 'flex';
+                            prepareDashboardSpans('db-animate-title', 0.20);
+                            prepareDashboardSpans('db-animate-message', 0.50);
+                            
+                            requestAnimationFrame(() => {
+                                dashboardOverlay.classList.add('show-framework');
+                            });
+                        }
+                        
+                        setTimeout(() => {
+                            document.body.classList.add('page-fade-out');
+                        }, 4000); 
+
+                        setTimeout(() => {
+                            window.location.replace('/beginning.html');
+                        }, 5400);
+
+                    } else {
+                        livesInErrorState = true;
+                        if (myInput) myInput.classList.add('input-error-state'); 
+                        submitBtn.classList.add('state-error');        
+                    }
+                } catch (err) {
+                    console.error("Ошибка сети или сервера:", err);
+                    submitBtn.classList.remove('state-loading');
+                    livesInErrorState = true;
+                    if (myInput) myInput.classList.add('input-error-state'); 
+                    submitBtn.classList.add('state-error');
+                }
+            });
+        }
+
+        (function initVersionChecker() {
+            let clickCount = 0;
+            let clickTimer = null;
+            let hideTimer = null;
+
+            const badge = document.createElement('div');
+            badge.className = 'version-debug-badge pc-mode';
+            badge.textContent = 'PC-Version';
+            document.body.appendChild(badge);
+
+            function handleTap(e) {
+                if (e.target.closest('button, input, a, .settings-trigger-zone, .input-container-box, #dev-console')) {
+                    return;
+                }
+
+                clickCount++;
                 clearTimeout(clickTimer);
-                clearTimeout(hideTimer);
-                badge.classList.add('show');
-                hideTimer = setTimeout(() => { badge.classList.remove('show'); }, 3000);
+                clickTimer = setTimeout(() => { clickCount = 0; }, 1500);
+
+                if (clickCount === 5) {
+                    clickCount = 0;
+                    clearTimeout(clickTimer);
+                    clearTimeout(hideTimer);
+                    badge.classList.add('show');
+                    hideTimer = setTimeout(() => { badge.classList.remove('show'); }, 3000);
+                }
+            }
+
+            window.addEventListener('click', handleTap);
+        })();
+
+        // --- ЛОГИКА ДЕСКТОПНОЙ КОНСОЛИ ---
+        const devConsole = document.getElementById('dev-console');
+        const consoleInput = document.getElementById('console-input');
+        const consoleOutput = document.getElementById('console-output');
+        const closeConsoleBtn = document.getElementById('close-console-btn');
+
+        function logToConsole(text, type = 'system') {
+            if (!consoleOutput) return;
+            const log = document.createElement('div');
+            log.className = `log-item ${type}`;
+            log.innerHTML = text;
+            consoleOutput.appendChild(log);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        function toggleConsole() {
+            if (!devConsole) return;
+            devConsole.classList.toggle('show');
+            if (devConsole.classList.contains('show') && consoleInput) {
+                setTimeout(() => consoleInput.focus(), 100);
             }
         }
 
-        window.addEventListener('click', handleTap);
-    })();
-
-    // --- ЛОГИКА ДЕСКТОПНОЙ КОНСОЛИ ---
-const devConsole = document.getElementById('dev-console');
-const consoleInput = document.getElementById('console-input');
-const consoleOutput = document.getElementById('console-output');
-const closeConsoleBtn = document.getElementById('close-console-btn');
-
-// Функция вывода текста в консоль
-function logToConsole(text, type = 'system') {
-    const log = document.createElement('div');
-    log.className = `log-item ${type}`;
-    log.innerHTML = text;
-    consoleOutput.appendChild(log);
-    consoleOutput.scrollTop = consoleOutput.scrollHeight;
-}
-
-// Переключение видимости консоли
-function toggleConsole() {
-    devConsole.classList.toggle('show');
-    if (devConsole.classList.contains('show')) {
-        setTimeout(() => consoleInput.focus(), 100);
-    }
-}
-
-// Вызов консоли по клавише `~` (Ё / Backquote)
-document.addEventListener('keydown', (e) => {
-    if (e.code === 'Backquote') {
-        e.preventDefault();
-        toggleConsole();
-    }
-});
-
-closeConsoleBtn.addEventListener('click', toggleConsole);
-
-// Обработка команд
-consoleInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        const command = consoleInput.value.trim();
-        if (!command) return;
-
-        logToConsole(`&gt; ${command}`, 'user');
-        consoleInput.value = '';
-
-        processCommand(command);
-    }
-});
-
-// Интерпретатор команд
-function processCommand(cmd) {
-    const parts = cmd.split(' ');
-    const mainCmd = parts[0].toLowerCase();
-
-    switch (mainCmd) {
-        case 'help':
-            logToConsole('Доступные команды:', 'system');
-            logToConsole('<span class="cmd-highlight">help</span> — показать список команд', 'system');
-            logToConsole('<span class="cmd-highlight">clear</span> — очистить консоль', 'system');
-            logToConsole('<span class="cmd-highlight">status</span> — проверить статус подключения', 'system');
-            logToConsole('<span class="cmd-highlight">bypass</span> — зайти без пароля', 'system');
-            logToConsole('<span class="cmd-highlight">exec [js]</span> — выполнить произвольный JS-код', 'system');
-            break;
-
-        case 'clear':
-            consoleOutput.innerHTML = '';
-            break;
-
-        case 'status':
-            logToConsole('Сервер: ACTIVE | Платформа: Desktop', 'success');
-            break;
-
-        case 'bypass':
-            logToConsole('Обход авторизации активирован...', 'success');
-            setTimeout(() => {
-                window.location.href = '/beginning.html';
-            }, 1000);
-            break;
-
-        case 'exec':
-            const codeToExec = cmd.substring(5);
-            try {
-                const result = eval(codeToExec);
-                logToConsole(`Результат: ${result}`, 'success');
-            } catch (err) {
-                logToConsole(`Ошибка выполнения: ${err.message}`, 'error');
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Backquote') {
+                e.preventDefault();
+                toggleConsole();
             }
-            break;
+        });
 
-        default:
-            logToConsole(`Неизвестная команда "${mainCmd}". Введите "help".`, 'error');
-            break;
-    }
-}
-</script>
+        if (closeConsoleBtn) {
+            closeConsoleBtn.addEventListener('click', toggleConsole);
+        }
 
-<div id="dev-console" class="dev-console">
-    <div class="console-header">
-        <span>GEOГРАФИЯ // DEV_CONSOLE [v1.0]</span>
-        <button id="close-console-btn" class="console-close">&times;</button>
-    </div>
-    <div id="console-output" class="console-output">
-        <div class="log-item system">Система готова. Введите <span class="cmd-highlight">help</span> для списка команд.</div>
-    </div>
-    <div class="console-input-row">
-        <span class="console-prompt">&gt;</span>
-        <input type="text" id="console-input" placeholder="Введите команду..." autocomplete="off" spellcheck="false">
-    </div>
-</div>
+        if (consoleInput) {
+            consoleInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const command = consoleInput.value.trim();
+                    if (!command) return;
 
+                    logToConsole(`&gt; ${command}`, 'user');
+                    consoleInput.value = '';
+
+                    processCommand(command);
+                }
+            });
+        }
+
+        function processCommand(cmd) {
+            const parts = cmd.split(' ');
+            const mainCmd = parts[0].toLowerCase();
+
+            switch (mainCmd) {
+                case 'help':
+                    logToConsole('Доступные команды:', 'system');
+                    logToConsole('<span class="cmd-highlight">help</span> — показать список команд', 'system');
+                    logToConsole('<span class="cmd-highlight">clear</span> — очистить консоль', 'system');
+                    logToConsole('<span class="cmd-highlight">status</span> — проверить статус подключения', 'system');
+                    logToConsole('<span class="cmd-highlight">bypass</span> — зайти без пароля', 'system');
+                    logToConsole('<span class="cmd-highlight">exec [js]</span> — выполнить произвольный JS-код', 'system');
+                    break;
+
+                case 'clear':
+                    if (consoleOutput) consoleOutput.innerHTML = '';
+                    break;
+
+                case 'status':
+                    logToConsole('Сервер: ACTIVE | Платформа: Desktop', 'success');
+                    break;
+
+                case 'bypass':
+                    logToConsole('Обход авторизации активирован...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/beginning.html';
+                    }, 1000);
+                    break;
+
+                case 'exec':
+                    const codeToExec = cmd.substring(5);
+                    try {
+                        const result = new Function(`return ${codeToExec}`)();
+                        logToConsole(`Результат: ${result}`, 'success');
+                    } catch (err) {
+                        logToConsole(`Ошибка выполнения: ${err.message}`, 'error');
+                    }
+                    break;
+
+                default:
+                    logToConsole(`Неизвестная команда "${mainCmd}". Введите "help".`, 'error');
+                    break;
+            }
+        }
+    </script>
 </body>
-
-<div class="app-banner banner-warning">
-        <span class="banner-icon">🛠</span>
-        <span>Ведется разработка сайта в раннем доступе</span>
-    </div>
-
 </html>
