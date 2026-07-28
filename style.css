@@ -1477,3 +1477,61 @@ body:has(.input-container-box.active) .logo-icon {
     font-family: inherit;
     font-size: 14px;
 }
+
+/* Контейнеры экранов консоли */
+.console-auth-container,
+.console-main-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: calc(100% - 35px);
+}
+
+.console-auth-container {
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 20px;
+}
+
+.auth-title {
+    color: #ff5555;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.auth-error {
+    color: #ff5555;
+    font-size: 12px;
+    margin: 0;
+    min-height: 15px;
+}
+
+/* Кнопка войти внутри консоли */
+.console-btn {
+    background: rgba(0, 255, 110, 0.15);
+    border: 1px solid rgba(0, 255, 110, 0.5);
+    color: #00ff6e;
+    padding: 6px 14px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.console-btn:hover {
+    background: rgba(0, 255, 110, 0.3);
+}
+
+#console-pass-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 14px;
+}
