@@ -1294,7 +1294,8 @@ body:has(.input-container-box.active) .logo-icon {
 /* Базовый каркас плашки */
 .app-banner {
     position: fixed;
-    top: calc(env(safe-area-inset-top) + 15px);
+    top: 15px; /* Fallback */
+    top: calc(env(safe-area-inset-top, 0px) + 15px);
     left: 50%;
     transform: translateX(-50%);
     
@@ -1379,11 +1380,10 @@ body:has(.input-container-box.active) .logo-icon {
     }
 }
 
-/* Применяем анимацию к иконке/эмодзи внутри плашки */
-.app-banner .banner-icon,
-.app-banner > span:first-child {
+/* Применяем анимацию строго к иконке внутри плашки */
+.app-banner .banner-icon {
     display: inline-block;
-    animation: iconSlowBlink 2.5s ease-in-out infinite; /* 2.5s — скорость мигания */
+    animation: iconSlowBlink 2.5s ease-in-out infinite;
 }
 
 /* --- ДЕСКТОПНАЯ КОНСОЛЬ РАЗРАБОТЧИКА --- */
