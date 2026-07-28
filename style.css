@@ -1323,7 +1323,7 @@ body:has(.input-container-box.active) .logo-icon {
    УНИВЕРСАЛЬНЫЕ ПЛАШКИ-УВЕДОМЛЕНИЯ (BANNERS)
    ========================================== */
 
-/* Контейнер плашек сообщений */
+/* Контейнер плашек (центрует относительно экрана) */
 .app-banners-container {
     position: fixed;
     top: 40px;
@@ -1337,18 +1337,18 @@ body:has(.input-container-box.active) .logo-icon {
     pointer-events: none;
 }
 
-/* Элемент плашки */
+/* Сама плашка */
 .app-banner {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 20px; /* Увеличено с 8px 16px */
+    padding: 10px 20px;
     border-radius: 20px;
     
     font-family: 'Montserrat', sans-serif;
-    font-size: 11px !important; /* Увеличено с 9px */
+    font-size: 11px !important;
     font-weight: 700;
-    letter-spacing: 1.5px; /* Увеличено с 1px */
+    letter-spacing: 1.5px;
     text-transform: uppercase;
     white-space: nowrap;
     
@@ -1359,17 +1359,11 @@ body:has(.input-container-box.active) .logo-icon {
     pointer-events: auto;
     user-select: none;
     
+    /* Анимация без дополнительного сдвига по X */
     animation: bannerSlideDown 0.6s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* Размер иконки внутри плашки */
-.banner-icon-svg {
-    width: 14px; /* Увеличено с 12px */
-    height: 14px;
-    flex-shrink: 0;
-}
-
-/* Анимация появления сверху */
+/* Исправленная анимация появления */
 @keyframes bannerSlideDown {
     0% {
         opacity: 0;
