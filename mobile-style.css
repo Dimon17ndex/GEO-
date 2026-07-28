@@ -175,7 +175,6 @@ html, body {
    УНИВЕРСАЛЬНЫЕ ПЛАШКИ-УВЕДОМЛЕНИЯ (BANNERS)
    ========================================== */
 
-/* Базовый каркас плашки */
 .app-banner {
     position: fixed;
     top: calc(env(safe-area-inset-top) + 15px);
@@ -185,22 +184,22 @@ html, body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     
-    /* --- АДАПТИВНОСТЬ И ОГРАНИЧЕНИЕ ШИРИНЫ --- */
-    max-width: calc(100vw - 32px); /* Защита от вылезания: отступы по 16px с краев */
-    width: max-content;            /* Подстраивается под текст, если он короткий */
-    white-space: normal;           /* Разрешаем перенос текста, если он не влезает */
-    text-align: center;            /* Центрируем текст при переносе */
+    /* Ограничения ширины */
+    max-width: calc(100vw - 24px); /* Оставляем по 12px по бокам */
+    width: max-content;
     
     padding: 8px 14px;
     border-radius: 12px;
     
     font-family: 'Montserrat', sans-serif;
-    font-size: clamp(8px, 2.5vw, 10px); /* Шрифт автоматически уменьшается на узких экранах */
+    /* Резиновый шрифт: подстраивается под ширину экрана */
+    font-size: clamp(8px, 2.8vw, 11px);
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.8px;
+    white-space: nowrap; /* Держим в одну строку */
     
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(10px);
@@ -213,9 +212,19 @@ html, body {
     animation: bannerSlideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Смещаем плашку оповещений вниз, когда активна плашка версии */
+/* Смещение при выплывании плашки версии */
 body:has(#version-badge.show) .app-banner {
     transform: translateX(-50%) translateY(50px) !important;
+}
+
+/* === ДОПОЛНИТЕЛЬНОЕ УМЕНЬШЕНИЕ ДЛЯ ОЧЕНЬ УЗКИХ ЭКРАНОВ (до 360px) === */
+@media screen and (max-width: 360px) {
+    .app-banner {
+        padding: 6px 10px;               /* Уменьшаем отступы плашки */
+        font-size: 8px !important;       /* Фиксируем компактный размер шрифта */
+        letter-spacing: 0.4px !important;/* Сжимаем межбуквенный интервал */
+        gap: 4px;                        /* Сближаем иконку и текст */
+    }
 }
 
 /* Анимация появления сверху при загрузке страницы */
