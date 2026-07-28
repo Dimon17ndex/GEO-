@@ -184,26 +184,31 @@ html, body {
     
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     
-    padding: 8px 16px;
+    /* --- АДАПТИВНОСТЬ И ОГРАНИЧЕНИЕ ШИРИНЫ --- */
+    max-width: calc(100vw - 32px); /* Защита от вылезания: отступы по 16px с краев */
+    width: max-content;            /* Подстраивается под текст, если он короткий */
+    white-space: normal;           /* Разрешаем перенос текста, если он не влезает */
+    text-align: center;            /* Центрируем текст при переносе */
+    
+    padding: 8px 14px;
     border-radius: 12px;
     
     font-family: 'Montserrat', sans-serif;
-    font-size: 10px;
+    font-size: clamp(8px, 2.5vw, 10px); /* Шрифт автоматически уменьшается на узких экранах */
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 1.2px;
-    white-space: nowrap;
+    letter-spacing: 1px;
     
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     
-    z-index: 99998; /* Чуть ниже, чем у version-badge (99999) */
+    z-index: 99998;
     user-select: none;
     
-    /* Плавность сдвига вниз и возвращения обратно */
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
     animation: bannerSlideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
