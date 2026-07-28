@@ -11,8 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!devConsole) return;
 
-    // Переключение состояния UI
-    function checkAuthUI() {
+    // Переключение экрана авторизации и консоли
+    function updateConsoleState() {
         const isAuth = sessionStorage.getItem('dev_console_authenticated') === 'true';
         if (isAuth) {
             if (authScreen) authScreen.style.display = 'none';
@@ -23,16 +23,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 1. Вызов консоли по нажатию ~ / Ё (без срабатывания внешних форм)
+    // 1. Перехват клавиши ~ / Ё (работает даже если фокус в инпуте)
     document.addEventListener('keydown', (e) => {
         if (e.code === 'Backquote' || e.key === '`' || e.key === '~' || e.key === 'Ё' || e.key === 'ё') {
             e.preventDefault();
-            e.stopImmediatePropagation();
+            e.stopImmediatePropagation(); // Блокируем ввод символа ~ в инпуты страницы
 
             if (devConsole.classList.contains('show')) {
                 devConsole.classList.remove('show');
             } else {
-                checkAuthUI();
+                updateConsoleState();
                 devConsole.classList.add('show');
 
                 const isAuth = sessionStorage.getItem('dev_console_authenticated') === 'true';
@@ -43,9 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
-    }, true);
+    }, true); // Третий параметр true важен для перехвата события
 
-    // 2. Закрытие консоли
+    // 2. Закрытие консоли по крестику
     if (closeBtn) {
         closeBtn.addEventListener('click', () => {
             devConsole.classList.remove('show');
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 3. Отправка пароля на проверку
-    async function submitConsolePassword(e) {
+    async function handleAuthSubmit(e) {
         if (e) {
             e.preventDefault();
             e.stopImmediatePropagation();
@@ -73,35 +73,36 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const data = await response.json();
-
-            // Очищаем инпут
             passInput.value = '';
 
             if (data.success) {
                 sessionStorage.setItem('dev_console_authenticated', 'true');
-                checkAuthUI();
+                updateConsoleState();
                 if (consoleInput) setTimeout(() => consoleInput.focus(), 100);
             } else {
                 if (authError) authError.textContent = 'Неверный пароль доступа!';
             }
         } catch (err) {
             passInput.value = '';
-            if (authError) authError.textContent = 'Ошибка соединения';
+            if (authError) authError.textContent = 'Ошибка соединения с сервером';
         }
     }
 
-    if (authBtn) authBtn.addEventListener('click', submitConsolePassword);
+    if (authBtn) {
+        authBtn.addEventListener('click', handleAuthSubmit);
+    }
+
     if (passInput) {
         passInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-                submitConsolePassword(e);
+                handleAuthSubmit(e);
             }
         });
     }
 
-    // 4. Логика вывода и обработки команд
+    // 4. Логирование и обработка команд
     function logToConsole(text, type = 'system') {
         if (!consoleOutput) return;
         const log = document.createElement('div');
