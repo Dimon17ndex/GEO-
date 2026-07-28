@@ -1325,12 +1325,12 @@ body:has(.input-container-box.active) .logo-icon {
 
 /* Контейнер: фиксируется сверху по центру экрана */
 .app-banners-container {
+    display: none; /* Изначально скрываем, а JS включит ('flex'), если плашка включена на сервере */
     position: fixed;
     top: 40px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
-    display: flex;
     flex-direction: column;
     align-items: center;
     gap: 8px;
