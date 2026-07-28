@@ -574,3 +574,120 @@ body.page-loaded {
     0% { width: 0px; height: 0px; opacity: 1; }
     100% { width: 1800px; height: 1800px; opacity: 0; }
 }
+
+/* ==========================================================================
+   7. КОНТЕЙНЕР И УНИВЕРСАЛЬНЫЕ ПЛАШКИ-УВЕДОМЛЕНИЯ (BANNERS)
+   ========================================================================== */
+
+/* Общий контейнер стопки плашек */
+.app-banners-container {
+    position: fixed;
+    top: calc(env(safe-area-inset-top) + 20px);
+    left: 50%;
+    transform: translateX(-50%) translateY(0);
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px; /* Отступ между несколькими плашками */
+    
+    z-index: 99998;
+    pointer-events: none; /* Пропускаем клики сквозь пустой контейнер */
+    
+    /* Плавное смещение всей стопки при выплывании дополнительных элементов */
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Смещаем стопку плашек вниз, если сверху появляется плашка версии */
+body:has(#version-badge.show) .app-banners-container {
+    transform: translateX(-50%) translateY(50px) !important;
+}
+
+/* Базовый каркас каждой плашки */
+.app-banner {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    
+    /* Адаптивные ограничения ширины для ПК и мобилок */
+    max-width: calc(100vw - 32px);
+    width: max-content;
+    
+    padding: 10px 20px;
+    border-radius: 12px;
+    
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(9px, 1.5vw, 11px); /* Адаптивный размер шрифта */
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    white-space: nowrap;
+    
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    
+    pointer-events: auto; /* Возвращаем кликабельность плашке */
+    user-select: none;
+    
+    /* Анимация плавного появления */
+    animation: bannerSlideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Анимация появления сверху */
+@keyframes bannerSlideDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-25px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* --- ВАРИАНТЫ ЦВЕТОВОГО ОФОРМЛЕНИЯ --- */
+
+/* 1. Оранжевый: Предупреждение / Работы */
+.banner-warning {
+    background: rgba(255, 152, 0, 0.18);
+    color: #ffb74d;
+    border: 1px solid rgba(255, 152, 0, 0.4);
+}
+
+/* 2. Красный: Ограничения / Ошибка */
+.banner-danger {
+    background: rgba(244, 67, 54, 0.18);
+    color: #ff8a80;
+    border: 1px solid rgba(244, 67, 54, 0.4);
+}
+
+/* 3. Синий: Информация / Бета */
+.banner-info {
+    background: rgba(33, 150, 243, 0.18);
+    color: #90caf9;
+    border: 1px solid rgba(33, 150, 243, 0.4);
+}
+
+/* 4. Зеленый: Успех / Акция */
+.banner-success {
+    background: rgba(76, 175, 80, 0.18);
+    color: #a5d6a7;
+    border: 1px solid rgba(76, 175, 80, 0.4);
+}
+
+/* Оптимизация для узких экранов / устройств */
+@media screen and (max-width: 480px) {
+    .app-banners-container {
+        top: calc(env(safe-area-inset-top) + 12px);
+        gap: 6px;
+    }
+
+    .app-banner {
+        padding: 7px 12px;
+        font-size: 8px !important;
+        letter-spacing: 0.5px !important;
+        gap: 5px;
+    }
+}
