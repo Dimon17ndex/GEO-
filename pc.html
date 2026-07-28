@@ -712,5 +712,44 @@
             });
         })();
     </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const badge = document.getElementById('version-badge');
+        let clickCount = 0;
+        let clickTimer = null;
+        let hideTimeout = null;
+
+        // Отслеживаем клики по всему экрану/документу
+        document.addEventListener('click', () => {
+            clickCount++;
+
+            // Если между кликами прошло более 1.5 секунд — сбрасываем счетчик
+            clearTimeout(clickTimer);
+            clickTimer = setTimeout(() => {
+                clickCount = 0;
+            }, 1500);
+
+            // Если кликнули 5 раз
+            if (clickCount === 5) {
+                clickCount = 0; // Сбрасываем счетчик
+                clearTimeout(clickTimer);
+
+                // Показываем плашку
+                if (badge) {
+                    badge.classList.add('visible');
+
+                    // Если был предыдущий таймер скрытия — очищаем его
+                    clearTimeout(hideTimeout);
+
+                    // Скрываем ровно через 3 секунды (3000 мс)
+                    hideTimeout = setTimeout(() => {
+                        badge.classList.remove('visible');
+                    }, 3000);
+                }
+            }
+        });
+    });
+</script>
 </body>
 </html>
