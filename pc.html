@@ -677,5 +677,48 @@
 
     <script src="console.js" defer></script>
 <div class="version-badge" id="version-badge">PC-VERSION</div>
+
+<script>
+(function() {
+    const vBadge = document.getElementById('version-badge');
+    let clickCount = 0;
+    let clickTimer = null;
+    let badgeHideTimer = null;
+
+    document.addEventListener('click', (e) => {
+        // Игнорируем клики по кнопкам, инпутам и консоли, чтобы отслеживать клики именно "по фону"
+        if (e.target.closest('input') || e.target.closest('button') || e.target.closest('.dev-console')) {
+            return;
+        }
+
+        clickCount++;
+
+        // Сбрасываем счетчик, если между кликами прошло больше 700 мс
+        clearTimeout(clickTimer);
+        clickTimer = setTimeout(() => {
+            clickCount = 0;
+        }, 700);
+
+        // При 5 кликах активируем плашку
+        if (clickCount >= 5) {
+            clickCount = 0;
+            clearTimeout(clickTimer);
+
+            if (vBadge) {
+                // Показываем плашку
+                vBadge.classList.add('show');
+
+                // Очищаем предыдущий таймер скрытия, если он был
+                clearTimeout(badgeHideTimer);
+
+                // Скрываем плашку ровно через 3 секунды (3000 мс)
+                badgeHideTimer = setTimeout(() => {
+                    vBadge.classList.remove('show');
+                }, 3000);
+            }
+        }
+    });
+})();
+</script>
 </body>
 </html>
