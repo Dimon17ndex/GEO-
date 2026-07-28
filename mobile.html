@@ -99,7 +99,6 @@
             gap: 16px !important;
         }
 
-        /* УВЕЛИЧЕННЫЙ ЛОГОТИП */
         .logo-icon {
             width: 96px !important;
             height: 96px !important;
@@ -210,7 +209,6 @@
             transition-delay: 0.2s;
         }
 
-        /* УВЕЛИЧЕННЫЙ ЛОГОТИП В ЭКРАНЕ СЕССИИ */
         .db-logo-icon {
             width: 80px;  
             height: 80px;
@@ -528,7 +526,7 @@
                     });
                 }, 600);
 
-                if (textInput) { setTimeout(() => textInput.focus(), 100); }
+                // Автофокус убран, чтобы клавиатура открывалась только при тапе на сам input
             }
         }
     });
