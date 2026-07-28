@@ -172,7 +172,6 @@
     </div>
 
     <main class="main-container">
-        
         <div class="brand-block">
             <div class="logo-wrapper">
                 <img src="images/gerb.png" alt="Герб" class="brand-logo">
@@ -214,7 +213,6 @@
         <div class="prompt-block" id="prompt-block-text">
             <span>Введите пароль, который вам предоставил организатор</span>
         </div>
-
     </main>
 
     <div class="session-dashboard" id="session-dashboard-overlay">
@@ -231,24 +229,21 @@
     <script src="console.js" defer></script>
 
     <script>
-        // Анимация волн
+        // --- 1. АНИМАЦИЯ ВОЛН ---
         const wave1 = document.getElementById('wave-path-1');
         const wave2 = document.getElementById('wave-path-2');
         let step = 0;
 
         function animateWaves() {
             step += 0.008; 
-            
             const y1 = Math.sin(step) * 40 + 200;
             const y2 = Math.cos(step * 0.8) * 50 + 250;
             const y3 = Math.sin(step * 1.2) * 35 + 180;
-            
             const path1 = `M -100 ${y1} Q 250 ${y2}, 600 ${y3} T 1100 ${y1} L 1100 1100 L -100 1100 Z`;
             
             const w1 = Math.cos(step * 0.7) * 45 + 280;
             const w2 = Math.sin(step * 1.1) * 55 + 220;
             const w3 = Math.cos(step * 0.9) * 40 + 310;
-            
             const path2 = `M -100 ${w1} Q 300 ${w2}, 700 ${w3} T 1100 ${w1} L 1100 1100 L -100 1100 Z`;
 
             if (wave1) wave1.setAttribute('d', path1);
@@ -258,40 +253,39 @@
         }
         animateWaves();
 
-        // 5 КЛИКОВ ПО ЭКРАНУ ДЛЯ ПОКАЗА ПЛАШКИ PC-VERSION
-        document.addEventListener('DOMContentLoaded', () => {
-            const versionBadge = document.getElementById('version-badge');
-            let clickCount = 0;
-            let clickTimer = null;
-            let badgeHideTimer = null;
+        // --- 2. ЛОГИКА 5 КЛИКОВ ДЛЯ PC-VERSION ---
+        (function initClickBadge() {
+            let clicks = 0;
+            let resetTimer = null;
+            let hideTimer = null;
 
-            document.addEventListener('click', (e) => {
-                if (['INPUT', 'BUTTON', 'A', 'TEXTAREA'].includes(e.target.tagName)) return;
+            window.addEventListener('click', (e) => {
+                // Пропускаем клики по интерактивным элементам ввода
+                if (e.target.closest('input, button, a, textarea')) return;
 
-                clickCount++;
+                clicks++;
 
-                clearTimeout(clickTimer);
-                clickTimer = setTimeout(() => {
-                    clickCount = 0;
-                }, 1500);
+                clearTimeout(resetTimer);
+                resetTimer = setTimeout(() => { clicks = 0; }, 1200);
 
-                if (clickCount >= 5) {
-                    clickCount = 0;
-                    clearTimeout(clickTimer);
+                if (clicks >= 5) {
+                    clicks = 0;
+                    clearTimeout(resetTimer);
 
-                    if (versionBadge) {
-                        versionBadge.classList.add('show');
+                    const badge = document.getElementById('version-badge');
+                    if (badge) {
+                        badge.classList.add('show');
 
-                        clearTimeout(badgeHideTimer);
-                        badgeHideTimer = setTimeout(() => {
-                            versionBadge.classList.remove('show');
+                        clearTimeout(hideTimer);
+                        hideTimer = setTimeout(() => {
+                            badge.classList.remove('show');
                         }, 3000);
                     }
                 }
             });
-        });
+        })();
 
-        // ПЕРЕКЛЮЧАТЕЛЬ ВИДИМОСТИ ПАРОЛЯ
+        // --- 3. ИКОНКА ПОКАЗА ПАРОЛЯ ---
         const togglePasswordBtn = document.getElementById('toggle-password-btn');
         const myInput = document.getElementById('user-text-input');
         const eyeOff = togglePasswordBtn ? togglePasswordBtn.querySelector('.eye-off') : null;
@@ -300,23 +294,16 @@
         if (togglePasswordBtn && myInput) {
             togglePasswordBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                e.stopPropagation();
-
                 const isPassword = myInput.type === 'password';
                 myInput.type = isPassword ? 'text' : 'password';
 
-                if (isPassword) {
-                    if (eyeOff) eyeOff.style.display = 'none';
-                    if (eyeOn) eyeOn.style.display = 'block';
-                } else {
-                    if (eyeOff) eyeOff.style.display = 'block';
-                    if (eyeOn) eyeOn.style.display = 'none';
-                }
+                if (eyeOff) eyeOff.style.display = isPassword ? 'none' : 'block';
+                if (eyeOn) eyeOn.style.display = isPassword ? 'block' : 'none';
                 myInput.focus();
             });
         }
 
-        // АНИМАЦИЯ ДАШБОРДА ПРИ ВХОДЕ
+        // --- 4. ДАШБОРД ВХОДА И АНИМАЦИЯ ---
         function prepareDashboardSpans(elementId, baseDelay = 0) {
             const el = document.getElementById(elementId);
             if (!el) return;
@@ -340,11 +327,7 @@
                 }
 
                 el.appendChild(wordSpan);
-
-                if (wIdx < words.length - 1) {
-                    const spaceNode = document.createTextNode(' ');
-                    el.appendChild(spaceNode);
-                }
+                if (wIdx < words.length - 1) el.appendChild(document.createTextNode(' '));
             });
 
             setTimeout(() => {
@@ -353,13 +336,12 @@
             }, 50);
         }
 
-        // ОТПРАВКА ОСНОВНОЙ ФОРМЫ
+        // --- 5. ОТПРАВКА ФОРМЫ ---
         const submitBtn = document.getElementById('submit-action-btn');
         const brandBlock = document.querySelector('.brand-block');
         const formContainer = document.querySelector('.form-container');
         const promptText = document.getElementById('prompt-block-text');
         const bannerAlert = document.querySelector('.app-banners-container');
-        const versionBadge = document.getElementById('version-badge');
         const dashboardOverlay = document.getElementById('session-dashboard-overlay');
 
         let livesInErrorState = false;
@@ -411,7 +393,9 @@
                         if (formContainer) formContainer.classList.add('fade-out-element');
                         if (promptText) promptText.classList.add('fade-out-element');
                         if (bannerAlert) bannerAlert.classList.add('fade-out-element');
-                        if (versionBadge) versionBadge.classList.remove('show');
+                        
+                        const badge = document.getElementById('version-badge');
+                        if (badge) badge.classList.remove('show');
                         
                         if (dashboardOverlay) {
                             dashboardOverlay.style.display = 'flex';
@@ -423,24 +407,19 @@
                             });
                         }
                         
-                        setTimeout(() => {
-                            document.body.classList.add('page-fade-out');
-                        }, 4000); 
-
-                        setTimeout(() => {
-                            window.location.replace('/beginning.html');
-                        }, 5400);
+                        setTimeout(() => { document.body.classList.add('page-fade-out'); }, 4000); 
+                        setTimeout(() => { window.location.replace('/beginning.html'); }, 5400);
 
                     } else {
                         livesInErrorState = true;
-                        if (myInput) myInput.classList.add('input-error-state'); 
+                        myInput.classList.add('input-error-state'); 
                         submitBtn.classList.add('state-error');        
                     }
                 } catch (err) {
                     console.error("Ошибка сети или сервера:", err);
                     submitBtn.classList.remove('state-loading');
                     livesInErrorState = true;
-                    if (myInput) myInput.classList.add('input-error-state'); 
+                    myInput.classList.add('input-error-state'); 
                     submitBtn.classList.add('state-error');
                 }
             });
