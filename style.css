@@ -1323,24 +1323,26 @@ body:has(.input-container-box.active) .logo-icon {
    УНИВЕРСАЛЬНЫЕ ПЛАШКИ-УВЕДОМЛЕНИЯ (BANNERS)
    ========================================== */
 
-/* Контейнер плашек (центрует относительно экрана) */
+/* Контейнер плашек сообщений — Центрируется строго по экрану */
 .app-banners-container {
     position: fixed;
     top: 40px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 50% !important;
+    transform: translateX(-50%) !important;
     z-index: 10;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 8px;
     pointer-events: none;
+    width: max-content;
 }
 
-/* Сама плашка */
+/* Элемент плашки */
 .app-banner {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     padding: 10px 20px;
     border-radius: 20px;
@@ -1358,12 +1360,20 @@ body:has(.input-container-box.active) .logo-icon {
     
     pointer-events: auto;
     user-select: none;
+    margin: 0 auto;
     
-    /* Анимация без дополнительного сдвига по X */
-    animation: bannerSlideDown 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    /* Анимация без горизонтального сдвига */
+    animation: bannerSlideDown 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
-/* Исправленная анимация появления */
+/* Размер иконки внутри плашки */
+.banner-icon-svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+/* Анимация появления только по Y */
 @keyframes bannerSlideDown {
     0% {
         opacity: 0;
@@ -1402,7 +1412,7 @@ body:has(.input-container-box.active) .logo-icon {
 .banner-success {
     background: rgba(76, 175, 80, 0.2);
     color: #a5d6a7;
-    border: 1px solid rgba(76, 175, 80, 0.5);
+    border: 1px solid rgba(76, 175, 80, 0.4);
 }
 
 /* ==========================================
