@@ -1343,7 +1343,9 @@ body:has(.input-container-box.active) .logo-icon {
     align-items: center;
     gap: 8px;
     padding: 10px 20px;
-    border-radius: 20px;
+    
+    /* Меняем с 20px на 12px для полного соответствия с beginning.css */
+    border-radius: 12px; 
     
     font-family: 'Montserrat', sans-serif;
     font-size: 11px;
