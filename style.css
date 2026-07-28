@@ -1535,3 +1535,40 @@ body:has(.input-container-box.active) .logo-icon {
     font-family: inherit;
     font-size: 14px;
 }
+
+/* ==========================================================================
+   ПЛАШКА ВЕРСИИ (PC-VERSION / MOBILE-VERSION)
+   ========================================================================== */
+.version-badge {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 10000;
+    padding: 6px 14px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #ffffff;
+    text-transform: uppercase;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    pointer-events: none;
+    user-select: none;
+    
+    /* Состояние по умолчанию — скрыто */
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(10px);
+    transition: opacity 0.4s ease, filter 0.4s ease, transform 0.4s ease;
+}
+
+/* Класс отображения плашки */
+.version-badge.show {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0);
+}
