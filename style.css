@@ -1323,35 +1323,50 @@ body:has(.input-container-box.active) .logo-icon {
    УНИВЕРСАЛЬНЫЕ ПЛАШКИ-УВЕДОМЛЕНИЯ (BANNERS)
    ========================================== */
 
-/* Базовый каркас плашки */
-.app-banner {
+/* Контейнер плашек сообщений */
+.app-banners-container {
     position: fixed;
-    top: 15px; /* Fallback */
-    top: calc(env(safe-area-inset-top, 0px) + 15px);
+    top: 40px;
     left: 50%;
     transform: translateX(-50%);
-    
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none;
+}
+
+/* Элемент плашки */
+.app-banner {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    
-    padding: 8px 16px;
-    border-radius: 12px;
+    padding: 10px 20px; /* Увеличено с 8px 16px */
+    border-radius: 20px;
     
     font-family: 'Montserrat', sans-serif;
-    font-size: 10px;
-    font-weight: 800;
+    font-size: 11px !important; /* Увеличено с 9px */
+    font-weight: 700;
+    letter-spacing: 1.5px; /* Увеличено с 1px */
     text-transform: uppercase;
-    letter-spacing: 1.2px;
     white-space: nowrap;
     
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     
-    z-index: 99999;
+    pointer-events: auto;
     user-select: none;
-    animation: bannerSlideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    
+    animation: bannerSlideDown 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Размер иконки внутри плашки */
+.banner-icon-svg {
+    width: 14px; /* Увеличено с 12px */
+    height: 14px;
+    flex-shrink: 0;
 }
 
 /* Анимация появления сверху */
