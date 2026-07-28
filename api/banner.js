@@ -1,30 +1,42 @@
 import { kv } from '@vercel/kv';
 
 export default async function handler(req, res) {
-    // Разрешаем Cross-Origin
+    // Разрешаем CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
 
     try {
-        // GET: Получение текущего состояния
+        // GET: Получение текущего состояния плашки
         if (req.method === 'GET') {
             const isEnabled = await kv.get('banner_enabled');
             return res.status(200).json({ enabled: Boolean(isEnabled) });
         }
 
-        // POST: Изменение состояния
+        // POST: Изменение состояния плашки из консоли
         if (req.method === 'POST') {
-            const { state } = req.body || {};
-            await kv.set('banner_enabled', Boolean(state));
-            return res.status(200).json({ success: true, enabled: Boolean(state) });
+            let body = req.body;
+            // Если body пришел строкой, парсим его
+            if (typeof body === 'string') {
+                body = JSON.parse(body);
+            }
+
+            const state = Boolean(body?.state);
+            await kv.set('banner_enabled', state);
+
+            return res.status(200).json({ success: true, enabled: state });
         }
     } catch (error) {
         console.error('KV Error:', error);
-        return res.status(500).json({ success: false, error: error.message });
+        // Возвращаем аккуратную ошибку в JSON вместо краша 500
+        return res.status(200).json({ 
+            success: false, 
+            error: 'Ошибка подключения к KV. Проверьте связи Storage в Vercel.' 
+        });
     }
 
     return res.status(405).json({ error: 'Method not allowed' });
