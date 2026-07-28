@@ -34,7 +34,7 @@ html, body {
 /* Перестраиваем главный блок под вертикальный экран */
 .brand-block {
     flex-direction: column !important; /* Ставим элементы в столбик */
-    gap: 15px !important;              /* Расстояние между лого и текстом */
+    gap: 15px !important;               /* Расстояние между лого и текстом */
     align-items: center !important;    /* Центрируем всё по горизонтали */
     text-align: center !important;
 }
@@ -60,7 +60,7 @@ html, body {
 
 /* Уменьшаем плашку "наука • образование..." */
 .subtitle-badge {
-    margin-top: 10px !important;       
+    margin-top: 10px !important;        
     padding: 6px 16px !important;      
     font-size: 11px !important;        
     letter-spacing: 0.5px !important;  
@@ -185,7 +185,7 @@ html, body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0px; /* Убрали внутренний отступ между плашками */
+    gap: 0px; /* Без зазора между плашками */
     
     z-index: 99998;
     pointer-events: none;
@@ -193,9 +193,9 @@ html, body {
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* При выплывании плашки версии сдвигаем контейнер ровно встык без зазора */
+/* При выплывании плашки версии сдвигаем контейнер ровно встык */
 body:has(#version-badge.show) .app-banners-container {
-    transform: translateX(-50%) translateY(32px) !important; /* Уменьшено с 50px до 32px для плотного прилегания */
+    transform: translateX(-50%) translateY(32px) !important;
 }
 
 /* Базовый стиль отдельной плашки */
@@ -228,7 +228,7 @@ body:has(#version-badge.show) .app-banners-container {
     animation: bannerSlideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Анимация появления */
+/* Анимация появления плашки */
 @keyframes bannerSlideDown {
     0% {
         opacity: 0;
@@ -247,18 +247,6 @@ body:has(#version-badge.show) .app-banners-container {
         font-size: 8px !important;
         letter-spacing: 0.4px !important;
         gap: 4px;
-    }
-}
-
-/* Анимация появления сверху при загрузке страницы */
-@keyframes bannerSlideDown {
-    0% {
-        opacity: 0;
-        transform: translateX(-50%) translateY(-40px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
     }
 }
 
