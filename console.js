@@ -76,6 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
             passInput.value = '';
 
             if (data.success) {
+                sessionStorage.getItem('dev_console_authenticated', 'true');
                 sessionStorage.setItem('dev_console_authenticated', 'true');
                 updateConsoleState();
                 if (consoleInput) setTimeout(() => consoleInput.focus(), 100);
@@ -112,6 +113,21 @@ document.addEventListener('DOMContentLoaded', () => {
         consoleOutput.scrollTop = consoleOutput.scrollHeight;
     }
 
+    // Вспомогательная функция отправки статуса плашки на Vercel API
+    async function toggleGlobalBanner(state) {
+        try {
+            const res = await fetch('/api/banner', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ state })
+            });
+            const data = await res.json();
+            return data.success;
+        } catch (err) {
+            return false;
+        }
+    }
+
     if (consoleInput) {
         consoleInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
@@ -120,14 +136,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const command = consoleInput.value.trim();
                 if (!command) return;
 
-                logToConsole(`&gt; ${command}`, 'user');
+                logToConsole(`> ${command}`, 'user');
                 consoleInput.value = '';
                 processCommand(command);
             }
         });
     }
 
-    function processCommand(cmd) {
+    async function processCommand(cmd) {
         const parts = cmd.split(' ');
         const mainCmd = parts[0].toLowerCase();
 
@@ -138,6 +154,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 logToConsole('<span class="cmd-highlight">clear</span> — очистить консоль', 'system');
                 logToConsole('<span class="cmd-highlight">status</span> — проверить статус подключения', 'system');
                 logToConsole('<span class="cmd-highlight">bypass</span> — зайти без пароля', 'system');
+                logToConsole('<span class="cmd-highlight">banner-on</span> — включить плашку для всех', 'system');
+                logToConsole('<span class="cmd-highlight">banner-off</span> — отключить плашку для всех', 'system');
                 break;
             case 'clear':
                 if (consoleOutput) consoleOutput.innerHTML = '';
@@ -148,6 +166,24 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'bypass':
                 logToConsole('Обход авторизации активирован...', 'success');
                 setTimeout(() => { window.location.href = '/beginning.html'; }, 1000);
+                break;
+            case 'banner-on':
+                logToConsole('Отправка запроса на включение плашки...', 'system');
+                const okOn = await toggleGlobalBanner(true);
+                if (okOn) {
+                    logToConsole('Плашка успешно ВКЛЮЧЕНА для всех пользователей!', 'success');
+                } else {
+                    logToConsole('Ошибка при изменении статуса плашки.', 'error');
+                }
+                break;
+            case 'banner-off':
+                logToConsole('Отправка запроса на отключение плашки...', 'system');
+                const okOff = await toggleGlobalBanner(false);
+                if (okOff) {
+                    logToConsole('Плашка успешно ОТКЛЮЧЕНА для всех пользователей!', 'success');
+                } else {
+                    logToConsole('Ошибка при изменении статуса плашки.', 'error');
+                }
                 break;
             default:
                 logToConsole(`Неизвестная команда "${mainCmd}". Введите "help".`, 'error');
