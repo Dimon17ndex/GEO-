@@ -79,6 +79,66 @@
             transform: translateX(-50%) translateY(0);
         }
 
+        /* --- УНИВЕРСАЛЬНЫЕ ПЛАШКИ ОПОВЕЩЕНИЙ --- */
+        .app-banner {
+            position: fixed;
+            top: calc(env(safe-area-inset-top) + 15px);
+            left: 50%;
+            transform: translateX(-50%) translateY(0);
+            
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            
+            padding: 8px 16px;
+            border-radius: 12px;
+            
+            font-family: 'Montserrat', sans-serif;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            white-space: nowrap;
+            
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            
+            z-index: 99998; /* Чуть ниже version-badge */
+            user-select: none;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+        }
+
+        /* При выплывании плашки версии смещаем оповещение вниз */
+        body:has(#version-badge.show) .app-banner {
+            transform: translateX(-50%) translateY(50px);
+        }
+
+        /* Цветовые варианты плашек */
+        .banner-warning {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ffb74d;
+            border: 1px solid rgba(255, 152, 0, 0.5);
+        }
+
+        .banner-danger {
+            background: rgba(244, 67, 54, 0.2);
+            color: #ff8a80;
+            border: 1px solid rgba(244, 67, 54, 0.5);
+        }
+
+        .banner-info {
+            background: rgba(33, 150, 243, 0.2);
+            color: #90caf9;
+            border: 1px solid rgba(33, 150, 243, 0.5);
+        }
+
+        .banner-success {
+            background: rgba(76, 175, 80, 0.2);
+            color: #a5d6a7;
+            border: 1px solid rgba(76, 175, 80, 0.5);
+        }
+
         /* --- СКОРРЕКТИРОВАННЫЙ ТЕКСТ "НАЖМИТЕ НА ЭКРАН" --- */
         .prompt-text {
             font-size: 11px !important;
@@ -323,6 +383,8 @@
 </head>
 <body>
 
+    <div class="app-banner banner-danger">⚠️ Возможности сайта ограничены</div>
+
     <div id="version-badge" class="version-badge">MOBILE-VERSION</div>
 
     <div class="shadow-layer"></div>
@@ -525,8 +587,6 @@
                         }, i * 20);
                     });
                 }, 600);
-
-                // Автофокус убран, чтобы клавиатура открывалась только при тапе на сам input
             }
         }
     });
@@ -587,10 +647,12 @@
                 const cornerWrapper = document.querySelector('.corner-icon-floating-wrapper');
                 const promptText = document.getElementById('click-prompt');
                 const dashboardOverlay = document.getElementById('session-dashboard');
+                const bannerAlert = document.querySelector('.app-banner');
 
                 if (mainContainer) mainContainer.classList.add('fade-out-element');
                 if (cornerWrapper) cornerWrapper.classList.add('fade-out-element');
                 if (promptText) promptText.classList.add('fade-out-element');
+                if (bannerAlert) bannerAlert.classList.add('fade-out-element');
                 if (versionBadge) versionBadge.classList.remove('show');
                 
                 if (dashboardOverlay) {
@@ -626,7 +688,4 @@
     });
 </script>
 </body>
-
-<div class="app-banner banner-danger">⚠️ Возможности сайта ограничены</div>
-
 </html>
