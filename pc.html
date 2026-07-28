@@ -320,15 +320,15 @@
     <div class="dev-console">
     <div class="console-header">
         <span>DEV CONSOLE v1.0</span>
-        <button class="console-close" id="console-close-btn">&times;</button>
+        <button type="button" class="console-close" id="console-close-btn">&times;</button>
     </div>
 
     <div id="console-auth-screen" class="console-auth-container">
         <p class="auth-title">ТРЕБУЕТСЯ АВТОРИЗАЦИЯ</p>
         <div class="console-input-row">
             <span class="console-prompt">PASS&gt;</span>
-            <input type="password" id="console-pass-input" placeholder="Введите пароль..." autocomplete="off">
-            <button id="console-auth-btn" class="console-btn">Войти</button>
+            <input type="password" id="console-pass-input" placeholder="Введите пароль..." autocomplete="new-password">
+            <button type="button" id="console-auth-btn" class="console-btn">Войти</button>
         </div>
         <p id="console-auth-error" class="auth-error"></p>
     </div>
