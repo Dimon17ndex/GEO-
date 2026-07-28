@@ -1339,48 +1339,48 @@ body:has(.input-container-box.active) .logo-icon {
 }
 
 .app-banner {
+    /* Фиксируем по центру экрана */
+    position: fixed !important;
+    top: 40px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 9999 !important;
+
+    /* Стили оформления */
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     gap: 8px !important;
     padding: 10px 20px !important;
     border-radius: 20px !important;
-    
+
     font-family: 'Montserrat', sans-serif !important;
     font-size: 11px !important;
     font-weight: 700 !important;
     letter-spacing: 1.5px !important;
     text-transform: uppercase !important;
     white-space: nowrap !important;
-    
+
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
     backdrop-filter: blur(8px) !important;
     -webkit-backdrop-filter: blur(8px) !important;
-    
+
     pointer-events: auto !important;
     user-select: none !important;
-    
-    /* Сбрасываем любые сдвиги у самой плашки */
-    margin: 0 auto !important;
-    transform: none !important;
+
+    /* Анимация появления сверху */
     animation: bannerSlideDown 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
 }
 
-.banner-icon-svg {
-    width: 14px !important;
-    height: 14px !important;
-    flex-shrink: 0 !important;
-}
-
-/* Чистая анимация только по высоте Y */
+/* Анимация появления с сохранением центрирования по горизонтали (translateX) */
 @keyframes bannerSlideDown {
     0% {
         opacity: 0;
-        transform: translateY(-40px);
+        transform: translateX(-50%) translateY(-40px);
     }
     100% {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateX(-50%) translateY(0);
     }
 }
 
