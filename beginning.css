@@ -691,3 +691,26 @@ body:has(#version-badge.show) .app-banners-container {
         gap: 5px;
     }
 }
+
+/* ==========================================
+   АНИМАЦИЯ МЕДЛЕННОГО МИГАНИЯ ИКОНОК
+   ========================================== */
+
+/* Анимация плавной пульсации прозрачности */
+@keyframes iconSlowBlink {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.35;        /* Насколько сильно тускнеет иконка */
+        transform: scale(0.9); /* Легкое уменьшение для эффекта дыхания */
+    }
+}
+
+/* Применяем анимацию к иконке/эмодзи внутри плашки */
+.app-banner .banner-icon,
+.app-banner > span:first-child {
+    display: inline-block;
+    animation: iconSlowBlink 2.5s ease-in-out infinite; /* 2.5s — скорость мигания */
+}
