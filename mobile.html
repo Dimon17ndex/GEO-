@@ -43,12 +43,13 @@
             padding-right: env(safe-area-inset-right);
         }
 
-        /* --- ПЛАШКА ВЕРСИИ СО СКРИНШОТА --- */
+        /* --- ВЫПЛЫВАЮЩАЯ ПЛАШКА ВЕРСИИ ВВЕРХУ ПО ЦЕНТРУ --- */
         .version-badge {
             position: fixed;
             top: 20px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.75);
+            left: 50%;
+            transform: translateX(-50%) translateY(-60px);
+            background: rgba(0, 0, 0, 0.85);
             color: #ffffff;
             border: 1px solid rgba(255, 255, 255, 0.25);
             padding: 8px 18px;
@@ -61,9 +62,16 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
-            z-index: 9999;
-            user-select: none;
+            opacity: 0;
             pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 99999;
+            user-select: none;
+        }
+
+        .version-badge.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
         }
 
         /* --- БЛОК БРЕНДА --- */
@@ -299,7 +307,7 @@
 </head>
 <body>
 
-    <div class="version-badge">MOBILE-VERSION</div>
+    <div id="version-badge" class="version-badge">MOBILE-VERSION</div>
 
     <div class="shadow-layer"></div>
 
@@ -393,12 +401,18 @@
     const promptElement = document.getElementById('click-prompt');
     const textInput = document.getElementById('user-text-input');
     const inputContainer = document.querySelector('.input-container-box');
+    const versionBadge = document.getElementById('version-badge');
     
     let initialText = "проект Запорожской области";
     let hasUserClicked = false; 
     let isClickAllowed = false;
     let isSecretTextActive = false; 
     let letters = [];
+
+    // Логика 5-кратного нажатия
+    let bgTapCount = 0;
+    let bgTapTimer = null;
+    let badgeTimeout = null;
 
     setTimeout(() => { isClickAllowed = true; }, 3000);
 
@@ -435,6 +449,26 @@
     textInput.addEventListener('keydown', (e) => { e.stopPropagation(); });
 
     document.body.addEventListener('pointerdown', (e) => {
+        // Логика подсчета кликов по фону (игнорируем клики по полю ввода и кнопке)
+        if (!e.target.closest('#user-text-input') && !e.target.closest('#submit-auth-btn')) {
+            bgTapCount++;
+            clearTimeout(bgTapTimer);
+            bgTapTimer = setTimeout(() => {
+                bgTapCount = 0;
+            }, 400); // 400ms между кликами для сброса счетчика
+
+            if (bgTapCount >= 5) {
+                bgTapCount = 0;
+                if (versionBadge) {
+                    clearTimeout(badgeTimeout);
+                    versionBadge.classList.add('show');
+                    badgeTimeout = setTimeout(() => {
+                        versionBadge.classList.remove('show');
+                    }, 3000); // Скрывается через 3 секунды
+                }
+            }
+        }
+
         if (!isClickAllowed) return;
 
         if (!hasUserClicked) {
@@ -538,12 +572,11 @@
                 const cornerWrapper = document.querySelector('.corner-icon-floating-wrapper');
                 const promptText = document.getElementById('click-prompt');
                 const dashboardOverlay = document.getElementById('session-dashboard');
-                const versionBadge = document.querySelector('.version-badge');
 
                 if (mainContainer) mainContainer.classList.add('fade-out-element');
                 if (cornerWrapper) cornerWrapper.classList.add('fade-out-element');
                 if (promptText) promptText.classList.add('fade-out-element');
-                if (versionBadge) versionBadge.classList.add('fade-out-element');
+                if (versionBadge) versionBadge.classList.remove('show');
                 
                 if (dashboardOverlay) {
                     dashboardOverlay.style.display = 'flex';
