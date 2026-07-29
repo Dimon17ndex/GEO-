@@ -1,35 +1,3 @@
-// console.js
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Проверяем, есть ли уже консоль на странице
-    if (!document.getElementById('console-overlay')) {
-        // Создаем контейнер консоли
-        const consoleHTML = `
-            <div id="console-overlay" class="console-hidden">
-                <div class="console-window">
-                    <div class="console-header">
-                        <span>Terminal / Console</span>
-                        <button id="console-close-btn">&times;</button>
-                    </div>
-                    <div class="console-body" id="console-output"></div>
-                    <div class="console-input-row">
-                        <span class="console-prompt">></span>
-                        <input type="text" id="console-input" autocomplete="off" placeholder="Введите команду...">
-                    </div>
-                </div>
-            </div>
-        `;
-        // Вставляем разметку в самый конец body
-        document.body.insertAdjacentHTML('beforeend', consoleHTML);
-    }
-
-    // 2. Здесь идет ваша основная логика консоли (нажатие горячих клавиш, обработка команд и т.д.)
-    initConsoleLogic();
-});
-
-function initConsoleLogic() {
-    // Ваша функция открытия/закрытия консоли и обработки ввода
-}
-
 // === НАСТРОЙКИ SUPABASE ===
 // Указываем адрес проекта БЕЗ /rest/v1/ на конце!
 const SUPABASE_URL = 'https://swigwhclmjnhcdrbjnes.supabase.co'; 
