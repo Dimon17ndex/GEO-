@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// --- СТИЛИ ---
+// --- СТИЛИ (Точные отступы 1:1 по макету) ---
 function injectAuthStyles() {
     if (document.getElementById('auth-system-styles')) return;
 
@@ -137,7 +137,7 @@ function injectAuthStyles() {
             left: 0 !important;
             width: 100vw !important;
             height: 100vh !important;
-            background: rgba(8, 8, 10, 0.9) !important;
+            background: rgba(10, 10, 12, 0.94) !important;
             backdrop-filter: blur(12px) !important;
             -webkit-backdrop-filter: blur(12px) !important;
             z-index: 9999999 !important;
@@ -166,7 +166,7 @@ function injectAuthStyles() {
             box-shadow: none !important;
             padding: 0 !important;
             width: 100% !important;
-            max-width: 320px !important; /* Уменьшили ширину для точной пропорции как на фото */
+            max-width: 300px !important; /* Узкая изящная пропорция */
             position: relative !important;
             color: #ffffff !important;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
@@ -183,15 +183,15 @@ function injectAuthStyles() {
             transform: scale(1) !important;
         }
 
-        /* Кнопка закрытия */
+        /* Кнопка закрытия (крестик справа на одном уровне с логотипом) */
         .auth-close-btn {
             position: absolute !important;
-            top: -45px !important;
-            right: 0 !important;
+            top: 4px !important;
+            right: -55px !important;
             background: transparent !important;
             border: none !important;
-            color: rgba(255, 255, 255, 0.4) !important;
-            font-size: 26px !important;
+            color: rgba(255, 255, 255, 0.35) !important;
+            font-size: 20px !important;
             line-height: 1 !important;
             cursor: pointer !important;
             transition: color 0.2s !important;
@@ -203,41 +203,41 @@ function injectAuthStyles() {
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 12px !important;
-            font-size: 22px !important;
+            gap: 10px !important;
+            font-size: 20px !important;
             font-weight: 700 !important;
-            letter-spacing: 2px !important;
+            letter-spacing: 1px !important;
             color: #ffffff !important;
-            margin-bottom: 38px !important; /* Точный отступ до тумблера */
+            margin-bottom: 20px !important; /* Небольшой отступ до капсулы */
             text-transform: uppercase !important;
         }
 
         .auth-header-title svg {
-            width: 30px !important;
-            height: 30px !important;
+            width: 28px !important;
+            height: 28px !important;
             stroke: #ffffff !important;
         }
 
         /* 2. Капсульный переключатель Вход / Регистрация */
         .auth-tabs {
             display: flex !important;
-            background: rgba(255, 255, 255, 0.08) !important;
-            border: 1px solid rgba(255, 255, 255, 0.12) !important;
-            border-radius: 30px !important;
-            padding: 4px !important;
+            background: rgba(255, 255, 255, 0.04) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            border-radius: 24px !important;
+            padding: 3px !important;
             width: 100% !important;
-            margin-bottom: 48px !important; /* Точный отступ от тумблера до полей */
+            margin-bottom: 110px !important; /* БОЛЬШОЙ отступ от тумблера до полей ввода */
             box-sizing: border-box !important;
         }
 
         .auth-tab-btn {
             flex: 1 !important;
-            padding: 10px 18px !important;
+            padding: 7px 14px !important;
             background: transparent !important;
             border: none !important;
-            border-radius: 25px !important;
+            border-radius: 20px !important;
             color: rgba(255, 255, 255, 0.5) !important;
-            font-size: 14px !important;
+            font-size: 13px !important;
             font-weight: 500 !important;
             cursor: pointer !important;
             transition: all 0.25s ease !important;
@@ -254,14 +254,14 @@ function injectAuthStyles() {
         .auth-form {
             display: flex !important;
             flex-direction: column !important;
-            gap: 36px !important; /* Просторное расстояние между полями ввода */
+            gap: 45px !important; /* Расстояние между Email и Паролем */
             width: 100% !important;
             transition: filter 0.2s ease, opacity 0.2s ease !important;
         }
 
         /* Анимация размытия при смене режима */
         .fade-out-blur {
-            filter: blur(10px) !important;
+            filter: blur(8px) !important;
             opacity: 0 !important;
         }
 
@@ -271,7 +271,7 @@ function injectAuthStyles() {
 
         @keyframes blurIn {
             from {
-                filter: blur(10px);
+                filter: blur(8px);
                 opacity: 0;
             }
             to {
@@ -290,9 +290,9 @@ function injectAuthStyles() {
             background: transparent !important;
             border: none !important;
             border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
-            padding: 8px 0 12px 0 !important;
+            padding: 4px 0 8px 0 !important;
             color: #ffffff !important;
-            font-size: 14px !important;
+            font-size: 13px !important;
             text-align: center !important;
             outline: none !important;
             width: 100% !important;
@@ -301,7 +301,7 @@ function injectAuthStyles() {
         }
 
         .auth-input::placeholder {
-            color: rgba(255, 255, 255, 0.4) !important;
+            color: rgba(255, 255, 255, 0.35) !important;
             text-align: center !important;
         }
 
@@ -314,13 +314,13 @@ function injectAuthStyles() {
             background: transparent !important;
             color: #ffffff !important;
             border: 1px solid #ffffff !important;
-            border-radius: 30px !important;
-            padding: 13px 24px !important;
-            font-size: 15px !important;
-            font-weight: 600 !important;
+            border-radius: 24px !important;
+            padding: 10px 20px !important;
+            font-size: 14px !important;
+            font-weight: 500 !important;
             cursor: pointer !important;
             width: 100% !important;
-            margin-top: 18px !important; /* Отступ сверху от последнего поля */
+            margin-top: 45px !important; /* Большой отступ сверху до кнопки */
             transition: all 0.2s ease !important;
             text-align: center !important;
         }
@@ -354,7 +354,7 @@ function initAuthModalUI() {
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10"></circle>
                         <path d="M2 12h20"></path>
-                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10z"></path>
                     </svg>
                     <span>GEOГРАФИЯ</span>
                 </div>
