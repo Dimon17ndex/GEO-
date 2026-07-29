@@ -1,8 +1,8 @@
 // auth-system.js
 
 // 1. Инициализация Supabase (укажите свои URL и ANON KEY)
-const SUPABASE_URL = 'https://your-project.supabase.co';
-const SUPABASE_KEY = 'your-anon-key';
+const SUPABASE_URL = 'https://cwgkdpmxwgfypbiykafl.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_mjHX0OTE6LSLh2qTVqMIng_mY9cvDcN';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 document.addEventListener('DOMContentLoaded', () => {
