@@ -1,6 +1,6 @@
 // === НАСТРОЙКИ SUPABASE ===
-// Вставьте сюда ваш Project URL и Publishable Key из Supabase
-const SUPABASE_URL = 'https://swigwhclmjnhcdrbjnes.supabase.co/rest/v1/'; 
+// Указываем адрес проекта БЕЗ /rest/v1/ на конце!
+const SUPABASE_URL = 'https://swigwhclmjnhcdrbjnes.supabase.co'; 
 const SUPABASE_KEY = 'sb_publishable_6m2jizjeOQd1rqWdoyVUdQ_JKNfoUYw'; 
 
 // Инициализируем клиент Supabase
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 1. Перехват клавиши ~ / Ё (работает даже если фокус в инпуте)
+    // 1. Перехват клавиши ~ / Ё
     document.addEventListener('keydown', (e) => {
         if (e.code === 'Backquote' || e.key === '`' || e.key === '~' || e.key === 'Ё' || e.key === 'ё') {
             e.preventDefault();
