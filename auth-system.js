@@ -3,22 +3,35 @@
 // 1. Инициализация Supabase (укажите свои URL и ANON KEY)
 const SUPABASE_URL = 'https://cwgkdpmxwgfypbiykafl.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_mjHX0OTE6LSLh2qTVqMIng_mY9cvDcN';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let supabase = null;
+
+// Безопасная инициализация Supabase
+try {
+    if (window.supabase) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    }
+} catch (e) {
+    console.error('Ошибка инициализации Supabase:', e);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Внедряем стили и модальное окно
+    // Сначала встраиваем интерфейс и стили
     injectAuthStyles();
     initAuthModalUI();
     initAuthEvents();
-    checkUserSession();
+    
+    // Затем проверяем сессию
+    if (supabase) {
+        checkUserSession();
+    }
 });
 
-// --- 1. СТИЛИ (CSS) ---
+// --- СТИЛИ (CSS) ---
 function injectAuthStyles() {
     if (document.getElementById('auth-system-styles')) return;
 
     const css = `
-        /* Затемнение фона */
         .auth-modal-overlay {
             position: fixed;
             top: 0;
@@ -29,19 +42,17 @@ function injectAuthStyles() {
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             z-index: 999999;
-            display: none; /* По умолчанию скрыто */
+            display: none;
             align-items: center;
             justify-content: center;
             padding: 16px;
             box-sizing: border-box;
         }
 
-        /* Когда добавляем класс .active, окно становится видимым */
         .auth-modal-overlay.active {
             display: flex !important;
         }
 
-        /* Карточка модального окна */
         .auth-modal-card {
             background: #121814;
             border: 1px solid rgba(0, 255, 110, 0.3);
@@ -56,7 +67,6 @@ function injectAuthStyles() {
             box-sizing: border-box;
         }
 
-        /* Крестик закрытия */
         .auth-close-btn {
             position: absolute;
             top: 12px;
@@ -67,13 +77,9 @@ function injectAuthStyles() {
             font-size: 26px;
             line-height: 1;
             cursor: pointer;
-            transition: color 0.2s;
         }
-        .auth-close-btn:hover {
-            color: #ffffff;
-        }
+        .auth-close-btn:hover { color: #ffffff; }
 
-        /* Вкладки */
         .auth-tabs {
             display: flex;
             gap: 12px;
@@ -91,7 +97,6 @@ function injectAuthStyles() {
             font-size: 15px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s;
         }
 
         .auth-tab-btn.active {
@@ -99,7 +104,6 @@ function injectAuthStyles() {
             border-bottom-color: #00ff6e;
         }
 
-        /* Поля и формы */
         .auth-form {
             display: flex;
             flex-direction: column;
@@ -114,14 +118,11 @@ function injectAuthStyles() {
             color: #ffffff;
             font-size: 14px;
             outline: none;
-            transition: border-color 0.2s;
             box-sizing: border-box;
             width: 100%;
         }
 
-        .auth-input:focus {
-            border-color: #00ff6e;
-        }
+        .auth-input:focus { border-color: #00ff6e; }
 
         .auth-submit-btn {
             background: #00ff6e;
@@ -133,11 +134,6 @@ function injectAuthStyles() {
             font-weight: 700;
             cursor: pointer;
             margin-top: 6px;
-            transition: opacity 0.2s, transform 0.1s;
-        }
-
-        .auth-submit-btn:active {
-            transform: scale(0.98);
         }
     `;
 
@@ -147,7 +143,7 @@ function injectAuthStyles() {
     document.head.appendChild(styleElement);
 }
 
-// --- 2. ВНЕДРЕНИЕ HTML ---
+// --- HTML МОДАЛЬНОГО ОКНА ---
 function initAuthModalUI() {
     if (document.getElementById('auth-modal-overlay')) return;
 
@@ -178,7 +174,7 @@ function initAuthModalUI() {
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
-// --- 3. ЛОГИКА СОБЫТИЙ ---
+// --- СОБЫТИЯ И ЛОГИКА ---
 function initAuthEvents() {
     const closeBtn = document.getElementById('auth-close-btn');
     const tabLogin = document.getElementById('tab-login-btn');
@@ -204,6 +200,8 @@ function initAuthEvents() {
 
     formLogin?.addEventListener('submit', async (e) => {
         e.preventDefault();
+        if (!supabase) return alert('Supabase не подключен!');
+        
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
 
@@ -219,6 +217,8 @@ function initAuthEvents() {
 
     formRegister?.addEventListener('submit', async (e) => {
         e.preventDefault();
+        if (!supabase) return alert('Supabase не подключен!');
+
         const email = document.getElementById('reg-email').value;
         const password = document.getElementById('reg-password').value;
 
@@ -233,9 +233,13 @@ function initAuthEvents() {
     });
 }
 
-// --- 4. ГЛОБАЛЬНЫЕ МЕТОДЫ ПОКАЗА / СКРЫТИЯ ---
+// --- ФУНКЦИИ ВЫЗОВА ---
 window.showAuthModal = function() {
-    const modal = document.getElementById('auth-modal-overlay');
+    let modal = document.getElementById('auth-modal-overlay');
+    if (!modal) {
+        initAuthModalUI();
+        modal = document.getElementById('auth-modal-overlay');
+    }
     if (modal) {
         modal.classList.add('active');
     }
@@ -249,13 +253,14 @@ window.hideAuthModal = function() {
 };
 
 window.logoutUser = async function() {
-    const { error } = await supabase.auth.signOut();
-    if (!error) {
+    if (supabase) {
+        await supabase.auth.signOut();
         updateUIForUser(null);
     }
 };
 
 async function checkUserSession() {
+    if (!supabase) return;
     const { data: { session } } = await supabase.auth.getSession();
     updateUIForUser(session ? session.user : null);
 }
