@@ -130,13 +130,14 @@ function injectAuthStyles() {
     if (document.getElementById('auth-system-styles')) return;
 
     const css = `
+        /* Оверлей на весь экран */
         .auth-modal-overlay {
             position: fixed !important;
             top: 0 !important;
             left: 0 !important;
             width: 100vw !important;
             height: 100vh !important;
-            background: rgba(10, 10, 12, 0.88) !important;
+            background: rgba(8, 8, 10, 0.9) !important;
             backdrop-filter: blur(12px) !important;
             -webkit-backdrop-filter: blur(12px) !important;
             z-index: 9999999 !important;
@@ -158,14 +159,14 @@ function injectAuthStyles() {
             pointer-events: auto !important;
         }
 
-        /* Полное отсутствие рамки и фонового блока */
+        /* Контейнер без рамки */
         .auth-modal-container {
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
             padding: 0 !important;
             width: 100% !important;
-            max-width: 360px !important;
+            max-width: 320px !important; /* Уменьшили ширину для точной пропорции как на фото */
             position: relative !important;
             color: #ffffff !important;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
@@ -185,53 +186,53 @@ function injectAuthStyles() {
         /* Кнопка закрытия */
         .auth-close-btn {
             position: absolute !important;
-            top: -40px !important;
+            top: -45px !important;
             right: 0 !important;
             background: transparent !important;
             border: none !important;
             color: rgba(255, 255, 255, 0.4) !important;
-            font-size: 24px !important;
+            font-size: 26px !important;
             line-height: 1 !important;
             cursor: pointer !important;
             transition: color 0.2s !important;
         }
         .auth-close-btn:hover { color: #ffffff !important; }
 
-        /* Заголовок GEOГРАФИЯ */
+        /* 1. Заголовок с логотипом GEOГРАФИЯ */
         .auth-header-title {
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 10px !important;
-            font-size: 20px !important;
+            gap: 12px !important;
+            font-size: 22px !important;
             font-weight: 700 !important;
-            letter-spacing: 1.5px !important;
+            letter-spacing: 2px !important;
             color: #ffffff !important;
-            margin-bottom: 28px !important;
+            margin-bottom: 38px !important; /* Точный отступ до тумблера */
             text-transform: uppercase !important;
         }
 
         .auth-header-title svg {
-            width: 28px !important;
-            height: 28px !important;
+            width: 30px !important;
+            height: 30px !important;
             stroke: #ffffff !important;
         }
 
-        /* Переключатель режимов */
+        /* 2. Капсульный переключатель Вход / Регистрация */
         .auth-tabs {
             display: flex !important;
             background: rgba(255, 255, 255, 0.08) !important;
             border: 1px solid rgba(255, 255, 255, 0.12) !important;
             border-radius: 30px !important;
-            padding: 3px !important;
+            padding: 4px !important;
             width: 100% !important;
-            margin-bottom: 36px !important;
+            margin-bottom: 48px !important; /* Точный отступ от тумблера до полей */
             box-sizing: border-box !important;
         }
 
         .auth-tab-btn {
             flex: 1 !important;
-            padding: 8px 16px !important;
+            padding: 10px 18px !important;
             background: transparent !important;
             border: none !important;
             border-radius: 25px !important;
@@ -249,16 +250,16 @@ function injectAuthStyles() {
             font-weight: 600 !important;
         }
 
-        /* Единая динамическая форма */
+        /* 3. Контейнер формы */
         .auth-form {
             display: flex !important;
             flex-direction: column !important;
-            gap: 28px !important;
+            gap: 36px !important; /* Просторное расстояние между полями ввода */
             width: 100% !important;
             transition: filter 0.2s ease, opacity 0.2s ease !important;
         }
 
-        /* Анимация размытия */
+        /* Анимация размытия при смене режима */
         .fade-out-blur {
             filter: blur(10px) !important;
             opacity: 0 !important;
@@ -284,11 +285,12 @@ function injectAuthStyles() {
             width: 100% !important;
         }
 
+        /* 4. Поля ввода (линии с отцентрованным текстом) */
         .auth-input {
             background: transparent !important;
             border: none !important;
             border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
-            padding: 10px 0 !important;
+            padding: 8px 0 12px 0 !important;
             color: #ffffff !important;
             font-size: 14px !important;
             text-align: center !important;
@@ -307,17 +309,18 @@ function injectAuthStyles() {
             border-bottom-color: #ffffff !important;
         }
 
+        /* 5. Кнопка «Войти» / «Зарегистрироваться» */
         .auth-submit-btn {
             background: transparent !important;
             color: #ffffff !important;
             border: 1px solid #ffffff !important;
             border-radius: 30px !important;
-            padding: 12px 24px !important;
+            padding: 13px 24px !important;
             font-size: 15px !important;
             font-weight: 600 !important;
             cursor: pointer !important;
             width: 100% !important;
-            margin-top: 10px !important;
+            margin-top: 18px !important; /* Отступ сверху от последнего поля */
             transition: all 0.2s ease !important;
             text-align: center !important;
         }
