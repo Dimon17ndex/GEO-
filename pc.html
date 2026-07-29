@@ -17,8 +17,10 @@
     </script>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="script.js"></script>
-<script src="console.js"></script>
+    
+    <script src="script.js"></script>
+    
+    <script src="console.js"></script>
 
     <link rel="icon" type="image/png" href="images/favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -756,41 +758,6 @@
             }
         });
     });
-</script>
-
-<script>
-// === СИНХРОНИЗАЦИЯ ПЛАШКИ ЧЕРЕЗ SUPABASE ===
-async function syncBannerVisibility() {
-    // Вставьте ваш ТОЧНЫЙ полный ключ вместо обрезанного:
-    const SUPABASE_URL = 'https://swigwhclmjnhcdrbjnes.supabase.co'; 
-    const SUPABASE_KEY = 'sb_publishable_6m2jizjeOQd1rqWdoyVUdQ_JKNfoUYw'; 
-
-    if (!window.supabase) return;
-
-    try {
-        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const { data, error } = await client
-            .from('settings')
-            .select('value')
-            .eq('key', 'banner_enabled')
-            .single();
-
-        if (error) {
-            console.error('Ошибка чтения из Supabase:', error);
-            return;
-        }
-
-        const bannerContainer = document.querySelector('.app-banners-container');
-        if (bannerContainer) {
-            bannerContainer.style.display = data?.value ? 'flex' : 'none';
-        }
-    } catch (e) {
-        console.warn('Не удалось загрузить статус плашки из Supabase:', e);
-    }
-}
-
-// Запускаем проверку при загрузке страницы
-document.addEventListener('DOMContentLoaded', syncBannerVisibility);
 </script>
 
 </body>
