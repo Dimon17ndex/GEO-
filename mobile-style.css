@@ -293,3 +293,58 @@ body:has(#version-badge.show) .app-banners-container {
     color: #a5d6a7;
     border: 1px solid rgba(76, 175, 80, 0.4);
 }
+
+/* ==========================================================================
+   КОМПАКТНАЯ ПЛАШКА ВЕРСИИ (#version-badge) ДЛЯ МОБИЛЬНОЙ ВЕРСИИ
+   ========================================================================== */
+
+#version-badge {
+    position: fixed;
+    top: 0;
+    left: 50% !important;
+    transform: translateX(-50%) translateY(-100%) !important; /* В скрытом состоянии спрятан наверх */
+    
+    width: auto !important;
+    max-width: calc(100vw - 32px);
+    height: auto !important; /* Убирает растягивание вниз по высоте */
+    min-height: 0 !important;
+    
+    /* Минимальные отступы: аккуратно огибает текст */
+    padding: calc(env(safe-area-inset-top) + 6px) 16px 7px 16px !important;
+    
+    background: rgba(10, 10, 12, 0.95) !important;
+    border-bottom: 1px solid rgba(0, 255, 110, 0.4) !important;
+    border-left: 1px solid rgba(0, 255, 110, 0.2) !important;
+    border-right: 1px solid rgba(0, 255, 110, 0.2) !important;
+    border-top: none !important;
+    border-radius: 0 0 12px 12px !important; /* Закругляем только нижние углы */
+    
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    
+    z-index: 99999 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px;
+    
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 11px !important;
+    color: #00ff6e !important;
+    font-weight: bold !important;
+    letter-spacing: 0.8px;
+    white-space: nowrap !important;
+    
+    pointer-events: auto;
+    user-select: none;
+    
+    /* Плавное выплывание сверху */
+    transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+/* Показ плашки версии (при 5 кликах добавлением класса .show или .visible) */
+#version-badge.show,
+#version-badge.visible {
+    transform: translateX(-50%) translateY(0) !important;
+}
