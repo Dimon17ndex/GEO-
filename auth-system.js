@@ -57,16 +57,16 @@ function injectAuthStyles() {
     if (document.getElementById('auth-system-styles')) return;
 
     const css = `
-        /* Затемнение фона с плавным переходом */
+        /* Затемнение фона */
         .auth-modal-overlay {
             position: fixed !important;
             top: 0 !important;
             left: 0 !important;
             width: 100vw !important;
             height: 100vh !important;
-            background: rgba(0, 0, 0, 0.85) !important;
-            backdrop-filter: blur(8px) !important;
-            -webkit-backdrop-filter: blur(8px) !important;
+            background: rgba(5, 5, 5, 0.88) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
             z-index: 9999999 !important;
             display: flex !important;
             align-items: center !important;
@@ -74,63 +74,76 @@ function injectAuthStyles() {
             padding: 16px !important;
             box-sizing: border-box !important;
             
-            /* Настройки для анимации исчезновения/появления */
             opacity: 0 !important;
             visibility: hidden !important;
             pointer-events: none !important;
-            transition: opacity 0.3s ease, visibility 0.3s ease !important;
+            transition: opacity 0.35s ease, visibility 0.35s !important;
         }
 
-        /* Состояние "активно" */
         .auth-modal-overlay.active {
             opacity: 1 !important;
             visibility: visible !important;
             pointer-events: auto !important;
         }
 
-        /* Карточка модального окна с эффектом всплытия */
+        /* Минималистичная карточка с тонкой glowing-рамкой */
         .auth-modal-card {
-            background: #121814 !important;
-            border: 1px solid rgba(0, 255, 110, 0.3) !important;
-            border-radius: 16px !important;
-            padding: 28px 24px 24px !important;
+            background: #0d0d0d !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            border-radius: 12px !important;
+            padding: 32px 28px 28px !important;
             width: 100% !important;
             max-width: 360px !important;
             position: relative !important;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.9) !important;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.08), 0 20px 40px rgba(0, 0, 0, 0.9) !important;
             color: #ffffff !important;
             font-family: 'Montserrat', sans-serif !important;
             box-sizing: border-box !important;
             
-            /* Карточка исходно чуть уменьшена и опущена */
-            transform: translateY(20px) scale(0.95) !important;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+            transform: translateY(15px) scale(0.98) !important;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
 
-        /* При открытии карточка возвращается в свой размер */
         .auth-modal-overlay.active .auth-modal-card {
             transform: translateY(0) scale(1) !important;
         }
 
+        /* Тонкая glowing-линия над карточкой как на скриншоте */
+        .auth-modal-card::before {
+            content: '' !important;
+            position: absolute !important;
+            top: -1px !important;
+            left: 15% !important;
+            right: 15% !important;
+            height: 1px !important;
+            background: #ffffff !important;
+            box-shadow: 0 0 10px #ffffff, 0 0 20px #ffffff !important;
+        }
+
+        /* Кнопка закрытия */
         .auth-close-btn {
             position: absolute !important;
-            top: 12px !important;
+            top: 14px !important;
             right: 16px !important;
             background: transparent !important;
             border: none !important;
-            color: rgba(255, 255, 255, 0.5) !important;
-            font-size: 26px !important;
+            color: rgba(255, 255, 255, 0.4) !important;
+            font-size: 24px !important;
             line-height: 1 !important;
             cursor: pointer !important;
             transition: color 0.2s !important;
         }
-        .auth-close-btn:hover { color: #ffffff !important; }
+        .auth-close-btn:hover { 
+            color: #ffffff !important;
+        }
 
+        /* Вкладки с тонкой подчеркивающей линией */
         .auth-tabs {
             display: flex !important;
-            gap: 12px !important;
-            margin-bottom: 20px !important;
+            gap: 16px !important;
+            margin-bottom: 24px !important;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+            position: relative !important;
         }
 
         .auth-tab-btn {
@@ -138,53 +151,75 @@ function injectAuthStyles() {
             padding: 10px 0 !important;
             background: transparent !important;
             border: none !important;
-            border-bottom: 2px solid transparent !important;
-            color: rgba(255, 255, 255, 0.5) !important;
-            font-size: 15px !important;
-            font-weight: 700 !important;
+            border-bottom: 1px solid transparent !important;
+            color: rgba(255, 255, 255, 0.4) !important;
+            font-size: 14px !important;
+            font-weight: 500 !important;
+            letter-spacing: 0.5px !important;
             cursor: pointer !important;
-            transition: all 0.2s !important;
+            transition: all 0.25s ease !important;
+            margin-bottom: -1px !important;
         }
 
         .auth-tab-btn.active {
-            color: #00ff6e !important;
-            border-bottom-color: #00ff6e !important;
+            color: #ffffff !important;
+            border-bottom: 1px solid #ffffff !important;
+            box-shadow: 0 2px 10px rgba(255, 255, 255, 0.5) !important;
         }
 
+        /* Формы и поля */
         .auth-form {
             display: flex !important;
             flex-direction: column !important;
-            gap: 14px !important;
+            gap: 18px !important;
         }
 
         .auth-input {
-            background: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
-            border-radius: 8px !important;
+            background: rgba(255, 255, 255, 0.03) !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            border-radius: 6px !important;
             padding: 12px 14px !important;
             color: #ffffff !important;
-            font-size: 14px !important;
+            font-size: 13px !important;
             outline: none !important;
             box-sizing: border-box !important;
             width: 100% !important;
-            transition: border-color 0.2s !important;
+            transition: border-color 0.25s, box-shadow 0.25s !important;
         }
 
-        .auth-input:focus { border-color: #00ff6e !important; }
+        .auth-input::placeholder {
+            color: rgba(255, 255, 255, 0.3) !important;
+        }
 
+        .auth-input:focus { 
+            border-color: rgba(255, 255, 255, 0.8) !important;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2) !important;
+        }
+
+        /* Белая контрастная кнопка с мягким свечением */
         .auth-submit-btn {
-            background: #00ff6e !important;
-            color: #000000 !important;
+            background: #ffffff !important;
+            color: #0d0d0d !important;
             border: none !important;
-            border-radius: 8px !important;
+            border-radius: 6px !important;
             padding: 12px !important;
-            font-size: 15px !important;
+            font-size: 14px !important;
             font-weight: 700 !important;
+            letter-spacing: 0.5px !important;
             cursor: pointer !important;
             margin-top: 6px !important;
-            transition: opacity 0.2s, transform 0.1s !important;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2) !important;
+            transition: transform 0.15s, box-shadow 0.25s, background-color 0.2s !important;
         }
-        .auth-submit-btn:active { transform: scale(0.98) !important; }
+
+        .auth-submit-btn:hover {
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.5) !important;
+            background: #f0f0f0 !important;
+        }
+
+        .auth-submit-btn:active { 
+            transform: scale(0.98) !important; 
+        }
     `;
 
     const styleElement = document.createElement('style');
