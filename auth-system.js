@@ -6,22 +6,49 @@ const SUPABASE_KEY = 'sb_publishable_mjHX0OTE6LSLh2qTVqMIng_mY9cvDcN';
 
 let supabase = null;
 
-// Безопасная инициализация Supabase
 try {
     if (window.supabase) {
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     }
 } catch (e) {
-    console.error('Ошибка инициализации Supabase:', e);
+    console.error('Supabase init error:', e);
 }
 
+// --- ОБЪЯВЛЯЕМ ГЛОБАЛЬНЫЕ ФУНКЦИИ В САМОМ НАЧАЛЕ ---
+window.showAuthModal = function() {
+    let modal = document.getElementById('auth-modal-overlay');
+    if (!modal) {
+        initAuthStyles();
+        initAuthModalUI();
+        initAuthEvents();
+        modal = document.getElementById('auth-modal-overlay');
+    }
+    if (modal) {
+        modal.classList.add('active');
+        modal.style.display = 'flex'; // Принудительно показываем
+    }
+};
+
+window.hideAuthModal = function() {
+    const modal = document.getElementById('auth-modal-overlay');
+    if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+    }
+};
+
+window.logoutUser = async function() {
+    if (supabase) {
+        await supabase.auth.signOut();
+        updateUIForUser(null);
+    }
+};
+
+// При загрузке страницы создаем стили и окно заранее
 document.addEventListener('DOMContentLoaded', () => {
-    // Сначала встраиваем интерфейс и стили
     injectAuthStyles();
     initAuthModalUI();
     initAuthEvents();
-    
-    // Затем проверяем сессию
     if (supabase) {
         checkUserSession();
     }
@@ -33,20 +60,20 @@ function injectAuthStyles() {
 
     const css = `
         .auth-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            z-index: 999999;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            background: rgba(0, 0, 0, 0.85) !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+            z-index: 9999999 !important;
             display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-            box-sizing: border-box;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 16px !important;
+            box-sizing: border-box !important;
         }
 
         .auth-modal-overlay.active {
@@ -54,86 +81,86 @@ function injectAuthStyles() {
         }
 
         .auth-modal-card {
-            background: #121814;
-            border: 1px solid rgba(0, 255, 110, 0.3);
-            border-radius: 16px;
-            padding: 28px 24px 24px;
-            width: 100%;
-            max-width: 360px;
-            position: relative;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.9);
-            color: #ffffff;
-            font-family: 'Montserrat', sans-serif;
-            box-sizing: border-box;
+            background: #121814 !important;
+            border: 1px solid rgba(0, 255, 110, 0.3) !important;
+            border-radius: 16px !important;
+            padding: 28px 24px 24px !important;
+            width: 100% !important;
+            max-width: 360px !important;
+            position: relative !important;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.9) !important;
+            color: #ffffff !important;
+            font-family: 'Montserrat', sans-serif !important;
+            box-sizing: border-box !important;
         }
 
         .auth-close-btn {
-            position: absolute;
-            top: 12px;
-            right: 16px;
-            background: transparent;
-            border: none;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 26px;
-            line-height: 1;
-            cursor: pointer;
+            position: absolute !important;
+            top: 12px !important;
+            right: 16px !important;
+            background: transparent !important;
+            border: none !important;
+            color: rgba(255, 255, 255, 0.5) !important;
+            font-size: 26px !important;
+            line-height: 1 !important;
+            cursor: pointer !important;
         }
-        .auth-close-btn:hover { color: #ffffff; }
+        .auth-close-btn:hover { color: #ffffff !important; }
 
         .auth-tabs {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex !important;
+            gap: 12px !important;
+            margin-bottom: 20px !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
         }
 
         .auth-tab-btn {
-            flex: 1;
-            padding: 10px 0;
-            background: transparent;
-            border: none;
-            border-bottom: 2px solid transparent;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
+            flex: 1 !important;
+            padding: 10px 0 !important;
+            background: transparent !important;
+            border: none !important;
+            border-bottom: 2px solid transparent !important;
+            color: rgba(255, 255, 255, 0.5) !important;
+            font-size: 15px !important;
+            font-weight: 700 !important;
+            cursor: pointer !important;
         }
 
         .auth-tab-btn.active {
-            color: #00ff6e;
-            border-bottom-color: #00ff6e;
+            color: #00ff6e !important;
+            border-bottom-color: #00ff6e !important;
         }
 
         .auth-form {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 14px !important;
         }
 
         .auth-input {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            padding: 12px 14px;
-            color: #ffffff;
-            font-size: 14px;
-            outline: none;
-            box-sizing: border-box;
-            width: 100%;
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            border-radius: 8px !important;
+            padding: 12px 14px !important;
+            color: #ffffff !important;
+            font-size: 14px !important;
+            outline: none !important;
+            box-sizing: border-box !important;
+            width: 100% !important;
         }
 
-        .auth-input:focus { border-color: #00ff6e; }
+        .auth-input:focus { border-color: #00ff6e !important; }
 
         .auth-submit-btn {
-            background: #00ff6e;
-            color: #000000;
-            border: none;
-            border-radius: 8px;
-            padding: 12px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 6px;
+            background: #00ff6e !important;
+            color: #000000 !important;
+            border: none !important;
+            border-radius: 8px !important;
+            padding: 12px !important;
+            font-size: 15px !important;
+            font-weight: 700 !important;
+            cursor: pointer !important;
+            margin-top: 6px !important;
         }
     `;
 
@@ -143,7 +170,7 @@ function injectAuthStyles() {
     document.head.appendChild(styleElement);
 }
 
-// --- HTML МОДАЛЬНОГО ОКНА ---
+// --- HTML РАЗМЕТКА ---
 function initAuthModalUI() {
     if (document.getElementById('auth-modal-overlay')) return;
 
@@ -174,7 +201,7 @@ function initAuthModalUI() {
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
-// --- СОБЫТИЯ И ЛОГИКА ---
+// --- СОБЫТИЯ ---
 function initAuthEvents() {
     const closeBtn = document.getElementById('auth-close-btn');
     const tabLogin = document.getElementById('tab-login-btn');
@@ -200,8 +227,7 @@ function initAuthEvents() {
 
     formLogin?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (!supabase) return alert('Supabase не подключен!');
-        
+        if (!supabase) return alert('Supabase не инициализирован');
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
 
@@ -217,8 +243,7 @@ function initAuthEvents() {
 
     formRegister?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (!supabase) return alert('Supabase не подключен!');
-
+        if (!supabase) return alert('Supabase не инициализирован');
         const email = document.getElementById('reg-email').value;
         const password = document.getElementById('reg-password').value;
 
@@ -232,32 +257,6 @@ function initAuthEvents() {
         }
     });
 }
-
-// --- ФУНКЦИИ ВЫЗОВА ---
-window.showAuthModal = function() {
-    let modal = document.getElementById('auth-modal-overlay');
-    if (!modal) {
-        initAuthModalUI();
-        modal = document.getElementById('auth-modal-overlay');
-    }
-    if (modal) {
-        modal.classList.add('active');
-    }
-};
-
-window.hideAuthModal = function() {
-    const modal = document.getElementById('auth-modal-overlay');
-    if (modal) {
-        modal.classList.remove('active');
-    }
-};
-
-window.logoutUser = async function() {
-    if (supabase) {
-        await supabase.auth.signOut();
-        updateUIForUser(null);
-    }
-};
 
 async function checkUserSession() {
     if (!supabase) return;
