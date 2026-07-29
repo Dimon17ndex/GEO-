@@ -172,69 +172,91 @@ html, body {
 }
 
 /* ==========================================================================
-   6. КОНТЕЙНЕР И ПЛАШКИ УВЕДОМЛЕНИЙ (BANNERS CONTAINER)
+   УНИВЕРСАЛЬНЫЕ ПЛАШКИ-УВЕДОМЛЕНИЯ (МОБИЛЬНАЯ ВЕРСИЯ - ИДЕАЛЬНО ПО ЦЕНТРУ)
    ========================================================================== */
 
-/* Общий контейнер, удерживающий плашки стопкой */
+/* 1. Главный контейнер плашек: строгая привязка по центру */
 .app-banners-container {
     position: fixed;
-    top: calc(env(safe-area-inset-top) + 15px);
-    
-    /* Центрирование без прыжков из правой части */
-    left: 0;
-    right: 0;
-    margin: 0 auto;
-    width: fit-content;
+    top: calc(env(safe-area-inset-top) + 12px); /* Учитываем "челку" и вырез мобильного */
+    left: 50% !important;
+    transform: translateX(-50%) translateY(0) !important;
     
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0px;
+    justify-content: center;
+    gap: 6px;
     
+    width: auto;
+    max-width: calc(100vw - 24px); /* Отступы по краям экрана, чтобы не прилипала */
     z-index: 99998;
-    pointer-events: none;
+    pointer-events: none; /* Пропускаем клики мимо плашки */
     
-    /* Анимируем только сдвиг по вертикали Y */
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* Плавное смещение всей стопки при появлении/исчезновении плашки версии */
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                top 0.4s ease;
 }
 
-/* При выплывании плашки версии сдвигаем контейнер строго вниз */
+/* 2. Смещение плашки вниз, когда открывается плашка версии (#version-badge) */
 body:has(#version-badge.show) .app-banners-container {
-    transform: translateY(32px) !important;
+    transform: translateX(-50%) translateY(42px) !important;
 }
 
-/* Базовый стиль отдельной плашки */
+/* 3. Базовый вид самой плашки */
 .app-banner {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
     
-    max-width: calc(100vw - 24px);
-    width: max-content;
-    
-    padding: 8px 14px;
+    padding: 7px 14px;
     border-radius: 12px;
     
     font-family: 'Montserrat', sans-serif;
-    font-size: clamp(8px, 2.8vw, 11px);
+    font-size: 8px;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.8px;
     white-space: nowrap;
+    text-align: center;
     
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     
-    pointer-events: auto;
+    pointer-events: auto; /* Делаем плашку кликабельной */
     user-select: none;
     
-    animation: bannerSlideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* Выравнивание содержимого строго по центру */
+    margin: 0 auto;
+    
+    /* Анимация появления */
+    animation: bannerSlideDownMobile 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
-/* Анимация появления плашки */
-@keyframes bannerSlideDown {
+/* Иконка и анимация пульсации */
+.app-banner .banner-icon,
+.app-banner > span:first-child {
+    display: inline-block;
+    font-size: 11px;
+    line-height: 1;
+    animation: iconSlowBlink 2.5s ease-in-out infinite;
+}
+
+@keyframes iconSlowBlink {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.35;
+        transform: scale(0.9);
+    }
+}
+
+/* 4. Анимация появления плашки сверху */
+@keyframes bannerSlideDownMobile {
     0% {
         opacity: 0;
         transform: translateY(-20px) scale(0.95);
@@ -245,42 +267,29 @@ body:has(#version-badge.show) .app-banners-container {
     }
 }
 
-/* Мобильная адаптация для узких экранов */
-@media screen and (max-width: 360px) {
-    .app-banner {
-        padding: 6px 10px;
-        font-size: 8px !important;
-        letter-spacing: 0.4px !important;
-        gap: 4px;
-    }
-}
+/* --- ЦВЕТОВЫЕ ВАРИАНТЫ (СОХРАНЕНЫ ДЛЯ МОБИЛЬНОЙ ВЕРСИИ) --- */
 
-/* --- ВАРИАНТЫ ОФОРМЛЕНИЯ --- */
-
-/* 1. Оранжевый: Ведутся работы */
 .banner-warning {
-    background: rgba(255, 152, 0, 0.2);
+    background: rgba(255, 152, 0, 0.18);
     color: #ffb74d;
-    border: 1px solid rgba(255, 152, 0, 0.5);
+    border: 1px solid rgba(255, 152, 0, 0.4);
 }
 
-/* 2. Красный: Ограничения / Ошибка */
-.banner-danger {
-    background: rgba(244, 67, 54, 0.2);
+.banner-danger,
+.banner-error {
+    background: rgba(244, 67, 54, 0.18);
     color: #ff8a80;
-    border: 1px solid rgba(244, 67, 54, 0.5);
+    border: 1px solid rgba(244, 67, 54, 0.4);
 }
 
-/* 3. Синий: Информация / Бета */
 .banner-info {
-    background: rgba(33, 150, 243, 0.2);
+    background: rgba(33, 150, 243, 0.18);
     color: #90caf9;
-    border: 1px solid rgba(33, 150, 243, 0.5);
+    border: 1px solid rgba(33, 150, 243, 0.4);
 }
 
-/* 4. Зеленый: Всё работает / Акция */
 .banner-success {
-    background: rgba(76, 175, 80, 0.2);
+    background: rgba(76, 175, 80, 0.18);
     color: #a5d6a7;
-    border: 1px solid rgba(76, 175, 80, 0.5);
+    border: 1px solid rgba(76, 175, 80, 0.4);
 }
