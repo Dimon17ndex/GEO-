@@ -6,37 +6,39 @@ const SUPABASE_KEY = 'sb_publishable_mjHX0OTE6LSLh2qTVqMIng_mY9cvDcN';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Автоматически встраиваем CSS-стили
+    // Внедряем стили и модальное окно
     injectAuthStyles();
-    // Встраиваем HTML модального окна
     initAuthModalUI();
-    // Настраиваем логику и события
     initAuthEvents();
-    // Проверяем сессию пользователя
     checkUserSession();
 });
 
-// --- АВТОМАТИЧЕСКОЕ ВНЕДРЕНИЕ СТИЛЕЙ (CSS) ---
+// --- 1. СТИЛИ (CSS) ---
 function injectAuthStyles() {
     if (document.getElementById('auth-system-styles')) return;
 
     const css = `
-        /* Затемняющий фон */
+        /* Затемнение фона */
         .auth-modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
-            z-index: 99999;
-            display: flex;
+            z-index: 999999;
+            display: none; /* По умолчанию скрыто */
             align-items: center;
             justify-content: center;
             padding: 16px;
             box-sizing: border-box;
+        }
+
+        /* Когда добавляем класс .active, окно становится видимым */
+        .auth-modal-overlay.active {
+            display: flex !important;
         }
 
         /* Карточка модального окна */
@@ -54,7 +56,7 @@ function injectAuthStyles() {
             box-sizing: border-box;
         }
 
-        /* Кнопка закрытия (крестик) */
+        /* Крестик закрытия */
         .auth-close-btn {
             position: absolute;
             top: 12px;
@@ -71,7 +73,7 @@ function injectAuthStyles() {
             color: #ffffff;
         }
 
-        /* Переключатель Вход / Регистрация */
+        /* Вкладки */
         .auth-tabs {
             display: flex;
             gap: 12px;
@@ -97,7 +99,7 @@ function injectAuthStyles() {
             border-bottom-color: #00ff6e;
         }
 
-        /* Поля ввода и формы */
+        /* Поля и формы */
         .auth-form {
             display: flex;
             flex-direction: column;
@@ -145,12 +147,12 @@ function injectAuthStyles() {
     document.head.appendChild(styleElement);
 }
 
-// --- ВНЕДРЕНИЕ HTML ---
+// --- 2. ВНЕДРЕНИЕ HTML ---
 function initAuthModalUI() {
     if (document.getElementById('auth-modal-overlay')) return;
 
     const modalHTML = `
-        <div id="auth-modal-overlay" class="auth-modal-overlay" style="display: none;">
+        <div id="auth-modal-overlay" class="auth-modal-overlay">
             <div class="auth-modal-card">
                 <button id="auth-close-btn" class="auth-close-btn" type="button">&times;</button>
                 
@@ -176,7 +178,7 @@ function initAuthModalUI() {
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
-// --- ЛОГИКА И СОБЫТИЯ ---
+// --- 3. ЛОГИКА СОБЫТИЙ ---
 function initAuthEvents() {
     const closeBtn = document.getElementById('auth-close-btn');
     const tabLogin = document.getElementById('tab-login-btn');
@@ -226,20 +228,24 @@ function initAuthEvents() {
             alert(`Ошибка регистрации: ${error.message}`);
         } else {
             window.hideAuthModal();
-            alert('Регистрация успешна!');
+            alert('Регистрация прошла успешно!');
         }
     });
 }
 
-// --- ГЛОБАЛЬНЫЕ МЕТОДЫ ---
+// --- 4. ГЛОБАЛЬНЫЕ МЕТОДЫ ПОКАЗА / СКРЫТИЯ ---
 window.showAuthModal = function() {
     const modal = document.getElementById('auth-modal-overlay');
-    if (modal) modal.style.display = 'flex';
+    if (modal) {
+        modal.classList.add('active');
+    }
 };
 
 window.hideAuthModal = function() {
     const modal = document.getElementById('auth-modal-overlay');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+        modal.classList.remove('active');
+    }
 };
 
 window.logoutUser = async function() {
