@@ -1319,28 +1319,6 @@ body:has(.input-container-box.active) .logo-icon {
     transform: translateY(0);
 }
 
-/* ==========================================
-   АНИМАЦИЯ МЕДЛЕННОГО МИГАНИЯ ИКОНОК
-   ========================================== */
-
-/* Анимация плавной пульсации прозрачности */
-@keyframes iconSlowBlink {
-    0%, 100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-    50% {
-        opacity: 0.35;        /* Насколько сильно тускнеет иконка */
-        transform: scale(0.9); /* Легкое уменьшение для эффекта дыхания */
-    }
-}
-
-/* Применяем анимацию строго к иконке внутри плашки */
-.app-banner .banner-icon {
-    display: inline-block;
-    animation: iconSlowBlink 2.5s ease-in-out infinite;
-}
-
 /* --- ДЕСКТОПНАЯ КОНСОЛЬ РАЗРАБОТЧИКА --- */
 /* 1. В базовом классе УБИРАЕМ box-shadow */
 .dev-console {
@@ -1491,73 +1469,126 @@ body:has(.input-container-box.active) .logo-icon {
     font-size: 14px;
 }
 
-/* ==========================================================================\r
-   УНИВЕРСАЛЬНЫЕ ПЛАШКИ-УВЕДОМЛЕНИЯ (BANNERS) — ЕДИНЫЙ СТИЛЬ
+/* ==========================================================================
+   7. КОНТЕЙНЕР И УНИВЕРСАЛЬНЫЕ ПЛАШКИ-УВЕДОМЛЕНИЯ (ТОЧНО КАК В BEGINNING.CSS)
    ========================================================================== */
 
-/* 1. Контейнер: по умолчанию скрыт (JS включает 'flex'), фиксируется сверху */
+/* Общий контейнер стопки плашек */
 .app-banners-container {
-    display: none; /* JS переключит на flex */
     position: fixed;
-    top: 20px;
+    top: calc(env(safe-area-inset-top) + 20px);
     left: 50%;
-    transform: translateX(-50%);
-    z-index: 1000;
+    transform: translateX(-50%) translateY(0);
+    
+    display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
-    width: 90%;
-    max-width: 500px;
-    pointer-events: none;
+    gap: 10px; /* Отступ между несколькими плашками */
+    
+    z-index: 99998;
+    pointer-events: none; /* Пропускаем клики сквозь пустой контейнер */
+    
+    /* Плавное смещение всей стопки при выплывании дополнительных элементов */
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* 2. Элемент плашки */
+/* Смещаем стопку плашек вниз, если сверху появляется плашка версии */
+body:has(#version-badge.show) .app-banners-container {
+    transform: translateX(-50%) translateY(50px) !important;
+}
+
+/* Базовый каркас каждой плашки */
 .app-banner {
-    pointer-events: auto;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    padding: 8px 16px;
-    border-radius: 50px; /* Округлые края как в beginning */
-    font-family: 'Montserrat', sans-serif;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    white-space: nowrap;
-    user-select: none;
+    gap: 8px;
     
+    /* Адаптивные ограничения ширины для ПК и мобилок */
+    max-width: calc(100vw - 32px);
+    width: max-content;
+    
+    padding: 10px 20px;
+    border-radius: 12px; /* Закругленные углы 12px как в beginning (не овал 50px) */
+    
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(9px, 1.5vw, 11px);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    white-space: nowrap;
+    
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
-                opacity 0.3s ease,
-                box-shadow 0.3s ease;
-    animation: bannerSlideDown 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    pointer-events: auto;
+    user-select: none;
+    
+    /* Анимация плавного появления */
+    animation: bannerSlideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.app-banner:hover {
-    transform: scale(1.02);
-    box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.5);
+/* Анимация появления сверху */
+@keyframes bannerSlideDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-25px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
-/* Иконка внутри плашки и анимация пульсации */
-.banner-icon-svg,
-.banner-icon {
-    font-size: 14px;
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+/* --- ВАРИАНТЫ ЦВЕТОВОГО ОФОРМЛЕНИЯ --- */
+
+/* 1. Оранжевый: Предупреждение / Работы */
+.banner-warning {
+    background: rgba(255, 152, 0, 0.18);
+    color: #ffb74d;
+    border: 1px solid rgba(255, 152, 0, 0.4);
 }
 
-.app-banner .banner-icon {
-    display: inline-block;
-    animation: iconSlowBlink 2.5s ease-in-out infinite;
+/* 2. Красный: Ограничения / Ошибка */
+.banner-danger {
+    background: rgba(244, 67, 54, 0.18);
+    color: #ff8a80;
+    border: 1px solid rgba(244, 67, 54, 0.4);
 }
+
+/* 3. Синий: Информация / Бета */
+.banner-info {
+    background: rgba(33, 150, 243, 0.18);
+    color: #90caf9;
+    border: 1px solid rgba(33, 150, 243, 0.4);
+}
+
+/* 4. Зеленый: Успех / Акция */
+.banner-success {
+    background: rgba(76, 175, 80, 0.18);
+    color: #a5d6a7;
+    border: 1px solid rgba(76, 175, 80, 0.4);
+}
+
+/* Оптимизация для узких экранов */
+@media screen and (max-width: 480px) {
+    .app-banners-container {
+        top: calc(env(safe-area-inset-top) + 12px);
+        gap: 6px;
+    }
+
+    .app-banner {
+        padding: 7px 12px;
+        font-size: 8px !important;
+        letter-spacing: 0.5px !important;
+        gap: 5px;
+    }
+}
+
+/* ==========================================
+   АНИМАЦИЯ МЕДЛЕННОГО МИГАНИЯ ИКОНОК
+   ========================================== */
 
 @keyframes iconSlowBlink {
     0%, 100% {
@@ -1570,54 +1601,8 @@ body:has(.input-container-box.active) .logo-icon {
     }
 }
 
-/* 3. Цветовые варианты */
-.banner-warning {
-    background: rgba(255, 179, 0, 0.18);
-    color: #ffd54f;
-    border: 1px solid rgba(255, 179, 0, 0.4);
-}
-
-.banner-danger,
-.banner-error {
-    background: rgba(244, 67, 54, 0.18);
-    color: #ff8a80;
-    border: 1px solid rgba(244, 67, 54, 0.4);
-}
-
-.banner-info {
-    background: rgba(33, 150, 243, 0.18);
-    color: #90caf9;
-    border: 1px solid rgba(33, 150, 243, 0.4);
-}
-
-.banner-success {
-    background: rgba(76, 175, 80, 0.18);
-    color: #a5d6a7;
-    border: 1px solid rgba(76, 175, 80, 0.4);
-}
-
-/* 4. Анимация появления */
-@keyframes bannerSlideDown {
-    0% {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Адаптив */
-@media screen and (max-width: 480px) {
-    .app-banners-container {
-        top: calc(env(safe-area-inset-top) + 12px);
-        gap: 6px;
-    }
-
-    .app-banner {
-        padding: 7px 12px;
-        font-size: 8px;
-        letter-spacing: 1px;
-    }
+.app-banner .banner-icon,
+.app-banner > span:first-child {
+    display: inline-block;
+    animation: iconSlowBlink 2.5s ease-in-out infinite;
 }
