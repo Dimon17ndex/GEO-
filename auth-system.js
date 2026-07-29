@@ -24,7 +24,6 @@ window.showAuthModal = function() {
     }
     if (modal) {
         modal.classList.add('active');
-        modal.style.display = 'flex';
     }
 };
 
@@ -32,7 +31,6 @@ window.hideAuthModal = function() {
     const modal = document.getElementById('auth-modal-overlay');
     if (modal) {
         modal.classList.remove('active');
-        modal.style.display = 'none';
     }
 };
 
@@ -59,6 +57,7 @@ function injectAuthStyles() {
     if (document.getElementById('auth-system-styles')) return;
 
     const css = `
+        /* Затемнение фона с плавным переходом */
         .auth-modal-overlay {
             position: fixed !important;
             top: 0 !important;
@@ -69,17 +68,27 @@ function injectAuthStyles() {
             backdrop-filter: blur(8px) !important;
             -webkit-backdrop-filter: blur(8px) !important;
             z-index: 9999999 !important;
-            display: none;
+            display: flex !important;
             align-items: center !important;
             justify-content: center !important;
             padding: 16px !important;
             box-sizing: border-box !important;
+            
+            /* Настройки для анимации исчезновения/появления */
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+            transition: opacity 0.3s ease, visibility 0.3s ease !important;
         }
 
+        /* Состояние "активно" */
         .auth-modal-overlay.active {
-            display: flex !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
         }
 
+        /* Карточка модального окна с эффектом всплытия */
         .auth-modal-card {
             background: #121814 !important;
             border: 1px solid rgba(0, 255, 110, 0.3) !important;
@@ -92,6 +101,15 @@ function injectAuthStyles() {
             color: #ffffff !important;
             font-family: 'Montserrat', sans-serif !important;
             box-sizing: border-box !important;
+            
+            /* Карточка исходно чуть уменьшена и опущена */
+            transform: translateY(20px) scale(0.95) !important;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+        }
+
+        /* При открытии карточка возвращается в свой размер */
+        .auth-modal-overlay.active .auth-modal-card {
+            transform: translateY(0) scale(1) !important;
         }
 
         .auth-close-btn {
@@ -104,6 +122,7 @@ function injectAuthStyles() {
             font-size: 26px !important;
             line-height: 1 !important;
             cursor: pointer !important;
+            transition: color 0.2s !important;
         }
         .auth-close-btn:hover { color: #ffffff !important; }
 
@@ -124,6 +143,7 @@ function injectAuthStyles() {
             font-size: 15px !important;
             font-weight: 700 !important;
             cursor: pointer !important;
+            transition: all 0.2s !important;
         }
 
         .auth-tab-btn.active {
@@ -147,6 +167,7 @@ function injectAuthStyles() {
             outline: none !important;
             box-sizing: border-box !important;
             width: 100% !important;
+            transition: border-color 0.2s !important;
         }
 
         .auth-input:focus { border-color: #00ff6e !important; }
@@ -161,7 +182,9 @@ function injectAuthStyles() {
             font-weight: 700 !important;
             cursor: pointer !important;
             margin-top: 6px !important;
+            transition: opacity 0.2s, transform 0.1s !important;
         }
+        .auth-submit-btn:active { transform: scale(0.98) !important; }
     `;
 
     const styleElement = document.createElement('style');
