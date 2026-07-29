@@ -23,8 +23,8 @@ window.showAuthModal = function() {
         modal = document.getElementById('auth-modal-overlay');
     }
     
-    // Всегда сбрасываем на режим "Вход" при каждом открытии
-    resetToLoginTab();
+    // Сбрасываем на вкладку "Вход" без анимации при открытии
+    switchTab('login', false);
 
     if (modal) {
         modal.classList.add('active');
@@ -45,19 +45,50 @@ window.logoutUser = async function() {
     }
 };
 
-// Функция сброса на вкладку "Вход"
-function resetToLoginTab() {
+// Функция переключения вкладок с эффектом размытия
+function switchTab(targetMode, animate = true) {
     const tabLogin = document.getElementById('tab-login-btn');
     const tabRegister = document.getElementById('tab-register-btn');
     const formLogin = document.getElementById('form-login');
     const formRegister = document.getElementById('form-register');
 
-    if (tabLogin && tabRegister && formLogin && formRegister) {
+    if (!tabLogin || !tabRegister || !formLogin || !formRegister) return;
+
+    const currentForm = targetMode === 'login' ? formRegister : formLogin;
+    const nextForm = targetMode === 'login' ? formLogin : formRegister;
+
+    if (targetMode === 'login') {
         tabLogin.classList.add('active');
         tabRegister.classList.remove('active');
-        formLogin.style.display = 'flex';
-        formRegister.style.display = 'none';
+    } else {
+        tabRegister.classList.add('active');
+        tabLogin.classList.remove('active');
     }
+
+    if (!animate) {
+        currentForm.style.display = 'none';
+        currentForm.classList.remove('fade-out-blur', 'fade-in-blur');
+        nextForm.style.display = 'flex';
+        nextForm.classList.remove('fade-out-blur', 'fade-in-blur');
+        return;
+    }
+
+    // Запускаем анимированное исчезновение текущей формы через размытие
+    currentForm.classList.remove('fade-in-blur');
+    currentForm.classList.add('fade-out-blur');
+
+    setTimeout(() => {
+        currentForm.style.display = 'none';
+        currentForm.classList.remove('fade-out-blur');
+
+        // Показываем новую форму
+        nextForm.style.display = 'flex';
+        nextForm.classList.add('fade-in-blur');
+
+        setTimeout(() => {
+            nextForm.classList.remove('fade-in-blur');
+        }, 300);
+    }, 250);
 }
 
 // --- ЗАГРУЗКА ---
@@ -71,19 +102,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// --- СТИЛИ (CSS по вашему макету) ---
+// --- СТИЛИ (Без рамки + Анимация размытия) ---
 function injectAuthStyles() {
     if (document.getElementById('auth-system-styles')) return;
 
     const css = `
-        /* Затемняющий оверлей с размытием */
+        /* Затемняющий оверлей */
         .auth-modal-overlay {
             position: fixed !important;
             top: 0 !important;
             left: 0 !important;
             width: 100vw !important;
             height: 100vh !important;
-            background: rgba(10, 10, 12, 0.85) !important;
+            background: rgba(10, 10, 12, 0.88) !important;
             backdrop-filter: blur(12px) !important;
             -webkit-backdrop-filter: blur(12px) !important;
             z-index: 9999999 !important;
@@ -93,7 +124,6 @@ function injectAuthStyles() {
             padding: 20px !important;
             box-sizing: border-box !important;
             
-            /* Плавное появление и исчезновение */
             opacity: 0 !important;
             visibility: hidden !important;
             pointer-events: none !important;
@@ -106,16 +136,15 @@ function injectAuthStyles() {
             pointer-events: auto !important;
         }
 
-        /* Карточка модального окна */
-        .auth-modal-card {
-            background: rgba(18, 18, 20, 0.95) !important;
-            border: 1px solid rgba(255, 255, 255, 0.08) !important;
-            border-radius: 20px !important;
-            padding: 36px 32px 32px !important;
+        /* Бескаркасный контейнер без обводки и фонового блока */
+        .auth-modal-container {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
             width: 100% !important;
-            max-width: 380px !important;
+            max-width: 360px !important;
             position: relative !important;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8) !important;
             color: #ffffff !important;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             box-sizing: border-box !important;
@@ -123,23 +152,23 @@ function injectAuthStyles() {
             flex-direction: column !important;
             align-items: center !important;
             
-            transform: scale(0.95) translateY(10px) !important;
+            transform: scale(0.96) !important;
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
 
-        .auth-modal-overlay.active .auth-modal-card {
-            transform: scale(1) translateY(0) !important;
+        .auth-modal-overlay.active .auth-modal-container {
+            transform: scale(1) !important;
         }
 
-        /* Кнопка закрытия (Крестик) */
+        /* Кнопка закрытия */
         .auth-close-btn {
             position: absolute !important;
-            top: 18px !important;
-            right: 20px !important;
+            top: -40px !important;
+            right: 0 !important;
             background: transparent !important;
             border: none !important;
             color: rgba(255, 255, 255, 0.4) !important;
-            font-size: 22px !important;
+            font-size: 24px !important;
             line-height: 1 !important;
             cursor: pointer !important;
             transition: color 0.2s !important;
@@ -156,7 +185,7 @@ function injectAuthStyles() {
             font-weight: 700 !important;
             letter-spacing: 1.5px !important;
             color: #ffffff !important;
-            margin-bottom: 24px !important;
+            margin-bottom: 28px !important;
             text-transform: uppercase !important;
         }
 
@@ -166,15 +195,15 @@ function injectAuthStyles() {
             stroke: #ffffff !important;
         }
 
-        /* Переключатель Вход / Регистрация (Капсула) */
+        /* Переключатель Вход / Регистрация */
         .auth-tabs {
             display: flex !important;
-            background: rgba(255, 255, 255, 0.06) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            background: rgba(255, 255, 255, 0.08) !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
             border-radius: 30px !important;
             padding: 3px !important;
             width: 100% !important;
-            margin-bottom: 32px !important;
+            margin-bottom: 36px !important;
             box-sizing: border-box !important;
         }
 
@@ -198,12 +227,34 @@ function injectAuthStyles() {
             font-weight: 600 !important;
         }
 
-        /* Формы и поля ввода */
+        /* Формы и элементы */
         .auth-form {
             display: flex !important;
             flex-direction: column !important;
-            gap: 24px !important;
+            gap: 28px !important;
             width: 100% !important;
+            transition: filter 0.25s ease, opacity 0.25s ease !important;
+        }
+
+        /* Анимации плавного сменяемого размытия */
+        .fade-out-blur {
+            filter: blur(8px) !important;
+            opacity: 0 !important;
+        }
+
+        .fade-in-blur {
+            animation: blurIn 0.3s ease forwards !important;
+        }
+
+        @keyframes blurIn {
+            from {
+                filter: blur(8px);
+                opacity: 0;
+            }
+            to {
+                filter: blur(0px);
+                opacity: 1;
+            }
         }
 
         .auth-input-group {
@@ -234,7 +285,7 @@ function injectAuthStyles() {
             border-bottom-color: #ffffff !important;
         }
 
-        /* Кнопка отправки формы */
+        /* Кнопка действия */
         .auth-submit-btn {
             background: transparent !important;
             color: #ffffff !important;
@@ -245,7 +296,7 @@ function injectAuthStyles() {
             font-weight: 600 !important;
             cursor: pointer !important;
             width: 100% !important;
-            margin-top: 12px !important;
+            margin-top: 10px !important;
             transition: all 0.2s ease !important;
             text-align: center !important;
         }
@@ -266,13 +317,13 @@ function injectAuthStyles() {
     document.head.appendChild(styleElement);
 }
 
-// --- HTML РАЗМЕТКА (В точности по вашим макетам) ---
+// --- HTML РАЗМЕТКА ---
 function initAuthModalUI() {
     if (document.getElementById('auth-modal-overlay')) return;
 
     const modalHTML = `
         <div id="auth-modal-overlay" class="auth-modal-overlay">
-            <div class="auth-modal-card">
+            <div class="auth-modal-container">
                 <button id="auth-close-btn" class="auth-close-btn" type="button">&times;</button>
                 
                 <div class="auth-header-title">
@@ -323,39 +374,25 @@ function initAuthEvents() {
     const formLogin = document.getElementById('form-login');
     const formRegister = document.getElementById('form-register');
 
-    // Закрытие по крестику
     closeBtn?.addEventListener('click', window.hideAuthModal);
 
-    // Закрытие по клику на затемненный фон вне карточки
     overlay?.addEventListener('click', (e) => {
         if (e.target === overlay) {
             window.hideAuthModal();
         }
     });
 
-    // Закрытие по клавише Esc
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             window.hideAuthModal();
         }
     });
 
-    // Переключение вкладок
-    tabLogin?.addEventListener('click', () => {
-        tabLogin.classList.add('active');
-        tabRegister.classList.remove('active');
-        formLogin.style.display = 'flex';
-        formRegister.style.display = 'none';
-    });
+    // Обработчики клика по переключателю режимов
+    tabLogin?.addEventListener('click', () => switchTab('login', true));
+    tabRegister?.addEventListener('click', () => switchTab('register', true));
 
-    tabRegister?.addEventListener('click', () => {
-        tabRegister.classList.add('active');
-        tabLogin.classList.remove('active');
-        formRegister.style.display = 'flex';
-        formLogin.style.display = 'none';
-    });
-
-    // Обработка Входа в Supabase
+    // Авторизация Supabase
     formLogin?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
@@ -373,7 +410,7 @@ function initAuthEvents() {
         }
     });
 
-    // Обработка Регистрации в Supabase
+    // Регистрация Supabase
     formRegister?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
@@ -392,14 +429,14 @@ function initAuthEvents() {
     });
 }
 
-// Проверка активной сессии
+// Проверка сессии
 async function checkUserSession() {
     if (!window.supabaseClient) return;
     const { data: { session } } = await window.supabaseClient.auth.getSession();
     updateUIForUser(session ? session.user : null);
 }
 
-// Обновление состояния интерфейса
+// Обновление состояния UI
 function updateUIForUser(user) {
     if (user) {
         document.body.classList.add('user-logged-in');
