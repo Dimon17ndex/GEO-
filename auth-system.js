@@ -4,7 +4,7 @@
 window.SUPABASE_URL = window.SUPABASE_URL || 'https://cwgkdpmxwgfypbiykafl.supabase.co'; 
 window.SUPABASE_KEY = window.SUPABASE_KEY || 'sb_publishable_mjHX0OTE6LSLh2qTVqMIng_mY9cvDcN';
 
-// Инициализируем клиент
+// Инициализация Supabase
 if (!window.supabaseClient && window.supabase) {
     try {
         window.supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
@@ -22,6 +22,10 @@ window.showAuthModal = function() {
         initAuthEvents();
         modal = document.getElementById('auth-modal-overlay');
     }
+    
+    // Всегда сбрасываем на режим "Вход" при каждом открытии
+    resetToLoginTab();
+
     if (modal) {
         modal.classList.add('active');
     }
@@ -41,7 +45,22 @@ window.logoutUser = async function() {
     }
 };
 
-// --- ЗАГРУЗКА ИНТЕРФЕЙСА ---
+// Функция сброса на вкладку "Вход"
+function resetToLoginTab() {
+    const tabLogin = document.getElementById('tab-login-btn');
+    const tabRegister = document.getElementById('tab-register-btn');
+    const formLogin = document.getElementById('form-login');
+    const formRegister = document.getElementById('form-register');
+
+    if (tabLogin && tabRegister && formLogin && formRegister) {
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
+        formLogin.style.display = 'flex';
+        formRegister.style.display = 'none';
+    }
+}
+
+// --- ЗАГРУЗКА ---
 document.addEventListener('DOMContentLoaded', () => {
     injectAuthStyles();
     initAuthModalUI();
@@ -52,32 +71,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// --- СТИЛИ (CSS) ---
+// --- СТИЛИ (CSS по вашему макету) ---
 function injectAuthStyles() {
     if (document.getElementById('auth-system-styles')) return;
 
     const css = `
-        /* Затемнение фона */
+        /* Затемняющий оверлей с размытием */
         .auth-modal-overlay {
             position: fixed !important;
             top: 0 !important;
             left: 0 !important;
             width: 100vw !important;
             height: 100vh !important;
-            background: rgba(5, 5, 5, 0.88) !important;
-            backdrop-filter: blur(10px) !important;
-            -webkit-backdrop-filter: blur(10px) !important;
+            background: rgba(10, 10, 12, 0.85) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
             z-index: 9999999 !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            padding: 16px !important;
+            padding: 20px !important;
             box-sizing: border-box !important;
             
+            /* Плавное появление и исчезновение */
             opacity: 0 !important;
             visibility: hidden !important;
             pointer-events: none !important;
-            transition: opacity 0.35s ease, visibility 0.35s !important;
+            transition: opacity 0.3s ease, visibility 0.3s ease !important;
         }
 
         .auth-modal-overlay.active {
@@ -86,139 +106,157 @@ function injectAuthStyles() {
             pointer-events: auto !important;
         }
 
-        /* Минималистичная карточка с тонкой glowing-рамкой */
+        /* Карточка модального окна */
         .auth-modal-card {
-            background: #0d0d0d !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
-            border-radius: 12px !important;
-            padding: 32px 28px 28px !important;
+            background: rgba(18, 18, 20, 0.95) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-radius: 20px !important;
+            padding: 36px 32px 32px !important;
             width: 100% !important;
-            max-width: 360px !important;
+            max-width: 380px !important;
             position: relative !important;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.08), 0 20px 40px rgba(0, 0, 0, 0.9) !important;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8) !important;
             color: #ffffff !important;
-            font-family: 'Montserrat', sans-serif !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             box-sizing: border-box !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
             
-            transform: translateY(15px) scale(0.98) !important;
-            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            transform: scale(0.95) translateY(10px) !important;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
 
         .auth-modal-overlay.active .auth-modal-card {
-            transform: translateY(0) scale(1) !important;
+            transform: scale(1) translateY(0) !important;
         }
 
-        /* Тонкая glowing-линия над карточкой как на скриншоте */
-        .auth-modal-card::before {
-            content: '' !important;
-            position: absolute !important;
-            top: -1px !important;
-            left: 15% !important;
-            right: 15% !important;
-            height: 1px !important;
-            background: #ffffff !important;
-            box-shadow: 0 0 10px #ffffff, 0 0 20px #ffffff !important;
-        }
-
-        /* Кнопка закрытия */
+        /* Кнопка закрытия (Крестик) */
         .auth-close-btn {
             position: absolute !important;
-            top: 14px !important;
-            right: 16px !important;
+            top: 18px !important;
+            right: 20px !important;
             background: transparent !important;
             border: none !important;
             color: rgba(255, 255, 255, 0.4) !important;
-            font-size: 24px !important;
+            font-size: 22px !important;
             line-height: 1 !important;
             cursor: pointer !important;
             transition: color 0.2s !important;
         }
-        .auth-close-btn:hover { 
+        .auth-close-btn:hover { color: #ffffff !important; }
+
+        /* Заголовок с логотипом GEOГРАФИЯ */
+        .auth-header-title {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 10px !important;
+            font-size: 20px !important;
+            font-weight: 700 !important;
+            letter-spacing: 1.5px !important;
             color: #ffffff !important;
+            margin-bottom: 24px !important;
+            text-transform: uppercase !important;
         }
 
-        /* Вкладки с тонкой подчеркивающей линией */
+        .auth-header-title svg {
+            width: 28px !important;
+            height: 28px !important;
+            stroke: #ffffff !important;
+        }
+
+        /* Переключатель Вход / Регистрация (Капсула) */
         .auth-tabs {
             display: flex !important;
-            gap: 16px !important;
-            margin-bottom: 24px !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-            position: relative !important;
+            background: rgba(255, 255, 255, 0.06) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 30px !important;
+            padding: 3px !important;
+            width: 100% !important;
+            margin-bottom: 32px !important;
+            box-sizing: border-box !important;
         }
 
         .auth-tab-btn {
             flex: 1 !important;
-            padding: 10px 0 !important;
+            padding: 8px 16px !important;
             background: transparent !important;
             border: none !important;
-            border-bottom: 1px solid transparent !important;
-            color: rgba(255, 255, 255, 0.4) !important;
+            border-radius: 25px !important;
+            color: rgba(255, 255, 255, 0.5) !important;
             font-size: 14px !important;
             font-weight: 500 !important;
-            letter-spacing: 0.5px !important;
             cursor: pointer !important;
             transition: all 0.25s ease !important;
-            margin-bottom: -1px !important;
+            text-align: center !important;
         }
 
         .auth-tab-btn.active {
-            color: #ffffff !important;
-            border-bottom: 1px solid #ffffff !important;
-            box-shadow: 0 2px 10px rgba(255, 255, 255, 0.5) !important;
+            background: #ffffff !important;
+            color: #000000 !important;
+            font-weight: 600 !important;
         }
 
-        /* Формы и поля */
+        /* Формы и поля ввода */
         .auth-form {
             display: flex !important;
             flex-direction: column !important;
-            gap: 18px !important;
+            gap: 24px !important;
+            width: 100% !important;
+        }
+
+        .auth-input-group {
+            position: relative !important;
+            width: 100% !important;
         }
 
         .auth-input {
-            background: rgba(255, 255, 255, 0.03) !important;
-            border: 1px solid rgba(255, 255, 255, 0.12) !important;
-            border-radius: 6px !important;
-            padding: 12px 14px !important;
+            background: transparent !important;
+            border: none !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
+            padding: 10px 0 !important;
             color: #ffffff !important;
-            font-size: 13px !important;
+            font-size: 14px !important;
+            text-align: center !important;
             outline: none !important;
-            box-sizing: border-box !important;
             width: 100% !important;
-            transition: border-color 0.25s, box-shadow 0.25s !important;
+            box-sizing: border-box !important;
+            transition: border-color 0.25s !important;
         }
 
         .auth-input::placeholder {
-            color: rgba(255, 255, 255, 0.3) !important;
+            color: rgba(255, 255, 255, 0.4) !important;
+            text-align: center !important;
         }
 
-        .auth-input:focus { 
-            border-color: rgba(255, 255, 255, 0.8) !important;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2) !important;
+        .auth-input:focus {
+            border-bottom-color: #ffffff !important;
         }
 
-        /* Белая контрастная кнопка с мягким свечением */
+        /* Кнопка отправки формы */
         .auth-submit-btn {
-            background: #ffffff !important;
-            color: #0d0d0d !important;
-            border: none !important;
-            border-radius: 6px !important;
-            padding: 12px !important;
-            font-size: 14px !important;
-            font-weight: 700 !important;
-            letter-spacing: 0.5px !important;
+            background: transparent !important;
+            color: #ffffff !important;
+            border: 1px solid #ffffff !important;
+            border-radius: 30px !important;
+            padding: 12px 24px !important;
+            font-size: 15px !important;
+            font-weight: 600 !important;
             cursor: pointer !important;
-            margin-top: 6px !important;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2) !important;
-            transition: transform 0.15s, box-shadow 0.25s, background-color 0.2s !important;
+            width: 100% !important;
+            margin-top: 12px !important;
+            transition: all 0.2s ease !important;
+            text-align: center !important;
         }
 
         .auth-submit-btn:hover {
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.5) !important;
-            background: #f0f0f0 !important;
+            background: #ffffff !important;
+            color: #000000 !important;
         }
 
-        .auth-submit-btn:active { 
-            transform: scale(0.98) !important; 
+        .auth-submit-btn:active {
+            transform: scale(0.98) !important;
         }
     `;
 
@@ -228,7 +266,7 @@ function injectAuthStyles() {
     document.head.appendChild(styleElement);
 }
 
-// --- HTML РАЗМЕТКА ---
+// --- HTML РАЗМЕТКА (В точности по вашим макетам) ---
 function initAuthModalUI() {
     if (document.getElementById('auth-modal-overlay')) return;
 
@@ -237,20 +275,37 @@ function initAuthModalUI() {
             <div class="auth-modal-card">
                 <button id="auth-close-btn" class="auth-close-btn" type="button">&times;</button>
                 
+                <div class="auth-header-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M2 12h20"></path>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    <span>GEOГРАФИЯ</span>
+                </div>
+                
                 <div class="auth-tabs">
                     <button type="button" class="auth-tab-btn active" id="tab-login-btn">Вход</button>
                     <button type="button" class="auth-tab-btn" id="tab-register-btn">Регистрация</button>
                 </div>
 
                 <form id="form-login" class="auth-form">
-                    <input type="email" id="login-email" placeholder="Email" required class="auth-input">
-                    <input type="password" id="login-password" placeholder="Пароль" required class="auth-input">
+                    <div class="auth-input-group">
+                        <input type="email" id="login-email" placeholder="Email..." required class="auth-input" autocomplete="email">
+                    </div>
+                    <div class="auth-input-group">
+                        <input type="password" id="login-password" placeholder="Пароль..." required class="auth-input" autocomplete="current-password">
+                    </div>
                     <button type="submit" class="auth-submit-btn">Войти</button>
                 </form>
 
                 <form id="form-register" class="auth-form" style="display: none;">
-                    <input type="email" id="reg-email" placeholder="Ваш Email" required class="auth-input">
-                    <input type="password" id="reg-password" placeholder="Пароль (мин. 6 символов)" required class="auth-input">
+                    <div class="auth-input-group">
+                        <input type="email" id="reg-email" placeholder="Ваш Email..." required class="auth-input" autocomplete="email">
+                    </div>
+                    <div class="auth-input-group">
+                        <input type="password" id="reg-password" placeholder="Пароль (мин. 6 символов)..." required class="auth-input" autocomplete="new-password">
+                    </div>
                     <button type="submit" class="auth-submit-btn">Зарегистрироваться</button>
                 </form>
             </div>
@@ -259,16 +314,33 @@ function initAuthModalUI() {
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
-// --- СОБЫТИЯ ---
+// --- СОБЫТИЯ И ЛОГИКА ---
 function initAuthEvents() {
+    const overlay = document.getElementById('auth-modal-overlay');
     const closeBtn = document.getElementById('auth-close-btn');
     const tabLogin = document.getElementById('tab-login-btn');
     const tabRegister = document.getElementById('tab-register-btn');
     const formLogin = document.getElementById('form-login');
     const formRegister = document.getElementById('form-register');
 
+    // Закрытие по крестику
     closeBtn?.addEventListener('click', window.hideAuthModal);
 
+    // Закрытие по клику на затемненный фон вне карточки
+    overlay?.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            window.hideAuthModal();
+        }
+    });
+
+    // Закрытие по клавише Esc
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            window.hideAuthModal();
+        }
+    });
+
+    // Переключение вкладок
     tabLogin?.addEventListener('click', () => {
         tabLogin.classList.add('active');
         tabRegister.classList.remove('active');
@@ -283,6 +355,7 @@ function initAuthEvents() {
         formLogin.style.display = 'none';
     });
 
+    // Обработка Входа в Supabase
     formLogin?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
@@ -300,6 +373,7 @@ function initAuthEvents() {
         }
     });
 
+    // Обработка Регистрации в Supabase
     formRegister?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
@@ -313,17 +387,19 @@ function initAuthEvents() {
             alert(`Ошибка регистрации: ${error.message}`);
         } else {
             window.hideAuthModal();
-            alert('Регистрация прошла успешно!');
+            alert('Регистрация прошла успешно! Проверьте вашу почту для подтверждения.');
         }
     });
 }
 
+// Проверка активной сессии
 async function checkUserSession() {
     if (!window.supabaseClient) return;
     const { data: { session } } = await window.supabaseClient.auth.getSession();
     updateUIForUser(session ? session.user : null);
 }
 
+// Обновление состояния интерфейса
 function updateUIForUser(user) {
     if (user) {
         document.body.classList.add('user-logged-in');
