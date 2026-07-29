@@ -17,6 +17,8 @@
     </script>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
+<script src="console.js"></script>
 
     <link rel="icon" type="image/png" href="images/favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -757,27 +759,11 @@
 </script>
 
 <script>
-    async function syncBannerVisibility() {
-        try {
-            const res = await fetch('/api/banner');
-            const data = await res.json();
-            
-            const bannerContainer = document.querySelector('.app-banners-container');
-            if (bannerContainer) {
-                bannerContainer.style.display = data.enabled ? 'flex' : 'none';
-            }
-        } catch (e) {
-            console.warn('Не удалось загрузить статус плашки');
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', syncBannerVisibility);
-
 // === СИНХРОНИЗАЦИЯ ПЛАШКИ ЧЕРЕЗ SUPABASE ===
 async function syncBannerVisibility() {
-    // ВСТАВЬТЕ ВАШИ РЕАЛЬНЫЕ ДАННЫЕ ВМЕСТО ЗАГЛУШЕК:
-    const SUPABASE_URL = 'https://swigwhclmjnhcdrbjnes.supabase.co'; 
-    const SUPABASE_KEY = 'sb_publishable_orwSYPtV707_kppyt7g3Bg_F72HW...'; // Ваш длинный Publishable Key
+    // Вставьте ваш ТОЧНЫЙ полный ключ вместо обрезанного:
+    const SUPABASE_URL = 'https://swigwhclmjnhcdrbjnes.supabase.co/rest/v1/'; 
+    const SUPABASE_KEY = 'sb_publishable_6m2jizjeOQd1rqWdoyVUdQ_JKNfoUYw'; 
 
     if (!window.supabase) return;
 
@@ -803,9 +789,9 @@ async function syncBannerVisibility() {
     }
 }
 
-// Запускаем проверку при загрузке любой страницы
+// Запускаем проверку при загрузке страницы
 document.addEventListener('DOMContentLoaded', syncBannerVisibility);
 </script>
-</body>
+
 </body>
 </html>
