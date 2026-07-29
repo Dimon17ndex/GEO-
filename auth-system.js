@@ -6,26 +6,30 @@ const SUPABASE_KEY = 'sb_publishable_mjHX0OTE6LSLh2qTVqMIng_mY9cvDcN';
 
 let supabase = null;
 
-try {
-    if (window.supabase) {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// Безопасная инициализация Supabase без падения скрипта
+function getSupabaseClient() {
+    if (!supabase && window.supabase) {
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        } catch (e) {
+            console.error('Ошибка инициализации Supabase:', e);
+        }
     }
-} catch (e) {
-    console.error('Supabase init error:', e);
+    return supabase;
 }
 
-// --- ОБЪЯВЛЯЕМ ГЛОБАЛЬНЫЕ ФУНКЦИИ В САМОМ НАЧАЛЕ ---
+// Глобальные функции вызова — объявляем СРАЗУ
 window.showAuthModal = function() {
     let modal = document.getElementById('auth-modal-overlay');
     if (!modal) {
-        initAuthStyles();
+        injectAuthStyles();
         initAuthModalUI();
         initAuthEvents();
         modal = document.getElementById('auth-modal-overlay');
     }
     if (modal) {
         modal.classList.add('active');
-        modal.style.display = 'flex'; // Принудительно показываем
+        modal.style.display = 'flex';
     }
 };
 
@@ -38,20 +42,26 @@ window.hideAuthModal = function() {
 };
 
 window.logoutUser = async function() {
-    if (supabase) {
-        await supabase.auth.signOut();
+    const client = getSupabaseClient();
+    if (client) {
+        await client.auth.signOut();
         updateUIForUser(null);
     }
 };
 
-// При загрузке страницы создаем стили и окно заранее
+// При загрузке DOM
 document.addEventListener('DOMContentLoaded', () => {
     injectAuthStyles();
     initAuthModalUI();
     initAuthEvents();
-    if (supabase) {
-        checkUserSession();
-    }
+    
+    // Проверяем сессию только если Supabase загрузился
+    setTimeout(() => {
+        const client = getSupabaseClient();
+        if (client) {
+            checkUserSession();
+        }
+    }, 300);
 });
 
 // --- СТИЛИ (CSS) ---
@@ -170,7 +180,7 @@ function injectAuthStyles() {
     document.head.appendChild(styleElement);
 }
 
-// --- HTML РАЗМЕТКА ---
+// --- HTML МОДАЛЬНОГО ОКНА ---
 function initAuthModalUI() {
     if (document.getElementById('auth-modal-overlay')) return;
 
@@ -227,11 +237,13 @@ function initAuthEvents() {
 
     formLogin?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (!supabase) return alert('Supabase не инициализирован');
+        const client = getSupabaseClient();
+        if (!client) return alert('Supabase CDN не подключен на этой странице!');
+
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
 
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await client.auth.signInWithPassword({ email, password });
 
         if (error) {
             alert(`Ошибка входа: ${error.message}`);
@@ -243,11 +255,13 @@ function initAuthEvents() {
 
     formRegister?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (!supabase) return alert('Supabase не инициализирован');
+        const client = getSupabaseClient();
+        if (!client) return alert('Supabase CDN не подключен на этой странице!');
+
         const email = document.getElementById('reg-email').value;
         const password = document.getElementById('reg-password').value;
 
-        const { data, error } = await supabase.auth.signUp({ email, password });
+        const { data, error } = await client.auth.signUp({ email, password });
 
         if (error) {
             alert(`Ошибка регистрации: ${error.message}`);
@@ -259,8 +273,9 @@ function initAuthEvents() {
 }
 
 async function checkUserSession() {
-    if (!supabase) return;
-    const { data: { session } } = await supabase.auth.getSession();
+    const client = getSupabaseClient();
+    if (!client) return;
+    const { data: { session } } = await client.auth.getSession();
     updateUIForUser(session ? session.user : null);
 }
 
