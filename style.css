@@ -1320,104 +1320,6 @@ body:has(.input-container-box.active) .logo-icon {
 }
 
 /* ==========================================
-   УНИВЕРСАЛЬНЫЕ ПЛАШКИ-УВЕДОМЛЕНИЯ (BANNERS)
-   ========================================== */
-
-/* Контейнер: фиксируется сверху по центру экрана */
-.app-banners-container {
-    display: none; /* Изначально скрываем, а JS включит ('flex'), если плашка включена на сервере */
-    position: fixed;
-    top: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    pointer-events: none;
-}
-
-/* Элемент плашки */
-.app-banner {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    
-    /* Меняем с 20px на 12px для полного соответствия с beginning.css */
-    border-radius: 12px; 
-    
-    font-family: 'Montserrat', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    white-space: nowrap;
-    
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    
-    pointer-events: auto;
-    user-select: none;
-    
-    animation: bannerSlideDown 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-/* Иконка внутри плашки */
-.banner-icon-svg,
-.banner-icon {
-    width: 14px;
-    height: 14px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-/* Анимация появления сверху */
-@keyframes bannerSlideDown {
-    0% {
-        opacity: 0;
-        transform: translateY(-40px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* --- ВАРИАНТЫ ОФОРМЛЕНИЯ --- */
-
-/* Оранжевый: Ведутся работы */
-.banner-warning {
-    background: rgba(255, 152, 0, 0.2);
-    color: #ffb74d;
-    border: 1px solid rgba(255, 152, 0, 0.5);
-}
-
-/* Красный: Ограничения / Ошибка */
-.banner-danger {
-    background: rgba(244, 67, 54, 0.2);
-    color: #ff8a80;
-    border: 1px solid rgba(244, 67, 54, 0.5);
-}
-
-/* Синий: Информация / Бета */
-.banner-info {
-    background: rgba(33, 150, 243, 0.2);
-    color: #90caf9;
-    border: 1px solid rgba(33, 150, 243, 0.5);
-}
-
-/* Зеленый: Всё работает */
-.banner-success {
-    background: rgba(76, 175, 80, 0.2);
-    color: #a5d6a7;
-    border: 1px solid rgba(76, 175, 80, 0.5);
-}
-
-/* ==========================================
    АНИМАЦИЯ МЕДЛЕННОГО МИГАНИЯ ИКОНОК
    ========================================== */
 
@@ -1590,26 +1492,26 @@ body:has(.input-container-box.active) .logo-icon {
 }
 
 /* ==========================================================================\r
-   СИНХРОНИЗИРОВАННЫЕ СТИЛИ ПЛАШЕК СООБЩЕНИЙ (ИЗ BEGINNING.CSS)\r
+   УНИВЕРСАЛЬНЫЕ ПЛАШКИ-УВЕДОМЛЕНИЯ (BANNERS) — ЕДИНЫЙ СТИЛЬ
    ========================================================================== */
 
-/* 1. Контейнер плашки */
+/* 1. Контейнер: по умолчанию скрыт (JS включает 'flex'), фиксируется сверху */
 .app-banners-container {
+    display: none; /* JS переключит на flex */
     position: fixed;
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 1000;
-    display: flex;
     flex-direction: column;
     align-items: center;
     gap: 8px;
     width: 90%;
     max-width: 500px;
-    pointer-events: none; /* Защита от случайного перекрытия кликов вокруг */
+    pointer-events: none;
 }
 
-/* 2. Базовый вид плашки */
+/* 2. Элемент плашки */
 .app-banner {
     pointer-events: auto;
     display: inline-flex;
@@ -1617,15 +1519,19 @@ body:has(.input-container-box.active) .logo-icon {
     justify-content: center;
     gap: 10px;
     padding: 8px 16px;
-    border-radius: 50px; /* Округлые края */
+    border-radius: 50px; /* Округлые края как в beginning */
     font-family: 'Montserrat', sans-serif;
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 1.5px;
     text-transform: uppercase;
+    white-space: nowrap;
+    user-select: none;
+    
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
                 opacity 0.3s ease,
                 box-shadow 0.3s ease;
@@ -1637,54 +1543,72 @@ body:has(.input-container-box.active) .logo-icon {
     box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.5);
 }
 
+/* Иконка внутри плашки и анимация пульсации */
+.banner-icon-svg,
 .banner-icon {
     font-size: 14px;
     line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
-/* 3. Варианты оформления плашек */
+.app-banner .banner-icon {
+    display: inline-block;
+    animation: iconSlowBlink 2.5s ease-in-out infinite;
+}
 
-/* Желто-оранжевая: Предупреждение / Разработка (banner-warning) */
+@keyframes iconSlowBlink {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.35;
+        transform: scale(0.9);
+    }
+}
+
+/* 3. Цветовые варианты */
 .banner-warning {
     background: rgba(255, 179, 0, 0.18);
     color: #ffd54f;
     border: 1px solid rgba(255, 179, 0, 0.4);
 }
 
-/* Красная: Ошибка / Внимание */
+.banner-danger,
 .banner-error {
     background: rgba(244, 67, 54, 0.18);
     color: #ff8a80;
     border: 1px solid rgba(244, 67, 54, 0.4);
 }
 
-/* Синяя: Информация / Бета */
 .banner-info {
     background: rgba(33, 150, 243, 0.18);
     color: #90caf9;
     border: 1px solid rgba(33, 150, 243, 0.4);
 }
 
-/* Зеленая: Успех / Акция */
 .banner-success {
     background: rgba(76, 175, 80, 0.18);
     color: #a5d6a7;
     border: 1px solid rgba(76, 175, 80, 0.4);
 }
 
-/* 4. Анимация появления сверху */
+/* 4. Анимация появления */
 @keyframes bannerSlideDown {
-    from {
+    0% {
         opacity: 0;
         transform: translateY(-20px);
     }
-    to {
+    100% {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-/* Оптимизация для мобильных устройств */
+/* Адаптив */
 @media screen and (max-width: 480px) {
     .app-banners-container {
         top: calc(env(safe-area-inset-top) + 12px);
