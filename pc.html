@@ -773,25 +773,29 @@
 
     document.addEventListener('DOMContentLoaded', syncBannerVisibility);
 
-    // === СИНХРОНИЗАЦИЯ ПЛАШКИ ЧЕРЕЗ SUPABASE ===
+// === СИНХРОНИЗАЦИЯ ПЛАШКИ ЧЕРЕЗ SUPABASE ===
 async function syncBannerVisibility() {
-    // Укажите те же URL и Key, что и в console.js
-    const SUPABASE_URL = 'https://ваш-проект.supabase.co'; 
-    const SUPABASE_KEY = 'sb_publishable_...'; 
+    // ВСТАВЬТЕ ВАШИ РЕАЛЬНЫЕ ДАННЫЕ ВМЕСТО ЗАГЛУШЕК:
+    const SUPABASE_URL = 'https://swigwhclmjnhcdrbjnes.supabase.co'; 
+    const SUPABASE_KEY = 'sb_publishable_orwSYPtV707_kppyt7g3Bg_F72HW...'; // Ваш длинный Publishable Key
 
-    if (!window.supabase || SUPABASE_URL === 'https://ваш-проект.supabase.co') return;
+    if (!window.supabase) return;
 
     try {
         const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const { data } = await client
+        const { data, error } = await client
             .from('settings')
             .select('value')
             .eq('key', 'banner_enabled')
             .single();
 
+        if (error) {
+            console.error('Ошибка чтения из Supabase:', error);
+            return;
+        }
+
         const bannerContainer = document.querySelector('.app-banners-container');
         if (bannerContainer) {
-            // Если в базе value === true, показываем плашку ('flex'), иначе скрываем ('none')
             bannerContainer.style.display = data?.value ? 'flex' : 'none';
         }
     } catch (e) {
