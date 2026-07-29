@@ -1,24 +1,19 @@
 // auth-system.js
 
-// 1. Инициализация Supabase (укажите свои URL и ANON KEY)
-const SUPABASE_URL = 'https://cwgkdpmxwgfypbiykafl.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_mjHX0OTE6LSLh2qTVqMIng_mY9cvDcN';
+// Используем window, чтобы не было ошибки "already been declared"
+window.SUPABASE_URL = window.SUPABASE_URL || 'https://cwgkdpmxwgfypbiykafl.supabase.co'; 
+window.SUPABASE_KEY = window.SUPABASE_KEY || 'sb_publishable_mjHX0OTE6LSLh2qTVqMIng_mY9cvDcN';
 
-let supabase = null;
-
-// Безопасная инициализация Supabase без падения скрипта
-function getSupabaseClient() {
-    if (!supabase && window.supabase) {
-        try {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        } catch (e) {
-            console.error('Ошибка инициализации Supabase:', e);
-        }
+// Инициализируем клиент
+if (!window.supabaseClient && window.supabase) {
+    try {
+        window.supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
+    } catch (e) {
+        console.error('Ошибка инициализации Supabase:', e);
     }
-    return supabase;
 }
 
-// Глобальные функции вызова — объявляем СРАЗУ
+// --- ГЛОБАЛЬНЫЕ ФУНКЦИИ ---
 window.showAuthModal = function() {
     let modal = document.getElementById('auth-modal-overlay');
     if (!modal) {
@@ -42,26 +37,21 @@ window.hideAuthModal = function() {
 };
 
 window.logoutUser = async function() {
-    const client = getSupabaseClient();
-    if (client) {
-        await client.auth.signOut();
+    if (window.supabaseClient) {
+        await window.supabaseClient.auth.signOut();
         updateUIForUser(null);
     }
 };
 
-// При загрузке DOM
+// --- ЗАГРУЗКА ИНТЕРФЕЙСА ---
 document.addEventListener('DOMContentLoaded', () => {
     injectAuthStyles();
     initAuthModalUI();
     initAuthEvents();
     
-    // Проверяем сессию только если Supabase загрузился
-    setTimeout(() => {
-        const client = getSupabaseClient();
-        if (client) {
-            checkUserSession();
-        }
-    }, 300);
+    if (window.supabaseClient) {
+        checkUserSession();
+    }
 });
 
 // --- СТИЛИ (CSS) ---
@@ -180,7 +170,7 @@ function injectAuthStyles() {
     document.head.appendChild(styleElement);
 }
 
-// --- HTML МОДАЛЬНОГО ОКНА ---
+// --- HTML РАЗМЕТКА ---
 function initAuthModalUI() {
     if (document.getElementById('auth-modal-overlay')) return;
 
@@ -237,13 +227,12 @@ function initAuthEvents() {
 
     formLogin?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const client = getSupabaseClient();
-        if (!client) return alert('Supabase CDN не подключен на этой странице!');
+        if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
 
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
 
-        const { data, error } = await client.auth.signInWithPassword({ email, password });
+        const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
 
         if (error) {
             alert(`Ошибка входа: ${error.message}`);
@@ -255,13 +244,12 @@ function initAuthEvents() {
 
     formRegister?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const client = getSupabaseClient();
-        if (!client) return alert('Supabase CDN не подключен на этой странице!');
+        if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
 
         const email = document.getElementById('reg-email').value;
         const password = document.getElementById('reg-password').value;
 
-        const { data, error } = await client.auth.signUp({ email, password });
+        const { data, error } = await window.supabaseClient.auth.signUp({ email, password });
 
         if (error) {
             alert(`Ошибка регистрации: ${error.message}`);
@@ -273,9 +261,8 @@ function initAuthEvents() {
 }
 
 async function checkUserSession() {
-    const client = getSupabaseClient();
-    if (!client) return;
-    const { data: { session } } = await client.auth.getSession();
+    if (!window.supabaseClient) return;
+    const { data: { session } } = await window.supabaseClient.auth.getSession();
     updateUIForUser(session ? session.user : null);
 }
 
