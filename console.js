@@ -1,7 +1,7 @@
 // === НАСТРОЙКИ SUPABASE ===
 // Вставьте сюда ваш Project URL и Publishable Key из Supabase
-const SUPABASE_URL = 'https://wkrjpootqguesflgppab.supabase.co/rest/v1/'; 
-const SUPABASE_KEY = 'sb_publishable_orwSYPtV707_kppyt7g3Bg_F72HWLsX'; 
+const SUPABASE_URL = 'https://swigwhclmjnhcdrbjnes.supabase.co/rest/v1/'; 
+const SUPABASE_KEY = 'sb_publishable_6m2jizjeOQd1rqWdoyVUdQ_JKNfoUYw'; 
 
 // Инициализируем клиент Supabase
 const supabaseClient = (window.supabase && SUPABASE_URL !== 'https://ваш-проект.supabase.co')
