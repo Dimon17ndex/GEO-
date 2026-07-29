@@ -6,11 +6,7 @@
     <title>GEOГРАФИЯ — Сессия</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <script src="script.js"></script>
-    
     <script src="console.js"></script>
 
     <link rel="icon" type="image/png" href="images/favicon.png">
@@ -90,9 +86,16 @@
         color: rgba(255, 255, 255, 0.4);
         text-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
     }
-</style>
+    </style>
 </head>
 <body>
+
+    <div class="app-banners-container">
+        <div class="app-banner banner-warning">
+            <span class="banner-icon">🛠</span>
+            <span>Ведется разработка сайта в раннем доступе</span>
+        </div>
+    </div>
 
     <div class="shadow-layer"></div>
 
@@ -233,55 +236,14 @@
             document.body.classList.add('page-loaded');
         });
     });
-    </script>
-    
-    <script>
+
     // Создаем искусственную точку в истории браузера
     history.pushState(null, null, location.href);
 
     // Перехватываем нажатие кнопки "Назад" в браузере
     window.addEventListener('popstate', function () {
-        // Выгружаем beginning.html и возвращаем на index.html
         window.location.replace('index.html');
     });
-
-    // === СИНХРОНИЗАЦИЯ ПЛАШКИ ЧЕРЕЗ SUPABASE ===
-async function syncBannerVisibility() {
-    // Укажите те же URL и Key, что и в console.js
-    const SUPABASE_URL = 'https://ваш-проект.supabase.co'; 
-    const SUPABASE_KEY = 'sb_publishable_...'; 
-
-    if (!window.supabase || SUPABASE_URL === 'https://ваш-проект.supabase.co') return;
-
-    try {
-        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const { data } = await client
-            .from('settings')
-            .select('value')
-            .eq('key', 'banner_enabled')
-            .single();
-
-        const bannerContainer = document.querySelector('.app-banners-container');
-        if (bannerContainer) {
-            // Если в базе value === true, показываем плашку ('flex'), иначе скрываем ('none')
-            bannerContainer.style.display = data?.value ? 'flex' : 'none';
-        }
-    } catch (e) {
-        console.warn('Не удалось загрузить статус плашки из Supabase:', e);
-    }
-}
-
-// Запускаем проверку при загрузке любой страницы
-document.addEventListener('DOMContentLoaded', syncBannerVisibility);
-</script>
+    </script>
 </body>
-
-<div class="app-banners-container">
-<div class="app-banner banner-warning">
-        <span class="banner-icon">🛠</span>
-        <span>Ведется разработка сайта в раннем доступе</span>
-    </div>
-
-</div>
-
 </html>
