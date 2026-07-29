@@ -6,15 +6,146 @@ const SUPABASE_KEY = 'sb_publishable_mjHX0OTE6LSLh2qTVqMIng_mY9cvDcN';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Встраиваем модальное окно в DOM
+    // Автоматически встраиваем CSS-стили
+    injectAuthStyles();
+    // Встраиваем HTML модального окна
     initAuthModalUI();
-    // Настраиваем обработчики событий
+    // Настраиваем логику и события
     initAuthEvents();
-    // Проверяем текущую сессию
+    // Проверяем сессию пользователя
     checkUserSession();
 });
 
-// Функция создания разметки окна входа/регистрации
+// --- АВТОМАТИЧЕСКОЕ ВНЕДРЕНИЕ СТИЛЕЙ (CSS) ---
+function injectAuthStyles() {
+    if (document.getElementById('auth-system-styles')) return;
+
+    const css = `
+        /* Затемняющий фон */
+        .auth-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        /* Карточка модального окна */
+        .auth-modal-card {
+            background: #121814;
+            border: 1px solid rgba(0, 255, 110, 0.3);
+            border-radius: 16px;
+            padding: 28px 24px 24px;
+            width: 100%;
+            max-width: 360px;
+            position: relative;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.9);
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            box-sizing: border-box;
+        }
+
+        /* Кнопка закрытия (крестик) */
+        .auth-close-btn {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 26px;
+            line-height: 1;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .auth-close-btn:hover {
+            color: #ffffff;
+        }
+
+        /* Переключатель Вход / Регистрация */
+        .auth-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .auth-tab-btn {
+            flex: 1;
+            padding: 10px 0;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .auth-tab-btn.active {
+            color: #00ff6e;
+            border-bottom-color: #00ff6e;
+        }
+
+        /* Поля ввода и формы */
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .auth-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 12px 14px;
+            color: #ffffff;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .auth-input:focus {
+            border-color: #00ff6e;
+        }
+
+        .auth-submit-btn {
+            background: #00ff6e;
+            color: #000000;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 6px;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+
+        .auth-submit-btn:active {
+            transform: scale(0.98);
+        }
+    `;
+
+    const styleElement = document.createElement('style');
+    styleElement.id = 'auth-system-styles';
+    styleElement.textContent = css;
+    document.head.appendChild(styleElement);
+}
+
+// --- ВНЕДРЕНИЕ HTML ---
 function initAuthModalUI() {
     if (document.getElementById('auth-modal-overlay')) return;
 
@@ -45,7 +176,7 @@ function initAuthModalUI() {
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
-// Настройка переключения вкладок и отправки форм в Supabase
+// --- ЛОГИКА И СОБЫТИЯ ---
 function initAuthEvents() {
     const closeBtn = document.getElementById('auth-close-btn');
     const tabLogin = document.getElementById('tab-login-btn');
@@ -53,25 +184,22 @@ function initAuthEvents() {
     const formLogin = document.getElementById('form-login');
     const formRegister = document.getElementById('form-register');
 
-    // Закрытие окна
     closeBtn?.addEventListener('click', window.hideAuthModal);
 
-    // Переключение Вход / Регистрация
     tabLogin?.addEventListener('click', () => {
         tabLogin.classList.add('active');
         tabRegister.classList.remove('active');
-        formLogin.style.display = 'block';
+        formLogin.style.display = 'flex';
         formRegister.style.display = 'none';
     });
 
     tabRegister?.addEventListener('click', () => {
         tabRegister.classList.add('active');
         tabLogin.classList.remove('active');
-        formRegister.style.display = 'block';
+        formRegister.style.display = 'flex';
         formLogin.style.display = 'none';
     });
 
-    // --- АВТОРИЗАЦИЯ (SUPABASE) ---
     formLogin?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('login-email').value;
@@ -80,7 +208,6 @@ function initAuthEvents() {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
         if (error) {
-            console.error('Ошибка входа:', error.message);
             alert(`Ошибка входа: ${error.message}`);
         } else {
             window.hideAuthModal();
@@ -88,7 +215,6 @@ function initAuthEvents() {
         }
     });
 
-    // --- РЕГИСТРАЦИЯ (SUPABASE) ---
     formRegister?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('reg-email').value;
@@ -97,16 +223,15 @@ function initAuthEvents() {
         const { data, error } = await supabase.auth.signUp({ email, password });
 
         if (error) {
-            console.error('Ошибка регистрации:', error.message);
             alert(`Ошибка регистрации: ${error.message}`);
         } else {
             window.hideAuthModal();
-            alert('Регистрация успешна! Если включено подтверждение, проверьте почту.');
+            alert('Регистрация успешна!');
         }
     });
 }
 
-// Глобальные методы управления окном
+// --- ГЛОБАЛЬНЫЕ МЕТОДЫ ---
 window.showAuthModal = function() {
     const modal = document.getElementById('auth-modal-overlay');
     if (modal) modal.style.display = 'flex';
@@ -117,7 +242,6 @@ window.hideAuthModal = function() {
     if (modal) modal.style.display = 'none';
 };
 
-// Глобальный метод выхода
 window.logoutUser = async function() {
     const { error } = await supabase.auth.signOut();
     if (!error) {
@@ -125,7 +249,6 @@ window.logoutUser = async function() {
     }
 };
 
-// Проверка активности пользователя при загрузке
 async function checkUserSession() {
     const { data: { session } } = await supabase.auth.getSession();
     updateUIForUser(session ? session.user : null);
