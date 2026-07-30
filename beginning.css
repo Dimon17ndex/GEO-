@@ -714,3 +714,29 @@ body:has(#version-badge.show) .app-banners-container {
     display: inline-block;
     animation: iconSlowBlink 2.5s ease-in-out infinite; /* 2.5s — скорость мигания */
 }
+
+.auth-trigger-btn {
+    position: fixed;
+    top: 40px;
+    right: 40px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+}
+
+.auth-trigger-btn:hover {
+    background: #ffffff;
+    color: #000000;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
