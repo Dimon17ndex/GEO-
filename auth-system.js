@@ -229,11 +229,28 @@ function injectAuthStyles() {
     margin-bottom: 30px !important;
 }
 
+/* Логотип рядом с текстом в шапке авторизации */
 .auth-header-logo {
     height: 85px !important;
     width: auto !important;
     display: block !important;
     object-fit: contain !important;
+    
+    /* Бесконечная плавная левитация */
+    animation: logoHover 3.5s ease-in-out infinite alternate !important;
+}
+
+/* Эффект парения вверх-вниз */
+@keyframes logoHover {
+    0% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-6px) rotate(-1.5deg);
+    }
+    100% {
+        transform: translateY(4px) rotate(1.5deg);
+    }
 }
 
 /* Окно маскирования для сменяемого текста */
