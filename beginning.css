@@ -777,8 +777,8 @@ body:has(#version-badge.show) .app-banners-container {
 /* Родительский контейнер профиля */
 #user-profile-widget {
     position: fixed !important;
-    top: 43px !important;       /* Выравнивание по вертикали */
-    right: 80px !important;     /* Увеличили с 35px/40px до 80px — профиль отъехал дальше от шестерёнки */
+    top: 43px !important;       /* Выравнивание по высоте */
+    right: 95px !important;     /* Еще чуть дальше отодвинули от шестерёнки */
     z-index: 100 !important;
     transition: right 0.35s cubic-bezier(0.25, 1, 0.5, 1) !important;
 }
@@ -786,7 +786,7 @@ body:has(#version-badge.show) .app-banners-container {
 /* Сдвиг влево при открытии настроек */
 .settings-trigger-zone:hover ~ #user-profile-widget,
 .settings-trigger-zone:focus-within ~ #user-profile-widget {
-    right: 240px !important;    /* Расстояние при открытых настройках */
+    right: 255px !important;    /* Пропорционально отодвинули для открытых настроек */
 }
 
 /* Дополнительно: чтобы профиль стоял ровно по вертикали */
