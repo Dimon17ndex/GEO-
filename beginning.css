@@ -777,13 +777,11 @@ body:has(#version-badge.show) .app-banners-container {
 .top-right-profile {
     position: fixed;
     top: 40px;
-    right: 65px;
+    right: 48px; /* Уменьшили с 65px до 48px — профиль стал намного ближе к шестерёнке */
     z-index: 10;
     
-    /* 1-е число (X): смещение вправо/влево (-5px придвигает БЛИЖЕ к шестерёнке)
-       2-е число (Y): смещение вниз/вверх (3px держит высоту как мы настроили)
-    */
-    transform: translate(-5px, 3px);
+    /* Сохраняем идеальную высоту (3px) */
+    transform: translateY(3px);
     
     transition: right 0.35s cubic-bezier(0.25, 1, 0.5, 1);
 }
