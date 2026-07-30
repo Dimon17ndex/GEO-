@@ -12,7 +12,6 @@ if (!window.supabaseClient && window.supabase) {
 }
 
 let currentAuthMode = 'login';
-let lastOverlayClickTime = 0;
 
 // --- ГЛОБАЛЬНЫЕ ФУНКЦИИ ---
 window.showAuthModal = function() {
@@ -24,7 +23,7 @@ window.showAuthModal = function() {
         modal = document.getElementById('auth-modal-overlay');
     }
     
-    hideConfirmToast(true); // Мгновенный сброс без задержек
+    hideConfirmToast(true);
     setAuthMode('login');
 
     if (modal) {
@@ -47,16 +46,17 @@ window.logoutUser = async function() {
     }
 };
 
-// Функция показа всплывающей плашки с волной
+// Функция показа всплывающей плашки с прыжком и радиальной волной
 function showConfirmToast() {
     const toast = document.getElementById('auth-confirm-toast');
     const wave = document.getElementById('auth-confirm-wave');
     
     if (toast) {
+        // Сбрасываем текущие классы
         toast.classList.remove('hiding', 'visible');
         if (wave) wave.classList.remove('active');
 
-        // Перезапуск CSS-анимаций
+        // Принудительная перезагрузка CSS для повторного запуска ключевых кадров
         void toast.offsetWidth;
 
         toast.classList.add('visible');
@@ -79,7 +79,7 @@ function hideConfirmToast(immediate = false) {
         toast.classList.add('hiding');
         setTimeout(() => {
             toast.classList.remove('visible', 'hiding');
-        }, 300); // 300ms совпадает с длительностью transition в CSS
+        }, 350); // 350мс совпадает с длительностью плавного исчезновения
     }
 }
 
@@ -126,7 +126,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- СТИЛИ ДЛЯ МЯГКОГО ИСЧЕЗНОВЕНИЯ И ЭФФЕКТНОЙ ВОЛНЫ ---
 function injectAuthStyles() {
-    if (document.getElementById('auth-system-styles')) return;
+    // Если стили уже были добавлены, удаляем старый тег, чтобы обновить стили принудительно
+    const existingStyle = document.getElementById('auth-system-styles');
+    if (existingStyle) existingStyle.remove();
 
     const css = `
         .auth-modal-overlay {
@@ -357,13 +359,13 @@ function injectAuthStyles() {
 
         /* --- СВЕТОВАЯ РАДИАЛЬНАЯ ВОЛНА НА ВЕСЬ ЭКРАН --- */
         .auth-confirm-wave {
-            position: absolute !important;
-            bottom: 40px !important;
+            position: fixed !important;
+            bottom: 20px !important;
             left: 50% !important;
             width: 10px !important;
             height: 10px !important;
             border-radius: 50% !important;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.12) 40%, rgba(255, 255, 255, 0) 70%) !important;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.25) 30%, rgba(255, 255, 255, 0) 70%) !important;
             transform: translate(-50%, 50%) scale(0) !important;
             pointer-events: none !important;
             z-index: 8 !important;
@@ -371,7 +373,7 @@ function injectAuthStyles() {
         }
 
         .auth-confirm-wave.active {
-            animation: fullScreenWave 0.8s ease-out forwards !important;
+            animation: fullScreenWave 0.85s cubic-bezier(0.1, 0.8, 0.3, 1) forwards !important;
         }
 
         @keyframes fullScreenWave {
@@ -379,35 +381,35 @@ function injectAuthStyles() {
                 transform: translate(-50%, 50%) scale(1);
                 opacity: 1;
             }
-            60% {
-                opacity: 0.6;
+            50% {
+                opacity: 0.7;
             }
             100% {
-                transform: translate(-50%, 50%) scale(250);
+                transform: translate(-50%, 50%) scale(280);
                 opacity: 0;
             }
         }
 
         /* --- ПАНЕЛЬ ПОДТВЕРЖДЕНИЯ --- */
         .auth-confirm-toast {
-            position: absolute !important;
+            position: fixed !important;
             bottom: 30px !important;
             left: 50% !important;
-            transform: translateX(-50%) translateY(80px) scale(0.8);
-            background: rgba(20, 20, 25, 0.96) !important;
-            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            transform: translateX(-50%) translateY(100px) scale(0.85);
+            background: rgba(22, 22, 28, 0.96) !important;
+            border: 1px solid rgba(255, 255, 255, 0.25) !important;
             border-radius: 16px !important;
             padding: 12px 20px !important;
             display: flex !important;
             align-items: center !important;
             gap: 15px !important;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6) !important;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7) !important;
             opacity: 0 !important;
             visibility: hidden !important;
             pointer-events: none !important;
             white-space: nowrap !important;
             z-index: 10 !important;
-            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease !important;
+            transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease !important;
         }
 
         /* Анимация подпрыгивания при появлении */
@@ -415,13 +417,13 @@ function injectAuthStyles() {
             opacity: 1 !important;
             visibility: visible !important;
             pointer-events: auto !important;
-            animation: bounceInUp 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+            animation: bounceInUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
         }
 
-        /* Мягкое растворение при скрытии (Fade Out) */
+        /* Мягкое угасание и уход вниз при Отмене */
         .auth-confirm-toast.hiding {
             opacity: 0 !important;
-            transform: translateX(-50%) translateY(30px) scale(0.95) !important;
+            transform: translateX(-50%) translateY(40px) scale(0.9) !important;
             pointer-events: none !important;
             animation: none !important;
         }
@@ -429,14 +431,14 @@ function injectAuthStyles() {
         @keyframes bounceInUp {
             0% {
                 opacity: 0;
-                transform: translateX(-50%) translateY(90px) scale(0.7);
+                transform: translateX(-50%) translateY(100px) scale(0.7);
             }
-            60% {
+            65% {
                 opacity: 1;
-                transform: translateX(-50%) translateY(-15px) scale(1.04);
+                transform: translateX(-50%) translateY(-12px) scale(1.03);
             }
-            80% {
-                transform: translateX(-50%) translateY(5px) scale(0.98);
+            85% {
+                transform: translateX(-50%) translateY(4px) scale(0.98);
             }
             100% {
                 opacity: 1;
@@ -467,7 +469,7 @@ function injectAuthStyles() {
         }
 
         .auth-confirm-btn:hover {
-            background: rgba(255, 255, 255, 0.1) !important;
+            background: rgba(255, 255, 255, 0.12) !important;
         }
 
         .auth-confirm-btn.danger {
@@ -563,30 +565,30 @@ function initAuthEvents() {
     const btnConfirmNo = document.getElementById('auth-cancel-close-btn');
 
     btnConfirmYes?.addEventListener('click', window.hideAuthModal);
-    btnConfirmNo?.addEventListener('click', () => hideConfirmToast(false)); // Мягкое скрытие
+    btnConfirmNo?.addEventListener('click', () => hideConfirmToast(false)); // Мягкое гашение
 
     closeBtn?.addEventListener('click', window.hideAuthModal);
 
+    // Двоиной клик по темному фону вызывает плашку + волну
+    overlay?.addEventListener('dblclick', (e) => {
+        if (e.target === overlay) {
+            showConfirmToast();
+        }
+    });
+
+    // Одиночный клик вызывает покачивание карточки
     overlay?.addEventListener('click', (e) => {
         if (e.target === overlay) {
-            const currentTime = new Date().getTime();
-            const timeDiff = currentTime - lastOverlayClickTime;
-
-            if (timeDiff < 350 && timeDiff > 0) {
-                showConfirmToast();
-            } else {
-                const container = document.querySelector('.auth-modal-container');
-                if (container) {
+            const container = document.querySelector('.auth-modal-container');
+            if (container) {
+                container.classList.remove('shake');
+                void container.offsetWidth;
+                container.classList.add('shake');
+                
+                setTimeout(() => {
                     container.classList.remove('shake');
-                    void container.offsetWidth;
-                    container.classList.add('shake');
-                    
-                    setTimeout(() => {
-                        container.classList.remove('shake');
-                    }, 400);
-                }
+                }, 400);
             }
-            lastOverlayClickTime = currentTime;
         }
     });
 
