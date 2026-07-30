@@ -485,44 +485,46 @@ function injectAuthStyles() {
             background: rgba(255, 255, 255, 0.85) !important;
         }
 
-        /* --- БОЛЬШОЙ ФОНОВЫЙ ЛОГОТИП С БЛЮРОМ И ПОКАЧИВАНИЕМ --- */
-.auth-bg-watermark {
-    position: absolute !important;
-    top: 50% !important;
-    left: 50% !important;
-    width: 750px !important; /* Увеличили размер водяного знака */
-    height: auto !important;
-    max-width: 90vw !important;
-    pointer-events: none !important;
-    z-index: 1 !important;
-    
-    /* Блюр, прозрачность и центрирование */
-    filter: blur(20px) brightness(0.85) !important; /* Чуть увеличили размытие под новый размер */
-    opacity: 0 !important;
-    transform: translate(-50%, -50%) scale(0.75) rotate(-4deg) !important;
-    
-    /* Мягкое проявление и исчезновение при закрытии */
-    transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
+        /* --- ОГРОМНЫЙ ФОНОВЫЙ ЛОГОТИП СПРАВА С ИНТЕНСИВНОЙ АНИМАЦИЕЙ --- */
+        .auth-bg-watermark {
+            position: absolute !important;
+            top: 45% !important;
+            right: -15% !important; /* Уводим правее за край экрана */
+            left: auto !important; /* Отменяем центрирование по левому краю */
+            width: 1200px !important; /* Гигантский размер */
+            height: auto !important;
+            max-width: none !important; /* Снимаем ограничения по ширине */
+            pointer-events: none !important;
+            z-index: 1 !important;
+            
+            /* Блюр, яркость и начальное состояние */
+            filter: blur(14px) brightness(0.9) !important;
+            opacity: 0 !important;
+            transform: translateY(-50%) scale(0.7) rotate(12deg) !important;
+            transform-origin: center right !important;
+            
+            /* Мягкое появление при открытии */
+            transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
 
-/* Когда оверлей активен — проявляем и запускаем плавание */
-.auth-modal-overlay.active .auth-bg-watermark {
-    opacity: 0.18 !important; /* Чуть добавили видимости (18%) */
-    transform: translate(-50%, -50%) scale(1) rotate(0deg) !important;
-    animation: gentleFloat 7s ease-in-out infinite alternate !important;
-    animation-delay: 0.4s !important;
-}
+        /* Когда оверлей активен — проявляем и запускаем интенсивную анимацию */
+        .auth-modal-overlay.active .auth-bg-watermark {
+            opacity: 0.22 !important; /* Добавили сочности (22% видимости) */
+            transform: translateY(-50%) scale(1) rotate(0deg) !important;
+            animation: intenseFloat 5s ease-in-out infinite alternate !important;
+            animation-delay: 0.3s !important;
+        }
 
-        /* Нежное покачивание вверх-вниз и легкое вращение */
-        @keyframes gentleFloat {
+        /* Динамичная размашистая анимация: покачивание, накренение и легкое пульсирование */
+        @keyframes intenseFloat {
             0% {
-                transform: translate(-50%, -50%) translateY(0px) rotate(0deg) scale(1);
+                transform: translateY(-50%) translateX(0px) rotate(0deg) scale(1);
             }
             50% {
-                transform: translate(-50%, -50%) translateY(-18px) rotate(2deg) scale(1.03);
+                transform: translateY(-58%) translateX(-25px) rotate(-5deg) scale(1.05);
             }
             100% {
-                transform: translate(-50%, -50%) translateY(12px) rotate(-1.5deg) scale(0.98);
+                transform: translateY(-42%) translateX(15px) rotate(4deg) scale(0.96);
             }
         }
     `;
