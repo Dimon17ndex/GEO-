@@ -1,6 +1,5 @@
 // auth-system.js
 
-// Используем window, чтобы не было ошибки "already been declared"
 window.SUPABASE_URL = window.SUPABASE_URL || 'https://cwgkdpmxwgfypbiykafl.supabase.co'; 
 window.SUPABASE_KEY = window.SUPABASE_KEY || 'sb_publishable_mjHX0OTE6LSLh2qTVqMIng_mY9cvDcN';
 
@@ -24,7 +23,7 @@ window.showAuthModal = function() {
         modal = document.getElementById('auth-modal-overlay');
     }
     
-    setAuthMode('login', false);
+    setAuthMode('login');
 
     if (modal) {
         modal.classList.add('active');
@@ -45,74 +44,37 @@ window.logoutUser = async function() {
     }
 };
 
-// Функция переключения режимов с быстрой подменой и анимацией подложки
-function setAuthMode(mode, animate = true) {
-    if (currentAuthMode === mode && animate) return;
+// Переключение режимов с эффектом перекрестного проявления (Crossfade)
+function setAuthMode(mode) {
+    if (currentAuthMode === mode) return;
     currentAuthMode = mode;
 
     const authTabs = document.getElementById('auth-tabs');
     const tabLogin = document.getElementById('tab-login-btn');
     const tabRegister = document.getElementById('tab-register-btn');
-    const formContainer = document.getElementById('auth-dynamic-form');
+    
+    const formLogin = document.getElementById('auth-form-login');
+    const formRegister = document.getElementById('auth-form-register');
 
-    if (!authTabs || !tabLogin || !tabRegister || !formContainer) return;
+    if (!authTabs || !tabLogin || !tabRegister || !formLogin || !formRegister) return;
 
-    // Плавный сдвиг белой подложки тумблера
     if (mode === 'login') {
         authTabs.classList.remove('register-mode');
         tabLogin.classList.add('active');
         tabRegister.classList.remove('active');
+
+        // Перекрестное проявление
+        formRegister.classList.remove('visible');
+        formLogin.classList.add('visible');
     } else {
         authTabs.classList.add('register-mode');
         tabRegister.classList.add('active');
         tabLogin.classList.remove('active');
+
+        // Перекрестное проявление
+        formLogin.classList.remove('visible');
+        formRegister.classList.add('visible');
     }
-
-    const renderFields = () => {
-        if (mode === 'login') {
-            formContainer.innerHTML = `
-                <div class="auth-input-group">
-                    <input type="email" id="auth-email" placeholder="Email..." required class="auth-input" autocomplete="email">
-                </div>
-                <div class="auth-input-group">
-                    <input type="password" id="auth-password" placeholder="Пароль..." required class="auth-input" autocomplete="current-password">
-                </div>
-                <button type="submit" class="auth-submit-btn">Войти</button>
-            `;
-        } else {
-            formContainer.innerHTML = `
-                <div class="auth-input-group">
-                    <input type="email" id="auth-email" placeholder="Ваш Email..." required class="auth-input" autocomplete="email">
-                </div>
-                <div class="auth-input-group">
-                    <input type="password" id="auth-password" placeholder="Пароль (мин. 6 символов)..." required class="auth-input" autocomplete="new-password">
-                </div>
-                <button type="submit" class="auth-submit-btn">Зарегистрироваться</button>
-            `;
-        }
-    };
-
-    if (!animate) {
-        renderFields();
-        formContainer.classList.remove('fade-out-blur', 'fade-in-blur');
-        return;
-    }
-
-    // Быстрый уход старых полей (100мс)
-    formContainer.classList.remove('fade-in-blur');
-    formContainer.classList.add('fade-out-blur');
-
-    setTimeout(() => {
-        renderFields();
-        
-        // Быстрое появление новых полей (150мс)
-        formContainer.classList.remove('fade-out-blur');
-        formContainer.classList.add('fade-in-blur');
-
-        setTimeout(() => {
-            formContainer.classList.remove('fade-in-blur');
-        }, 150);
-    }, 100);
 }
 
 // --- ЗАГРУЗКА ---
@@ -126,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// --- СТИЛИ С АНИМИРОВАННОЙ ПОДЛОЖКОЙ ---
+// --- СТИЛИ ДЛЯ МЯГКОГО CROSSFADE ---
 function injectAuthStyles() {
     if (document.getElementById('auth-system-styles')) return;
 
@@ -215,7 +177,7 @@ function injectAuthStyles() {
             stroke: #ffffff !important;
         }
 
-        /* 2. Скользящий тумблер с белой плавающей подложкой */
+        /* Тумблер с плавной белой подложкой */
         .auth-tabs {
             position: relative !important;
             display: flex !important;
@@ -228,7 +190,6 @@ function injectAuthStyles() {
             box-sizing: border-box !important;
         }
 
-        /* Скользящий белый элемент */
         .auth-tab-pill {
             position: absolute !important;
             top: 3px !important;
@@ -242,7 +203,6 @@ function injectAuthStyles() {
             pointer-events: none !important;
         }
 
-        /* Анимация перемещения плашки вправо */
         .auth-tabs.register-mode .auth-tab-pill {
             transform: translateX(100%) !important;
         }
@@ -267,33 +227,35 @@ function injectAuthStyles() {
             font-weight: 600 !important;
         }
 
-        /* 3. Быстрый и плавный Crossfade полей */
+        /* 3. КОНТЕЙНЕР ДЛЯ ОДНОВРЕМЕННОГО НАЛОЖЕНИЯ ФОРМ */
+        .auth-forms-wrapper {
+            position: relative !important;
+            width: 100% !important;
+            min-height: 220px !important; /* Фиксированная высота для предотвращения скачков */
+        }
+
         .auth-form {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
             display: flex !important;
             flex-direction: column !important;
             gap: 45px !important;
-            width: 100% !important;
-            transition: filter 0.12s ease, opacity 0.12s ease !important;
-        }
-
-        .fade-out-blur {
-            filter: blur(6px) !important;
+            
+            /* Эффект проявления один сквозь другой */
             opacity: 0 !important;
+            filter: blur(8px) !important;
+            pointer-events: none !important;
+            transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                        filter 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
 
-        .fade-in-blur {
-            animation: blurIn 0.15s ease forwards !important;
-        }
-
-        @keyframes blurIn {
-            from {
-                filter: blur(6px);
-                opacity: 0;
-            }
-            to {
-                filter: blur(0px);
-                opacity: 1;
-            }
+        /* Активная форма плавно проступает */
+        .auth-form.visible {
+            opacity: 1 !important;
+            filter: blur(0px) !important;
+            pointer-events: auto !important;
         }
 
         .auth-input-group {
@@ -355,7 +317,7 @@ function injectAuthStyles() {
     document.head.appendChild(styleElement);
 }
 
-// --- HTML РАЗМЕТКА С ПЛАВАЮЩЕЙ ПОДЛОЖКОЙ ---
+// --- HTML ДВУХ НАЛОЖЕННЫХ ФОРМ ---
 function initAuthModalUI() {
     if (document.getElementById('auth-modal-overlay')) return;
 
@@ -379,20 +341,42 @@ function initAuthModalUI() {
                     <button type="button" class="auth-tab-btn" id="tab-register-btn">Регистрация</button>
                 </div>
 
-                <form id="auth-dynamic-form" class="auth-form"></form>
+                <div class="auth-forms-wrapper">
+                    <form id="auth-form-login" class="auth-form visible">
+                        <div class="auth-input-group">
+                            <input type="email" id="login-email" placeholder="Email..." required class="auth-input" autocomplete="email">
+                        </div>
+                        <div class="auth-input-group">
+                            <input type="password" id="login-password" placeholder="Пароль..." required class="auth-input" autocomplete="current-password">
+                        </div>
+                        <button type="submit" class="auth-submit-btn">Войти</button>
+                    </form>
+
+                    <form id="auth-form-register" class="auth-form">
+                        <div class="auth-input-group">
+                            <input type="email" id="reg-email" placeholder="Ваш Email..." required class="auth-input" autocomplete="email">
+                        </div>
+                        <div class="auth-input-group">
+                            <input type="password" id="reg-password" placeholder="Пароль (мин. 6 символов)..." required class="auth-input" autocomplete="new-password">
+                        </div>
+                        <button type="submit" class="auth-submit-btn">Зарегистрироваться</button>
+                    </form>
+                </div>
             </div>
         </div>
     `;
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
-// --- СОБЫТИЯ И ЛОГИКА ---
+// --- СОБЫТИЯ И ОБРАБОТКА ОБЕИХ ФОРМ ---
 function initAuthEvents() {
     const overlay = document.getElementById('auth-modal-overlay');
     const closeBtn = document.getElementById('auth-close-btn');
     const tabLogin = document.getElementById('tab-login-btn');
     const tabRegister = document.getElementById('tab-register-btn');
-    const form = document.getElementById('auth-dynamic-form');
+    
+    const formLogin = document.getElementById('auth-form-login');
+    const formRegister = document.getElementById('auth-form-register');
 
     closeBtn?.addEventListener('click', window.hideAuthModal);
 
@@ -408,32 +392,40 @@ function initAuthEvents() {
         }
     });
 
-    tabLogin?.addEventListener('click', () => setAuthMode('login', true));
-    tabRegister?.addEventListener('click', () => setAuthMode('register', true));
+    tabLogin?.addEventListener('click', () => setAuthMode('login'));
+    tabRegister?.addEventListener('click', () => setAuthMode('register'));
 
-    form?.addEventListener('submit', async (e) => {
+    // Обработка Входа
+    formLogin?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
 
-        const email = document.getElementById('auth-email').value;
-        const password = document.getElementById('auth-password').value;
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
 
-        if (currentAuthMode === 'login') {
-            const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
-            if (error) {
-                alert(`Ошибка входа: ${error.message}`);
-            } else {
-                window.hideAuthModal();
-                updateUIForUser(data.user);
-            }
+        const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) {
+            alert(`Ошибка входа: ${error.message}`);
         } else {
-            const { data, error } = await window.supabaseClient.auth.signUp({ email, password });
-            if (error) {
-                alert(`Ошибка регистрации: ${error.message}`);
-            } else {
-                window.hideAuthModal();
-                alert('Регистрация прошла успешно! Проверьте вашу почту для подтверждения.');
-            }
+            window.hideAuthModal();
+            updateUIForUser(data.user);
+        }
+    });
+
+    // Обработка Регистрации
+    formRegister?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
+
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-password').value;
+
+        const { data, error } = await window.supabaseClient.auth.signUp({ email, password });
+        if (error) {
+            alert(`Ошибка регистрации: ${error.message}`);
+        } else {
+            window.hideAuthModal();
+            alert('Регистрация прошла успешно! Проверьте вашу почту для подтверждения.');
         }
     });
 }
