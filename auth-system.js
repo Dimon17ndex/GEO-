@@ -223,18 +223,19 @@ function injectAuthStyles() {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 14px !important;
+    gap: 16px !important; /* Увеличили зазор между логотипом и надписью */
     font-family: 'Unbounded', sans-serif !important;
-    font-size: 22px !important;
+    font-size: 26px !important; /* Увеличили размер шрифта (было 22px) */
     font-weight: 900 !important;
     letter-spacing: -0.5px !important;
     color: #ffffff !important;
-    margin-bottom: 25px !important;
+    margin-top: -15px !important; /* Приподнимаем блок выше */
+    margin-bottom: 30px !important; /* Добавляем отступ до табов/формы */
     text-transform: uppercase !important;
 }
 
 .auth-header-logo {
-    height: 70px !important; /* Увеличили логотип до 70px */
+    height: 85px !important; /* Увеличили высоту логотипа (было 70px) */
     width: auto !important;
     display: block !important;
     object-fit: contain !important;
