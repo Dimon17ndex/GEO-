@@ -47,10 +47,14 @@ window.logoutUser = async function() {
     }
 };
 
-// Функция показа/скрытия плашки подтверждения
 function showConfirmToast() {
     const toast = document.getElementById('auth-confirm-toast');
-    if (toast) toast.classList.add('visible');
+    if (toast) {
+        // Перезапуск анимации для повторного прыжка и волны
+        toast.classList.remove('visible');
+        void toast.offsetWidth;
+        toast.classList.add('visible');
+    }
 }
 
 function hideConfirmToast() {
@@ -58,7 +62,6 @@ function hideConfirmToast() {
     if (toast) toast.classList.remove('visible');
 }
 
-// Переключение режимов (Crossfade)
 function setAuthMode(mode) {
     if (currentAuthMode === mode) return;
     currentAuthMode = mode;
@@ -100,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// --- СТИЛИ ---
+// --- СТИЛИ С АНИМАЦИЕЙ ПРЫЖКА И СВЕТОВОЙ ВОЛНЫ ---
 function injectAuthStyles() {
     if (document.getElementById('auth-system-styles')) return;
 
@@ -120,6 +123,7 @@ function injectAuthStyles() {
             justify-content: center !important;
             padding: 20px !important;
             box-sizing: border-box !important;
+            overflow: hidden !important;
             
             opacity: 0 !important;
             visibility: hidden !important;
@@ -150,6 +154,7 @@ function injectAuthStyles() {
             
             transform: scale(0.96) !important;
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            z-index: 2 !important;
         }
 
         .auth-modal-overlay.active .auth-modal-container {
@@ -329,37 +334,92 @@ function injectAuthStyles() {
             transform: scale(0.98) !important;
         }
 
-        /* --- ПАНЕЛЬ ПОДТВЕРЖДЕНИЯ ВНИЗУ ПО ЦЕНТРУ --- */
+        /* --- ПАНЕЛЬ ПОДТВЕРЖДЕНИЯ С ВОЛНОЙ И ЭНЕРГИЧНЫМ ПРЫЖКОМ --- */
         .auth-confirm-toast {
             position: absolute !important;
             bottom: 30px !important;
             left: 50% !important;
-            transform: translateX(-50%) translateY(20px) !important;
+            transform: translateX(-50%) translateY(100px);
             background: rgba(20, 20, 25, 0.95) !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
             border-radius: 16px !important;
             padding: 12px 20px !important;
             display: flex !important;
             align-items: center !important;
             gap: 15px !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
             opacity: 0 !important;
             visibility: hidden !important;
             pointer-events: none !important;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
             white-space: nowrap !important;
             z-index: 10000000 !important;
         }
 
+        /* Радиальная светлая волна */
+        .auth-confirm-toast::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            width: 0px !important;
+            height: 0px !important;
+            border-radius: 50% !important;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0) 70%) !important;
+            transform: translate(-50%, -50%) !important;
+            pointer-events: none !important;
+            z-index: -1 !important;
+            opacity: 0 !important;
+        }
+
+        /* Активация анимаций при появлении */
         .auth-confirm-toast.visible {
             opacity: 1 !important;
             visibility: visible !important;
             pointer-events: auto !important;
-            transform: translateX(-50%) translateY(0) !important;
+            animation: bounceInUp 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+        }
+
+        .auth-confirm-toast.visible::before {
+            animation: radialWave 0.75s ease-out forwards !important;
+        }
+
+        /* Анимация прыжка */
+        @keyframes bounceInUp {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(100px) scale(0.7);
+            }
+            60% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(-15px) scale(1.05);
+            }
+            80% {
+                transform: translateX(-50%) translateY(5px) scale(0.98);
+            }
+            100% {
+                transform: translateX(-50%) translateY(0) scale(1);
+            }
+        }
+
+        /* Анимация радиальной волны на весь экран */
+        @keyframes radialWave {
+            0% {
+                width: 0px;
+                height: 0px;
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+            100% {
+                width: 250vw;
+                height: 250vw;
+                opacity: 0;
+            }
         }
 
         .auth-confirm-text {
-            color: rgba(255, 255, 255, 0.9) !important;
+            color: rgba(255, 255, 255, 0.95) !important;
             font-size: 13px !important;
             font-weight: 500 !important;
         }
@@ -474,24 +534,19 @@ function initAuthEvents() {
     const btnConfirmYes = document.getElementById('auth-confirm-close-btn');
     const btnConfirmNo = document.getElementById('auth-cancel-close-btn');
 
-    // Кнопки панели подтверждения
     btnConfirmYes?.addEventListener('click', window.hideAuthModal);
     btnConfirmNo?.addEventListener('click', hideConfirmToast);
 
-    // Крестик закрывает сразу
     closeBtn?.addEventListener('click', window.hideAuthModal);
 
-    // Клик по фону
     overlay?.addEventListener('click', (e) => {
         if (e.target === overlay) {
             const currentTime = new Date().getTime();
             const timeDiff = currentTime - lastOverlayClickTime;
 
-            // При ДВОЙНОМ КЛИКЕ показываем нижнюю панель
             if (timeDiff < 350 && timeDiff > 0) {
                 showConfirmToast();
             } else {
-                // При 1 клике — легкое покачивание
                 const container = document.querySelector('.auth-modal-container');
                 if (container) {
                     container.classList.remove('shake');
@@ -516,7 +571,6 @@ function initAuthEvents() {
     tabLogin?.addEventListener('click', () => setAuthMode('login'));
     tabRegister?.addEventListener('click', () => setAuthMode('register'));
 
-    // Форма входа
     formLogin?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
@@ -533,7 +587,6 @@ function initAuthEvents() {
         }
     });
 
-    // Форма регистрации
     formRegister?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
