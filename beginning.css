@@ -776,22 +776,24 @@ body:has(#version-badge.show) .app-banners-container {
    ========================================================= */
 .top-right-profile {
     position: fixed;
-    top: 40px;          /* На одном уровне с логотипом и шестерёнкой */
-    right: 80px;        /* По умолчанию аккуратно рядом с шестерёнкой */
+    top: 40px;          /* Задайте такое же значение top, как у шестерёнки */
+    right: 70px;        /* Стоит прямо рядом с шестерёнкой */
     z-index: 10;
-    transition: right 0.35s cubic-bezier(0.25, 1, 0.5, 1); /* Мягкая анимация */
+    transition: right 0.35s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* Сдвигаем ровно настолько, чтобы освободить место слову НАСТРОЙКИ */
+/* Сдвиг влево при наведении на панель настроек */
 .settings-trigger-zone:hover ~ .top-right-profile,
 .settings-trigger-zone:focus-within ~ .top-right-profile {
-    right: 220px;       /* Оптимальный отступ без огромного зазора */
+    right: 230px;       /* Оставляет аккуратный зазор от надписи НАСТРОЙКИ */
 }
 
+/* Дополнительно: чтобы профиль стоял ровно по вертикали */
 .profile-card {
     position: relative;
-    display: inline-block;
-    padding: 10px 18px;
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;  /* Небольшой вертикальный отступ для ровной высоты */
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 12px;
