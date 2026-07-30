@@ -196,7 +196,7 @@ function injectAuthStyles() {
         }
 
         .auth-close-btn {
-    position: fixed !important;
+    position: absolute !important;
     top: 30px !important;
     right: 30px !important;
     background: rgba(255, 255, 255, 0.08) !important;
@@ -560,11 +560,11 @@ function initAuthModalUI() {
 
     const modalHTML = `
         <div id="auth-modal-overlay" class="auth-modal-overlay">
+            <button id="auth-close-btn" class="auth-close-btn" type="button">&times;</button>
+
             <img src="images/geo_logo.png" alt="" class="auth-bg-watermark">
 
             <div class="auth-modal-container">
-                <button id="auth-close-btn" class="auth-close-btn" type="button">&times;</button>
-                
                 <div class="auth-header-title">
                     <img src="images/geo_logo.png" alt="Geo Logo" class="auth-header-logo">
                     <span>GEOГРАФИЯ</span>
