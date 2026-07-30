@@ -780,8 +780,8 @@ body:has(#version-badge.show) .app-banners-container {
     right: 65px;
     z-index: 10;
     
-    /* Сдвигает блок вниз на нужное количество пикселей */
-    transform: translateY(6px); /* Попробуйте 4px, 6px или 8px */
+    /* Сдвигаем вниз всего на 3px вместо 6px (поднимаем на 3px выше) */
+    transform: translateY(3px); 
     
     transition: right 0.35s cubic-bezier(0.25, 1, 0.5, 1);
 }
