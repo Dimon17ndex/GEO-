@@ -24,7 +24,7 @@ window.showAuthModal = function() {
         modal = document.getElementById('auth-modal-overlay');
     }
     
-    hideConfirmToast();
+    hideConfirmToast(true); // Мгновенный сброс без задержек
     setAuthMode('login');
 
     if (modal) {
@@ -36,7 +36,7 @@ window.hideAuthModal = function() {
     const modal = document.getElementById('auth-modal-overlay');
     if (modal) {
         modal.classList.remove('active');
-        hideConfirmToast();
+        hideConfirmToast(true);
     }
 };
 
@@ -47,19 +47,40 @@ window.logoutUser = async function() {
     }
 };
 
+// Функция показа всплывающей плашки с волной
 function showConfirmToast() {
     const toast = document.getElementById('auth-confirm-toast');
+    const wave = document.getElementById('auth-confirm-wave');
+    
     if (toast) {
-        // Перезапуск анимации для повторного прыжка и волны
-        toast.classList.remove('visible');
+        toast.classList.remove('hiding', 'visible');
+        if (wave) wave.classList.remove('active');
+
+        // Перезапуск CSS-анимаций
         void toast.offsetWidth;
+
         toast.classList.add('visible');
+        if (wave) wave.classList.add('active');
     }
 }
 
-function hideConfirmToast() {
+// Функция мягкого скрытия плашки
+function hideConfirmToast(immediate = false) {
     const toast = document.getElementById('auth-confirm-toast');
-    if (toast) toast.classList.remove('visible');
+    const wave = document.getElementById('auth-confirm-wave');
+
+    if (!toast) return;
+
+    if (wave) wave.classList.remove('active');
+
+    if (immediate) {
+        toast.classList.remove('visible', 'hiding');
+    } else {
+        toast.classList.add('hiding');
+        setTimeout(() => {
+            toast.classList.remove('visible', 'hiding');
+        }, 300); // 300ms совпадает с длительностью transition в CSS
+    }
 }
 
 function setAuthMode(mode) {
@@ -103,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// --- СТИЛИ С АНИМАЦИЕЙ ПРЫЖКА И СВЕТОВОЙ ВОЛНЫ ---
+// --- СТИЛИ ДЛЯ МЯГКОГО ИСЧЕЗНОВЕНИЯ И ЭФФЕКТНОЙ ВОЛНЫ ---
 function injectAuthStyles() {
     if (document.getElementById('auth-system-styles')) return;
 
@@ -154,7 +175,7 @@ function injectAuthStyles() {
             
             transform: scale(0.96) !important;
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-            z-index: 2 !important;
+            z-index: 5 !important;
         }
 
         .auth-modal-overlay.active .auth-modal-container {
@@ -334,44 +355,62 @@ function injectAuthStyles() {
             transform: scale(0.98) !important;
         }
 
-        /* --- ПАНЕЛЬ ПОДТВЕРЖДЕНИЯ С ВОЛНОЙ И ЭНЕРГИЧНЫМ ПРЫЖКОМ --- */
+        /* --- СВЕТОВАЯ РАДИАЛЬНАЯ ВОЛНА НА ВЕСЬ ЭКРАН --- */
+        .auth-confirm-wave {
+            position: absolute !important;
+            bottom: 40px !important;
+            left: 50% !important;
+            width: 10px !important;
+            height: 10px !important;
+            border-radius: 50% !important;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.12) 40%, rgba(255, 255, 255, 0) 70%) !important;
+            transform: translate(-50%, 50%) scale(0) !important;
+            pointer-events: none !important;
+            z-index: 8 !important;
+            opacity: 0 !important;
+        }
+
+        .auth-confirm-wave.active {
+            animation: fullScreenWave 0.8s ease-out forwards !important;
+        }
+
+        @keyframes fullScreenWave {
+            0% {
+                transform: translate(-50%, 50%) scale(1);
+                opacity: 1;
+            }
+            60% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translate(-50%, 50%) scale(250);
+                opacity: 0;
+            }
+        }
+
+        /* --- ПАНЕЛЬ ПОДТВЕРЖДЕНИЯ --- */
         .auth-confirm-toast {
             position: absolute !important;
             bottom: 30px !important;
             left: 50% !important;
-            transform: translateX(-50%) translateY(100px);
-            background: rgba(20, 20, 25, 0.95) !important;
+            transform: translateX(-50%) translateY(80px) scale(0.8);
+            background: rgba(20, 20, 25, 0.96) !important;
             border: 1px solid rgba(255, 255, 255, 0.2) !important;
             border-radius: 16px !important;
             padding: 12px 20px !important;
             display: flex !important;
             align-items: center !important;
             gap: 15px !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6) !important;
             opacity: 0 !important;
             visibility: hidden !important;
             pointer-events: none !important;
             white-space: nowrap !important;
-            z-index: 10000000 !important;
+            z-index: 10 !important;
+            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease !important;
         }
 
-        /* Радиальная светлая волна */
-        .auth-confirm-toast::before {
-            content: '' !important;
-            position: absolute !important;
-            top: 50% !important;
-            left: 50% !important;
-            width: 0px !important;
-            height: 0px !important;
-            border-radius: 50% !important;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0) 70%) !important;
-            transform: translate(-50%, -50%) !important;
-            pointer-events: none !important;
-            z-index: -1 !important;
-            opacity: 0 !important;
-        }
-
-        /* Активация анимаций при появлении */
+        /* Анимация подпрыгивания при появлении */
         .auth-confirm-toast.visible {
             opacity: 1 !important;
             visibility: visible !important;
@@ -379,42 +418,29 @@ function injectAuthStyles() {
             animation: bounceInUp 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
         }
 
-        .auth-confirm-toast.visible::before {
-            animation: radialWave 0.75s ease-out forwards !important;
+        /* Мягкое растворение при скрытии (Fade Out) */
+        .auth-confirm-toast.hiding {
+            opacity: 0 !important;
+            transform: translateX(-50%) translateY(30px) scale(0.95) !important;
+            pointer-events: none !important;
+            animation: none !important;
         }
 
-        /* Анимация прыжка */
         @keyframes bounceInUp {
             0% {
                 opacity: 0;
-                transform: translateX(-50%) translateY(100px) scale(0.7);
+                transform: translateX(-50%) translateY(90px) scale(0.7);
             }
             60% {
                 opacity: 1;
-                transform: translateX(-50%) translateY(-15px) scale(1.05);
+                transform: translateX(-50%) translateY(-15px) scale(1.04);
             }
             80% {
                 transform: translateX(-50%) translateY(5px) scale(0.98);
             }
             100% {
-                transform: translateX(-50%) translateY(0) scale(1);
-            }
-        }
-
-        /* Анимация радиальной волны на весь экран */
-        @keyframes radialWave {
-            0% {
-                width: 0px;
-                height: 0px;
                 opacity: 1;
-            }
-            50% {
-                opacity: 0.8;
-            }
-            100% {
-                width: 250vw;
-                height: 250vw;
-                opacity: 0;
+                transform: translateX(-50%) translateY(0) scale(1);
             }
         }
 
@@ -509,6 +535,8 @@ function initAuthModalUI() {
                 </div>
             </div>
 
+            <div id="auth-confirm-wave" class="auth-confirm-wave"></div>
+
             <div id="auth-confirm-toast" class="auth-confirm-toast">
                 <span class="auth-confirm-text">Вы точно хотите покинуть авторизацию?</span>
                 <div class="auth-confirm-actions">
@@ -535,7 +563,7 @@ function initAuthEvents() {
     const btnConfirmNo = document.getElementById('auth-cancel-close-btn');
 
     btnConfirmYes?.addEventListener('click', window.hideAuthModal);
-    btnConfirmNo?.addEventListener('click', hideConfirmToast);
+    btnConfirmNo?.addEventListener('click', () => hideConfirmToast(false)); // Мягкое скрытие
 
     closeBtn?.addEventListener('click', window.hideAuthModal);
 
