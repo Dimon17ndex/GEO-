@@ -774,19 +774,24 @@ body:has(#version-badge.show) .app-banners-container {
 /* =========================================================
    ВИДЖЕТ ПРОФИЛЯ В ВЕРХНЕМ ПРАВОМ УГЛУ
    ========================================================= */
-/* Родительский контейнер профиля */
+/* 1. Базовое состояние (когда настройки закрыты) */
 #user-profile-widget {
     position: fixed !important;
-    top: 43px !important;       /* Выравнивание по высоте */
-    right: 95px !important;     /* Еще чуть дальше отодвинули от шестерёнки */
+    top: 43px !important;
+    right: 95px !important;
     z-index: 100 !important;
     transition: right 0.35s cubic-bezier(0.25, 1, 0.5, 1) !important;
 }
 
-/* Сдвиг влево при открытии настроек */
+/* 2. Обычное открытие настроек (навели на шестерёнку или другие значки) */
 .settings-trigger-zone:hover ~ #user-profile-widget,
 .settings-trigger-zone:focus-within ~ #user-profile-widget {
-    right: 255px !important;    /* Пропорционально отодвинули для открытых настроек */
+    right: 255px !important;
+}
+
+/* 3. Дополнительный сдвиг: когда навели ИМЕННО на кнопку звука (линия удлинилась) */
+.settings-trigger-zone:has(#volume-toggle-btn:hover) ~ #user-profile-widget {
+    right: 310px !important; /* Сдвигаем левее ещё на ~55px, пока горит линия */
 }
 
 /* Дополнительно: чтобы профиль стоял ровно по вертикали */
