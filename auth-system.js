@@ -241,13 +241,35 @@ function injectAuthStyles() {
     margin-bottom: 30px !important;
 }
 
-/* Левитирующий логотип */
+/* Контейнер-обёртка для гарантированной левитации */
+.auth-logo-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    will-change: transform !important;
+    /* Запуск анимации плавания */
+    animation: logoHover 3s ease-in-out infinite alternate !important;
+}
+
+/* Изображение логотипа */
 .auth-header-logo {
     height: 105px !important;
     width: auto !important;
     display: block !important;
     object-fit: contain !important;
-    animation: logoHover 3.5s ease-in-out infinite alternate !important;
+}
+
+/* Анимация плавного парения вверх-вниз */
+@keyframes logoHover {
+    0% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-8px) rotate(-2deg);
+    }
+    100% {
+        transform: translateY(6px) rotate(2deg);
+    }
 }
 
 /* Окно маски — увеличили высоту до 55px */
@@ -653,7 +675,10 @@ function initAuthModalUI() {
 
             <div class="auth-modal-container">
                 <div class="auth-header-title">
-    <img src="images/geo_logo.png" alt="Geo Logo" class="auth-header-logo">
+    <div class="auth-logo-wrapper">
+        <img src="images/geo_logo.png" alt="Geo Logo" class="auth-header-logo">
+    </div>
+
     <div class="auth-title-ticker">
         <div class="auth-title-track">
             <span>GEOГРАФИЯ</span>
