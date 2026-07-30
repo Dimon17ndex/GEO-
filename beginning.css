@@ -776,7 +776,7 @@ body:has(#version-badge.show) .app-banners-container {
    ========================================================= */
 .top-right-profile {
     position: fixed;
-    top: 20px;          /* Увеличьте это число (44px, 45px, 46px), чтобы опустить профиль ниже */
+    top: 46px;          /* Увеличьте это число (44px, 45px, 46px), чтобы опустить профиль ниже */
     right: 65px;        /* Расстояние до шестерёнки */
     z-index: 10;
     transition: right 0.35s cubic-bezier(0.25, 1, 0.5, 1);
