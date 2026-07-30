@@ -776,16 +776,16 @@ body:has(#version-badge.show) .app-banners-container {
    ========================================================= */
 .top-right-profile {
     position: fixed;
-    top: 40px;          /* Выравнивание по высоте с шестерёнкой */
-    right: 65px;        /* Придвигаем вплотную к иконке настройки */
+    top: 45px;          /* Увеличьте это число (44px, 45px, 46px), чтобы опустить профиль ниже */
+    right: 65px;        /* Расстояние до шестерёнки */
     z-index: 10;
     transition: right 0.35s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* При наведении на настройки профиль плавно отезжает влево */
+/* Сдвиг влево при наведении на настройки */
 .settings-trigger-zone:hover ~ .top-right-profile,
 .settings-trigger-zone:focus-within ~ .top-right-profile {
-    right: 240px;       /* Расстояние для открытой плашки "НАСТРОЙКИ" */
+    right: 240px;
 }
 
 /* Дополнительно: чтобы профиль стоял ровно по вертикали */
