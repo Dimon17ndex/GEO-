@@ -745,30 +745,38 @@ async function checkUserSession() {
 }
 
 function updateUIForUser(user) {
-    const authBtn = document.getElementById('open-auth-btn'); // ID вашей кнопки в шапке сайта
+    // Ищем кнопку по ID, который мы только что добавили в HTML
+    const authBtn = document.getElementById('open-auth-btn');
 
     if (user) {
+        // Пользователь авторизован
         document.body.classList.add('user-logged-in');
         
         if (authBtn) {
-            // Показываем часть email до собачки @
+            // Берем часть логина до знака @
             const username = user.email.split('@')[0];
             authBtn.textContent = `Профиль (${username})`;
             
-            // Меняв действие кнопки: при клике вызываем logoutUser()
-            authBtn.onclick = () => {
-                if (confirm('Выйти из аккаунта?')) {
-                    window.logoutUser();
+            // Назначаем подтверждение выхода при клике
+            authBtn.onclick = async () => {
+                if (confirm('Вы действительно хотите выйти из аккаунта?')) {
+                    if (window.logoutUser) {
+                        await window.logoutUser();
+                    }
                 }
             };
         }
     } else {
+        // Пользователь не вошёл или вышел
         document.body.classList.remove('user-logged-in');
         
         if (authBtn) {
-            authBtn.textContent = 'Войти';
-            // Возвращаем открытие модального окна
-            authBtn.onclick = window.showAuthModal;
+            authBtn.textContent = 'Войти / Зарегистрироваться';
+            authBtn.onclick = () => {
+                if (window.showAuthModal) {
+                    window.showAuthModal();
+                }
+            };
         }
     }
 }
