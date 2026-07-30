@@ -210,23 +210,25 @@ function injectAuthStyles() {
         .auth-close-btn:hover { color: #ffffff !important; }
 
         .auth-header-title {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            gap: 10px !important;
-            font-size: 20px !important;
-            font-weight: 700 !important;
-            letter-spacing: 1px !important;
-            color: #ffffff !important;
-            margin-bottom: 20px !important;
-            text-transform: uppercase !important;
-        }
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    font-family: 'Unbounded', sans-serif !important;
+    font-size: 22px !important;
+    font-weight: 900 !important;
+    letter-spacing: -0.5px !important;
+    color: #ffffff !important;
+    margin-bottom: 25px !important;
+    text-transform: uppercase !important;
+}
 
-        .auth-header-title svg {
-            width: 28px !important;
-            height: 28px !important;
-            stroke: #ffffff !important;
-        }
+.auth-header-logo {
+    height: 32px !important;
+    width: auto !important;
+    display: block !important;
+    object-fit: contain !important;
+}
 
         .auth-tabs {
             position: relative !important;
@@ -500,11 +502,7 @@ function initAuthModalUI() {
                 <button id="auth-close-btn" class="auth-close-btn" type="button">&times;</button>
                 
                 <div class="auth-header-title">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <path d="M2 12h20"></path>
-                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10z"></path>
-                    </svg>
+                    <img src="images/geo_logo.png" alt="Geo Logo" class="auth-header-logo">
                     <span>GEOГРАФИЯ</span>
                 </div>
                 
