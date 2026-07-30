@@ -485,43 +485,43 @@ function injectAuthStyles() {
             background: rgba(255, 255, 255, 0.85) !important;
         }
 
-        /* --- ОГРОМНЫЙ ФОНОВЫЙ ЛОГОТИП СПРАВА С ИНТЕНСИВНОЙ АНИМАЦИЕЙ --- */
+        /* --- ОГРОМНЫЙ ФОНОВЫЙ ЛОГОТИП СПРАВА С ПЛАВНЫМ БЛЮР-ПРОЯВЛЕНИЕМ --- */
         .auth-bg-watermark {
             position: absolute !important;
             top: 45% !important;
-            right: -15% !important; /* Уводим правее за край экрана */
-            left: auto !important; /* Отменяем центрирование по левому краю */
-            width: 1200px !important; /* Гигантский размер */
+            right: -15% !important;
+            left: auto !important;
+            width: 1200px !important;
             height: auto !important;
-            max-width: none !important; /* Снимаем ограничения по ширине */
+            max-width: none !important;
             pointer-events: none !important;
             z-index: 1 !important;
-            
-            /* Блюр, яркость и начальное состояние */
-            filter: blur(14px) brightness(0.9) !important;
-            opacity: 0 !important;
-            transform: translateY(-50%) scale(0.7) rotate(12deg) !important;
             transform-origin: center right !important;
             
-            /* Мягкое появление при открытии */
-            transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            /* Исходые параметры: полностью невидимый и глубоко заблюренный */
+            opacity: 0 !important;
+            filter: blur(45px) brightness(0.6) !important;
+            
+            /* Плавно проявляем ВСЕ свойства (включая filter и opacity) при изменении */
+            transition: opacity 1.2s ease-out, filter 1.2s ease-out !important;
+            
+            /* Анимация движения крутится постоянно, но её не видно, пока opacity: 0 */
+            animation: intenseFloat 6s ease-in-out infinite alternate !important;
         }
 
-        /* Когда оверлей активен — проявляем и запускаем интенсивную анимацию */
+        /* Когда окно авторизации открыто — проявляем через плавный блюр */
         .auth-modal-overlay.active .auth-bg-watermark {
-            opacity: 0.22 !important; /* Добавили сочности (22% видимости) */
-            transform: translateY(-50%) scale(1) rotate(0deg) !important;
-            animation: intenseFloat 5s ease-in-out infinite alternate !important;
-            animation-delay: 0.3s !important;
+            opacity: 0.22 !important; /* Проявляется до 22% */
+            filter: blur(12px) brightness(0.9) !important; /* Проясняется блюр с 45px до 12px */
         }
 
-        /* Динамичная размашистая анимация: покачивание, накренение и легкое пульсирование */
+        /* Динамичная размашистая анимация движения */
         @keyframes intenseFloat {
             0% {
                 transform: translateY(-50%) translateX(0px) rotate(0deg) scale(1);
             }
             50% {
-                transform: translateY(-58%) translateX(-25px) rotate(-5deg) scale(1.05);
+                transform: translateY(-58%) translateX(-25px) rotate(-5deg) scale(1.04);
             }
             100% {
                 transform: translateY(-42%) translateX(15px) rotate(4deg) scale(0.96);
