@@ -213,7 +213,7 @@ function injectAuthStyles() {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 10px !important;
+    gap: 12px !important;
     font-family: 'Unbounded', sans-serif !important;
     font-size: 22px !important;
     font-weight: 900 !important;
@@ -224,7 +224,7 @@ function injectAuthStyles() {
 }
 
 .auth-header-logo {
-    height: 32px !important;
+    height: 50px !important; /* Увеличили высоту с 32px до 50px */
     width: auto !important;
     display: block !important;
     object-fit: contain !important;
