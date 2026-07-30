@@ -484,6 +484,47 @@ function injectAuthStyles() {
         .auth-confirm-btn.danger:hover {
             background: rgba(255, 255, 255, 0.85) !important;
         }
+
+        /* --- БОЛЬШОЙ ФОНОВЫЙ ЛОГОТИП С БЛЮРОМ И ПОКАЧИВАНИЕМ --- */
+        .auth-bg-watermark {
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            width: 480px !important; /* Размер водяного знака */
+            height: auto !important;
+            max-width: 80vw !important;
+            pointer-events: none !important;
+            z-index: 1 !important;
+            
+            /* Блюр, прозрачность и центрирование */
+            filter: blur(16px) brightness(0.8) !important;
+            opacity: 0 !important;
+            transform: translate(-50%, -50%) scale(0.8) rotate(-5deg) !important;
+            
+            /* Мягкое проявление и исчезновение при закрытии */
+            transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+
+        /* Когда оверлей активен — проявляем и запускаем плавание */
+        .auth-modal-overlay.active .auth-bg-watermark {
+            opacity: 0.15 !important; /* Нежная прозрачность (15%) */
+            transform: translate(-50%, -50%) scale(1) rotate(0deg) !important;
+            animation: gentleFloat 7s ease-in-out infinite alternate !important;
+            animation-delay: 0.5s !important;
+        }
+
+        /* Нежное покачивание вверх-вниз и легкое вращение */
+        @keyframes gentleFloat {
+            0% {
+                transform: translate(-50%, -50%) translateY(0px) rotate(0deg) scale(1);
+            }
+            50% {
+                transform: translate(-50%, -50%) translateY(-18px) rotate(2deg) scale(1.03);
+            }
+            100% {
+                transform: translate(-50%, -50%) translateY(12px) rotate(-1.5deg) scale(0.98);
+            }
+        }
     `;
 
     const styleElement = document.createElement('style');
@@ -498,6 +539,8 @@ function initAuthModalUI() {
 
     const modalHTML = `
         <div id="auth-modal-overlay" class="auth-modal-overlay">
+            <img src="images/geo_logo.png" alt="" class="auth-bg-watermark">
+
             <div class="auth-modal-container">
                 <button id="auth-close-btn" class="auth-close-btn" type="button">&times;</button>
                 
