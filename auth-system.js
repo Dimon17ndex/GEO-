@@ -12,7 +12,6 @@ if (!window.supabaseClient && window.supabase) {
     }
 }
 
-// Текущий активный режим: 'login' или 'register'
 let currentAuthMode = 'login';
 
 // --- ГЛОБАЛЬНЫЕ ФУНКЦИИ ---
@@ -25,7 +24,6 @@ window.showAuthModal = function() {
         modal = document.getElementById('auth-modal-overlay');
     }
     
-    // Всегда сбрасываем на 'login' при открытии
     setAuthMode('login', false);
 
     if (modal) {
@@ -47,22 +45,25 @@ window.logoutUser = async function() {
     }
 };
 
-// Функция переключения режимов с эффектом размытия
+// Функция переключения режимов с быстрой подменой и анимацией подложки
 function setAuthMode(mode, animate = true) {
     if (currentAuthMode === mode && animate) return;
     currentAuthMode = mode;
 
+    const authTabs = document.getElementById('auth-tabs');
     const tabLogin = document.getElementById('tab-login-btn');
     const tabRegister = document.getElementById('tab-register-btn');
     const formContainer = document.getElementById('auth-dynamic-form');
 
-    if (!tabLogin || !tabRegister || !formContainer) return;
+    if (!authTabs || !tabLogin || !tabRegister || !formContainer) return;
 
-    // Подсветка переключателя
+    // Плавный сдвиг белой подложки тумблера
     if (mode === 'login') {
+        authTabs.classList.remove('register-mode');
         tabLogin.classList.add('active');
         tabRegister.classList.remove('active');
     } else {
+        authTabs.classList.add('register-mode');
         tabRegister.classList.add('active');
         tabLogin.classList.remove('active');
     }
@@ -97,21 +98,21 @@ function setAuthMode(mode, animate = true) {
         return;
     }
 
-    // Запускаем анимированный уход старых полей (blur + fade)
+    // Быстрый уход старых полей (100мс)
     formContainer.classList.remove('fade-in-blur');
     formContainer.classList.add('fade-out-blur');
 
     setTimeout(() => {
-        // Подменяем поля в момент полного размытия
         renderFields();
         
+        // Быстрое появление новых полей (150мс)
         formContainer.classList.remove('fade-out-blur');
         formContainer.classList.add('fade-in-blur');
 
         setTimeout(() => {
             formContainer.classList.remove('fade-in-blur');
-        }, 250);
-    }, 200);
+        }, 150);
+    }, 100);
 }
 
 // --- ЗАГРУЗКА ---
@@ -125,12 +126,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// --- СТИЛИ (Точные отступы 1:1 по макету) ---
+// --- СТИЛИ С АНИМИРОВАННОЙ ПОДЛОЖКОЙ ---
 function injectAuthStyles() {
     if (document.getElementById('auth-system-styles')) return;
 
     const css = `
-        /* Оверлей на весь экран */
         .auth-modal-overlay {
             position: fixed !important;
             top: 0 !important;
@@ -159,14 +159,13 @@ function injectAuthStyles() {
             pointer-events: auto !important;
         }
 
-        /* Контейнер без рамки */
         .auth-modal-container {
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
             padding: 0 !important;
             width: 100% !important;
-            max-width: 300px !important; /* Узкая изящная пропорция */
+            max-width: 300px !important;
             position: relative !important;
             color: #ffffff !important;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
@@ -183,7 +182,6 @@ function injectAuthStyles() {
             transform: scale(1) !important;
         }
 
-        /* Кнопка закрытия (крестик справа на одном уровне с логотипом) */
         .auth-close-btn {
             position: absolute !important;
             top: 4px !important;
@@ -198,7 +196,6 @@ function injectAuthStyles() {
         }
         .auth-close-btn:hover { color: #ffffff !important; }
 
-        /* 1. Заголовок с логотипом GEOГРАФИЯ */
         .auth-header-title {
             display: flex !important;
             align-items: center !important;
@@ -208,7 +205,7 @@ function injectAuthStyles() {
             font-weight: 700 !important;
             letter-spacing: 1px !important;
             color: #ffffff !important;
-            margin-bottom: 20px !important; /* Небольшой отступ до капсулы */
+            margin-bottom: 20px !important;
             text-transform: uppercase !important;
         }
 
@@ -218,60 +215,79 @@ function injectAuthStyles() {
             stroke: #ffffff !important;
         }
 
-        /* 2. Капсульный переключатель Вход / Регистрация */
+        /* 2. Скользящий тумблер с белой плавающей подложкой */
         .auth-tabs {
+            position: relative !important;
             display: flex !important;
             background: rgba(255, 255, 255, 0.04) !important;
             border: 1px solid rgba(255, 255, 255, 0.15) !important;
             border-radius: 24px !important;
             padding: 3px !important;
             width: 100% !important;
-            margin-bottom: 110px !important; /* БОЛЬШОЙ отступ от тумблера до полей ввода */
+            margin-bottom: 110px !important;
             box-sizing: border-box !important;
         }
 
+        /* Скользящий белый элемент */
+        .auth-tab-pill {
+            position: absolute !important;
+            top: 3px !important;
+            left: 3px !important;
+            width: calc(50% - 3px) !important;
+            height: calc(100% - 6px) !important;
+            background: #ffffff !important;
+            border-radius: 20px !important;
+            z-index: 1 !important;
+            transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1) !important;
+            pointer-events: none !important;
+        }
+
+        /* Анимация перемещения плашки вправо */
+        .auth-tabs.register-mode .auth-tab-pill {
+            transform: translateX(100%) !important;
+        }
+
         .auth-tab-btn {
+            position: relative !important;
+            z-index: 2 !important;
             flex: 1 !important;
             padding: 7px 14px !important;
             background: transparent !important;
             border: none !important;
-            border-radius: 20px !important;
             color: rgba(255, 255, 255, 0.5) !important;
             font-size: 13px !important;
             font-weight: 500 !important;
             cursor: pointer !important;
-            transition: all 0.25s ease !important;
+            transition: color 0.3s ease !important;
             text-align: center !important;
         }
 
         .auth-tab-btn.active {
-            background: #ffffff !important;
             color: #000000 !important;
             font-weight: 600 !important;
         }
 
-        /* 3. Контейнер формы */
+        /* 3. Быстрый и плавный Crossfade полей */
         .auth-form {
             display: flex !important;
             flex-direction: column !important;
-            gap: 45px !important; /* Расстояние между Email и Паролем */
+            gap: 45px !important;
             width: 100% !important;
-            transition: filter 0.2s ease, opacity 0.2s ease !important;
+            transition: filter 0.12s ease, opacity 0.12s ease !important;
         }
 
-        /* Анимация размытия при смене режима */
         .fade-out-blur {
-            filter: blur(8px) !important;
+            filter: blur(6px) !important;
             opacity: 0 !important;
         }
 
         .fade-in-blur {
-            animation: blurIn 0.25s ease forwards !important;
+            animation: blurIn 0.15s ease forwards !important;
         }
 
         @keyframes blurIn {
             from {
-                filter: blur(8px);
+                filter: blur(6px);
                 opacity: 0;
             }
             to {
@@ -285,7 +301,6 @@ function injectAuthStyles() {
             width: 100% !important;
         }
 
-        /* 4. Поля ввода (линии с отцентрованным текстом) */
         .auth-input {
             background: transparent !important;
             border: none !important;
@@ -309,7 +324,6 @@ function injectAuthStyles() {
             border-bottom-color: #ffffff !important;
         }
 
-        /* 5. Кнопка «Войти» / «Зарегистрироваться» */
         .auth-submit-btn {
             background: transparent !important;
             color: #ffffff !important;
@@ -320,7 +334,7 @@ function injectAuthStyles() {
             font-weight: 500 !important;
             cursor: pointer !important;
             width: 100% !important;
-            margin-top: 45px !important; /* Большой отступ сверху до кнопки */
+            margin-top: 45px !important;
             transition: all 0.2s ease !important;
             text-align: center !important;
         }
@@ -341,7 +355,7 @@ function injectAuthStyles() {
     document.head.appendChild(styleElement);
 }
 
-// --- HTML РАЗМЕТКА ---
+// --- HTML РАЗМЕТКА С ПЛАВАЮЩЕЙ ПОДЛОЖКОЙ ---
 function initAuthModalUI() {
     if (document.getElementById('auth-modal-overlay')) return;
 
@@ -359,7 +373,8 @@ function initAuthModalUI() {
                     <span>GEOГРАФИЯ</span>
                 </div>
                 
-                <div class="auth-tabs">
+                <div class="auth-tabs" id="auth-tabs">
+                    <div class="auth-tab-pill"></div>
                     <button type="button" class="auth-tab-btn active" id="tab-login-btn">Вход</button>
                     <button type="button" class="auth-tab-btn" id="tab-register-btn">Регистрация</button>
                 </div>
@@ -396,7 +411,6 @@ function initAuthEvents() {
     tabLogin?.addEventListener('click', () => setAuthMode('login', true));
     tabRegister?.addEventListener('click', () => setAuthMode('register', true));
 
-    // Отправка единой формы
     form?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
@@ -405,7 +419,6 @@ function initAuthEvents() {
         const password = document.getElementById('auth-password').value;
 
         if (currentAuthMode === 'login') {
-            // Режим ВХОД
             const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
             if (error) {
                 alert(`Ошибка входа: ${error.message}`);
@@ -414,7 +427,6 @@ function initAuthEvents() {
                 updateUIForUser(data.user);
             }
         } else {
-            // Режим РЕГИСТРАЦИЯ
             const { data, error } = await window.supabaseClient.auth.signUp({ email, password });
             if (error) {
                 alert(`Ошибка регистрации: ${error.message}`);
