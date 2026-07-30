@@ -715,16 +715,39 @@ body:has(#version-badge.show) .app-banners-container {
     animation: iconSlowBlink 2.5s ease-in-out infinite; /* 2.5s — скорость мигания */
 }
 
-.auth-trigger-btn {
+/* Контейнер строго по центру экрана */
+.center-status-wrapper {
     position: fixed;
-    top: 40px;
-    right: 40px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px; /* Расстояние между кнопкой и текстом */
+    text-align: center;
+}
+
+/* Серый статус "ЗДЕСЬ ПОКА ПУСТО" */
+.empty-status-message {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+    pointer-events: none;
+}
+
+/* Кнопка авторизации по центру */
+.auth-trigger-btn {
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: #ffffff;
-    padding: 10px 20px;
-    border-radius: 20px;
+    padding: 12px 24px;
+    border-radius: 24px;
     font-family: 'Montserrat', sans-serif;
     font-size: 13px;
     font-weight: 700;
@@ -732,11 +755,18 @@ body:has(#version-badge.show) .app-banners-container {
     text-transform: uppercase;
     cursor: pointer;
     backdrop-filter: blur(8px);
-    transition: all 0.3s ease;
+    -webkit-backdrop-filter: blur(8px);
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    pointer-events: auto;
 }
 
 .auth-trigger-btn:hover {
     background: #ffffff;
     color: #000000;
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+    transform: scale(1.03);
+}
+
+.auth-trigger-btn:active {
+    transform: scale(0.97);
 }
