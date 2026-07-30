@@ -234,10 +234,10 @@ function injectAuthStyles() {
         /* Шапка с логотипом и текстом */
 .auth-header-title {
     display: flex !important;
-    align-items: center !important; /* Центрируем логотип и текст строго по вертикали */
+    align-items: center !important;
     justify-content: center !important;
-    gap: 20px !important; /* Немного увеличили зазор */
-    margin-top: -35px !important; /* Поднимаем повыше */
+    gap: 20px !important;
+    margin-top: -30px !important;
     margin-bottom: 30px !important;
 }
 
@@ -250,13 +250,11 @@ function injectAuthStyles() {
     animation: logoHover 3.5s ease-in-out infinite alternate !important;
 }
 
-/* Маска для увеличенного сменяющегося текста */
+/* Окно маски — увеличили высоту до 55px */
 .auth-title-ticker {
-    height: 46px !important; /* Увеличили высоту под шрифт 34px */
+    height: 55px !important;
     overflow: hidden !important;
     position: relative !important;
-    display: flex !important;
-    align-items: center !important; /* Центровка внутри маски */
 }
 
 /* Трек с бегущим текстом */
@@ -267,27 +265,29 @@ function injectAuthStyles() {
 }
 
 .auth-title-track span {
-    height: 46px !important;
-    line-height: 46px !important;
+    height: 55px !important;
+    line-height: 55px !important; /* Выравнивание ровно по центру строки */
     font-family: 'Unbounded', sans-serif !important;
-    font-size: 34px !important; /* Увеличили шрифт текста до 34px */
+    font-size: 32px !important; /* Идеальный размер под шрифт */
     font-weight: 900 !important;
     letter-spacing: -0.5px !important;
     color: #ffffff !important;
     text-transform: uppercase !important;
     white-space: nowrap !important;
+    display: flex !important;
+    align-items: center !important;
 }
 
-/* Обновленная анимация сдвига под новую высоту 46px */
+/* Анимация сдвига на актуальную высоту строки (55px) */
 @keyframes titleVerticalScroll {
     0%, 20% {
         transform: translateY(0);
     }
     25%, 45% {
-        transform: translateY(-46px); /* Сдвигаем ровно на высоту одной строки */
+        transform: translateY(-55px); /* Смещение ровно на 55px */
     }
     50%, 70% {
-        transform: translateY(-46px);
+        transform: translateY(-55px);
     }
     75%, 100% {
         transform: translateY(0);
