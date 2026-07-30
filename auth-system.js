@@ -234,27 +234,29 @@ function injectAuthStyles() {
         /* Шапка с логотипом и текстом */
 .auth-header-title {
     display: flex !important;
-    align-items: center !important;
+    align-items: center !important; /* Центрируем логотип и текст строго по вертикали */
     justify-content: center !important;
-    gap: 18px !important;
-    margin-top: -30px !important; /* Поднимаем весь блок ещё выше */
+    gap: 20px !important; /* Немного увеличили зазор */
+    margin-top: -35px !important; /* Поднимаем повыше */
     margin-bottom: 30px !important;
 }
 
-/* Крупный левитирующий логотип */
+/* Левитирующий логотип */
 .auth-header-logo {
-    height: 105px !important; /* Увеличили логотип до 105px */
+    height: 105px !important;
     width: auto !important;
     display: block !important;
     object-fit: contain !important;
     animation: logoHover 3.5s ease-in-out infinite alternate !important;
 }
 
-/* Маска для сменяющегося текста (увеличена под новый размер) */
+/* Маска для увеличенного сменяющегося текста */
 .auth-title-ticker {
-    height: 40px !important; /* Подняли высоту под шрифт 30px */
+    height: 46px !important; /* Увеличили высоту под шрифт 34px */
     overflow: hidden !important;
     position: relative !important;
+    display: flex !important;
+    align-items: center !important; /* Центровка внутри маски */
 }
 
 /* Трек с бегущим текстом */
@@ -265,10 +267,10 @@ function injectAuthStyles() {
 }
 
 .auth-title-track span {
-    height: 40px !important;
-    line-height: 40px !important;
+    height: 46px !important;
+    line-height: 46px !important;
     font-family: 'Unbounded', sans-serif !important;
-    font-size: 30px !important; /* Увеличили размер текста с 24px до 30px */
+    font-size: 34px !important; /* Увеличили шрифт текста до 34px */
     font-weight: 900 !important;
     letter-spacing: -0.5px !important;
     color: #ffffff !important;
@@ -276,16 +278,16 @@ function injectAuthStyles() {
     white-space: nowrap !important;
 }
 
-/* Обновлённые кадры скролла под высоту 40px */
+/* Обновленная анимация сдвига под новую высоту 46px */
 @keyframes titleVerticalScroll {
     0%, 20% {
         transform: translateY(0);
     }
     25%, 45% {
-        transform: translateY(-40px); /* Сдвиг на -40px для перехода ко второй строке */
+        transform: translateY(-46px); /* Сдвигаем ровно на высоту одной строки */
     }
     50%, 70% {
-        transform: translateY(-40px);
+        transform: translateY(-46px);
     }
     75%, 100% {
         transform: translateY(0);
