@@ -774,19 +774,19 @@ body:has(#version-badge.show) .app-banners-container {
 /* =========================================================
    ВИДЖЕТ ПРОФИЛЯ В ВЕРХНЕМ ПРАВОМ УГЛУ
    ========================================================= */
-/* Обращаемся напрямую по ID, чтобы перебить любые другие стили */
+/* Родительский контейнер профиля */
 #user-profile-widget {
     position: fixed !important;
-    top: 43px !important;    /* Настройте высоту (40px–45px) */
-    right: 35px !important;  /* Уменьшайте это число (30px, 25px и т.д.), чтобы придвинуть ВПЛОТНУЮ к шестеренке */
+    top: 43px !important;       /* Выравнивание по вертикали */
+    right: 80px !important;     /* Увеличили с 35px/40px до 80px — профиль отъехал дальше от шестерёнки */
     z-index: 100 !important;
     transition: right 0.35s cubic-bezier(0.25, 1, 0.5, 1) !important;
 }
 
-/* Сдвиг при открытии настроек */
+/* Сдвиг влево при открытии настроек */
 .settings-trigger-zone:hover ~ #user-profile-widget,
 .settings-trigger-zone:focus-within ~ #user-profile-widget {
-    right: 220px !important;
+    right: 240px !important;    /* Расстояние при открытых настройках */
 }
 
 /* Дополнительно: чтобы профиль стоял ровно по вертикали */
