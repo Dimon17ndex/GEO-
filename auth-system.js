@@ -219,26 +219,63 @@ function injectAuthStyles() {
     transform: scale(0.9) rotate(90deg) !important;
 }
 
-        .auth-header-title {
+        /* Шапка с логотипом */
+.auth-header-title {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 16px !important; /* Увеличили зазор между логотипом и надписью */
-    font-family: 'Unbounded', sans-serif !important;
-    font-size: 26px !important; /* Увеличили размер шрифта (было 22px) */
-    font-weight: 900 !important;
-    letter-spacing: -0.5px !important;
-    color: #ffffff !important;
-    margin-top: -15px !important; /* Приподнимаем блок выше */
-    margin-bottom: 30px !important; /* Добавляем отступ до табов/формы */
-    text-transform: uppercase !important;
+    gap: 16px !important;
+    margin-top: -15px !important;
+    margin-bottom: 30px !important;
 }
 
 .auth-header-logo {
-    height: 85px !important; /* Увеличили высоту логотипа (было 70px) */
+    height: 85px !important;
     width: auto !important;
     display: block !important;
     object-fit: contain !important;
+}
+
+/* Окно маскирования для сменяемого текста */
+.auth-title-ticker {
+    height: 32px !important; /* Высота одной строки */
+    overflow: hidden !important; /* Прячем текст за пределами строки */
+    position: relative !important;
+}
+
+/* Трек с текстом, который двигается вверх и вниз */
+.auth-title-track {
+    display: flex !important;
+    flex-direction: column !important;
+    animation: titleVerticalScroll 8s cubic-bezier(0.77, 0, 0.175, 1) infinite !important;
+}
+
+.auth-title-track span {
+    height: 32px !important;
+    line-height: 32px !important;
+    font-family: 'Unbounded', sans-serif !important;
+    font-size: 24px !important;
+    font-weight: 900 !important;
+    letter-spacing: -0.5px !important;
+    color: #ffffff !important;
+    text-transform: uppercase !important;
+    white-space: nowrap !important;
+}
+
+/* Анимация скролла вниз-вверх (пауза 2 сек на каждом слове) */
+@keyframes titleVerticalScroll {
+    0%, 20% {
+        transform: translateY(0); /* Задержка на GEOГРАФИЯ (2 сек) */
+    }
+    25%, 45% {
+        transform: translateY(-32px); /* Скролл вниз к АВТОРИЗАЦИЯ (2 сек) */
+    }
+    50%, 70% {
+        transform: translateY(-32px); /* Задержка на АВТОРИЗАЦИЯ */
+    }
+    75%, 100% {
+        transform: translateY(0); /* Возврат наверх к GEOГРАФИЯ */
+    }
 }
 
         .auth-tabs {
@@ -558,9 +595,14 @@ function initAuthModalUI() {
 
             <div class="auth-modal-container">
                 <div class="auth-header-title">
-                    <img src="images/geo_logo.png" alt="Geo Logo" class="auth-header-logo">
-                    <span>GEOГРАФИЯ</span>
-                </div>
+    <img src="images/geo_logo.png" alt="Geo Logo" class="auth-header-logo">
+    <div class="auth-title-ticker">
+        <div class="auth-title-track">
+            <span>GEOГРАФИЯ</span>
+            <span>АВТОРИЗАЦИЯ</span>
+        </div>
+    </div>
+</div>
                 
                 <div class="auth-tabs" id="auth-tabs">
                     <div class="auth-tab-pill"></div>
