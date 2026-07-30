@@ -6,8 +6,8 @@
     <title>GEOГРАФИЯ — Сессия</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="script.js"></script>
-    <script src="console.js"></script>
+    <script src="script.js" defer></script>
+    <script src="console.js" defer></script>
 
     <link rel="icon" type="image/png" href="images/favicon.png">
 
@@ -38,8 +38,8 @@
 
     .top-left-brand .db-brand-block {
         display: flex;
-        align-items: center; /* Центрируем логотип вертикально */
-        gap: 10px; /* Логотип сдвинут ближе к тексту */
+        align-items: center;
+        gap: 10px;
     }
 
     .top-left-brand .db-logo-icon {
@@ -148,6 +148,8 @@
         </div>
     </div>
 
+    <script src="auth-system.js?v=3"></script>
+
     <script>
     const waveContainer = document.getElementById('bg-wave-container');
     const volumeStatusLabel = document.getElementById('volume-status-label');
@@ -215,7 +217,7 @@
         bgMusic.muted = isMuted;
         if (isMuted) {
             volumeStatusLabel.classList.add('muted-mode');
-            volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15" stroke-width="1.5"></line><line x1="17" y1="9" x2="23" y2="15" stroke-width="1.5"></line>`;
+            volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15" stroke="currentColor" stroke-width="1.5"></line><line x1="17" y1="9" x2="23" y2="15" stroke="currentColor" stroke-width="1.5"></line>`;
         } else {
             volumeStatusLabel.classList.remove('muted-mode');
             volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path class="volume-wave-1" d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path class="volume-wave-2" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>`;
@@ -237,18 +239,11 @@
         });
     });
 
-    // Создаем искусственную точку в истории браузера
+    // Перехватываем кнопку "Назад"
     history.pushState(null, null, location.href);
-
-    // Перехватываем нажатие кнопки "Назад" в браузере
     window.addEventListener('popstate', function () {
         window.location.replace('index.html');
     });
     </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="auth-system.js?v=2"></script>
-
-<button type="button" onclick="showAuthModal()">Войти / Зарегистрироваться</button>
 </body>
 </html>
