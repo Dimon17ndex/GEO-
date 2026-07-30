@@ -12,6 +12,7 @@ if (!window.supabaseClient && window.supabase) {
 }
 
 let currentAuthMode = 'login';
+let lastOverlayClickTime = 0; // Для отслеживания интервала двойного клика
 
 // --- ГЛОБАЛЬНЫЕ ФУНКЦИИ ---
 window.showAuthModal = function() {
@@ -88,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// --- СТИЛИ ДЛЯ МЯГКОГО CROSSFADE ---
+// --- СТИЛИ ДЛЯ АНИМАЦИЙ И МЯГКОГО CROSSFADE ---
 function injectAuthStyles() {
     if (document.getElementById('auth-system-styles')) return;
 
@@ -142,6 +143,18 @@ function injectAuthStyles() {
 
         .auth-modal-overlay.active .auth-modal-container {
             transform: scale(1) !important;
+        }
+
+        /* Анимация дрожания при единичном клике на фон */
+        .auth-modal-container.shake {
+            animation: shakeAnimation 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) !important;
+        }
+
+        @keyframes shakeAnimation {
+            10%, 90% { transform: scale(1) translateX(-3px); }
+            20%, 80% { transform: scale(1) translateX(4px); }
+            30%, 50%, 70% { transform: scale(1) translateX(-6px); }
+            40%, 60% { transform: scale(1) translateX(6px); }
         }
 
         .auth-close-btn {
@@ -227,11 +240,11 @@ function injectAuthStyles() {
             font-weight: 600 !important;
         }
 
-        /* 3. КОНТЕЙНЕР ДЛЯ ОДНОВРЕМЕННОГО НАЛОЖЕНИЯ ФОРМ */
+        /* Контейнер для одновременного наложения форм */
         .auth-forms-wrapper {
             position: relative !important;
             width: 100% !important;
-            min-height: 220px !important; /* Фиксированная высота для предотвращения скачков */
+            min-height: 220px !important;
         }
 
         .auth-form {
@@ -251,7 +264,6 @@ function injectAuthStyles() {
                         filter 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
 
-        /* Активная форма плавно проступает */
         .auth-form.visible {
             opacity: 1 !important;
             filter: blur(0px) !important;
@@ -368,7 +380,7 @@ function initAuthModalUI() {
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
-// --- СОБЫТИЯ И ОБРАБОТКА ОБЕИХ ФОРМ ---
+// --- СОБЫТИЯ И ОБРАБОТКА ---
 function initAuthEvents() {
     const overlay = document.getElementById('auth-modal-overlay');
     const closeBtn = document.getElementById('auth-close-btn');
@@ -378,11 +390,32 @@ function initAuthEvents() {
     const formLogin = document.getElementById('auth-form-login');
     const formRegister = document.getElementById('auth-form-register');
 
+    // Обычная крестик-кнопка закрывает сразу
     closeBtn?.addEventListener('click', window.hideAuthModal);
 
+    // ДВОЙНОЙ КЛИК ПО ФОНУ
     overlay?.addEventListener('click', (e) => {
         if (e.target === overlay) {
-            window.hideAuthModal();
+            const currentTime = new Date().getTime();
+            const timeDiff = currentTime - lastOverlayClickTime;
+
+            // Если кликнули повторно быстрее чем через 350мс
+            if (timeDiff < 350 && timeDiff > 0) {
+                window.hideAuthModal();
+            } else {
+                // При единичном клике модалка слегка встряхивается
+                const container = document.querySelector('.auth-modal-container');
+                if (container) {
+                    container.classList.remove('shake');
+                    void container.offsetWidth; // перезапуск анимации
+                    container.classList.add('shake');
+                    
+                    setTimeout(() => {
+                        container.classList.remove('shake');
+                    }, 400);
+                }
+            }
+            lastOverlayClickTime = currentTime;
         }
     });
 
