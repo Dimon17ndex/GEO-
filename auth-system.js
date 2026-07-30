@@ -52,12 +52,10 @@ function showConfirmToast() {
     const wave = document.getElementById('auth-confirm-wave');
     
     if (toast) {
-        // Сбрасываем текущие классы
         toast.classList.remove('hiding', 'visible');
         if (wave) wave.classList.remove('active');
 
-        // Принудительная перезагрузка CSS для повторного запуска ключевых кадров
-        void toast.offsetWidth;
+        void toast.offsetWidth; // Перезапуск анимации
 
         toast.classList.add('visible');
         if (wave) wave.classList.add('active');
@@ -79,7 +77,7 @@ function hideConfirmToast(immediate = false) {
         toast.classList.add('hiding');
         setTimeout(() => {
             toast.classList.remove('visible', 'hiding');
-        }, 350); // 350мс совпадает с длительностью плавного исчезновения
+        }, 350);
     }
 }
 
@@ -124,9 +122,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// --- СТИЛИ ДЛЯ МЯГКОГО ИСЧЕЗНОВЕНИЯ И ЭФФЕКТНОЙ ВОЛНЫ ---
+// --- СТИЛИ (БЕЗ ДУБЛЕЙ) ---
 function injectAuthStyles() {
-    // Если стили уже были добавлены, удаляем старый тег, чтобы обновить стили принудительно
     const existingStyle = document.getElementById('auth-system-styles');
     if (existingStyle) existingStyle.remove();
 
@@ -195,169 +192,106 @@ function injectAuthStyles() {
             40%, 60% { transform: scale(1) translateX(6px); }
         }
 
+        /* --- КРЕСТИК ЗАКРЫТИЯ --- */
         .auth-close-btn {
-    position: absolute !important;
-    top: 30px !important;
-    right: 30px !important;
-    background: transparent !important;
-    border: none !important;
-    color: rgba(255, 255, 255, 0.4) !important;
-    font-size: 28px !important;
-    line-height: 1 !important;
-    cursor: pointer !important;
-    z-index: 99999999 !important;
-    padding: 0 !important;
-    /* Фиксируем точку трансформации по центру */
-    transform-origin: center center !important;
-    transition: color 0.25s ease, transform 0.25s ease !important;
-}
+            position: absolute !important;
+            top: 30px !important;
+            right: 30px !important;
+            background: transparent !important;
+            border: none !important;
+            color: rgba(255, 255, 255, 0.4) !important;
+            font-size: 28px !important;
+            line-height: 1 !important;
+            cursor: pointer !important;
+            z-index: 99999999 !important;
+            padding: 0 !important;
+            transform-origin: center center !important;
+            transition: color 0.25s ease, transform 0.25s ease !important;
+        }
 
-/* Прозрачный хитбокс во имя защиты от дребезжания */
-.auth-close-btn::before {
-    content: '' !important;
-    position: absolute !important;
-    top: -12px !important;
-    bottom: -12px !important;
-    left: -12px !important;
-    right: -12px !important;
-}
+        .auth-close-btn::before {
+            content: '' !important;
+            position: absolute !important;
+            top: -12px !important;
+            bottom: -12px !important;
+            left: -12px !important;
+            right: -12px !important;
+        }
 
-.auth-close-btn:hover {
-    color: #ffffff !important;
-    transform: scale(1.15) rotate(90deg) !important;
-}
+        .auth-close-btn:hover {
+            color: #ffffff !important;
+            transform: scale(1.15) rotate(90deg) !important;
+        }
 
-.auth-close-btn:active {
-    transform: scale(0.9) rotate(90deg) !important;
-}
+        .auth-close-btn:active {
+            transform: scale(0.9) rotate(90deg) !important;
+        }
 
-        /* Шапка с логотипом и текстом */
-.auth-header-title {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 20px !important;
-    margin-top: -30px !important;
-    margin-bottom: 30px !important;
-}
+        /* --- ШАПКА, ЛОГОТИП И СКРОЛЛ ТЕКСТА --- */
+        .auth-header-title {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 20px !important;
+            margin-top: -30px !important;
+            margin-bottom: 30px !important;
+        }
 
-/* Контейнер-обёртка для гарантированной левитации */
-.auth-logo-wrapper {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    will-change: transform !important;
-    /* Запуск анимации плавания */
-    animation: logoHover 3s ease-in-out infinite alternate !important;
-}
+        .auth-logo-wrapper {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            will-change: transform !important;
+            animation: logoHover 3s ease-in-out infinite alternate !important;
+        }
 
-/* Изображение логотипа */
-.auth-header-logo {
-    height: 105px !important;
-    width: auto !important;
-    display: block !important;
-    object-fit: contain !important;
-}
+        .auth-header-logo {
+            height: 105px !important;
+            width: auto !important;
+            display: block !important;
+            object-fit: contain !important;
+        }
 
-/* Анимация плавного парения вверх-вниз */
-@keyframes logoHover {
-    0% {
-        transform: translateY(0px) rotate(0deg);
-    }
-    50% {
-        transform: translateY(-8px) rotate(-2deg);
-    }
-    100% {
-        transform: translateY(6px) rotate(2deg);
-    }
-}
+        @keyframes logoHover {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(-2deg); }
+            100% { transform: translateY(6px) rotate(2deg); }
+        }
 
-/* Окно маски — увеличили высоту до 55px */
-.auth-title-ticker {
-    height: 55px !important;
-    overflow: hidden !important;
-    position: relative !important;
-}
+        .auth-title-ticker {
+            height: 55px !important;
+            overflow: hidden !important;
+            position: relative !important;
+        }
 
-/* Трек с бегущим текстом */
-.auth-title-track {
-    display: flex !important;
-    flex-direction: column !important;
-    animation: titleVerticalScroll 8s cubic-bezier(0.77, 0, 0.175, 1) infinite !important;
-}
+        .auth-title-track {
+            display: flex !important;
+            flex-direction: column !important;
+            animation: titleVerticalScroll 8s cubic-bezier(0.77, 0, 0.175, 1) infinite !important;
+        }
 
-.auth-title-track span {
-    height: 55px !important;
-    line-height: 55px !important; /* Выравнивание ровно по центру строки */
-    font-family: 'Unbounded', sans-serif !important;
-    font-size: 32px !important; /* Идеальный размер под шрифт */
-    font-weight: 900 !important;
-    letter-spacing: -0.5px !important;
-    color: #ffffff !important;
-    text-transform: uppercase !important;
-    white-space: nowrap !important;
-    display: flex !important;
-    align-items: center !important;
-}
+        .auth-title-track span {
+            height: 55px !important;
+            line-height: 55px !important;
+            font-family: 'Unbounded', sans-serif !important;
+            font-size: 32px !important;
+            font-weight: 900 !important;
+            letter-spacing: -0.5px !important;
+            color: #ffffff !important;
+            text-transform: uppercase !important;
+            white-space: nowrap !important;
+            display: flex !important;
+            align-items: center !important;
+        }
 
-/* Анимация сдвига на актуальную высоту строки (55px) */
-@keyframes titleVerticalScroll {
-    0%, 20% {
-        transform: translateY(0);
-    }
-    25%, 45% {
-        transform: translateY(-55px); /* Смещение ровно на 55px */
-    }
-    50%, 70% {
-        transform: translateY(-55px);
-    }
-    75%, 100% {
-        transform: translateY(0);
-    }
-}
+        @keyframes titleVerticalScroll {
+            0%, 20% { transform: translateY(0); }
+            25%, 45% { transform: translateY(-55px); }
+            50%, 70% { transform: translateY(-55px); }
+            75%, 100% { transform: translateY(0); }
+        }
 
-/* Окно маскирования для сменяемого текста */
-.auth-title-ticker {
-    height: 32px !important; /* Высота одной строки */
-    overflow: hidden !important; /* Прячем текст за пределами строки */
-    position: relative !important;
-}
-
-/* Трек с текстом, который двигается вверх и вниз */
-.auth-title-track {
-    display: flex !important;
-    flex-direction: column !important;
-    animation: titleVerticalScroll 8s cubic-bezier(0.77, 0, 0.175, 1) infinite !important;
-}
-
-.auth-title-track span {
-    height: 32px !important;
-    line-height: 32px !important;
-    font-family: 'Unbounded', sans-serif !important;
-    font-size: 24px !important;
-    font-weight: 900 !important;
-    letter-spacing: -0.5px !important;
-    color: #ffffff !important;
-    text-transform: uppercase !important;
-    white-space: nowrap !important;
-}
-
-/* Анимация скролла вниз-вверх (пауза 2 сек на каждом слове) */
-@keyframes titleVerticalScroll {
-    0%, 20% {
-        transform: translateY(0); /* Задержка на GEOГРАФИЯ (2 сек) */
-    }
-    25%, 45% {
-        transform: translateY(-32px); /* Скролл вниз к АВТОРИЗАЦИЯ (2 сек) */
-    }
-    50%, 70% {
-        transform: translateY(-32px); /* Задержка на АВТОРИЗАЦИЯ */
-    }
-    75%, 100% {
-        transform: translateY(0); /* Возврат наверх к GEOГРАФИЯ */
-    }
-}
-
+        /* --- ТАБЫ И ФОРМЫ --- */
         .auth-tabs {
             position: relative !important;
             display: flex !important;
@@ -487,7 +421,7 @@ function injectAuthStyles() {
             transform: scale(0.98) !important;
         }
 
-        /* --- СВЕТОВАЯ РАДИАЛЬНАЯ ВОЛНА НА ВЕСЬ ЭКРАН --- */
+        /* --- СВЕТОВАЯ РАДИАЛЬНАЯ ВОЛНА --- */
         .auth-confirm-wave {
             position: fixed !important;
             bottom: 20px !important;
@@ -542,7 +476,6 @@ function injectAuthStyles() {
             transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease !important;
         }
 
-        /* Анимация подпрыгивания при появлении */
         .auth-confirm-toast.visible {
             opacity: 1 !important;
             visibility: visible !important;
@@ -550,7 +483,6 @@ function injectAuthStyles() {
             animation: bounceInUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
         }
 
-        /* Мягкое угасание и уход вниз при Отмене */
         .auth-confirm-toast.hiding {
             opacity: 0 !important;
             transform: translateX(-50%) translateY(40px) scale(0.9) !important;
@@ -613,7 +545,7 @@ function injectAuthStyles() {
             background: rgba(255, 255, 255, 0.85) !important;
         }
 
-        /* --- ОГРОМНЫЙ ФОНОВЫЙ ЛОГОТИП СПРАВА С ПЛАВНЫМ БЛЮР-ПРОЯВЛЕНИЕМ --- */
+        /* --- ОГРОМНЫЙ ФОНОВЫЙ ЛОГОТИП СПРАВА С БЛЮРОМ --- */
         .auth-bg-watermark {
             position: absolute !important;
             top: 45% !important;
@@ -626,24 +558,17 @@ function injectAuthStyles() {
             z-index: 1 !important;
             transform-origin: center right !important;
             
-            /* Исходые параметры: полностью невидимый и глубоко заблюренный */
             opacity: 0 !important;
             filter: blur(45px) brightness(0.6) !important;
-            
-            /* Плавно проявляем ВСЕ свойства (включая filter и opacity) при изменении */
             transition: opacity 1.2s ease-out, filter 1.2s ease-out !important;
-            
-            /* Анимация движения крутится постоянно, но её не видно, пока opacity: 0 */
             animation: intenseFloat 6s ease-in-out infinite alternate !important;
         }
 
-        /* Когда окно авторизации открыто — проявляем через плавный блюр */
         .auth-modal-overlay.active .auth-bg-watermark {
-            opacity: 0.22 !important; /* Проявляется до 22% */
-            filter: blur(12px) brightness(0.9) !important; /* Проясняется блюр с 45px до 12px */
+            opacity: 0.22 !important;
+            filter: blur(12px) brightness(0.9) !important;
         }
 
-        /* Динамичная размашистая анимация движения */
         @keyframes intenseFloat {
             0% {
                 transform: translateY(-50%) translateX(0px) rotate(0deg) scale(1);
@@ -675,17 +600,17 @@ function initAuthModalUI() {
 
             <div class="auth-modal-container">
                 <div class="auth-header-title">
-    <div class="auth-logo-wrapper">
-        <img src="images/geo_logo.png" alt="Geo Logo" class="auth-header-logo">
-    </div>
+                    <div class="auth-logo-wrapper">
+                        <img src="images/geo_logo.png" alt="Geo Logo" class="auth-header-logo">
+                    </div>
 
-    <div class="auth-title-ticker">
-        <div class="auth-title-track">
-            <span>GEOГРАФИЯ</span>
-            <span>АВТОРИЗАЦИЯ</span>
-        </div>
-    </div>
-</div>
+                    <div class="auth-title-ticker">
+                        <div class="auth-title-track">
+                            <span>GEOГРАФИЯ</span>
+                            <span>АВТОРИЗАЦИЯ</span>
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="auth-tabs" id="auth-tabs">
                     <div class="auth-tab-pill"></div>
@@ -744,11 +669,11 @@ function initAuthEvents() {
     const btnConfirmNo = document.getElementById('auth-cancel-close-btn');
 
     btnConfirmYes?.addEventListener('click', window.hideAuthModal);
-    btnConfirmNo?.addEventListener('click', () => hideConfirmToast(false)); // Мягкое гашение
+    btnConfirmNo?.addEventListener('click', () => hideConfirmToast(false));
 
     closeBtn?.addEventListener('click', window.hideAuthModal);
 
-    // Двоиной клик по темному фону вызывает плашку + волну
+    // Двойной клик по темному фону вызывает плашку + волну
     overlay?.addEventListener('dblclick', (e) => {
         if (e.target === overlay) {
             showConfirmToast();
