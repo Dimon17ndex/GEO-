@@ -205,13 +205,6 @@ body.user-logged-in #open-auth-btn {
         </div>
     </div>
 
-    <div id="user-profile-widget" class="top-right-profile" style="display: none;">
-        <div class="profile-card">
-            <span class="profile-username" id="profile-email-text">Профиль</span>
-            <button type="button" class="logout-dropdown-btn" onclick="logoutUser()">Выйти</button>
-        </div>
-    </div>
-
     <div class="center-status-wrapper">
         <button type="button" id="open-auth-btn" class="auth-trigger-btn" onclick="showAuthModal()">
             Войти / Зарегистрироваться
@@ -251,6 +244,13 @@ body.user-logged-in #open-auth-btn {
                     <input type="range" id="wave-intensity-slider" min="0" max="100" value="20">
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div id="user-profile-widget" class="top-right-profile" style="display: none;">
+        <div class="profile-card">
+            <span class="profile-username" id="profile-email-text">Профиль</span>
+            <button type="button" class="logout-dropdown-btn" onclick="logoutUser()">Выйти</button>
         </div>
     </div>
 
