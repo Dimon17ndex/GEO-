@@ -231,37 +231,64 @@ function injectAuthStyles() {
     transform: scale(0.9) rotate(90deg) !important;
 }
 
-        /* Шапка с логотипом */
+        /* Шапка с логотипом и текстом */
 .auth-header-title {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 16px !important;
-    margin-top: -15px !important;
+    gap: 18px !important;
+    margin-top: -30px !important; /* Поднимаем весь блок ещё выше */
     margin-bottom: 30px !important;
 }
 
-/* Логотип рядом с текстом в шапке авторизации */
+/* Крупный левитирующий логотип */
 .auth-header-logo {
-    height: 85px !important;
+    height: 105px !important; /* Увеличили логотип до 105px */
     width: auto !important;
     display: block !important;
     object-fit: contain !important;
-    
-    /* Бесконечная плавная левитация */
     animation: logoHover 3.5s ease-in-out infinite alternate !important;
 }
 
-/* Эффект парения вверх-вниз */
-@keyframes logoHover {
-    0% {
-        transform: translateY(0px) rotate(0deg);
+/* Маска для сменяющегося текста (увеличена под новый размер) */
+.auth-title-ticker {
+    height: 40px !important; /* Подняли высоту под шрифт 30px */
+    overflow: hidden !important;
+    position: relative !important;
+}
+
+/* Трек с бегущим текстом */
+.auth-title-track {
+    display: flex !important;
+    flex-direction: column !important;
+    animation: titleVerticalScroll 8s cubic-bezier(0.77, 0, 0.175, 1) infinite !important;
+}
+
+.auth-title-track span {
+    height: 40px !important;
+    line-height: 40px !important;
+    font-family: 'Unbounded', sans-serif !important;
+    font-size: 30px !important; /* Увеличили размер текста с 24px до 30px */
+    font-weight: 900 !important;
+    letter-spacing: -0.5px !important;
+    color: #ffffff !important;
+    text-transform: uppercase !important;
+    white-space: nowrap !important;
+}
+
+/* Обновлённые кадры скролла под высоту 40px */
+@keyframes titleVerticalScroll {
+    0%, 20% {
+        transform: translateY(0);
     }
-    50% {
-        transform: translateY(-6px) rotate(-1.5deg);
+    25%, 45% {
+        transform: translateY(-40px); /* Сдвиг на -40px для перехода ко второй строке */
     }
-    100% {
-        transform: translateY(4px) rotate(1.5deg);
+    50%, 70% {
+        transform: translateY(-40px);
+    }
+    75%, 100% {
+        transform: translateY(0);
     }
 }
 
