@@ -199,33 +199,24 @@ function injectAuthStyles() {
     position: absolute !important;
     top: 30px !important;
     right: 30px !important;
-    background: rgba(255, 255, 255, 0.08) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    border-radius: 50% !important;
-    width: 44px !important;
-    height: 44px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    color: rgba(255, 255, 255, 0.6) !important;
-    font-size: 24px !important;
+    background: transparent !important;
+    border: none !important;
+    color: rgba(255, 255, 255, 0.4) !important;
+    font-size: 28px !important;
     line-height: 1 !important;
     cursor: pointer !important;
     z-index: 99999999 !important;
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
-    transition: all 0.25s ease !important;
+    padding: 0 !important;
+    transition: color 0.25s ease, transform 0.25s ease !important;
 }
 
 .auth-close-btn:hover {
     color: #ffffff !important;
-    background: rgba(255, 255, 255, 0.2) !important;
-    border-color: rgba(255, 255, 255, 0.4) !important;
-    transform: scale(1.08) rotate(90deg) !important;
+    transform: scale(1.15) rotate(90deg) !important;
 }
 
 .auth-close-btn:active {
-    transform: scale(0.95) rotate(90deg) !important;
+    transform: scale(0.9) rotate(90deg) !important;
 }
 
         .auth-header-title {
