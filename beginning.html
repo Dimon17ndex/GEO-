@@ -18,6 +18,11 @@
     <link rel="stylesheet" href="beginning.css">
 
     <style>
+        /* Когда пользователь вошел — гарантированно скрываем центральную кнопку */
+body.user-logged-in #open-auth-btn {
+    display: none !important;
+}
+
     /* Плавное проявление страницы при загрузке */
     body {
         opacity: 0;
