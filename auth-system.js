@@ -12,7 +12,7 @@ if (!window.supabaseClient && window.supabase) {
 }
 
 let currentAuthMode = 'login';
-let lastOverlayClickTime = 0; // Для отслеживания интервала двойного клика
+let lastOverlayClickTime = 0;
 
 // --- ГЛОБАЛЬНЫЕ ФУНКЦИИ ---
 window.showAuthModal = function() {
@@ -24,6 +24,7 @@ window.showAuthModal = function() {
         modal = document.getElementById('auth-modal-overlay');
     }
     
+    hideConfirmToast();
     setAuthMode('login');
 
     if (modal) {
@@ -35,6 +36,7 @@ window.hideAuthModal = function() {
     const modal = document.getElementById('auth-modal-overlay');
     if (modal) {
         modal.classList.remove('active');
+        hideConfirmToast();
     }
 };
 
@@ -45,7 +47,18 @@ window.logoutUser = async function() {
     }
 };
 
-// Переключение режимов с эффектом перекрестного проявления (Crossfade)
+// Функция показа/скрытия плашки подтверждения
+function showConfirmToast() {
+    const toast = document.getElementById('auth-confirm-toast');
+    if (toast) toast.classList.add('visible');
+}
+
+function hideConfirmToast() {
+    const toast = document.getElementById('auth-confirm-toast');
+    if (toast) toast.classList.remove('visible');
+}
+
+// Переключение режимов (Crossfade)
 function setAuthMode(mode) {
     if (currentAuthMode === mode) return;
     currentAuthMode = mode;
@@ -64,7 +77,6 @@ function setAuthMode(mode) {
         tabLogin.classList.add('active');
         tabRegister.classList.remove('active');
 
-        // Перекрестное проявление
         formRegister.classList.remove('visible');
         formLogin.classList.add('visible');
     } else {
@@ -72,7 +84,6 @@ function setAuthMode(mode) {
         tabRegister.classList.add('active');
         tabLogin.classList.remove('active');
 
-        // Перекрестное проявление
         formLogin.classList.remove('visible');
         formRegister.classList.add('visible');
     }
@@ -89,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// --- СТИЛИ ДЛЯ АНИМАЦИЙ И МЯГКОГО CROSSFADE ---
+// --- СТИЛИ ---
 function injectAuthStyles() {
     if (document.getElementById('auth-system-styles')) return;
 
@@ -145,7 +156,6 @@ function injectAuthStyles() {
             transform: scale(1) !important;
         }
 
-        /* Анимация дрожания при единичном клике на фон */
         .auth-modal-container.shake {
             animation: shakeAnimation 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) !important;
         }
@@ -190,7 +200,6 @@ function injectAuthStyles() {
             stroke: #ffffff !important;
         }
 
-        /* Тумблер с плавной белой подложкой */
         .auth-tabs {
             position: relative !important;
             display: flex !important;
@@ -240,7 +249,6 @@ function injectAuthStyles() {
             font-weight: 600 !important;
         }
 
-        /* Контейнер для одновременного наложения форм */
         .auth-forms-wrapper {
             position: relative !important;
             width: 100% !important;
@@ -256,7 +264,6 @@ function injectAuthStyles() {
             flex-direction: column !important;
             gap: 45px !important;
             
-            /* Эффект проявления один сквозь другой */
             opacity: 0 !important;
             filter: blur(8px) !important;
             pointer-events: none !important;
@@ -321,6 +328,72 @@ function injectAuthStyles() {
         .auth-submit-btn:active {
             transform: scale(0.98) !important;
         }
+
+        /* --- ПАНЕЛЬ ПОДТВЕРЖДЕНИЯ ВНИЗУ ПО ЦЕНТРУ --- */
+        .auth-confirm-toast {
+            position: absolute !important;
+            bottom: 30px !important;
+            left: 50% !important;
+            transform: translateX(-50%) translateY(20px) !important;
+            background: rgba(20, 20, 25, 0.95) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            border-radius: 16px !important;
+            padding: 12px 20px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 15px !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            white-space: nowrap !important;
+            z-index: 10000000 !important;
+        }
+
+        .auth-confirm-toast.visible {
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+            transform: translateX(-50%) translateY(0) !important;
+        }
+
+        .auth-confirm-text {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-size: 13px !important;
+            font-weight: 500 !important;
+        }
+
+        .auth-confirm-actions {
+            display: flex !important;
+            gap: 8px !important;
+        }
+
+        .auth-confirm-btn {
+            background: transparent !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            color: #ffffff !important;
+            padding: 5px 12px !important;
+            border-radius: 12px !important;
+            font-size: 12px !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }
+
+        .auth-confirm-btn:hover {
+            background: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .auth-confirm-btn.danger {
+            background: #ffffff !important;
+            color: #000000 !important;
+            border-color: #ffffff !important;
+            font-weight: 600 !important;
+        }
+
+        .auth-confirm-btn.danger:hover {
+            background: rgba(255, 255, 255, 0.85) !important;
+        }
     `;
 
     const styleElement = document.createElement('style');
@@ -329,7 +402,7 @@ function injectAuthStyles() {
     document.head.appendChild(styleElement);
 }
 
-// --- HTML ДВУХ НАЛОЖЕННЫХ ФОРМ ---
+// --- HTML РАЗМЕТКА ---
 function initAuthModalUI() {
     if (document.getElementById('auth-modal-overlay')) return;
 
@@ -375,12 +448,20 @@ function initAuthModalUI() {
                     </form>
                 </div>
             </div>
+
+            <div id="auth-confirm-toast" class="auth-confirm-toast">
+                <span class="auth-confirm-text">Вы точно хотите покинуть авторизацию?</span>
+                <div class="auth-confirm-actions">
+                    <button type="button" class="auth-confirm-btn" id="auth-cancel-close-btn">Отмена</button>
+                    <button type="button" class="auth-confirm-btn danger" id="auth-confirm-close-btn">Да</button>
+                </div>
+            </div>
         </div>
     `;
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
-// --- СОБЫТИЯ И ОБРАБОТКА ---
+// --- СОБЫТИЯ ---
 function initAuthEvents() {
     const overlay = document.getElementById('auth-modal-overlay');
     const closeBtn = document.getElementById('auth-close-btn');
@@ -390,24 +471,31 @@ function initAuthEvents() {
     const formLogin = document.getElementById('auth-form-login');
     const formRegister = document.getElementById('auth-form-register');
 
-    // Обычная крестик-кнопка закрывает сразу
+    const btnConfirmYes = document.getElementById('auth-confirm-close-btn');
+    const btnConfirmNo = document.getElementById('auth-cancel-close-btn');
+
+    // Кнопки панели подтверждения
+    btnConfirmYes?.addEventListener('click', window.hideAuthModal);
+    btnConfirmNo?.addEventListener('click', hideConfirmToast);
+
+    // Крестик закрывает сразу
     closeBtn?.addEventListener('click', window.hideAuthModal);
 
-    // ДВОЙНОЙ КЛИК ПО ФОНУ
+    // Клик по фону
     overlay?.addEventListener('click', (e) => {
         if (e.target === overlay) {
             const currentTime = new Date().getTime();
             const timeDiff = currentTime - lastOverlayClickTime;
 
-            // Если кликнули повторно быстрее чем через 350мс
+            // При ДВОЙНОМ КЛИКЕ показываем нижнюю панель
             if (timeDiff < 350 && timeDiff > 0) {
-                window.hideAuthModal();
+                showConfirmToast();
             } else {
-                // При единичном клике модалка слегка встряхивается
+                // При 1 клике — легкое покачивание
                 const container = document.querySelector('.auth-modal-container');
                 if (container) {
                     container.classList.remove('shake');
-                    void container.offsetWidth; // перезапуск анимации
+                    void container.offsetWidth;
                     container.classList.add('shake');
                     
                     setTimeout(() => {
@@ -428,7 +516,7 @@ function initAuthEvents() {
     tabLogin?.addEventListener('click', () => setAuthMode('login'));
     tabRegister?.addEventListener('click', () => setAuthMode('register'));
 
-    // Обработка Входа
+    // Форма входа
     formLogin?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
@@ -445,7 +533,7 @@ function initAuthEvents() {
         }
     });
 
-    // Обработка Регистрации
+    // Форма регистрации
     formRegister?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
