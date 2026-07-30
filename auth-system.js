@@ -745,38 +745,31 @@ async function checkUserSession() {
 }
 
 function updateUIForUser(user) {
-    // Ищем кнопку по ID, который мы только что добавили в HTML
-    const authBtn = document.getElementById('open-auth-btn');
+    const mainAuthBtn = document.getElementById('auth-main-btn');
+    const profileWidget = document.getElementById('user-profile-widget');
+    const profileEmailText = document.getElementById('profile-email-text');
 
     if (user) {
-        // Пользователь авторизован
+        // 1. Пользователь ВОШЁЛ
         document.body.classList.add('user-logged-in');
-        
-        if (authBtn) {
-            // Берем часть логина до знака @
+
+        // Скрываем центральную кнопку
+        if (mainAuthBtn) mainAuthBtn.style.display = 'none';
+
+        // Показываем блок профиля сверху справа и подставляем логин
+        if (profileWidget && profileEmailText) {
             const username = user.email.split('@')[0];
-            authBtn.textContent = `Профиль (${username})`;
-            
-            // Назначаем подтверждение выхода при клике
-            authBtn.onclick = async () => {
-                if (confirm('Вы действительно хотите выйти из аккаунта?')) {
-                    if (window.logoutUser) {
-                        await window.logoutUser();
-                    }
-                }
-            };
+            profileEmailText.textContent = username;
+            profileWidget.style.display = 'block';
         }
     } else {
-        // Пользователь не вошёл или вышел
+        // 2. Пользователь НЕ ВОШЁЛ или вышел
         document.body.classList.remove('user-logged-in');
-        
-        if (authBtn) {
-            authBtn.textContent = 'Войти / Зарегистрироваться';
-            authBtn.onclick = () => {
-                if (window.showAuthModal) {
-                    window.showAuthModal();
-                }
-            };
-        }
+
+        // Показываем центральную кнопку
+        if (mainAuthBtn) mainAuthBtn.style.display = 'inline-block';
+
+        // Скрываем блок профиля справа
+        if (profileWidget) profileWidget.style.display = 'none';
     }
 }
