@@ -780,8 +780,10 @@ body:has(#version-badge.show) .app-banners-container {
     right: 65px;
     z-index: 10;
     
-    /* Сдвигаем вниз всего на 3px вместо 6px (поднимаем на 3px выше) */
-    transform: translateY(3px); 
+    /* 1-е число (X): смещение вправо/влево (-5px придвигает БЛИЖЕ к шестерёнке)
+       2-е число (Y): смещение вниз/вверх (3px держит высоту как мы настроили)
+    */
+    transform: translate(-5px, 3px);
     
     transition: right 0.35s cubic-bezier(0.25, 1, 0.5, 1);
 }
