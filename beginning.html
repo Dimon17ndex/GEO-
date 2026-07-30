@@ -65,6 +65,91 @@
         color: #ffffff;
     }
 
+    /* =========================================================
+       ВИДЖЕТ ПРОФИЛЯ В ВЕРХНЕМ ПРАВОМ УГЛУ (выпадает Выйти)
+       ========================================================= */
+    .top-right-profile {
+        position: fixed;
+        top: 40px;          /* На одном уровне с логотипом */
+        right: 140px;       /* Безопасное расстояние от шестерёнки */
+        z-index: 10;
+    }
+
+    .profile-card {
+        position: relative;
+        display: inline-block;
+        padding: 10px 18px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .profile-card:hover {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .profile-username {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        color: #ffffff;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Маленькая стрелочка возле профиля */
+    .profile-username::after {
+        content: '▾';
+        font-size: 10px;
+        opacity: 0.6;
+        transition: transform 0.2s ease;
+    }
+
+    .profile-card:hover .profile-username::after {
+        transform: rotate(180deg);
+    }
+
+    /* Выпадающая кнопка "Выйти" */
+    .logout-dropdown-btn {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        width: 100%;
+        padding: 10px 0;
+        background: #e74c3c;
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        
+        /* Скрыта по умолчанию */
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-5px);
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+    }
+
+    /* Появление кнопки при наведении на карточку профиля */
+    .profile-card:hover .logout-dropdown-btn {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .logout-dropdown-btn:hover {
+        background: #c0392b;
+    }
+
     /* Контейнер для размещения статуса строго по центру экрана */
     .center-status-wrapper {
         position: fixed;
@@ -74,6 +159,11 @@
         z-index: 5;
         pointer-events: none;
         text-align: center;
+    }
+
+    /* Разрешаем клики по кнопке внутри pointer-events: none контейнера */
+    .auth-trigger-btn {
+        pointer-events: auto;
     }
 
     /* Серый статус "ЗДЕСЬ ПОКА ПУСТО" */
@@ -110,10 +200,17 @@
         </div>
     </div>
 
+    <div id="user-profile-widget" class="top-right-profile" style="display: none;">
+        <div class="profile-card">
+            <span class="profile-username" id="profile-email-text">Профиль</span>
+            <button type="button" class="logout-dropdown-btn" onclick="logoutUser()">Выйти</button>
+        </div>
+    </div>
+
     <div class="center-status-wrapper">
         <button type="button" id="open-auth-btn" class="auth-trigger-btn" onclick="showAuthModal()">
-    Войти / Зарегистрироваться
-</button>
+            Войти / Зарегистрироваться
+        </button>
 
         <div class="empty-status-message">ЗДЕСЬ ПОКА ПУСТО</div>
     </div>
