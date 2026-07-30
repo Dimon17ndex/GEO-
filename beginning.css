@@ -770,3 +770,73 @@ body:has(#version-badge.show) .app-banners-container {
 .auth-trigger-btn:active {
     transform: scale(0.97);
 }
+
+/* Позиционирование блока профиля сверху справа */
+.top-right-profile {
+    position: fixed;
+    top: 40px;          /* На одном уровне с логотипом слева */
+    right: 120px;       /* Отступ справа, чтобы не перекрывать шестерёнку настроек */
+    z-index: 10;
+}
+
+/* Контейнер карточки профиля */
+.profile-card {
+    position: relative;
+    display: inline-block;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.profile-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Текст с логином/почтой */
+.profile-username {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+    white-space: nowrap;
+}
+
+/* Выпадающая кнопка "Выйти" */
+.logout-dropdown-btn {
+    position: absolute;
+    top: calc(100% + 8px);  /* Появляется ровно под профилем */
+    left: 0;
+    width: 100%;
+    padding: 10px 0;
+    background: #e74c3c;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    
+    /* Скрываем по умолчанию */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-5px);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+}
+
+/* Показываем кнопку "Выйти" при наведении на карточку профиля */
+.profile-card:hover .logout-dropdown-btn {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.logout-dropdown-btn:hover {
+    background: #c0392b;
+}
