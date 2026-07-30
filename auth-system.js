@@ -207,7 +207,19 @@ function injectAuthStyles() {
     cursor: pointer !important;
     z-index: 99999999 !important;
     padding: 0 !important;
+    /* Фиксируем точку трансформации по центру */
+    transform-origin: center center !important;
     transition: color 0.25s ease, transform 0.25s ease !important;
+}
+
+/* Прозрачный хитбокс во имя защиты от дребезжания */
+.auth-close-btn::before {
+    content: '' !important;
+    position: absolute !important;
+    top: -12px !important;
+    bottom: -12px !important;
+    left: -12px !important;
+    right: -12px !important;
 }
 
 .auth-close-btn:hover {
