@@ -181,6 +181,46 @@ body.user-logged-in #open-auth-btn {
         color: rgba(255, 255, 255, 0.4);
         text-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
     }
+
+    /* =========================================================
+       АНИМАЦИЯ ЛЕВИТАЦИИ ЛОГОТИПА И НАДПИСИ
+       ========================================================= */
+
+    /* Левитация логотипа */
+    .top-left-brand .db-logo-icon {
+        will-change: transform;
+        animation: floatingLogo 4s ease-in-out infinite alternate !important;
+    }
+
+    /* Левитация названия GEOГРАФИЯ */
+    .top-left-brand .db-main-title {
+        will-change: transform;
+        animation: floatingText 4.5s ease-in-out infinite alternate !important;
+    }
+
+    @keyframes floatingLogo {
+        0% {
+            transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+            transform: translateY(-8px) rotate(-1.5deg);
+        }
+        100% {
+            transform: translateY(5px) rotate(1.5deg);
+        }
+    }
+
+    @keyframes floatingText {
+        0% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-6px);
+        }
+        100% {
+            transform: translateY(4px);
+        }
+    }
     </style>
 </head>
 <body>
