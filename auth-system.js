@@ -39,10 +39,29 @@ window.hideAuthModal = function() {
     }
 };
 
+// Функция выхода из аккаунта с плавным затемнением и последующей перезагрузкой
 window.logoutUser = async function() {
-    if (window.supabaseClient) {
-        await window.supabaseClient.auth.signOut();
-        updateUIForUser(null);
+    try {
+        if (window.supabaseClient) {
+            await window.supabaseClient.auth.signOut();
+        }
+        
+        // 1. Применяем класс плавного угасания страницы
+        document.body.classList.add('page-hidden');
+
+        // 2. Ждём 500мс для выполнения CSS-анимации и перезагружаем
+        setTimeout(() => {
+            window.location.reload();
+        }, 500);
+
+    } catch (error) {
+        console.error('Ошибка при выходе из аккаунта:', error);
+        
+        // В случае ошибки также плавно перезагружаем
+        document.body.classList.add('page-hidden');
+        setTimeout(() => {
+            window.location.reload();
+        }, 500);
     }
 };
 
