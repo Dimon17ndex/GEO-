@@ -539,73 +539,77 @@
     }
 
     // Функция отрисовки списка пользователей из базы Supabase
-async function fetchAndRenderUsers() {
-    const container = document.getElementById('geousers-list-container');
-    if (!container) return;
+    async function fetchAndRenderUsers() {
+        const container = document.getElementById('geousers-list-container');
+        if (!container) return;
 
-    const client = getSupabaseClient();
-    if (!client) {
-        console.warn('Supabase клиент не найден. Загрузите или инициализируйте Supabase.');
-        return;
-    }
-
-    // Векторный значок аккаунта
-    const userIconSVG = `
-        <svg class="geouser-avatar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-        </svg>
-    `;
-
-    try {
-        // Запрос к публичной таблице profiles
-        const { data: users, error } = await client
-            .from('profiles')
-            .select('*');
-
-        if (error) throw error;
-
-        if (!users || users.length === 0) {
-            container.innerHTML = `
-                <div class="geouser-row-item">
-                    <span class="geouser-number">0</span>
-                    <div class="geouser-card-box">
-                        ${userIconSVG}
-                        <span>Пользователи не найдены</span>
-                    </div>
-                </div>`;
+        const client = getSupabaseClient();
+        if (!client) {
+            console.warn('Supabase клиент не найден. Загрузите или инициализируйте Supabase.');
             return;
         }
 
-        // Рендерим пользователей: "Имя (email)" или просто "email", если имени нет
-        container.innerHTML = users.map((u, index) => {
-            const displayName = u.username 
-                ? `${u.username} <span style="opacity: 0.5; font-size: 0.9em; margin-left: 6px;">(${u.email || 'без email'})</span>`
-                : (u.email || 'Без имени');
+        // Векторный значок аккаунта
+        const userIconSVG = `
+            <svg class="geouser-avatar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+        `;
 
-            return `
-                <div class="geouser-row-item">
-                    <span class="geouser-number">${index + 1}</span>
-                    <div class="geouser-card-box">
-                        ${userIconSVG}
-                        <span>${displayName}</span>
+        try {
+            // Запрос к публичной таблице profiles
+            const { data: users, error } = await client
+                .from('profiles')
+                .select('*');
+
+            if (error) throw error;
+
+            if (!users || users.length === 0) {
+                container.innerHTML = `
+                    <div class="geouser-row-item">
+                        <span class="geouser-number">0</span>
+                        <div class="geouser-card-box">
+                            ${userIconSVG}
+                            <span>Пользователи не найдены</span>
+                        </div>
+                    </div>`;
+                return;
+            }
+
+            // Рендерим пользователей
+            container.innerHTML = users.map((u, index) => {
+                // Проверяем валидность имени
+                const hasUsername = u.username && u.username.trim() !== '' && u.username !== '—';
+
+                // Если имя есть — красивое стандартное отображение, если нет — "нет имени" полупрозрачным курсивом
+                const displayName = hasUsername 
+                    ? `<strong>${u.username}</strong> <span style="opacity: 0.5; font-size: 0.9em; margin-left: 6px;">(${u.email || 'без email'})</span>`
+                    : `<span style="opacity: 0.4; font-style: italic; font-weight: 400;">нет имени</span> <span style="opacity: 0.75; margin-left: 6px;">(${u.email || 'без email'})</span>`;
+
+                return `
+                    <div class="geouser-row-item">
+                        <span class="geouser-number">${index + 1}</span>
+                        <div class="geouser-card-box">
+                            ${userIconSVG}
+                            <div>${displayName}</div>
+                        </div>
                     </div>
-                </div>
-            `;
-        }).join('');
+                `;
+            }).join('');
 
-    } catch (err) {
-        console.error('Ошибка загрузки пользователей:', err);
-        container.innerHTML = `
-            <div class="geouser-row-item">
-                <span class="geouser-number">!</span>
-                <div class="geouser-card-box" style="color: #e74c3c;">
-                    ${userIconSVG}
-                    <span>Ошибка при загрузке данных</span>
-                </div>
-            </div>`;
+        } catch (err) {
+            console.error('Ошибка загрузки пользователей:', err);
+            container.innerHTML = `
+                <div class="geouser-row-item">
+                    <span class="geouser-number">!</span>
+                    <div class="geouser-card-box" style="color: #e74c3c;">
+                        ${userIconSVG}
+                        <span>Ошибка при загрузке данных</span>
+                    </div>
+                </div>`;
+        }
     }
-}
 
     document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(() => {
