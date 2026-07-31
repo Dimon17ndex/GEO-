@@ -166,6 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 logToConsole('<span class="cmd-highlight">help</span> — показать список команд', 'system');
                 logToConsole('<span class="cmd-highlight">clear</span> — очистить консоль', 'system');
                 logToConsole('<span class="cmd-highlight">status</span> — проверить статус подключения', 'system');
+                logToConsole('<span class="cmd-highlight">admin_stat</span> — открыть админ-панель', 'system');
                 logToConsole('<span class="cmd-highlight">bypass</span> — зайти без пароля', 'system');
                 logToConsole('<span class="cmd-highlight">banner-on</span> — включить плашку для всех', 'system');
                 logToConsole('<span class="cmd-highlight">banner-off</span> — отключить плашку для всех', 'system');
@@ -177,6 +178,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             case 'status':
                 logToConsole('Сервер: ACTIVE | Платформа: Desktop', 'success');
+                break;
+
+            case 'admin_stat':
+                logToConsole('Переход в панель администратора...', 'success');
+                setTimeout(() => { 
+                    window.location.href = 'admin.html'; 
+                }, 600);
                 break;
 
             case 'bypass':
