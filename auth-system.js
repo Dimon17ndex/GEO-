@@ -359,7 +359,7 @@ function injectAuthStyles() {
             width: 100% !important;
             display: flex !important;
             flex-direction: column !important;
-            gap: 45px !important;
+            gap: 35px !important;
             
             opacity: 0 !important;
             filter: blur(8px) !important;
@@ -412,7 +412,7 @@ function injectAuthStyles() {
             font-weight: 500 !important;
             cursor: pointer !important;
             width: 100% !important;
-            margin-top: 45px !important;
+            margin-top: 25px !important;
             transition: all 0.2s ease !important;
             text-align: center !important;
         }
@@ -633,6 +633,9 @@ function initAuthModalUI() {
 
                     <form id="auth-form-register" class="auth-form">
                         <div class="auth-input-group">
+                            <input type="text" id="reg-name" placeholder="Ваше имя / Никнейм..." required class="auth-input" autocomplete="nickname">
+                        </div>
+                        <div class="auth-input-group">
                             <input type="email" id="reg-email" placeholder="Ваш Email..." required class="auth-input" autocomplete="email">
                         </div>
                         <div class="auth-input-group">
@@ -722,6 +725,7 @@ function initAuthEvents() {
         if (error) {
             alert(`Ошибка входа: ${error.message}`);
         } else {
+            window.hideAuthModal();
             window.location.reload();
         }
     });
@@ -730,10 +734,21 @@ function initAuthEvents() {
         e.preventDefault();
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
 
+        const name = document.getElementById('reg-name').value;
         const email = document.getElementById('reg-email').value;
         const password = document.getElementById('reg-password').value;
 
-        const { data, error } = await window.supabaseClient.auth.signUp({ email, password });
+        const { data, error } = await window.supabaseClient.auth.signUp({ 
+            email, 
+            password,
+            options: {
+                data: {
+                    full_name: name,
+                    username: name
+                }
+            }
+        });
+
         if (error) {
             alert(`Ошибка регистрации: ${error.message}`);
         } else {
@@ -743,15 +758,27 @@ function initAuthEvents() {
     });
 }
 
+// --- ПРОВЕРКА СЕССИИ И ОБНОВЛЕНИЕ UI ---
 async function checkUserSession() {
     if (!window.supabaseClient) return;
+
+    // 1. Проверка сессии при загрузке
     const { data: { session } } = await window.supabaseClient.auth.getSession();
     updateUIForUser(session ? session.user : null);
+
+    // 2. Отслеживание изменения состояния авторизации в режиме реального времени
+    window.supabaseClient.auth.onAuthStateChange((event, session) => {
+        const user = session ? session.user : null;
+        updateUIForUser(user);
+    });
 }
 
 function updateUIForUser(user) {
     const mainAuthBtn = document.getElementById('open-auth-btn') || document.getElementById('auth-main-btn');
     const profileWidget = document.getElementById('user-profile-widget');
+    
+    // Элементы профиля
+    const profileNameText = document.getElementById('profile-name-text');
     const profileEmailText = document.getElementById('profile-email-text');
 
     if (user) {
@@ -759,9 +786,21 @@ function updateUIForUser(user) {
 
         if (mainAuthBtn) mainAuthBtn.style.display = 'none';
 
-        if (profileWidget && profileEmailText) {
-            const username = user.email.split('@')[0];
-            profileEmailText.textContent = username;
+        if (profileWidget) {
+            const userEmail = user.email || '';
+            const customName = user.user_metadata?.full_name || user.user_metadata?.username;
+            const username = customName || (userEmail ? userEmail.split('@')[0] : 'Пользователь');
+
+            // Выводим имя
+            if (profileNameText) {
+                profileNameText.textContent = username;
+            }
+
+            // Выводим почту
+            if (profileEmailText) {
+                profileEmailText.textContent = userEmail;
+            }
+
             profileWidget.style.display = 'block';
         }
     } else {
