@@ -98,12 +98,15 @@
             box-shadow: 0 0 10px rgba(231, 76, 60, 0.2);
         }
 
-        /* Новая серые плашка "АВТОРИЗОВАННЫЕ GEOUSERS" */
+        /* Статичная плашка "АВТОРИЗОВАННЫЕ GEOUSERS" под логотипом и названием */
         .admin-sub-badge {
+            position: fixed;
+            top: 135px; /* Находится ниже бренд-блока */
+            left: 40px;
+            z-index: 10;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            margin-top: 10px;
             padding: 8px 16px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -126,7 +129,7 @@
             color: #ffffff;
         }
 
-        /* Анимация левитации */
+        /* Анимация левитации логотипа и текста */
         @keyframes floatingLogo {
             0% {
                 transform: translateY(0px) rotate(0deg);
@@ -274,11 +277,12 @@
             <div class="db-text-right">
                 <h1 class="db-main-title">GEOГРАФИЯ</h1>
                 <span class="admin-mode-badge">РЕЖИМ ADMIN</span>
-                <div class="admin-sub-badge">
-                    АВТОРИЗОВАННЫЕ GEOUSERS
-                </div>
             </div>
         </div>
+    </div>
+
+    <div class="admin-sub-badge">
+        АВТОРИЗОВАННЫЕ GEOUSERS
     </div>
 
     <div class="center-status-wrapper">
