@@ -346,158 +346,177 @@
     <script src="auth-system.js?v=3"></script>
 
     <script>
-    const waveContainer = document.getElementById('bg-wave-container');
-    const volumeStatusLabel = document.getElementById('volume-status-label');
-    const intensitySlider = document.getElementById('wave-intensity-slider');
-    const intensityValueLabel = document.getElementById('intensity-value');
+// Переменные состояния
+const waveContainer = document.getElementById('bg-wave-container');
+const volumeStatusLabel = document.getElementById('volume-status-label');
+const intensitySlider = document.getElementById('wave-intensity-slider');
+const intensityValueLabel = document.getElementById('intensity-value');
+
+let intensityPercent = 20;
+let ambientTimeoutId = null; // Фикс параллельных циклов волн
+
+// Генерация визуальных волн
+function createBackgroundRipple(x, y, className, duration = 1500) {
+    if (!waveContainer) return;
+    const ripple = document.createElement('div');
+    ripple.classList.add(className);
+    ripple.style.left = `${x}px`;
+    ripple.style.top = `${y}px`;
+    waveContainer.appendChild(ripple);
+    setTimeout(() => { ripple.remove(); }, duration);
+}
+
+// Фоновые амбиентные волны с защитой от дублирования таймеров
+function spawnAmbientWave() {
+    clearTimeout(ambientTimeoutId);
+
+    if (intensityPercent === 0) { 
+        ambientTimeoutId = setTimeout(spawnAmbientWave, 1000); 
+        return; 
+    }
+
+    let spawnX = 0, spawnY = 0;
+    const side = Math.floor(Math.random() * 4);
+    switch(side) {
+        case 0: spawnX = Math.random() * window.innerWidth; spawnY = -50; break;
+        case 1: spawnX = window.innerWidth + 50; spawnY = Math.random() * window.innerHeight; break;
+        case 2: spawnX = Math.random() * window.innerWidth; spawnY = window.innerHeight + 50; break;
+        case 3: spawnX = -50; spawnY = Math.random() * window.innerHeight; break;
+    }
+
+    createBackgroundRipple(spawnX, spawnY, 'bg-ambient-ripple', 3000);
+
+    const baseDelay = 500, maxAdditionalDelay = 8000; 
+    const factor = (100 - intensityPercent) / 100;
+    const nextDelay = baseDelay + (Math.random() * maxAdditionalDelay * factor);
+
+    ambientTimeoutId = setTimeout(spawnAmbientWave, nextDelay);
+}
+
+// Аудио сопровождение
+const bgMusic = new Audio('audio/melody_start.mp3');
+bgMusic.volume = 0.4; 
+let musicStarted = false;
+
+function playMusic() {
+    if (musicStarted || bgMusic.muted) return;
+    bgMusic.play().then(() => { musicStarted = true; }).catch(() => {});
+}
+
+bgMusic.addEventListener('ended', () => {
+    setTimeout(() => { if (!bgMusic.muted) bgMusic.play(); }, 5000); 
+});
+
+document.body.addEventListener('mousedown', (e) => {
+    if (e.target.closest('#settings-btn') || e.target.closest('.settings-trigger-zone')) return;
+    playMusic();
+    createBackgroundRipple(e.clientX, e.clientY, 'bg-click-ripple');
+});
+
+// Управление звуком
+const volumeBtn = document.getElementById('volume-toggle-btn');
+const volumeIcon = document.getElementById('volume-icon');
+let isMuted = false;
+
+volumeBtn?.addEventListener('click', (e) => {
+    e.stopPropagation(); 
+    isMuted = !isMuted;
+    bgMusic.muted = isMuted;
     
-    let intensityPercent = 20;
-
-    function createBackgroundRipple(x, y, className, duration = 1500) {
-        const ripple = document.createElement('div');
-        ripple.classList.add(className);
-        ripple.style.left = `${x}px`;
-        ripple.style.top = `${y}px`;
-        waveContainer.appendChild(ripple);
-        setTimeout(() => { ripple.remove(); }, duration);
+    if (isMuted) {
+        volumeStatusLabel?.classList.add('muted-mode');
+        volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15" stroke="currentColor" stroke-width="1.5"></line><line x1="17" y1="9" x2="23" y2="15" stroke="currentColor" stroke-width="1.5"></line>`;
+    } else {
+        volumeStatusLabel?.classList.remove('muted-mode');
+        volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path class="volume-wave-1" d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path class="volume-wave-2" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>`;
+        playMusic();
     }
+});
 
-    // Фоновые амбиентные волны
-    function spawnAmbientWave() {
-        if (intensityPercent === 0) { setTimeout(spawnAmbientWave, 1000); return; }
-        let spawnX = 0, spawnY = 0;
-        const side = Math.floor(Math.random() * 4);
-        switch(side) {
-            case 0: spawnX = Math.random() * window.innerWidth; spawnY = -50; break;
-            case 1: spawnX = window.innerWidth + 50; spawnY = Math.random() * window.innerHeight; break;
-            case 2: spawnX = Math.random() * window.innerWidth; spawnY = window.innerHeight + 50; break;
-            case 3: spawnX = -50; spawnY = Math.random() * window.innerHeight; break;
-        }
-        createBackgroundRipple(spawnX, spawnY, 'bg-ambient-ripple', 3000);
-        const baseDelay = 500, maxAdditionalDelay = 8000; 
-        const factor = (100 - intensityPercent) / 100;
-        setTimeout(spawnAmbientWave, baseDelay + (Math.random() * maxAdditionalDelay * factor));
+// Управление интенсивностью
+intensitySlider?.addEventListener('mousedown', (e) => { e.stopPropagation(); });
+intensitySlider?.addEventListener('input', (e) => {
+    intensityPercent = parseInt(e.target.value);
+    if (intensityValueLabel) intensityValueLabel.innerText = `${intensityPercent}%`;
+});
+
+// Перехватываем кнопку "Назад"
+history.pushState(null, null, location.href);
+window.addEventListener('popstate', function () {
+    window.location.replace('index.html');
+});
+
+// Навигация без дублирования
+function navigateToPage(targetPage) {
+    const currentPage = window.location.pathname.split('/').pop() || 'beginning.html';
+    if (currentPage !== targetPage) {
+        window.location.href = targetPage;
     }
+}
 
+// ЕДИНЫЙ ОБРАБОТЧИК ЗАГРУЗКИ СТРАНИЦЫ
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Анимация появления
+    requestAnimationFrame(() => {
+        document.body.classList.add('page-loaded');
+    });
+
+    // 2. Запуск волн
     setTimeout(() => { spawnAmbientWave(); }, 1000);
 
-    // Аудио сопровождение
-    const bgMusic = new Audio('audio/melody_start.mp3');
-    bgMusic.volume = 0.4; 
-    let musicStarted = false;
+    // 3. Инициализация панели администратора
+    const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
+    const sidePanel = document.getElementById('dev-side-panel');
+    let hideTimeout = null;
 
-    function playMusic() {
-        if (musicStarted || bgMusic.muted) return;
-        bgMusic.play().then(() => { musicStarted = true; }).catch(() => {});
+    // Подсветка активной страницы
+    const currentPage = window.location.pathname.split('/').pop() || 'beginning.html';
+    if (currentPage === 'beginning.html') {
+        document.getElementById('btn-main-profile')?.classList.add('active-page');
+    } else if (currentPage === 'admin.html') {
+        document.getElementById('btn-admin-profile')?.classList.add('active-page');
     }
 
-    bgMusic.addEventListener('ended', () => {
-        setTimeout(() => { if (!bgMusic.muted) bgMusic.play(); }, 5000); 
-    });
+    async function initDevPanel() {
+        const client = window.supabaseClient || window.supabase;
+        if (!client) return;
 
-    document.body.addEventListener('mousedown', (e) => {
-        if (e.target.closest('#settings-btn') || e.target.closest('.settings-trigger-zone')) return;
-        playMusic();
-        createBackgroundRipple(e.clientX, e.clientY, 'bg-click-ripple');
-    });
-
-    // Управление звуком
-    const volumeBtn = document.getElementById('volume-toggle-btn');
-    const volumeIcon = document.getElementById('volume-icon');
-    let isMuted = false;
-
-    volumeBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); 
-        isMuted = !isMuted;
-        bgMusic.muted = isMuted;
-        if (isMuted) {
-            volumeStatusLabel.classList.add('muted-mode');
-            volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15" stroke="currentColor" stroke-width="1.5"></line><line x1="17" y1="9" x2="23" y2="15" stroke="currentColor" stroke-width="1.5"></line>`;
-        } else {
-            volumeStatusLabel.classList.remove('muted-mode');
-            volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path class="volume-wave-1" d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path class="volume-wave-2" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>`;
-            playMusic();
-        }
-    });
-
-    // Управление интенсивностью
-    intensitySlider.addEventListener('mousedown', (e) => { e.stopPropagation(); });
-    intensitySlider.addEventListener('input', (e) => {
-        intensityPercent = parseInt(e.target.value);
-        intensityValueLabel.innerText = `${intensityPercent}%`;
-    });
-
-    // Запуск мягкого проявления из темноты при загрузке
-    document.addEventListener('DOMContentLoaded', () => {
-        requestAnimationFrame(() => {
-            document.body.classList.add('page-loaded');
-        });
-    });
-
-    // Перехватываем кнопку "Назад"
-    history.pushState(null, null, location.href);
-    window.addEventListener('popstate', function () {
-        window.location.replace('index.html');
-    });
-
-    // Навигация без дублирования
-    function navigateToPage(targetPage) {
-        const currentPage = window.location.pathname.split('/').pop() || 'beginning.html';
-        if (currentPage !== targetPage) {
-            window.location.href = targetPage;
-        }
-    }
-
-    // Инициализация панели администратора/разработчика
-    document.addEventListener('DOMContentLoaded', () => {
-        const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
-        const sidePanel = document.getElementById('dev-side-panel');
-        let hideTimeout = null;
-
-        // Подсветка активной страницы на кнопках
-        const currentPage = window.location.pathname.split('/').pop() || 'beginning.html';
-        if (currentPage === 'beginning.html') {
-            document.getElementById('btn-main-profile')?.classList.add('active-page');
-        } else if (currentPage === 'admin.html') {
-            document.getElementById('btn-admin-profile')?.classList.add('active-page');
-        }
-
-        async function initDevPanel() {
-            const client = window.supabaseClient || window.supabase;
-            if (!client) return;
-
+        try {
             const { data: { session } } = await client.auth.getSession();
-            
-            if (session && session.user && session.user.email === DEV_EMAIL) {
+            if (session?.user?.email === DEV_EMAIL) {
                 setupHoverDetection();
             }
+        } catch (err) {
+            console.error('Ошибка проверки прав разработчика:', err);
         }
+    }
 
-        function setupHoverDetection() {
-            document.addEventListener('mousemove', (e) => {
-                const distanceFromRight = window.innerWidth - e.clientX;
+    function setupHoverDetection() {
+        if (!sidePanel) return;
 
-                if (distanceFromRight <= 60) {
-                    clearTimeout(hideTimeout);
-                    sidePanel.classList.add('visible');
-                }
-            });
-
-            sidePanel.addEventListener('mouseenter', () => {
+        document.addEventListener('mousemove', (e) => {
+            const distanceFromRight = window.innerWidth - e.clientX;
+            if (distanceFromRight <= 60) {
                 clearTimeout(hideTimeout);
                 sidePanel.classList.add('visible');
-            });
+            }
+        });
 
-            sidePanel.addEventListener('mouseleave', () => {
-                hideTimeout = setTimeout(() => {
-                    sidePanel.classList.remove('visible');
-                }, 2000);
-            });
-        }
+        sidePanel.addEventListener('mouseenter', () => {
+            clearTimeout(hideTimeout);
+            sidePanel.classList.add('visible');
+        });
 
-        initDevPanel();
-    });
-    </script>
+        sidePanel.addEventListener('mouseleave', () => {
+            hideTimeout = setTimeout(() => {
+                sidePanel.classList.remove('visible');
+            }, 2000);
+        });
+    }
+
+    initDevPanel();
+});
+</script>
 
     <script src="app.js"></script>
     <script src="reset-password.js"></script>
