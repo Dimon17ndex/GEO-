@@ -577,24 +577,43 @@
         }
 
         function setupHoverDetection() {
-            document.addEventListener('mousemove', (e) => {
-                const distanceFromRight = window.innerWidth - e.clientX;
-
-                if (distanceFromRight <= 60) {
-                    clearTimeout(hideTimeout);
-                    sidePanel.classList.add('visible');
-                }
-            });
+            let isMouseOverPanel = false;
 
             sidePanel.addEventListener('mouseenter', () => {
-                clearTimeout(hideTimeout);
+                isMouseOverPanel = true;
+                if (hideTimeout) {
+                    clearTimeout(hideTimeout);
+                    hideTimeout = null;
+                }
                 sidePanel.classList.add('visible');
             });
 
             sidePanel.addEventListener('mouseleave', () => {
+                isMouseOverPanel = false;
+                if (hideTimeout) clearTimeout(hideTimeout);
                 hideTimeout = setTimeout(() => {
                     sidePanel.classList.remove('visible');
+                    hideTimeout = null;
                 }, 2000);
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                const distanceFromRight = window.innerWidth - e.clientX;
+
+                if (distanceFromRight <= 60) {
+                    if (hideTimeout) {
+                        clearTimeout(hideTimeout);
+                        hideTimeout = null;
+                    }
+                    sidePanel.classList.add('visible');
+                } else if (!isMouseOverPanel && sidePanel.classList.contains('visible')) {
+                    if (!hideTimeout) {
+                        hideTimeout = setTimeout(() => {
+                            sidePanel.classList.remove('visible');
+                            hideTimeout = null;
+                        }, 2000);
+                    }
+                }
             });
         }
 
