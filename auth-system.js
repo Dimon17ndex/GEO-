@@ -3,6 +3,7 @@
 window.SUPABASE_URL = window.SUPABASE_URL || 'https://cwgkdpmxwgfypbiykafl.supabase.co'; 
 window.SUPABASE_KEY = window.SUPABASE_KEY || 'sb_publishable_mjHX0OTE6LSLh2qTVqMIng_mY9cvDcN';
 
+// Инициализация Supabase
 if (!window.supabaseClient && window.supabase) {
     try {
         window.supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
@@ -43,12 +44,9 @@ window.logoutUser = async function() {
         if (window.supabaseClient) {
             await window.supabaseClient.auth.signOut();
         }
-        document.body.classList.add('page-hidden');
-        setTimeout(() => {
-            window.location.reload();
-        }, 500);
     } catch (error) {
         console.error('Ошибка при выходе из аккаунта:', error);
+    } finally {
         document.body.classList.add('page-hidden');
         setTimeout(() => {
             window.location.reload();
@@ -305,7 +303,7 @@ function injectAuthStyles() {
             border-radius: 24px !important;
             padding: 3px !important;
             width: 100% !important;
-            margin-bottom: 110px !important;
+            margin-bottom: 30px !important;
             box-sizing: border-box !important;
         }
 
@@ -359,7 +357,7 @@ function injectAuthStyles() {
             width: 100% !important;
             display: flex !important;
             flex-direction: column !important;
-            gap: 35px !important;
+            gap: 25px !important;
             
             opacity: 0 !important;
             filter: blur(8px) !important;
@@ -412,7 +410,7 @@ function injectAuthStyles() {
             font-weight: 500 !important;
             cursor: pointer !important;
             width: 100% !important;
-            margin-top: 25px !important;
+            margin-top: 15px !important;
             transition: all 0.2s ease !important;
             text-align: center !important;
         }
@@ -672,6 +670,10 @@ function initAuthEvents() {
 
     const btnConfirmYes = document.getElementById('auth-confirm-close-btn');
     const btnConfirmNo = document.getElementById('auth-cancel-close-btn');
+
+    // Предотвращение дублирования обработчиков при повторном вызове
+    if (overlay && overlay.dataset.eventsInitialized) return;
+    if (overlay) overlay.dataset.eventsInitialized = "true";
 
     btnConfirmYes?.addEventListener('click', window.hideAuthModal);
     btnConfirmNo?.addEventListener('click', () => hideConfirmToast(false));
