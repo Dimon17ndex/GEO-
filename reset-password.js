@@ -230,8 +230,8 @@ function injectResetStyles() {
             align-items: center !important;
             justify-content: center !important;
             gap: 20px !important;
-            margin-top: -30px !important;
-            margin-bottom: 30px !important;
+            margin-top: -90px !important; /* Подняли блок еще выше */
+            margin-bottom: 50px !important; /* Увеличили отступ до табов */
         }
 
         .reset-logo-wrapper {
