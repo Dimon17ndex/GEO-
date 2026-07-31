@@ -871,3 +871,52 @@ body:has(#version-badge.show) .app-banners-container {
     background: #c0392b;
 }
 
+/* Выдвижная секретная панель администратора */
+.dev-side-panel {
+    position: fixed;
+    top: 50%;
+    right: 0;
+    transform: translate(100%, -50%); /* По умолчанию полностью скрыта за правым краем */
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 15px;
+    background: rgba(15, 15, 20, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-right: none;
+    border-radius: 16px 0 0 16px;
+    backdrop-filter: blur(15px);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Класс для выдвижения панели */
+.dev-side-panel.visible {
+    transform: translate(0, -50%);
+}
+
+.dev-panel-btn {
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    border-radius: 10px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.25s ease;
+}
+
+.dev-panel-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateX(-3px);
+}
+
+.dev-panel-btn.active-page {
+    border-color: #3498db;
+    background: rgba(52, 152, 219, 0.2);
+}
