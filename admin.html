@@ -211,11 +211,9 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
-        /* Усиленная обводка для карточки ТЕКУЩЕГО пользователя */
+        /* Усиленная белая обводка для карточки ТЕКУЩЕГО пользователя (без подсветки фона и свечения) */
         .geouser-card-box.currentUserCard {
-            border: 1px solid rgba(255, 255, 255, 0.75) !important;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.25), inset 0 0 12px rgba(255, 255, 255, 0.08) !important;
-            background: rgba(255, 255, 255, 0.08) !important;
+            border: 1px solid rgba(255, 255, 255, 0.85) !important;
         }
 
         .geouser-card-box:hover {
@@ -234,7 +232,7 @@
         }
 
         .geouser-card-box:hover .geouser-avatar-icon {
-            stroke: #3498db; /* Симпатичный подсвечивающийся синий акцент */
+            stroke: #3498db;
         }
 
         /* Анимация левитации логотипа и текста */
@@ -574,7 +572,6 @@
             return;
         }
 
-        // Векторный значок аккаунта
         const userIconSVG = `
             <svg class="geouser-avatar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -622,7 +619,6 @@
 
             // 4. Рендерим пользователей
             container.innerHTML = users.map((u, index) => {
-                // Проверяем, действительно ли эта плашка принадлежит текущему пользователю
                 const isSelf = currentUserId && u.id === currentUserId;
                 const hasUsername = u.username && u.username.trim() !== '' && u.username !== '—';
 
@@ -630,12 +626,10 @@
                     ? `<strong>${u.username}</strong> <span style="opacity: 0.5; font-size: 0.9em; margin-left: 6px;">(${u.email || 'без email'})</span>`
                     : `<span style="opacity: 0.4; font-style: italic; font-weight: 400;">нет имени</span> <span style="opacity: 0.75; margin-left: 6px;">(${u.email || 'без email'})</span>`;
 
-                // Бейдж "ВЫ" перед первой цифрой (только для своего профиля)
                 const numberLabel = isSelf 
                     ? `<span class="geouser-you-badge">ВЫ</span><span>${index + 1}</span>` 
                     : `<span>${index + 1}</span>`;
 
-                // Применяем класс с белой подсветкой для текущего пользователя
                 const cardClass = isSelf ? 'geouser-card-box currentUserCard' : 'geouser-card-box';
 
                 return `
@@ -687,12 +681,10 @@
             try {
                 const { data: { session } } = await client.auth.getSession();
                 
-                // Включаем боковую панель администратора
                 if (session?.user?.email === DEV_EMAIL) {
                     setupHoverDetection();
                 }
 
-                // Отображаем Email текущего авторизованного пользователя
                 if (session?.user) {
                     document.body.classList.add('user-logged-in');
                     const widget = document.getElementById('user-profile-widget');
@@ -749,7 +741,6 @@
             });
         }
 
-        // Запуск инициализации панелей и получения пользователей
         initDevPanel();
         fetchAndRenderUsers();
     });
