@@ -1,5 +1,3 @@
-//reset-password.js
-
 (function () {
     // 1. Внедрение стилей модального окна в <head>
     const styles = `
@@ -145,7 +143,7 @@
     styleSheet.textContent = styles;
     document.head.appendChild(styleSheet);
 
-    // 2. Внедрение HTML-разметки в <body>
+    // 2. Внедрение HTML-разметки окна
     const modalHTML = `
         <div id="reset-password-modal" class="modal-overlay">
             <div class="reset-card">
@@ -183,19 +181,41 @@
     document.addEventListener('DOMContentLoaded', () => {
         document.body.insertAdjacentHTML('beforeend', modalHTML);
 
-        // Навешивание обработчиков событий
+        // Вставляем тестовую кнопку в левый нижний угол
+        const testBtnHTML = `
+            <button id="test-open-reset-btn" type="button" style="
+                position: fixed;
+                bottom: 20px;
+                left: 20px;
+                z-index: 9999;
+                padding: 10px 18px;
+                background: #ffffff;
+                color: #000000;
+                border: none;
+                border-radius: 8px;
+                font-family: 'Montserrat', sans-serif;
+                font-size: 13px;
+                font-weight: 700;
+                cursor: pointer;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            ">
+                🔑 Тест: Сброс пароля
+            </button>
+        `;
+        document.body.insertAdjacentHTML('beforeend', testBtnHTML);
+
+        // Клики по кнопкам
+        document.getElementById('test-open-reset-btn').addEventListener('click', () => openResetModal('request'));
         document.getElementById('close-reset-modal-btn').addEventListener('click', closeResetModal);
         document.getElementById('request-reset-form').addEventListener('submit', handleRequestReset);
         document.getElementById('update-password-form').addEventListener('submit', handleUpdatePassword);
 
-        // Закрытие по клику на затемнённый фон
+        // Закрытие по фону
         document.getElementById('reset-password-modal').addEventListener('click', (e) => {
-            if (e.target.id === 'reset-password-modal') {
-                closeResetModal();
-            }
+            if (e.target.id === 'reset-password-modal') closeResetModal();
         });
 
-        // Слушатель Supabase на переход по ссылке из письма
+        // Проверка перехода по ссылке из письма Supabase
         if (typeof supabase !== 'undefined') {
             supabase.auth.onAuthStateChange((event) => {
                 if (event === 'PASSWORD_RECOVERY') {
@@ -206,7 +226,7 @@
     });
 })();
 
-// Глобальные функции управления модальным окном
+// Глобальные функции
 window.openResetModal = function (step = 'request') {
     const modal = document.getElementById('reset-password-modal');
     const requestStep = document.getElementById('request-reset-step');
@@ -234,7 +254,6 @@ window.closeResetModal = function () {
     if (modal) modal.classList.remove('active');
 };
 
-// Логика работы с Supabase
 async function handleRequestReset(e) {
     e.preventDefault();
     const email = document.getElementById('reset-email').value;
@@ -282,8 +301,6 @@ async function handleUpdatePassword(e) {
     } else {
         msg.textContent = 'Пароль успешно изменён!';
         msg.className = 'reset-message success';
-        setTimeout(() => {
-            closeResetModal();
-        }, 2000);
+        setTimeout(() => closeResetModal(), 2000);
     }
 }
