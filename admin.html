@@ -288,6 +288,57 @@
             background: rgba(255, 255, 255, 0.2);
             border-color: rgba(255, 255, 255, 0.4);
         }
+
+        /* =========================================================
+           ВЫДВИЖНАЯ СЕКРЕТНАЯ ПАНЕЛЬ АДМИНИСТРАТОРА
+           ========================================================= */
+        .dev-side-panel {
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translate(100%, -50%); /* По умолчанию скрыто за правым краем */
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 15px;
+            background: rgba(15, 15, 20, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-right: none;
+            border-radius: 16px 0 0 16px;
+            backdrop-filter: blur(15px);
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .dev-side-panel.visible {
+            transform: translate(0, -50%);
+        }
+
+        .dev-panel-btn {
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            border-radius: 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.25s ease;
+        }
+
+        .dev-panel-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateX(-3px);
+        }
+
+        .dev-panel-btn.active-page {
+            border-color: #3498db;
+            background: rgba(52, 152, 219, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -333,7 +384,7 @@
                 </div>
             </div>
 
-            <button type="button" class="admin-return-btn" onclick="window.location.href='beginning.html'">
+            <button type="button" class="admin-return-btn" onclick="navigateToPage('beginning.html')">
                 ← На главную
             </button>
         </div>
@@ -384,6 +435,15 @@
             <span class="profile-username" id="profile-email-text">Профиль</span>
             <button type="button" class="logout-dropdown-btn" onclick="logoutUser()">Выйти</button>
         </div>
+    </div>
+
+    <div id="dev-side-panel" class="dev-side-panel">
+        <button type="button" class="dev-panel-btn" id="btn-main-profile" onclick="navigateToPage('beginning.html')">
+            Основной профиль
+        </button>
+        <button type="button" class="dev-panel-btn" id="btn-admin-profile" onclick="navigateToPage('admin.html')">
+            Профиль администратора
+        </button>
     </div>
 
     <script src="auth-system.js?v=3"></script>
@@ -483,79 +543,66 @@
         window.location.replace('index.html');
     });
 
-    // Переход между страницами без повторной перезагрузки, если уже на ней
-function navigateToPage(targetPage) {
-    const currentPage = window.location.pathname.split('/').pop() || 'beginning.html';
-    if (currentPage !== targetPage) {
-        window.location.href = targetPage;
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
-    const sidePanel = document.getElementById('dev-side-panel');
-    let hideTimeout = null;
-
-    // Подсветка активной страницы на кнопках
-    const currentPage = window.location.pathname.split('/').pop() || 'beginning.html';
-    if (currentPage === 'beginning.html') {
-        document.getElementById('btn-main-profile')?.classList.add('active-page');
-    } else if (currentPage === 'admin.html') {
-        document.getElementById('btn-admin-profile')?.classList.add('active-page');
-    }
-
-    // Функция проверки пользователя и запуска отслеживания
-    async function initDevPanel() {
-        if (!supabaseClient) return;
-
-        // Получаем текущую сессию Supabase
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        
-        if (session && session.user && session.user.email === DEV_EMAIL) {
-            setupHoverDetection();
+    // Навигация без повторной перезагрузки
+    function navigateToPage(targetPage) {
+        const currentPage = window.location.pathname.split('/').pop() || 'beginning.html';
+        if (currentPage !== targetPage) {
+            window.location.href = targetPage;
         }
     }
 
-    function setupHoverDetection() {
-        // Наведение мыши в правую часть экрана (ближе чем 60px от правого края)
-        document.addEventListener('mousemove', (e) => {
-            const distanceFromRight = window.innerWidth - e.clientX;
+    // Инициализация панели администратора/разработчика
+    document.addEventListener('DOMContentLoaded', () => {
+        const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
+        const sidePanel = document.getElementById('dev-side-panel');
+        let hideTimeout = null;
 
-            if (distanceFromRight <= 60) {
+        // Подсветка активной страницы на кнопках
+        const currentPage = window.location.pathname.split('/').pop() || 'beginning.html';
+        if (currentPage === 'beginning.html') {
+            document.getElementById('btn-main-profile')?.classList.add('active-page');
+        } else if (currentPage === 'admin.html') {
+            document.getElementById('btn-admin-profile')?.classList.add('active-page');
+        }
+
+        async function initDevPanel() {
+            const client = window.supabaseClient || window.supabase;
+            if (!client) return;
+
+            const { data: { session } } = await client.auth.getSession();
+            
+            if (session && session.user && session.user.email === DEV_EMAIL) {
+                setupHoverDetection();
+            }
+        }
+
+        function setupHoverDetection() {
+            document.addEventListener('mousemove', (e) => {
+                const distanceFromRight = window.innerWidth - e.clientX;
+
+                if (distanceFromRight <= 60) {
+                    clearTimeout(hideTimeout);
+                    sidePanel.classList.add('visible');
+                }
+            });
+
+            sidePanel.addEventListener('mouseenter', () => {
                 clearTimeout(hideTimeout);
                 sidePanel.classList.add('visible');
-            }
-        });
+            });
 
-        // Когда курсор заходит на саму панель — не даем ей уйти
-        sidePanel.addEventListener('mouseenter', () => {
-            clearTimeout(hideTimeout);
-            sidePanel.classList.add('visible');
-        });
+            sidePanel.addEventListener('mouseleave', () => {
+                hideTimeout = setTimeout(() => {
+                    sidePanel.classList.remove('visible');
+                }, 2000);
+            });
+        }
 
-        // Когда курсор уходит с панели — прячем через 2 секунды (2000 мс)
-        sidePanel.addEventListener('mouseleave', () => {
-            hideTimeout = setTimeout(() => {
-                sidePanel.classList.remove('visible');
-            }, 2000);
-        });
-    }
-
-    // Запускаем проверку
-    initDevPanel();
-});
+        initDevPanel();
+    });
     </script>
 
     <script src="app.js"></script>
     <script src="reset-password.js"></script>
-
-    <div id="dev-side-panel" class="dev-side-panel">
-    <button type="button" class="dev-panel-btn" id="btn-main-profile" onclick="navigateToPage('beginning.html')">
-        Основной профиль
-    </button>
-    <button type="button" class="dev-panel-btn" id="btn-admin-profile" onclick="navigateToPage('admin.html')">
-        Профиль администратора
-    </button>
-</div>
 </body>
 </html>
