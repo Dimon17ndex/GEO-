@@ -38,7 +38,7 @@
             opacity: 0 !important;
         }
 
-        /* Позиционирование бренд-блока в верхнем левом углу (исходное ровное центрирование) */
+        /* Позиционирование бренд-блока в верхнем левом углу */
         .top-left-brand {
             position: fixed;
             top: 40px;
@@ -48,7 +48,7 @@
 
         .top-left-brand .db-brand-block {
             display: flex;
-            align-items: center; /* Вернули как было */
+            align-items: center;
             gap: 12px;
         }
 
@@ -98,7 +98,7 @@
             box-shadow: 0 0 10px rgba(231, 76, 60, 0.2);
         }
 
-        /* Плашка "АВТОРИЗОВАННЫЕ GEOUSERS" — ниже и правее */
+        /* Плашка "АВТОРИЗОВАННЫЕ GEOUSERS" */
         .admin-sub-badge {
             position: fixed;
             top: 165px;  /* Смещена ниже */
@@ -129,29 +129,74 @@
             color: #ffffff;
         }
 
+        /* =========================================================
+           СПИСОК ПЛАШЕК ДЛЯ GEOUSERS (ПОД ПЛАШКОЙ "АВТОРИЗОВАННЫЕ...")
+           ========================================================= */
+        .geousers-list-container {
+            position: fixed;
+            top: 220px;          /* Чуть ниже плашки admin-sub-badge */
+            left: 160px;         /* По левому краю верхнего бейджа */
+            width: 600px;        /* Длинная фиксированная ширина */
+            display: flex;
+            flex-direction: column;
+            gap: 12px;           /* Расстояние между плашками */
+            z-index: 10;
+        }
+
+        .geouser-row-item {
+            display: flex;
+            align-items: center;  /* Вертикальное центрирование содержимого */
+            gap: 16px;           /* Отступ между цифрой и плашкой */
+            width: 100%;
+        }
+
+        /* Цифра слева без контейнера */
+        .geouser-number {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.4);
+            min-width: 20px;
+            text-align: right;
+            user-select: none;
+        }
+
+        /* Сама длинная плашка */
+        .geouser-card-box {
+            flex: 1;
+            display: flex;
+            align-items: center;  /* Вертикальное центрирование текста внутри */
+            min-height: 48px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .geouser-card-box:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateX(4px);
+        }
+
         /* Анимация левитации логотипа и текста */
         @keyframes floatingLogo {
-            0% {
-                transform: translateY(0px) rotate(0deg);
-            }
-            50% {
-                transform: translateY(-8px) rotate(-1.5deg);
-            }
-            100% {
-                transform: translateY(5px) rotate(1.5deg);
-            }
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(-1.5deg); }
+            100% { transform: translateY(5px) rotate(1.5deg); }
         }
 
         @keyframes floatingText {
-            0% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-6px);
-            }
-            100% {
-                transform: translateY(4px);
-            }
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+            100% { transform: translateY(4px); }
         }
 
         /* =========================================================
@@ -283,6 +328,29 @@
 
     <div class="admin-sub-badge">
         АВТОРИЗОВАННЫЕ GEOUSERS
+    </div>
+
+    <div class="geousers-list-container">
+        <div class="geouser-row-item">
+            <span class="geouser-number">1</span>
+            <div class="geouser-card-box">Пользователь 1</div>
+        </div>
+        <div class="geouser-row-item">
+            <span class="geouser-number">2</span>
+            <div class="geouser-card-box">Пользователь 2</div>
+        </div>
+        <div class="geouser-row-item">
+            <span class="geouser-number">3</span>
+            <div class="geouser-card-box">Пользователь 3</div>
+        </div>
+        <div class="geouser-row-item">
+            <span class="geouser-number">4</span>
+            <div class="geouser-card-box">Пользователь 4</div>
+        </div>
+        <div class="geouser-row-item">
+            <span class="geouser-number">5</span>
+            <div class="geouser-card-box">Пользователь 5</div>
+        </div>
     </div>
 
     <div class="center-status-wrapper">
