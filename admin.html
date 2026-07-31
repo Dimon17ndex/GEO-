@@ -168,9 +168,27 @@
             font-size: 14px;
             font-weight: 800;
             color: rgba(255, 255, 255, 0.4);
-            min-width: 20px;
+            min-width: 45px;
             text-align: right;
             user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
+        }
+
+        /* Лейбл "ВЫ" перед номером пользователя */
+        .geouser-you-badge {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 10px;
+            font-weight: 900;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 2px 6px;
+            border-radius: 5px;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
         }
 
         /* Сама длинная плашка */
@@ -191,6 +209,13 @@
             color: rgba(255, 255, 255, 0.9);
             transition: all 0.25s ease;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Усиленная обводка для карточки ТЕКУЩЕГО пользователя */
+        .geouser-card-box.currentUserCard {
+            border: 1px solid rgba(255, 255, 255, 0.75) !important;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.25), inset 0 0 12px rgba(255, 255, 255, 0.08) !important;
+            background: rgba(255, 255, 255, 0.08) !important;
         }
 
         .geouser-card-box:hover {
@@ -558,7 +583,16 @@
         `;
 
         try {
-            // Запрос к публичной таблице profiles
+            // 1. Проверяем ID текущего авторизованного пользователя
+            let currentUserId = null;
+            if (client.auth) {
+                const { data: { session } } = await client.auth.getSession();
+                if (session?.user) {
+                    currentUserId = session.user.id;
+                }
+            }
+
+            // 2. Запрос к публичной таблице profiles
             const { data: users, error } = await client
                 .from('profiles')
                 .select('*');
@@ -577,20 +611,37 @@
                 return;
             }
 
-            // Рендерим пользователей
+            // 3. Если пользователь авторизован, гарантированно поднимаем его на 1-е место
+            if (currentUserId) {
+                const myIndex = users.findIndex(u => u.id === currentUserId);
+                if (myIndex !== -1) {
+                    const [myProfile] = users.splice(myIndex, 1);
+                    users.unshift(myProfile);
+                }
+            }
+
+            // 4. Рендерим пользователей
             container.innerHTML = users.map((u, index) => {
-                // Проверяем валидность имени
+                // Проверяем, действительно ли эта плашка принадлежит текущему пользователю
+                const isSelf = currentUserId && u.id === currentUserId;
                 const hasUsername = u.username && u.username.trim() !== '' && u.username !== '—';
 
-                // Если имя есть — красивое стандартное отображение, если нет — "нет имени" полупрозрачным курсивом
                 const displayName = hasUsername 
                     ? `<strong>${u.username}</strong> <span style="opacity: 0.5; font-size: 0.9em; margin-left: 6px;">(${u.email || 'без email'})</span>`
                     : `<span style="opacity: 0.4; font-style: italic; font-weight: 400;">нет имени</span> <span style="opacity: 0.75; margin-left: 6px;">(${u.email || 'без email'})</span>`;
 
+                // Бейдж "ВЫ" перед первой цифрой (только для своего профиля)
+                const numberLabel = isSelf 
+                    ? `<span class="geouser-you-badge">ВЫ</span><span>${index + 1}</span>` 
+                    : `<span>${index + 1}</span>`;
+
+                // Применяем класс с белой подсветкой для текущего пользователя
+                const cardClass = isSelf ? 'geouser-card-box currentUserCard' : 'geouser-card-box';
+
                 return `
                     <div class="geouser-row-item">
-                        <span class="geouser-number">${index + 1}</span>
-                        <div class="geouser-card-box">
+                        <div class="geouser-number">${numberLabel}</div>
+                        <div class="${cardClass}">
                             ${userIconSVG}
                             <div>${displayName}</div>
                         </div>
