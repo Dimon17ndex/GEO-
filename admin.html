@@ -137,10 +137,22 @@
             top: 220px;          /* Чуть ниже плашки admin-sub-badge */
             left: 160px;         /* По левому краю верхнего бейджа */
             width: 600px;        /* Длинная фиксированная ширина */
+            max-height: calc(100vh - 250px); /* Добавлен скролл, если пользователей много */
+            overflow-y: auto;
+            padding-right: 6px;
             display: flex;
             flex-direction: column;
             gap: 12px;           /* Расстояние между плашками */
             z-index: 10;
+        }
+
+        /* Кастомный красивый скроллбар */
+        .geousers-list-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .geousers-list-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
         }
 
         .geouser-row-item {
@@ -330,26 +342,10 @@
         АВТОРИЗОВАННЫЕ GEOUSERS
     </div>
 
-    <div class="geousers-list-container">
+    <div class="geousers-list-container" id="geousers-list-container">
         <div class="geouser-row-item">
-            <span class="geouser-number">1</span>
-            <div class="geouser-card-box">Пользователь 1</div>
-        </div>
-        <div class="geouser-row-item">
-            <span class="geouser-number">2</span>
-            <div class="geouser-card-box">Пользователь 2</div>
-        </div>
-        <div class="geouser-row-item">
-            <span class="geouser-number">3</span>
-            <div class="geouser-card-box">Пользователь 3</div>
-        </div>
-        <div class="geouser-row-item">
-            <span class="geouser-number">4</span>
-            <div class="geouser-card-box">Пользователь 4</div>
-        </div>
-        <div class="geouser-row-item">
-            <span class="geouser-number">5</span>
-            <div class="geouser-card-box">Пользователь 5</div>
+            <span class="geouser-number">--</span>
+            <div class="geouser-card-box">Загрузка пользователей...</div>
         </div>
     </div>
 
@@ -515,6 +511,59 @@
         }, 500);
     }
 
+    // Вспомогательная функция безопасного получения Supabase клиента
+    function getSupabaseClient() {
+        if (window.supabaseClient) return window.supabaseClient;
+        if (window.supabase && typeof window.supabase.from === 'function') return window.supabase;
+        return null;
+    }
+
+    // Функция отрисовки списка пользователей из базы Supabase
+    async function fetchAndRenderUsers() {
+        const container = document.getElementById('geousers-list-container');
+        if (!container) return;
+
+        const client = getSupabaseClient();
+        if (!client) {
+            console.warn('Supabase клиент не найден. Загрузите или инициализируйте Supabase.');
+            return;
+        }
+
+        try {
+            // Делаем запрос к таблице 'profiles' или 'users' (измените название под вашу БД)
+            const { data: users, error } = await client
+                .from('profiles')
+                .select('*');
+
+            if (error) throw error;
+
+            if (!users || users.length === 0) {
+                container.innerHTML = `
+                    <div class="geouser-row-item">
+                        <span class="geouser-number">0</span>
+                        <div class="geouser-card-box">Пользователи не найдены</div>
+                    </div>`;
+                return;
+            }
+
+            // Рендерим список динамически
+            container.innerHTML = users.map((u, index) => `
+                <div class="geouser-row-item">
+                    <span class="geouser-number">${index + 1}</span>
+                    <div class="geouser-card-box">${u.username || u.email || 'Без имени'}</div>
+                </div>
+            `).join('');
+
+        } catch (err) {
+            console.error('Ошибка загрузки пользователей:', err);
+            container.innerHTML = `
+                <div class="geouser-row-item">
+                    <span class="geouser-number">!</span>
+                    <div class="geouser-card-box" style="color: #e74c3c;">Ошибка при загрузке данных</div>
+                </div>`;
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(() => {
             document.body.classList.add('page-loaded');
@@ -534,16 +583,29 @@
         }
 
         async function initDevPanel() {
-            const client = window.supabaseClient || window.supabase;
-            if (!client) return;
+            const client = getSupabaseClient();
+            if (!client || !client.auth) return;
 
             try {
                 const { data: { session } } = await client.auth.getSession();
+                
+                // Включаем боковую панель администратора
                 if (session?.user?.email === DEV_EMAIL) {
                     setupHoverDetection();
                 }
+
+                // Отображаем Email текущего авторизованного пользователя
+                if (session?.user) {
+                    document.body.classList.add('user-logged-in');
+                    const widget = document.getElementById('user-profile-widget');
+                    const emailText = document.getElementById('profile-email-text');
+                    if (widget && emailText) {
+                        emailText.innerText = session.user.email;
+                        widget.style.display = 'block';
+                    }
+                }
             } catch (err) {
-                console.error('Ошибка инициализации панели админа:', err);
+                console.error('Ошибка инициализации сессии:', err);
             }
         }
 
@@ -589,7 +651,9 @@
             });
         }
 
+        // Запуск инициализации панелей и получения пользователей
         initDevPanel();
+        fetchAndRenderUsers();
     });
     </script>
 
