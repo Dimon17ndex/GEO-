@@ -23,14 +23,19 @@
             display: none !important;
         }
 
-        /* Плавное проявление страницы при загрузке */
+        /* Плавное проявление и затухание страницы */
         body {
             opacity: 0;
-            transition: opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: opacity 0.5s ease;
         }
 
         body.page-loaded {
             opacity: 1;
+        }
+
+        /* Класс для плавного угасания перед переходом */
+        body.page-hidden {
+            opacity: 0 !important;
         }
 
         /* Позиционирование бренд-блока в верхнем левом углу */
@@ -443,15 +448,23 @@ intensitySlider?.addEventListener('input', (e) => {
 // Перехватываем кнопку "Назад"
 history.pushState(null, null, location.href);
 window.addEventListener('popstate', function () {
-    window.location.replace('index.html');
+    navigateToPage('index.html');
 });
 
-// Навигация без дублирования
+// Функция навигации с анимацией затухания
 function navigateToPage(targetPage) {
     const currentPage = window.location.pathname.split('/').pop() || 'beginning.html';
-    if (currentPage !== targetPage) {
+    
+    // Если пытаемся перейти на ту же страницу — ничего не делаем и не гасим экран
+    if (currentPage === targetPage) return;
+
+    // Плавно гасим страницу
+    document.body.classList.add('page-hidden');
+
+    // Переходим на другую страницу после завершения CSS-транзишна (500мс)
+    setTimeout(() => {
         window.location.href = targetPage;
-    }
+    }, 500);
 }
 
 // ЕДИНЫЙ ОБРАБОТЧИК ЗАГРУЗКИ СТРАНИЦЫ
