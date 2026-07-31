@@ -12,17 +12,15 @@ if (!window.supabaseClient && window.supabase) {
 }
 
 let currentAuthMode = 'login';
+let overlayClickTimeout = null;
 
 // --- ГЛОБАЛЬНЫЕ ФУНКЦИИ ---
 window.showAuthModal = function() {
-    let modal = document.getElementById('auth-modal-overlay');
-    if (!modal) {
-        injectAuthStyles();
-        initAuthModalUI();
-        initAuthEvents();
-        modal = document.getElementById('auth-modal-overlay');
-    }
+    injectAuthStyles();
+    initAuthModalUI();
+    initAuthEvents();
     
+    const modal = document.getElementById('auth-modal-overlay');
     hideConfirmToast(true);
     setAuthMode('login');
 
@@ -39,25 +37,18 @@ window.hideAuthModal = function() {
     }
 };
 
-// Функция выхода из аккаунта с плавным затемнением и последующей перезагрузкой
+// Функция выхода из аккаунта
 window.logoutUser = async function() {
     try {
         if (window.supabaseClient) {
             await window.supabaseClient.auth.signOut();
         }
-        
-        // 1. Применяем класс плавного угасания страницы
         document.body.classList.add('page-hidden');
-
-        // 2. Ждём 500мс для выполнения CSS-анимации и перезагружаем
         setTimeout(() => {
             window.location.reload();
         }, 500);
-
     } catch (error) {
         console.error('Ошибка при выходе из аккаунта:', error);
-        
-        // В случае ошибки также плавно перезагружаем
         document.body.classList.add('page-hidden');
         setTimeout(() => {
             window.location.reload();
@@ -101,7 +92,6 @@ function hideConfirmToast(immediate = false) {
 }
 
 function setAuthMode(mode) {
-    if (currentAuthMode === mode) return;
     currentAuthMode = mode;
 
     const authTabs = document.getElementById('auth-tabs');
@@ -141,10 +131,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// --- СТИЛИ (БЕЗ ДУБЛЕЙ) ---
+// --- СТИЛИ ---
 function injectAuthStyles() {
-    const existingStyle = document.getElementById('auth-system-styles');
-    if (existingStyle) existingStyle.remove();
+    if (document.getElementById('auth-system-styles')) return;
 
     const css = `
         .auth-modal-overlay {
@@ -211,7 +200,6 @@ function injectAuthStyles() {
             40%, 60% { transform: scale(1) translateX(6px); }
         }
 
-        /* --- КРЕСТИК ЗАКРЫТИЯ --- */
         .auth-close-btn {
             position: absolute !important;
             top: 30px !important;
@@ -246,7 +234,6 @@ function injectAuthStyles() {
             transform: scale(0.9) rotate(90deg) !important;
         }
 
-        /* --- ШАПКА, ЛОГОТИП И СКРОЛЛ ТЕКСТА --- */
         .auth-header-title {
             display: flex !important;
             align-items: center !important;
@@ -310,7 +297,6 @@ function injectAuthStyles() {
             75%, 100% { transform: translateY(0); }
         }
 
-        /* --- ТАБЫ И ФОРМЫ --- */
         .auth-tabs {
             position: relative !important;
             display: flex !important;
@@ -440,7 +426,6 @@ function injectAuthStyles() {
             transform: scale(0.98) !important;
         }
 
-        /* --- СВЕТОВАЯ РАДИАЛЬНАЯ ВОЛНА --- */
         .auth-confirm-wave {
             position: fixed !important;
             bottom: 20px !important;
@@ -473,7 +458,6 @@ function injectAuthStyles() {
             }
         }
 
-        /* --- ПАНЕЛЬ ПОДТВЕРЖДЕНИЯ --- */
         .auth-confirm-toast {
             position: fixed !important;
             bottom: 30px !important;
@@ -564,7 +548,6 @@ function injectAuthStyles() {
             background: rgba(255, 255, 255, 0.85) !important;
         }
 
-        /* --- ОГРОМНЫЙ ФОНОВЫЙ ЛОГОТИП СПРАВА С БЛЮРОМ --- */
         .auth-bg-watermark {
             position: absolute !important;
             top: 45% !important;
@@ -692,16 +675,13 @@ function initAuthEvents() {
 
     closeBtn?.addEventListener('click', window.hideAuthModal);
 
-    // Двойной клик по темному фону вызывает плашку + волну
-    overlay?.addEventListener('dblclick', (e) => {
-        if (e.target === overlay) {
-            showConfirmToast();
-        }
-    });
-
-    // Одиночный клик вызывает покачивание карточки
+    // Разделение single/double click на оверлее
     overlay?.addEventListener('click', (e) => {
-        if (e.target === overlay) {
+        if (e.target !== overlay) return;
+
+        if (overlayClickTimeout) clearTimeout(overlayClickTimeout);
+
+        overlayClickTimeout = setTimeout(() => {
             const container = document.querySelector('.auth-modal-container');
             if (container) {
                 container.classList.remove('shake');
@@ -712,6 +692,13 @@ function initAuthEvents() {
                     container.classList.remove('shake');
                 }, 400);
             }
+        }, 250);
+    });
+
+    overlay?.addEventListener('dblclick', (e) => {
+        if (e.target === overlay) {
+            if (overlayClickTimeout) clearTimeout(overlayClickTimeout);
+            showConfirmToast();
         }
     });
 
@@ -735,7 +722,6 @@ function initAuthEvents() {
         if (error) {
             alert(`Ошибка входа: ${error.message}`);
         } else {
-            // Мгновенная и незаметная перезагрузка без анимаций угасания
             window.location.reload();
         }
     });
@@ -769,26 +755,20 @@ function updateUIForUser(user) {
     const profileEmailText = document.getElementById('profile-email-text');
 
     if (user) {
-        // 1. Пользователь ВОШЁЛ
         document.body.classList.add('user-logged-in');
 
-        // Скрываем центральную кнопку
         if (mainAuthBtn) mainAuthBtn.style.display = 'none';
 
-        // Показываем блок профиля сверху справа и подставляем логин
         if (profileWidget && profileEmailText) {
             const username = user.email.split('@')[0];
             profileEmailText.textContent = username;
             profileWidget.style.display = 'block';
         }
     } else {
-        // 2. Пользователь НЕ ВОШЁЛ или вышел
         document.body.classList.remove('user-logged-in');
 
-        // Показываем центральную кнопку
         if (mainAuthBtn) mainAuthBtn.style.display = 'inline-block';
 
-        // Скрываем блок профиля справа
         if (profileWidget) profileWidget.style.display = 'none';
     }
 }
