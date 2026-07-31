@@ -100,7 +100,7 @@
         }
 
         /* =========================================================
-           ВИДЖЕТ ПРОФИЛЯ В ВЕРХНЕМ ПРАВОМ УГЛУ (выпадает Выйти)
+           ВИДЖЕТ ПРОФИЛЯ В ВЕРХНЕМ ПРАВОМ УГЛУ (Чистый информер)
            ========================================================= */
         .top-right-profile {
             position: fixed;
@@ -117,13 +117,7 @@
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 12px;
             backdrop-filter: blur(10px);
-            cursor: pointer;
             transition: all 0.3s ease;
-        }
-
-        .profile-card:hover {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 255, 255, 0.3);
         }
 
         .profile-username {
@@ -134,54 +128,6 @@
             white-space: nowrap;
             display: flex;
             align-items: center;
-            gap: 8px;
-        }
-
-        /* Маленькая стрелочка возле профиля */
-        .profile-username::after {
-            content: '▾';
-            font-size: 10px;
-            opacity: 0.6;
-            transition: transform 0.2s ease;
-        }
-
-        .profile-card:hover .profile-username::after {
-            transform: rotate(180deg);
-        }
-
-        /* Выпадающая кнопка "Выйти" */
-        .logout-dropdown-btn {
-            position: absolute;
-            top: calc(100% + 8px);
-            left: 0;
-            width: 100%;
-            padding: 10px 0;
-            background: #e74c3c;
-            color: #ffffff;
-            border: none;
-            border-radius: 8px;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            
-            /* Скрыта по умолчанию */
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-5px);
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
-        }
-
-        /* Появление кнопки при наведении на карточку профиля */
-        .profile-card:hover .logout-dropdown-btn {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .logout-dropdown-btn:hover {
-            background: #c0392b;
         }
 
         /* Контейнер для размещения статуса и элементов админки по центру */
@@ -296,7 +242,7 @@
             position: fixed;
             top: 50%;
             right: 0;
-            transform: translate(100%, -50%); /* По умолчанию скрыто за правым краем */
+            transform: translate(100%, -50%); /* Скрыто за правым краем */
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -433,7 +379,6 @@
     <div id="user-profile-widget" class="top-right-profile" style="display: none;">
         <div class="profile-card">
             <span class="profile-username" id="profile-email-text">Профиль</span>
-            <button type="button" class="logout-dropdown-btn" onclick="logoutUser()">Выйти</button>
         </div>
     </div>
 
@@ -455,8 +400,10 @@
     const intensityValueLabel = document.getElementById('intensity-value');
     
     let intensityPercent = 20;
+    let ambientTimeoutId = null;
 
     function createBackgroundRipple(x, y, className, duration = 1500) {
+        if (!waveContainer) return;
         const ripple = document.createElement('div');
         ripple.classList.add(className);
         ripple.style.left = `${x}px`;
@@ -467,7 +414,13 @@
 
     // Фоновые амбиентные волны
     function spawnAmbientWave() {
-        if (intensityPercent === 0) { setTimeout(spawnAmbientWave, 1000); return; }
+        clearTimeout(ambientTimeoutId);
+
+        if (intensityPercent === 0) { 
+            ambientTimeoutId = setTimeout(spawnAmbientWave, 1000); 
+            return; 
+        }
+
         let spawnX = 0, spawnY = 0;
         const side = Math.floor(Math.random() * 4);
         switch(side) {
@@ -476,13 +429,15 @@
             case 2: spawnX = Math.random() * window.innerWidth; spawnY = window.innerHeight + 50; break;
             case 3: spawnX = -50; spawnY = Math.random() * window.innerHeight; break;
         }
+
         createBackgroundRipple(spawnX, spawnY, 'bg-ambient-ripple', 3000);
+
         const baseDelay = 500, maxAdditionalDelay = 8000; 
         const factor = (100 - intensityPercent) / 100;
-        setTimeout(spawnAmbientWave, baseDelay + (Math.random() * maxAdditionalDelay * factor));
-    }
+        const nextDelay = baseDelay + (Math.random() * maxAdditionalDelay * factor);
 
-    setTimeout(() => { spawnAmbientWave(); }, 1000);
+        ambientTimeoutId = setTimeout(spawnAmbientWave, nextDelay);
+    }
 
     // Аудио сопровождение
     const bgMusic = new Audio('audio/melody_start.mp3');
@@ -509,32 +464,25 @@
     const volumeIcon = document.getElementById('volume-icon');
     let isMuted = false;
 
-    volumeBtn.addEventListener('click', (e) => {
+    volumeBtn?.addEventListener('click', (e) => {
         e.stopPropagation(); 
         isMuted = !isMuted;
         bgMusic.muted = isMuted;
         if (isMuted) {
-            volumeStatusLabel.classList.add('muted-mode');
+            volumeStatusLabel?.classList.add('muted-mode');
             volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15" stroke="currentColor" stroke-width="1.5"></line><line x1="17" y1="9" x2="23" y2="15" stroke="currentColor" stroke-width="1.5"></line>`;
         } else {
-            volumeStatusLabel.classList.remove('muted-mode');
+            volumeStatusLabel?.classList.remove('muted-mode');
             volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path class="volume-wave-1" d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path class="volume-wave-2" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>`;
             playMusic();
         }
     });
 
     // Управление интенсивностью
-    intensitySlider.addEventListener('mousedown', (e) => { e.stopPropagation(); });
-    intensitySlider.addEventListener('input', (e) => {
+    intensitySlider?.addEventListener('mousedown', (e) => { e.stopPropagation(); });
+    intensitySlider?.addEventListener('input', (e) => {
         intensityPercent = parseInt(e.target.value);
-        intensityValueLabel.innerText = `${intensityPercent}%`;
-    });
-
-    // Запуск мягкого проявления из темноты при загрузке
-    document.addEventListener('DOMContentLoaded', () => {
-        requestAnimationFrame(() => {
-            document.body.classList.add('page-loaded');
-        });
+        if (intensityValueLabel) intensityValueLabel.innerText = `${intensityPercent}%`;
     });
 
     // Перехватываем кнопку "Назад"
@@ -543,7 +491,7 @@
         window.location.replace('index.html');
     });
 
-    // Навигация без повторной перезагрузки
+    // Навигация без дублирования
     function navigateToPage(targetPage) {
         const currentPage = window.location.pathname.split('/').pop() || 'beginning.html';
         if (currentPage !== targetPage) {
@@ -551,8 +499,17 @@
         }
     }
 
-    // Инициализация панели администратора/разработчика
+    // Инициализация при загрузке страницы
     document.addEventListener('DOMContentLoaded', () => {
+        // Мягкое проявление из темноты
+        requestAnimationFrame(() => {
+            document.body.classList.add('page-loaded');
+        });
+
+        // Запуск волн
+        setTimeout(() => { spawnAmbientWave(); }, 1000);
+
+        // Панель разработчика/администратора
         const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
         const sidePanel = document.getElementById('dev-side-panel');
         let hideTimeout = null;
@@ -569,14 +526,18 @@
             const client = window.supabaseClient || window.supabase;
             if (!client) return;
 
-            const { data: { session } } = await client.auth.getSession();
-            
-            if (session && session.user && session.user.email === DEV_EMAIL) {
-                setupHoverDetection();
+            try {
+                const { data: { session } } = await client.auth.getSession();
+                if (session?.user?.email === DEV_EMAIL) {
+                    setupHoverDetection();
+                }
+            } catch (err) {
+                console.error('Ошибка инициализации панели админа:', err);
             }
         }
 
         function setupHoverDetection() {
+            if (!sidePanel) return;
             let isMouseOverPanel = false;
 
             sidePanel.addEventListener('mouseenter', () => {
