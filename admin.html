@@ -38,7 +38,7 @@
             opacity: 0 !important;
         }
 
-        /* Позиционирование бренд-блока в верхнем левом углу */
+        /* Позиционирование бренд-блока в верхнем левом углу (исходное ровное центрирование) */
         .top-left-brand {
             position: fixed;
             top: 40px;
@@ -48,7 +48,7 @@
 
         .top-left-brand .db-brand-block {
             display: flex;
-            align-items: flex-start;
+            align-items: center; /* Вернули как было */
             gap: 12px;
         }
 
@@ -98,11 +98,11 @@
             box-shadow: 0 0 10px rgba(231, 76, 60, 0.2);
         }
 
-        /* Статичная плашка "АВТОРИЗОВАННЫЕ GEOUSERS" под логотипом и названием */
+        /* Плашка "АВТОРИЗОВАННЫЕ GEOUSERS" — ниже и правее */
         .admin-sub-badge {
             position: fixed;
-            top: 135px; /* Находится ниже бренд-блока */
-            left: 40px;
+            top: 165px;  /* Смещена ниже */
+            left: 160px; /* Смещена правее */
             z-index: 10;
             display: inline-flex;
             align-items: center;
