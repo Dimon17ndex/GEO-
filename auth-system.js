@@ -735,8 +735,8 @@ function initAuthEvents() {
         if (error) {
             alert(`Ошибка входа: ${error.message}`);
         } else {
-            window.hideAuthModal();
-            updateUIForUser(data.user);
+            // Мгновенная и незаметная перезагрузка без анимаций угасания
+            window.location.reload();
         }
     });
 
@@ -764,7 +764,7 @@ async function checkUserSession() {
 }
 
 function updateUIForUser(user) {
-    const mainAuthBtn = document.getElementById('auth-main-btn');
+    const mainAuthBtn = document.getElementById('open-auth-btn') || document.getElementById('auth-main-btn');
     const profileWidget = document.getElementById('user-profile-widget');
     const profileEmailText = document.getElementById('profile-email-text');
 
