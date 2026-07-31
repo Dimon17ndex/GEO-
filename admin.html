@@ -154,7 +154,7 @@
             align-items: center;
         }
 
-        /* Контейнер для размещения статуса и элементов админки по центру */
+        /* Контейнер по центру для новых элементов админки */
         .center-status-wrapper {
             position: fixed;
             top: 50%;
@@ -167,96 +167,12 @@
             max-width: 650px;
         }
 
-        /* Разрешаем клики по интерактивным элементам внутри контейнера */
         .center-status-wrapper * {
             pointer-events: auto;
         }
 
         .auth-trigger-btn {
             pointer-events: auto;
-        }
-
-        /* Серый статус "ЗДЕСЬ ПОКА ПУСТО" */
-        .empty-status-message {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 13px;
-            font-weight: 700;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.4);
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
-            margin-top: 15px;
-        }
-
-        /* СТИЛИ АДМИН-ПАНЕЛИ */
-        .admin-dashboard-box {
-            background: rgba(15, 15, 20, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 20px;
-            padding: 30px;
-            backdrop-filter: blur(15px);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            color: #ffffff;
-            font-family: 'Montserrat', sans-serif;
-            text-align: left;
-        }
-
-        .admin-dashboard-header {
-            font-family: 'Unbounded', sans-serif;
-            font-size: 20px;
-            font-weight: 700;
-            color: #3498db;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .admin-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .admin-stat-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-        }
-
-        .admin-stat-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .admin-stat-val {
-            font-size: 22px;
-            font-weight: 800;
-            margin-top: 5px;
-        }
-
-        .admin-return-btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 700;
-            transition: all 0.2s ease;
-            text-decoration: none;
-        }
-
-        .admin-return-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.4);
         }
 
         /* =========================================================
@@ -266,7 +182,7 @@
             position: fixed;
             top: 50%;
             right: 0;
-            transform: translate(100%, -50%); /* Скрыто за правым краем */
+            transform: translate(100%, -50%);
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -335,36 +251,9 @@
     </div>
 
     <div class="center-status-wrapper">
-        <div class="admin-dashboard-box">
-            <div class="admin-dashboard-header">
-                <span>🛡️</span> ПАНЕЛЬ АДМИНИСТРАТОРА
-            </div>
-
-            <div class="admin-stats-grid">
-                <div class="admin-stat-card">
-                    <div class="admin-stat-label">Сервер</div>
-                    <div class="admin-stat-val" style="color: #2ecc71;">ONLINE</div>
-                </div>
-                <div class="admin-stat-card">
-                    <div class="admin-stat-label">Режим</div>
-                    <div class="admin-stat-val" style="color: #e74c3c;">ADMIN</div>
-                </div>
-                <div class="admin-stat-card">
-                    <div class="admin-stat-label">Версия</div>
-                    <div class="admin-stat-val">v0.4.2</div>
-                </div>
-            </div>
-
-            <button type="button" class="admin-return-btn" onclick="navigateToPage('beginning.html')">
-                ← На главную
-            </button>
-        </div>
-
-        <button type="button" id="open-auth-btn" class="auth-trigger-btn" onclick="showAuthModal()" style="margin-top: 20px;">
+        <button type="button" id="open-auth-btn" class="auth-trigger-btn" onclick="showAuthModal()">
             Войти / Зарегистрироваться
         </button>
-
-        <div class="empty-status-message">ЗДЕСЬ ПОКА ПУСТО</div>
     </div>
 
     <div class="settings-trigger-zone" id="settings-btn" style="opacity: 1; pointer-events: auto;">
@@ -437,7 +326,6 @@
         setTimeout(() => { ripple.remove(); }, duration);
     }
 
-    // Фоновые амбиентные волны
     function spawnAmbientWave() {
         clearTimeout(ambientTimeoutId);
 
@@ -464,7 +352,6 @@
         ambientTimeoutId = setTimeout(spawnAmbientWave, nextDelay);
     }
 
-    // Аудио сопровождение
     const bgMusic = new Audio('audio/melody_start.mp3');
     bgMusic.volume = 0.4; 
     let musicStarted = false;
@@ -484,7 +371,6 @@
         createBackgroundRipple(e.clientX, e.clientY, 'bg-click-ripple');
     });
 
-    // Управление звуком
     const volumeBtn = document.getElementById('volume-toggle-btn');
     const volumeIcon = document.getElementById('volume-icon');
     let isMuted = false;
@@ -503,51 +389,40 @@
         }
     });
 
-    // Управление интенсивностью
     intensitySlider?.addEventListener('mousedown', (e) => { e.stopPropagation(); });
     intensitySlider?.addEventListener('input', (e) => {
         intensityPercent = parseInt(e.target.value);
         if (intensityValueLabel) intensityValueLabel.innerText = `${intensityPercent}%`;
     });
 
-    // Перехватываем кнопку "Назад"
     history.pushState(null, null, location.href);
     window.addEventListener('popstate', function () {
         navigateToPage('index.html');
     });
 
-    // Функция навигации с анимацией угасания
     function navigateToPage(targetPage) {
         const currentPage = window.location.pathname.split('/').pop() || 'beginning.html';
         
-        // Если переходим на ту же страницу — ничего не делаем и не угасаем
         if (currentPage === targetPage) return;
 
-        // Добавляем класс угасания
         document.body.classList.add('page-hidden');
 
-        // Ждем завершения анимации перехода (500 мс) и делаем перенаправление
         setTimeout(() => {
             window.location.href = targetPage;
         }, 500);
     }
 
-    // Инициализация при загрузке страницы
     document.addEventListener('DOMContentLoaded', () => {
-        // Мягкое проявление из темноты
         requestAnimationFrame(() => {
             document.body.classList.add('page-loaded');
         });
 
-        // Запуск волн
         setTimeout(() => { spawnAmbientWave(); }, 1000);
 
-        // Панель разработчика/администратора
         const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
         const sidePanel = document.getElementById('dev-side-panel');
         let hideTimeout = null;
 
-        // Подсветка активной страницы на кнопках
         const currentPage = window.location.pathname.split('/').pop() || 'beginning.html';
         if (currentPage === 'beginning.html') {
             document.getElementById('btn-main-profile')?.classList.add('active-page');
