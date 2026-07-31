@@ -870,3 +870,41 @@ body:has(#version-badge.show) .app-banners-container {
 .logout-dropdown-btn:hover {
     background: #c0392b;
 }
+
+/* --- АНИМАЦИЯ ЛЕВИТАЦИИ --- */
+
+/* 1. Плавная левитация для логотипа */
+.levitate-logo {
+    will-change: transform;
+    animation: floatingLogo 4s ease-in-out infinite alternate !important;
+}
+
+@keyframes floatingLogo {
+    0% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-12px) rotate(-2deg);
+    }
+    100% {
+        transform: translateY(8px) rotate(2deg);
+    }
+}
+
+/* 2. Легкая синхронная левитация для надписи GEOГРАФИЯ */
+.levitate-text {
+    will-change: transform;
+    animation: floatingText 4.5s ease-in-out infinite alternate !important;
+}
+
+@keyframes floatingText {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+    100% {
+        transform: translateY(6px);
+    }
+}
