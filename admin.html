@@ -178,6 +178,7 @@
             flex: 1;
             display: flex;
             align-items: center;  /* Вертикальное центрирование текста внутри */
+            gap: 12px;           /* Отступ между иконкой и текстом */
             min-height: 48px;
             padding: 10px 20px;
             background: rgba(255, 255, 255, 0.04);
@@ -196,6 +197,19 @@
             background: rgba(255, 255, 255, 0.08);
             border-color: rgba(255, 255, 255, 0.25);
             transform: translateX(4px);
+        }
+
+        /* Стили для SVG иконки профиля */
+        .geouser-avatar-icon {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            stroke: rgba(255, 255, 255, 0.5);
+            transition: stroke 0.25s ease;
+        }
+
+        .geouser-card-box:hover .geouser-avatar-icon {
+            stroke: #3498db; /* Симпатичный подсвечивающийся синий акцент */
         }
 
         /* Анимация левитации логотипа и текста */
@@ -345,7 +359,13 @@
     <div class="geousers-list-container" id="geousers-list-container">
         <div class="geouser-row-item">
             <span class="geouser-number">--</span>
-            <div class="geouser-card-box">Загрузка пользователей...</div>
+            <div class="geouser-card-box">
+                <svg class="geouser-avatar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>Загрузка пользователей...</span>
+            </div>
         </div>
     </div>
 
@@ -529,8 +549,16 @@
             return;
         }
 
+        // Векторный значок аккаунта
+        const userIconSVG = `
+            <svg class="geouser-avatar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+        `;
+
         try {
-            // Делаем запрос к таблице 'profiles' или 'users' (измените название под вашу БД)
+            // Запрос к публичной таблице profiles
             const { data: users, error } = await client
                 .from('profiles')
                 .select('*');
@@ -541,16 +569,22 @@
                 container.innerHTML = `
                     <div class="geouser-row-item">
                         <span class="geouser-number">0</span>
-                        <div class="geouser-card-box">Пользователи не найдены</div>
+                        <div class="geouser-card-box">
+                            ${userIconSVG}
+                            <span>Пользователи не найдены</span>
+                        </div>
                     </div>`;
                 return;
             }
 
-            // Рендерим список динамически
+            // Рендерим пользователей со значком слева
             container.innerHTML = users.map((u, index) => `
                 <div class="geouser-row-item">
                     <span class="geouser-number">${index + 1}</span>
-                    <div class="geouser-card-box">${u.username || u.email || 'Без имени'}</div>
+                    <div class="geouser-card-box">
+                        ${userIconSVG}
+                        <span>${u.username || u.email || 'Без имени'}</span>
+                    </div>
                 </div>
             `).join('');
 
@@ -559,7 +593,10 @@
             container.innerHTML = `
                 <div class="geouser-row-item">
                     <span class="geouser-number">!</span>
-                    <div class="geouser-card-box" style="color: #e74c3c;">Ошибка при загрузке данных</div>
+                    <div class="geouser-card-box" style="color: #e74c3c;">
+                        ${userIconSVG}
+                        <span>Ошибка при загрузке данных</span>
+                    </div>
                 </div>`;
         }
     }
@@ -657,7 +694,6 @@
     });
     </script>
 
-    <script src="app.js"></script>
     <script src="reset-password.js"></script>
 </body>
 </html>
