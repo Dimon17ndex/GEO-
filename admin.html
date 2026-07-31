@@ -577,29 +577,43 @@
         }
 
         function setupHoverDetection() {
-            document.addEventListener('mousemove', (e) => {
-                const distanceFromRight = window.innerWidth - e.clientX;
+    let isMouseOverPanel = false;
 
-                if (distanceFromRight <= 60) {
-                    clearTimeout(hideTimeout);
-                    sidePanel.classList.add('visible');
-                }
-            });
+    // Отслеживаем, находится ли курсор над самой панелью
+    sidePanel.addEventListener('mouseenter', () => {
+        isMouseOverPanel = true;
+        clearTimeout(hideTimeout);
+        sidePanel.classList.add('visible');
+    });
 
-            sidePanel.addEventListener('mouseenter', () => {
-                clearTimeout(hideTimeout);
-                sidePanel.classList.add('visible');
-            });
+    sidePanel.addEventListener('mouseleave', () => {
+        isMouseOverPanel = false;
+        // Когда мышь покинула панель — запускаем таймер скрытия
+        hideTimeout = setTimeout(() => {
+            sidePanel.classList.remove('visible');
+        }, 2000);
+    });
 
-            sidePanel.addEventListener('mouseleave', () => {
+    // Отслеживаем движение мыши по всему документу
+    document.addEventListener('mousemove', (e) => {
+        const distanceFromRight = window.innerWidth - e.clientX;
+
+        // Если курсор у правого края (ближе 60px)
+        if (distanceFromRight <= 60) {
+            clearTimeout(hideTimeout);
+            sidePanel.classList.add('visible');
+        } else if (!isMouseOverPanel && sidePanel.classList.contains('visible')) {
+            // Если курсор дальше 60px И не над панелью И панель сейчас видна —
+            // запускаем таймер скрытия, если он ещё не запущен
+            if (!hideTimeout) {
                 hideTimeout = setTimeout(() => {
                     sidePanel.classList.remove('visible');
+                    hideTimeout = null;
                 }, 2000);
-            });
+            }
         }
-
-        initDevPanel();
     });
+}
     </script>
 
     <script src="app.js"></script>
