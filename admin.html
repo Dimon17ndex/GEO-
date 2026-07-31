@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEOГРАФИЯ — Панель Администратора</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="console.js" defer></script>
+
+    <link rel="icon" type="image/png" href="images/favicon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="beginning.css">
+
+    <style>
+        body {
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+        body.page-loaded {
+            opacity: 1;
+        }
+
+        /* Центрированный контент админки */
+        .admin-dashboard-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+            width: 90%;
+            max-width: 800px;
+            background: rgba(15, 15, 20, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .admin-title {
+            font-family: 'Unbounded', sans-serif;
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #4facfe;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            margin-top: 10px;
+            color: #ffffff;
+        }
+
+        .back-btn {
+            margin-top: 30px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="shadow-layer"></div>
+    <div id="bg-wave-container"></div>
+
+    <div class="top-left-brand">
+        <div class="db-brand-block">
+            <img src="images/geo_logo.png" alt="Geo Logo" class="db-logo-icon">
+            <div class="db-text-right">
+                <h1 class="db-main-title">GEOГРАФИЯ</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-dashboard-container">
+        <div class="admin-title">
+            <span>📊</span> СТАТИСТИКА И УПРАВЛЕНИЕ
+        </div>
+        <p style="opacity: 0.7;">Добро пожаловать в закрытую панель разработчика.</p>
+
+        <div class="admin-grid">
+            <div class="stat-card">
+                <div>Статус сервера</div>
+                <div class="stat-value" style="color: #2ecc71;">ONLINE</div>
+            </div>
+            <div class="stat-card">
+                <div>Версия билда</div>
+                <div class="stat-value">v0.4.2</div>
+            </div>
+        </div>
+
+        <button class="back-btn" onclick="window.location.href='beginning.html'">← Вернуться на сайт</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.body.classList.add('page-loaded');
+        });
+    </script>
+</body>
+</html>
