@@ -3,6 +3,7 @@
 window.SUPABASE_URL = window.SUPABASE_URL || 'https://cwgkdpmxwgfypbiykafl.supabase.co'; 
 window.SUPABASE_KEY = window.SUPABASE_KEY || 'sb_publishable_mjHX0OTE6LSLh2qTVqMIng_mY9cvDcN';
 
+// Инициализация Supabase
 if (!window.supabaseClient && window.supabase) {
     try {
         window.supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY);
@@ -11,19 +12,17 @@ if (!window.supabaseClient && window.supabase) {
     }
 }
 
-let currentResetMode = 'request'; 
-let isUpdateUnlocked = false;    
+let currentResetMode = 'request'; // 'request' или 'update'
+let isResetUpdateUnlocked = false; 
+let resetOverlayClickTimeout = null;
 
 // --- ГЛОБАЛЬНЫЕ ФУНКЦИИ ---
 window.showResetModal = function(mode = 'request') {
-    let modal = document.getElementById('reset-modal-overlay');
-    if (!modal) {
-        injectResetStyles();
-        initResetModalUI();
-        initResetEvents();
-        modal = document.getElementById('reset-modal-overlay');
-    }
+    injectResetStyles();
+    initResetModalUI();
+    initResetEvents();
     
+    const modal = document.getElementById('reset-modal-overlay');
     hideResetConfirmToast(true);
     setResetMode(mode);
 
@@ -40,6 +39,7 @@ window.hideResetModal = function() {
     }
 };
 
+// Функция показа всплывающей плашки с прыжком и радиальной волной
 function showResetConfirmToast() {
     const toast = document.getElementById('reset-confirm-toast');
     const wave = document.getElementById('reset-confirm-wave');
@@ -48,13 +48,14 @@ function showResetConfirmToast() {
         toast.classList.remove('hiding', 'visible');
         if (wave) wave.classList.remove('active');
 
-        void toast.offsetWidth;
+        void toast.offsetWidth; // Перезапуск анимации
 
         toast.classList.add('visible');
         if (wave) wave.classList.add('active');
     }
 }
 
+// Функция мягкого скрытия плашки
 function hideResetConfirmToast(immediate = false) {
     const toast = document.getElementById('reset-confirm-toast');
     const wave = document.getElementById('reset-confirm-wave');
@@ -74,27 +75,30 @@ function hideResetConfirmToast(immediate = false) {
 }
 
 function setResetMode(mode) {
-    if (mode === 'update' && !isUpdateUnlocked && currentResetMode !== 'update') {
-        return; 
+    if (mode === 'update' && !isResetUpdateUnlocked && currentResetMode !== 'update') {
+        return; // Запрещаем переключение на замену, если режим еще не разблокирован
     }
 
     currentResetMode = mode;
 
+    const resetTabs = document.getElementById('reset-tabs');
     const tabRequest = document.getElementById('tab-request-btn');
     const tabUpdate = document.getElementById('tab-update-btn');
     
     const formRequest = document.getElementById('reset-form-request');
     const formUpdate = document.getElementById('reset-form-update');
 
-    if (!tabRequest || !tabUpdate || !formRequest || !formUpdate) return;
+    if (!resetTabs || !tabRequest || !tabUpdate || !formRequest || !formUpdate) return;
 
     if (mode === 'request') {
+        resetTabs.classList.remove('update-mode');
         tabRequest.classList.add('active');
         tabUpdate.classList.remove('active');
 
         formUpdate.classList.remove('visible');
         formRequest.classList.add('visible');
     } else {
+        resetTabs.classList.add('update-mode');
         tabUpdate.classList.add('active');
         tabRequest.classList.remove('active');
 
@@ -103,7 +107,7 @@ function setResetMode(mode) {
     }
 }
 
-// --- ЗАГРУЗКА И ИНИЦИАЛИЗАЦИЯ ---
+// --- ЗАГРУЗКА ---
 document.addEventListener('DOMContentLoaded', () => {
     injectResetStyles();
     initResetModalUI();
@@ -112,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.supabaseClient) {
         window.supabaseClient.auth.onAuthStateChange((event) => {
             if (event === 'PASSWORD_RECOVERY') {
-                isUpdateUnlocked = true;
+                isResetUpdateUnlocked = true;
                 const tabUpdate = document.getElementById('tab-update-btn');
                 if (tabUpdate) {
                     tabUpdate.classList.remove('disabled');
@@ -126,8 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- СТИЛИ ---
 function injectResetStyles() {
-    const existingStyle = document.getElementById('reset-system-styles');
-    if (existingStyle) existingStyle.remove();
+    if (document.getElementById('reset-system-styles')) return;
 
     const css = `
         .reset-modal-overlay {
@@ -136,16 +139,17 @@ function injectResetStyles() {
             left: 0 !important;
             width: 100vw !important;
             height: 100vh !important;
-            background: rgba(8, 9, 11, 0.95) !important;
-            backdrop-filter: blur(16px) !important;
-            -webkit-backdrop-filter: blur(16px) !important;
-            z-index: 999999 !important;
+            background: rgba(10, 10, 12, 0.94) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            z-index: 9999999 !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
             padding: 20px !important;
             box-sizing: border-box !important;
             overflow: hidden !important;
+            
             opacity: 0 !important;
             visibility: hidden !important;
             pointer-events: none !important;
@@ -159,18 +163,20 @@ function injectResetStyles() {
         }
 
         .reset-modal-container {
-            position: relative !important;
-            width: 100% !important;
-            max-width: 760px !important;
-            padding: 40px 50px 60px 50px !important;
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
+            padding: 0 !important;
+            width: 100% !important;
+            max-width: 300px !important;
+            position: relative !important;
             color: #ffffff !important;
-            font-family: 'Montserrat', sans-serif !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             box-sizing: border-box !important;
             display: flex !important;
             flex-direction: column !important;
+            align-items: center !important;
+            
             transform: scale(0.96) !important;
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
             z-index: 5 !important;
@@ -193,40 +199,57 @@ function injectResetStyles() {
 
         .reset-close-btn {
             position: absolute !important;
-            top: -10px !important;
-            right: 0px !important;
+            top: 30px !important;
+            right: 30px !important;
             background: transparent !important;
             border: none !important;
-            color: rgba(255, 255, 255, 0.3) !important;
-            font-size: 26px !important;
+            color: rgba(255, 255, 255, 0.4) !important;
+            font-size: 28px !important;
             line-height: 1 !important;
             cursor: pointer !important;
             z-index: 99999999 !important;
+            padding: 0 !important;
+            transform-origin: center center !important;
             transition: color 0.25s ease, transform 0.25s ease !important;
+        }
+
+        .reset-close-btn::before {
+            content: '' !important;
+            position: absolute !important;
+            top: -12px !important;
+            bottom: -12px !important;
+            left: -12px !important;
+            right: -12px !important;
         }
 
         .reset-close-btn:hover {
             color: #ffffff !important;
-            transform: scale(1.15) !important;
+            transform: scale(1.15) rotate(90deg) !important;
+        }
+
+        .reset-close-btn:active {
+            transform: scale(0.9) rotate(90deg) !important;
         }
 
         .reset-header-title {
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 16px !important;
-            margin-bottom: 50px !important;
+            gap: 20px !important;
+            margin-top: -30px !important;
+            margin-bottom: 30px !important;
         }
 
         .reset-logo-wrapper {
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            animation: resetLogoHover 4s ease-in-out infinite alternate !important;
+            will-change: transform !important;
+            animation: resetLogoHover 3s ease-in-out infinite alternate !important;
         }
 
         .reset-header-logo {
-            height: 48px !important;
+            height: 105px !important;
             width: auto !important;
             display: block !important;
             object-fit: contain !important;
@@ -234,53 +257,95 @@ function injectResetStyles() {
 
         @keyframes resetLogoHover {
             0% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-5px) rotate(-1deg); }
-            100% { transform: translateY(4px) rotate(1deg); }
+            50% { transform: translateY(-8px) rotate(-2deg); }
+            100% { transform: translateY(6px) rotate(2deg); }
         }
 
-        .reset-brand-text {
+        .reset-title-ticker {
+            height: 55px !important;
+            overflow: hidden !important;
+            position: relative !important;
+        }
+
+        .reset-title-track {
+            display: flex !important;
+            flex-direction: column !important;
+            animation: resetTitleVerticalScroll 8s cubic-bezier(0.77, 0, 0.175, 1) infinite !important;
+        }
+
+        .reset-title-track span {
+            height: 55px !important;
+            line-height: 55px !important;
             font-family: 'Unbounded', sans-serif !important;
-            font-size: 26px !important;
+            font-size: 32px !important;
             font-weight: 900 !important;
             letter-spacing: -0.5px !important;
             color: #ffffff !important;
             text-transform: uppercase !important;
+            white-space: nowrap !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+
+        @keyframes resetTitleVerticalScroll {
+            0%, 20% { transform: translateY(0); }
+            25%, 45% { transform: translateY(-55px); }
+            50%, 70% { transform: translateY(-55px); }
+            75%, 100% { transform: translateY(0); }
         }
 
         .reset-tabs {
             position: relative !important;
             display: flex !important;
-            justify-content: space-between !important;
-            align-items: center !important;
+            background: rgba(255, 255, 255, 0.04) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            border-radius: 24px !important;
+            padding: 3px !important;
             width: 100% !important;
-            margin-bottom: 70px !important;
+            margin-bottom: 30px !important;
+            box-sizing: border-box !important;
+        }
+
+        .reset-tab-pill {
+            position: absolute !important;
+            top: 3px !important;
+            left: 3px !important;
+            width: calc(50% - 3px) !important;
+            height: calc(100% - 6px) !important;
+            background: #ffffff !important;
+            border-radius: 20px !important;
+            z-index: 1 !important;
+            transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1) !important;
+            pointer-events: none !important;
+        }
+
+        .reset-tabs.update-mode .reset-tab-pill {
+            transform: translateX(100%) !important;
         }
 
         .reset-tab-btn {
             position: relative !important;
             z-index: 2 !important;
-            padding: 10px 36px !important;
+            flex: 1 !important;
+            padding: 7px 14px !important;
             background: transparent !important;
-            border: 1px solid rgba(255, 255, 255, 0.2) !important;
-            border-radius: 14px !important;
+            border: none !important;
             color: rgba(255, 255, 255, 0.5) !important;
             font-size: 13px !important;
-            font-weight: 700 !important;
+            font-weight: 500 !important;
             cursor: pointer !important;
-            transition: all 0.3s ease !important;
+            transition: color 0.3s ease, opacity 0.3s ease !important;
+            text-align: center !important;
         }
 
         .reset-tab-btn.disabled {
-            opacity: 0.25 !important;
+            opacity: 0.3 !important;
             cursor: not-allowed !important;
-            border-color: rgba(255, 255, 255, 0.08) !important;
         }
 
         .reset-tab-btn.active {
-            background: #ffffff !important;
-            border-color: #ffffff !important;
             color: #000000 !important;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2) !important;
+            font-weight: 600 !important;
         }
 
         .reset-forms-wrapper {
@@ -296,12 +361,13 @@ function injectResetStyles() {
             width: 100% !important;
             display: flex !important;
             flex-direction: column !important;
-            align-items: flex-start !important;
-            gap: 50px !important;
+            gap: 25px !important;
+            
             opacity: 0 !important;
             filter: blur(8px) !important;
             pointer-events: none !important;
-            transition: opacity 0.35s ease, filter 0.35s ease !important;
+            transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                        filter 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
 
         .reset-form.visible {
@@ -310,32 +376,28 @@ function injectResetStyles() {
             pointer-events: auto !important;
         }
 
-        #reset-form-update {
-            align-items: flex-end !important;
-        }
-
         .reset-input-group {
             position: relative !important;
             width: 100% !important;
-            max-width: 320px !important;
         }
 
         .reset-input {
             background: transparent !important;
             border: none !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
-            padding: 8px 0 !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
+            padding: 4px 0 8px 0 !important;
             color: #ffffff !important;
             font-size: 13px !important;
-            font-weight: 500 !important;
+            text-align: center !important;
             outline: none !important;
             width: 100% !important;
             box-sizing: border-box !important;
-            transition: border-color 0.25s ease !important;
+            transition: border-color 0.25s !important;
         }
 
         .reset-input::placeholder {
             color: rgba(255, 255, 255, 0.35) !important;
+            text-align: center !important;
         }
 
         .reset-input:focus {
@@ -345,43 +407,25 @@ function injectResetStyles() {
         .reset-submit-btn {
             background: transparent !important;
             color: #ffffff !important;
-            border: 1px solid rgba(255, 255, 255, 0.3) !important;
-            border-radius: 14px !important;
-            padding: 12px 36px !important;
-            font-size: 13px !important;
-            font-weight: 700 !important;
+            border: 1px solid #ffffff !important;
+            border-radius: 24px !important;
+            padding: 10px 20px !important;
+            font-size: 14px !important;
+            font-weight: 500 !important;
             cursor: pointer !important;
-            transition: all 0.25s ease !important;
+            width: 100% !important;
+            margin-top: 15px !important;
+            transition: all 0.2s ease !important;
+            text-align: center !important;
         }
 
         .reset-submit-btn:hover {
-            background: rgba(255, 255, 255, 0.1) !important;
-            border-color: rgba(255, 255, 255, 0.6) !important;
+            background: #ffffff !important;
+            color: #000000 !important;
         }
 
-        .reset-bg-watermark {
-            position: absolute !important;
-            top: 50% !important;
-            right: -10% !important;
-            width: 900px !important;
-            height: auto !important;
-            pointer-events: none !important;
-            z-index: 1 !important;
-            opacity: 0 !important;
-            filter: blur(20px) brightness(0.6) !important;
-            transition: opacity 1s ease-out, filter 1s ease-out !important;
-            animation: resetIntenseFloat 7s ease-in-out infinite alternate !important;
-        }
-
-        .reset-modal-overlay.active .reset-bg-watermark {
-            opacity: 0.15 !important;
-            filter: blur(10px) brightness(0.8) !important;
-        }
-
-        @keyframes resetIntenseFloat {
-            0% { transform: translateY(-50%) rotate(0deg) scale(1); }
-            50% { transform: translateY(-55%) rotate(-4deg) scale(1.03); }
-            100% { transform: translateY(-45%) rotate(3deg) scale(0.97); }
+        .reset-submit-btn:active {
+            transform: scale(0.98) !important;
         }
 
         .reset-confirm-wave {
@@ -391,7 +435,7 @@ function injectResetStyles() {
             width: 10px !important;
             height: 10px !important;
             border-radius: 50% !important;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 70%) !important;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.25) 30%, rgba(255, 255, 255, 0) 70%) !important;
             transform: translate(-50%, 50%) scale(0) !important;
             pointer-events: none !important;
             z-index: 8 !important;
@@ -403,8 +447,17 @@ function injectResetStyles() {
         }
 
         @keyframes resetFullScreenWave {
-            0% { transform: translate(-50%, 50%) scale(1); opacity: 1; }
-            100% { transform: translate(-50%, 50%) scale(280); opacity: 0; }
+            0% {
+                transform: translate(-50%, 50%) scale(1);
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translate(-50%, 50%) scale(280);
+                opacity: 0;
+            }
         }
 
         .reset-confirm-toast {
@@ -425,14 +478,39 @@ function injectResetStyles() {
             pointer-events: none !important;
             white-space: nowrap !important;
             z-index: 10 !important;
-            transition: all 0.35s ease !important;
+            transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease !important;
         }
 
         .reset-confirm-toast.visible {
             opacity: 1 !important;
             visibility: visible !important;
             pointer-events: auto !important;
-            transform: translateX(-50%) translateY(0) scale(1) !important;
+            animation: resetBounceInUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+        }
+
+        .reset-confirm-toast.hiding {
+            opacity: 0 !important;
+            transform: translateX(-50%) translateY(40px) scale(0.9) !important;
+            pointer-events: none !important;
+            animation: none !important;
+        }
+
+        @keyframes resetBounceInUp {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(100px) scale(0.7);
+            }
+            65% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(-12px) scale(1.03);
+            }
+            85% {
+                transform: translateX(-50%) translateY(4px) scale(0.98);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0) scale(1);
+            }
         }
 
         .reset-confirm-text {
@@ -454,6 +532,11 @@ function injectResetStyles() {
             border-radius: 12px !important;
             font-size: 12px !important;
             cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }
+
+        .reset-confirm-btn:hover {
+            background: rgba(255, 255, 255, 0.12) !important;
         }
 
         .reset-confirm-btn.danger {
@@ -461,6 +544,45 @@ function injectResetStyles() {
             color: #000000 !important;
             border-color: #ffffff !important;
             font-weight: 600 !important;
+        }
+
+        .reset-confirm-btn.danger:hover {
+            background: rgba(255, 255, 255, 0.85) !important;
+        }
+
+        .reset-bg-watermark {
+            position: absolute !important;
+            top: 45% !important;
+            right: -15% !important;
+            left: auto !important;
+            width: 1200px !important;
+            height: auto !important;
+            max-width: none !important;
+            pointer-events: none !important;
+            z-index: 1 !important;
+            transform-origin: center right !important;
+            
+            opacity: 0 !important;
+            filter: blur(45px) brightness(0.6) !important;
+            transition: opacity 1.2s ease-out, filter 1.2s ease-out !important;
+            animation: resetIntenseFloat 6s ease-in-out infinite alternate !important;
+        }
+
+        .reset-modal-overlay.active .reset-bg-watermark {
+            opacity: 0.22 !important;
+            filter: blur(12px) brightness(0.9) !important;
+        }
+
+        @keyframes resetIntenseFloat {
+            0% {
+                transform: translateY(-50%) translateX(0px) rotate(0deg) scale(1);
+            }
+            50% {
+                transform: translateY(-58%) translateX(-25px) rotate(-5deg) scale(1.04);
+            }
+            100% {
+                transform: translateY(-42%) translateX(15px) rotate(4deg) scale(0.96);
+            }
         }
     `;
 
@@ -476,19 +598,26 @@ function initResetModalUI() {
 
     const modalHTML = `
         <div id="reset-modal-overlay" class="reset-modal-overlay">
+            <button id="reset-close-btn" class="reset-close-btn" type="button">&times;</button>
+
             <img src="images/geo_logo.png" alt="" class="reset-bg-watermark">
 
             <div class="reset-modal-container">
-                <button id="reset-close-btn" class="reset-close-btn" type="button">&times;</button>
-
                 <div class="reset-header-title">
                     <div class="reset-logo-wrapper">
                         <img src="images/geo_logo.png" alt="Geo Logo" class="reset-header-logo">
                     </div>
-                    <span class="reset-brand-text">GEOГРАФИЯ</span>
+
+                    <div class="reset-title-ticker">
+                        <div class="reset-title-track">
+                            <span>GEOГРАФИЯ</span>
+                            <span>СБРОС ПАРОЛЯ</span>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="reset-tabs" id="reset-tabs">
+                    <div class="reset-tab-pill"></div>
                     <button type="button" class="reset-tab-btn active" id="tab-request-btn">Запрос</button>
                     <button type="button" class="reset-tab-btn disabled" id="tab-update-btn" disabled>Замена</button>
                 </div>
@@ -503,7 +632,7 @@ function initResetModalUI() {
 
                     <form id="reset-form-update" class="reset-form">
                         <div class="reset-input-group">
-                            <input type="password" id="reset-new-password" placeholder="Новый пароль (мин. 6 )..." required minlength="6" class="reset-input" autocomplete="new-password">
+                            <input type="password" id="reset-new-password" placeholder="Новый пароль (мин. 6)..." required minlength="6" class="reset-input" autocomplete="new-password">
                         </div>
                         <button type="submit" class="reset-submit-btn" id="reset-update-btn-text">Сохранить пароль</button>
                     </form>
@@ -524,7 +653,7 @@ function initResetModalUI() {
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
-// --- СОБЫТИЯ И ЛОГИКА ---
+// --- СОБЫТИЯ ---
 function initResetEvents() {
     const overlay = document.getElementById('reset-modal-overlay');
     const closeBtn = document.getElementById('reset-close-btn');
@@ -537,19 +666,22 @@ function initResetEvents() {
     const btnConfirmYes = document.getElementById('reset-confirm-close-btn');
     const btnConfirmNo = document.getElementById('reset-cancel-close-btn');
 
+    // Предотвращение дублирования обработчиков
+    if (overlay && overlay.dataset.eventsInitialized) return;
+    if (overlay) overlay.dataset.eventsInitialized = "true";
+
     btnConfirmYes?.addEventListener('click', window.hideResetModal);
     btnConfirmNo?.addEventListener('click', () => hideResetConfirmToast(false));
 
     closeBtn?.addEventListener('click', window.hideResetModal);
 
-    overlay?.addEventListener('dblclick', (e) => {
-        if (e.target === overlay) {
-            showResetConfirmToast();
-        }
-    });
-
+    // Разделение single/double click на оверлее
     overlay?.addEventListener('click', (e) => {
-        if (e.target === overlay) {
+        if (e.target !== overlay) return;
+
+        if (resetOverlayClickTimeout) clearTimeout(resetOverlayClickTimeout);
+
+        resetOverlayClickTimeout = setTimeout(() => {
             const container = document.querySelector('.reset-modal-container');
             if (container) {
                 container.classList.remove('shake');
@@ -560,6 +692,13 @@ function initResetEvents() {
                     container.classList.remove('shake');
                 }, 400);
             }
+        }, 250);
+    });
+
+    overlay?.addEventListener('dblclick', (e) => {
+        if (e.target === overlay) {
+            if (resetOverlayClickTimeout) clearTimeout(resetOverlayClickTimeout);
+            showResetConfirmToast();
         }
     });
 
@@ -571,7 +710,7 @@ function initResetEvents() {
 
     tabRequest?.addEventListener('click', () => setResetMode('request'));
     tabUpdate?.addEventListener('click', () => {
-        if (isUpdateUnlocked) {
+        if (isResetUpdateUnlocked) {
             setResetMode('update');
         }
     });
@@ -596,9 +735,9 @@ function initResetEvents() {
         if (error) {
             alert(`Ошибка отправки: ${error.message}`);
         } else {
-            alert('Ссылка для сброса пароля отправлена на почту! Теперь активирован режим замены.');
+            alert('Ссылка отправлена на вашу почту! Теперь активирована вкладка «Замена».');
             
-            isUpdateUnlocked = true;
+            isResetUpdateUnlocked = true;
             if (tabUpdate) {
                 tabUpdate.classList.remove('disabled');
                 tabUpdate.removeAttribute('disabled');
@@ -625,9 +764,9 @@ function initResetEvents() {
         btn.textContent = 'Сохранить пароль';
 
         if (error) {
-            alert(`Ошибка обновления пароля: ${error.message}`);
+            alert(`Ошибка изменения пароля: ${error.message}`);
         } else {
-            alert('Пароль успешно изменён!');
+            alert('Пароль успешно обновлён!');
             window.hideResetModal();
         }
     });
