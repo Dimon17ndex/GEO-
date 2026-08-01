@@ -365,21 +365,36 @@
             color: rgba(255, 255, 255, 0.7);
             letter-spacing: 0.5px;
             text-transform: uppercase;
-            align-self: flex-start; /* Выравнивание текста по левому краю */
+            align-self: flex-start; /* Текст выровнен по левому краю */
             text-align: left;
         }
 
-        .logout-btn-override {
-            align-self: flex-end; /* Выравнивание кнопки по правому краю */
+        /* Красная кнопка выхода, выровненная по правому краю */
+        .red-logout-btn {
+            align-self: flex-end; /* Кнопка выровнена по правому краю */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 32px;
+            background: rgba(231, 76, 60, 0.15);
+            border: 1px solid rgba(231, 76, 60, 0.4);
+            border-radius: 12px;
+            color: #ff6b6b;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
 
-        /* Эффект наведения как на профиль из beginning */
-        .logout-btn-override:hover {
-            background: rgba(255, 255, 255, 0.22);
-            border-color: rgba(255, 255, 255, 0.5);
+        .red-logout-btn:hover {
+            background: rgba(231, 76, 60, 0.3);
+            border-color: rgba(231, 76, 60, 0.7);
             color: #ffffff;
-            transform: scale(1.03);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.25), 0 10px 25px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(231, 76, 60, 0.3);
         }
 
         .center-status-wrapper {
@@ -495,7 +510,7 @@
     <div class="main-profile-container" id="main-profile-block">
         <div class="session-logout-section">
             <span class="logout-label-text">Завершение сессии/выход из аккаунта</span>
-            <button type="button" class="action-btn-styled logout-btn-override" onclick="handleLogout()">
+            <button type="button" class="red-logout-btn" onclick="handleLogout()">
                 Выйти
             </button>
         </div>
