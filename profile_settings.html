@@ -93,18 +93,17 @@
         }
 
         /* =========================================================
-           БЛОК АККАУНТА ПО ЦЕНТРУ ВВЕРХУ (БЕЗ ПЛАШКИ)
+           БЛОК АККАУНТА ПО ЦЕНТРУ (ОПУЩЕН НИЖЕ, БЕЗ КНОПКИ ВЫЙТИ)
            ========================================================= */
         .top-center-account {
             position: fixed;
-            top: 40px;
+            top: 120px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
             text-align: center;
         }
 
@@ -117,25 +116,6 @@
             letter-spacing: 1px;
             text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
             white-space: nowrap;
-        }
-
-        .logout-simple-btn {
-            background: transparent;
-            border: 1px solid rgba(231, 76, 60, 0.5);
-            color: #e74c3c;
-            padding: 6px 16px;
-            border-radius: 8px;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.25s ease;
-        }
-
-        .logout-simple-btn:hover {
-            background: #e74c3c;
-            color: #ffffff;
-            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
         }
 
         /* Контейнер для размещения статуса строго по центру экрана */
@@ -151,17 +131,6 @@
 
         .auth-trigger-btn {
             pointer-events: auto;
-        }
-
-        /* Серый статус "ЗДЕСЬ ПОКА ПУСТО" */
-        .empty-status-message {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 13px;
-            font-weight: 700;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.4);
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
         }
 
         /* Секретная панель администратора */
@@ -253,15 +222,12 @@
 
     <div id="user-profile-widget" class="top-center-account" style="display: none;">
         <div class="account-title-large" id="profile-email-text">ПРОФИЛЬ</div>
-        <button type="button" class="logout-simple-btn" onclick="logoutUser()">Выйти</button>
     </div>
 
     <div class="center-status-wrapper">
         <button type="button" id="open-auth-btn" class="auth-trigger-btn" onclick="showAuthModal()">
             Войти / Зарегистрироваться
         </button>
-
-        <div class="empty-status-message">ЗДЕСЬ ПОКА ПУСТО</div>
     </div>
 
     <div id="dev-side-panel" class="dev-side-panel">
