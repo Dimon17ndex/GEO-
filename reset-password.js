@@ -231,13 +231,14 @@ function injectResetStyles() {
             transform: scale(0.9) rotate(90deg) !important;
         }
 
+        /* ПОДНЯЛИ ХЕДЕР И УВЕЛИЧИЛИ РАССТОЯНИЕ ДО КНОПОК ПЕРЕКЛЮЧЕНИЯ */
         .reset-header-title {
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
             gap: 20px !important;
-            margin-top: -70px !important; /* Подняли заголовок и логотип выше */
-            margin-bottom: 20px !important;
+            margin-top: -50px !important; 
+            margin-bottom: 55px !important; 
         }
 
         .reset-logo-wrapper {
