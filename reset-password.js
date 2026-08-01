@@ -236,8 +236,8 @@ function injectResetStyles() {
             align-items: center !important;
             justify-content: center !important;
             gap: 20px !important;
-            margin-top: -30px !important;
-            margin-bottom: 30px !important;
+            margin-top: -70px !important; /* Подняли заголовок и логотип выше */
+            margin-bottom: 20px !important;
         }
 
         .reset-logo-wrapper {
