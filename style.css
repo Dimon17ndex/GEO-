@@ -1606,3 +1606,18 @@ body:has(#version-badge.show) .app-banners-container {
     display: inline-block;
     animation: iconSlowBlink 2.5s ease-in-out infinite;
 }
+
+/* Закрепляем оранжевую плашку на исходной позиции */
+.app-banners-container .banner-warning {
+    position: relative !important;
+    top: 0 !important;
+    transform: none !important;
+    margin-top: 0 !important;
+    transition: none !important;
+}
+
+/* Если контейнер плашек смещался целиком, изолируем анимацию только для плашки ПК-версии */
+.app-banners-container {
+    transform: none !important;
+    top: 0 !important;
+}
