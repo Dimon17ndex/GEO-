@@ -18,12 +18,12 @@
     <link rel="stylesheet" href="beginning.css">
 
     <style>
-        /* Когда пользователь вошел — гарантированно скрываем центральную кнопку */
+        /* Когда пользователь вошел — скрываем центральную кнопку */
         body.user-logged-in #open-auth-btn {
             display: none !important;
         }
 
-        /* Плавное проявление и затухание страницы */
+        /* Плавное проявление страницы */
         body {
             opacity: 0;
             transition: opacity 0.5s ease;
@@ -33,12 +33,11 @@
             opacity: 1;
         }
 
-        /* Класс для плавного угасания перед переходом */
         body.page-hidden {
             opacity: 0 !important;
         }
 
-        /* Позиционирование бренд-блока в верхнем левом углу */
+        /* Бренд-блок в верхнем левом углу */
         .top-left-brand {
             position: fixed;
             top: 40px;
@@ -79,7 +78,6 @@
             animation: floatingText 4.5s ease-in-out infinite alternate !important;
         }
 
-        /* Анимация левитации */
         @keyframes floatingLogo {
             0% { transform: translateY(0px) rotate(0deg); }
             50% { transform: translateY(-8px) rotate(-1.5deg); }
@@ -93,12 +91,12 @@
         }
 
         /* =========================================================
-           ПРИНУДИТЕЛЬНОЕ ПОЗИЦИОНИРОВАНИЕ БЛОКА АККАУНТА (НИЖЕ ЛОГО)
+           БЛОК АККАУНТА (ПРОЯВЛЕНИЕ ЧЕРЕЗ БЛЮР И ВСПЫШКУ)
            ========================================================= */
         #user-profile-widget,
         .top-center-account {
             position: absolute !important;
-            top: 180px !important;       /* Опускаем принудительно на 180px от верха */
+            top: 180px !important;
             left: 50% !important;
             transform: translateX(-50%) !important;
             right: auto !important;
@@ -108,22 +106,89 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
+            
+            /* Анимация проявления с расфокусировкой/блюром */
+            animation: accountBlurAppear 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            will-change: transform, filter, opacity;
         }
 
-        /* =========================================================
-   ШРИФТ И СТИЛЬ ИМЕНИ АККАУНТА
-   ========================================================= */
-.account-title-large {
-    font-family: 'Montserrat', sans-serif; /* Поменяйте на желаемый шрифт */
-    font-size: 22px;
-    font-weight: 800;
-    color: #ffffff;
-    letter-spacing: 1.5px;
-    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-    white-space: nowrap;
-}
+        .account-title-large {
+            position: relative;
+            font-family: 'Unbounded', sans-serif;
+            font-size: 26px;
+            font-weight: 900;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            white-space: nowrap;
+            overflow: hidden;
 
-        /* Контейнер для размещения статуса строго по центру экрана */
+            /* Мягкая вспышка световой ауры при появлении */
+            animation: accountGlowPulse 1.8s ease-out forwards;
+        }
+
+        /* Бегущий световой блик по надписи */
+        .account-title-large::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -150%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.9) 50%, 
+                transparent 100%
+            );
+            transform: skewX(-25deg);
+            animation: lightFlash 1.4s ease-out 0.4s 1 forwards;
+        }
+
+        /* Keyframes: Плавный выход из глубокого блюра */
+        @keyframes accountBlurAppear {
+            0% {
+                opacity: 0;
+                filter: blur(20px);
+                transform: translateX(-50%) scale(0.92);
+            }
+            50% {
+                opacity: 0.8;
+                filter: blur(5px);
+            }
+            100% {
+                opacity: 1;
+                filter: blur(0px);
+                transform: translateX(-50%) scale(1);
+            }
+        }
+
+        /* Keyframes: Импульс вспышки света (свечение букв) */
+        @keyframes accountGlowPulse {
+            0% {
+                text-shadow: 0 0 0px rgba(255, 255, 255, 0);
+            }
+            50% {
+                /* Пик вспышки света */
+                text-shadow: 0 0 35px rgba(255, 255, 255, 0.9), 0 0 15px rgba(52, 152, 219, 0.6);
+            }
+            100% {
+                /* Стабильное мягкое свечение */
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            }
+        }
+
+        /* Keyframes: Блик света, пробегающий слева направо */
+        @keyframes lightFlash {
+            0% {
+                left: -150%;
+            }
+            100% {
+                left: 150%;
+            }
+        }
+
+        /* Контейнер статуса */
         .center-status-wrapper {
             position: fixed;
             top: 50%;
@@ -138,7 +203,7 @@
             pointer-events: auto;
         }
 
-        /* Секретная панель администратора */
+        /* Панель администратора */
         .dev-side-panel {
             position: fixed;
             top: 50%;
@@ -247,7 +312,6 @@
     <script src="auth-system.js?v=3"></script>
 
     <script>
-// Переменные состояния
 const waveContainer = document.getElementById('bg-wave-container');
 let ambientTimeoutId = null;
 
@@ -281,7 +345,6 @@ document.body.addEventListener('mousedown', (e) => {
     createBackgroundRipple(e.clientX, e.clientY, 'bg-click-ripple');
 });
 
-// Навигация с анимацией
 history.pushState(null, null, location.href);
 window.addEventListener('popstate', function () {
     navigateToPage('index.html');
@@ -297,7 +360,6 @@ function navigateToPage(targetPage) {
     }, 500);
 }
 
-// Загрузка страницы
 document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(() => {
         document.body.classList.add('page-loaded');
