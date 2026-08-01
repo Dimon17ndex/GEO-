@@ -88,7 +88,7 @@
         }
 
         /* =========================================================
-   ВИДЖЕТ ПРОФИЛЯ (БЕЗ ПРОВАЛОВ И МЕРЦАНИЯ)
+   ВИДЖЕТ ПРОФИЛЯ — ПОЛНАЯ ЗАЩИТА ОТ СРЫВА HOVER
    ========================================================= */
 .top-right-profile {
     position: fixed;
@@ -97,6 +97,7 @@
     z-index: 10;
 }
 
+/* 1. Карточка профиля */
 .profile-card {
     position: relative;
     display: inline-block;
@@ -106,7 +107,7 @@
     border-radius: 12px;
     backdrop-filter: blur(10px);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .profile-card:hover {
@@ -136,71 +137,85 @@
     transform: rotate(180deg);
 }
 
-/* Выпадающий контейнер для кнопок */
+/* 2. Контейнер выпадающего меню */
 .profile-dropdown-menu {
     position: absolute;
-    top: 100%;             /* Привязываем вплотную к низу карточки */
+    top: 100%;             /* Зацепка ровно за нижний край карточки */
     left: 0;
-    width: 100%;
-    padding-top: 8px;      /* Отступ от названия профиля до синей кнопки */
+    right: 0;
+    padding-top: 8px;      /* Заменяем внешние зазоры внутренними */
     display: flex;
     flex-direction: column;
-    
-    /* Скрыто по умолчанию */
+    gap: 6px;              /* Расстояние между кнопками */
+
+    /* Визуальное скрытие */
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-5px);
+    transform: translateY(-4px);
     transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+    
+    /* Отключаем клики в скрытом состоянии */
     pointer-events: none;
 }
 
-/* При наведении на карточку ИЛИ на само меню — оно остается видимым */
-.profile-card:hover .profile-dropdown-menu,
-.profile-dropdown-menu:hover {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-    pointer-events: auto;
+/* 3. НЕВИДИМАЯ ПОДУШКА-СОЕДИНИТЕЛЬ (Убирает все провалы) */
+.profile-dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -10px;           /* Немного расширяем зону по бокам */
+    right: -10px;
+    bottom: -10px;         /* И снизу, чтобы мышь не соскакивала */
+    z-index: -1;
+    background: transparent;
 }
 
-/* Синяя кнопка "Характеристики профиля" */
-.profile-settings-btn {
+/* 4. Открытие и удержание при наведении на ЛЮБОЙ элемент этой зоны */
+.profile-card:hover .profile-dropdown-menu,
+.profile-dropdown-menu:hover {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
+    pointer-events: auto !important;
+}
+
+/* 5. Кнопки внутри меню */
+.profile-settings-btn,
+.logout-dropdown-btn {
     width: 100%;
-    padding: 10px 8px;
-    margin-bottom: 6px;    /* Безопасный отступ до красной кнопки без разрыва ховера */
-    background: #3498db;
-    color: #ffffff;
     border: none;
     border-radius: 8px;
     font-family: 'Montserrat', sans-serif;
-    font-size: 12px;
     font-weight: 700;
     cursor: pointer;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 2;            /* Кнопки поверх невидимой подушки */
+}
+
+/* Синяя кнопка */
+.profile-settings-btn {
+    padding: 10px 8px;
+    background: #3498db;
+    color: #ffffff;
+    font-size: 12px;
     transition: background 0.2s ease;
     box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
     text-align: center;
-    box-sizing: border-box;
 }
 
 .profile-settings-btn:hover {
     background: #2980b9;
 }
 
-/* Красная кнопка "Выйти" */
+/* Красная кнопка */
 .logout-dropdown-btn {
-    width: 100%;
     padding: 10px 0;
     background: #e74c3c;
     color: #ffffff;
-    border: none;
-    border-radius: 8px;
-    font-family: 'Montserrat', sans-serif;
     font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
     transition: background 0.2s ease;
     box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
-    box-sizing: border-box;
 }
 
 .logout-dropdown-btn:hover {
