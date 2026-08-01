@@ -27,8 +27,6 @@ window.showAuthModal = function() {
 
     if (modal) {
         modal.classList.add('active');
-        // 🚀 Запуск анимации приветственного текста
-        triggerWelcomeAnimation();
     }
 };
 
@@ -55,36 +53,6 @@ window.logoutUser = async function() {
         }, 500);
     }
 };
-
-// Функция создания и анимации побуквенного приветственного текста
-function triggerWelcomeAnimation() {
-    const overlay = document.getElementById('auth-modal-overlay');
-    if (!overlay) return;
-
-    // Удаляем предыдущую анимацию, если она была
-    const oldWelcome = overlay.querySelector('.auth-welcome-text');
-    if (oldWelcome) oldWelcome.remove();
-
-    // Создаем контейнер для приветствия
-    const welcomeContainer = document.createElement('div');
-    welcomeContainer.className = 'auth-welcome-text';
-
-    const text = "Привет, мы тебя ждали!";
-    
-    // Разбиваем строку на отдельные символы
-    text.split('').forEach((char, index) => {
-        const span = document.createElement('span');
-        span.className = 'auth-welcome-letter';
-        span.innerHTML = char === ' ' ? '&nbsp;' : char;
-        
-        // Поочередная задержка появления букв (35мс)
-        span.style.animationDelay = `${index * 0.035}s`;
-        
-        welcomeContainer.appendChild(span);
-    });
-
-    overlay.appendChild(welcomeContainer);
-}
 
 // Функция показа всплывающей плашки с прыжком и радиальной волной
 function showConfirmToast() {
@@ -193,54 +161,6 @@ function injectAuthStyles() {
             opacity: 1 !important;
             visibility: visible !important;
             pointer-events: auto !important;
-        }
-
-        /* --- ПРИВЕТСТВЕННЫЙ ТЕКСТ С БЛЮРОМ И ЗАПЛЫВАНИЕМ --- */
-        .auth-welcome-text {
-            position: absolute !important;
-            left: 6% !important;
-            top: 50% !important;
-            transform: translateY(-50%) !important;
-            font-family: 'Unbounded', sans-serif !important;
-            font-size: 26px !important;
-            font-weight: 800 !important;
-            color: rgba(255, 255, 255, 0.92) !important;
-            z-index: 2 !important; /* Находится под формой (у формы z-index: 5) */
-            pointer-events: none !important;
-            white-space: nowrap !important;
-            display: flex !important;
-            gap: 2px !important;
-        }
-
-        .auth-welcome-letter {
-            display: inline-block !important;
-            opacity: 0 !important;
-            filter: blur(14px) !important;
-            transform: translateX(-50px) scale(0.8) !important;
-            animation: letterFlyInAndOut 3.4s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
-        }
-
-        @keyframes letterFlyInAndOut {
-            0% {
-                opacity: 0;
-                filter: blur(14px);
-                transform: translateX(-50px) scale(0.8);
-            }
-            28% {
-                opacity: 1;
-                filter: blur(0px);
-                transform: translateX(0) scale(1);
-            }
-            65% {
-                opacity: 1;
-                filter: blur(0px);
-                transform: translateX(0) scale(1);
-            }
-            100% {
-                opacity: 0;
-                filter: blur(16px);
-                transform: translateX(220px) scale(0.75); /* Заплывает вправо под форму */
-            }
         }
 
         .auth-modal-container {
@@ -657,7 +577,7 @@ function injectAuthStyles() {
                 transform: translateY(-58%) translateX(-25px) rotate(-5deg) scale(1.04);
             }
             100% {
-                transform: translateY(-42%) translateX(15px) rotate(4deg) scale(4deg) scale(0.96);
+                transform: translateY(-42%) translateX(15px) rotate(4deg) scale(0.96);
             }
         }
     `;
