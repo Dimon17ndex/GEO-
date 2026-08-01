@@ -91,7 +91,7 @@
         }
 
         /* =========================================================
-           БЛОК АККАУНТА (ПРОЯВЛЕНИЕ ЧЕРЕЗ БЛЮР И ВСПЫШКУ)
+           БЛОК АККАУНТА (ПРОЯВЛЕНИЕ С БЛЮРОМ, ВСПЫШКОЙ И ПРЫЖКОМ)
            ========================================================= */
         #user-profile-widget,
         .top-center-account {
@@ -107,8 +107,8 @@
             align-items: center;
             text-align: center;
             
-            /* Анимация проявления с расфокусировкой/блюром */
-            animation: accountBlurAppear 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            /* Пружинящая анимация прыжка с расфокусировкой */
+            animation: accountBlurBounce 1.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
             will-change: transform, filter, opacity;
         }
 
@@ -123,7 +123,7 @@
             white-space: nowrap;
             overflow: hidden;
 
-            /* Мягкая вспышка световой ауры при появлении */
+            /* Мягкая вспышка световой ауры во время прыжка */
             animation: accountGlowPulse 1.8s ease-out forwards;
         }
 
@@ -145,40 +145,48 @@
             animation: lightFlash 1.4s ease-out 0.4s 1 forwards;
         }
 
-        /* Keyframes: Плавный выход из глубокого блюра */
-        @keyframes accountBlurAppear {
+        /* Keyframes: Блюр + Прыжок (увеличение до 1.25x и отскок к 1x) */
+        @keyframes accountBlurBounce {
             0% {
                 opacity: 0;
                 filter: blur(20px);
-                transform: translateX(-50%) scale(0.92);
+                transform: translateX(-50%) scale(0.6);
             }
-            50% {
-                opacity: 0.8;
-                filter: blur(5px);
+            60% {
+                opacity: 1;
+                filter: blur(2px);
+                /* Максимальный прыжок в процессе увеличения */
+                transform: translateX(-50%) scale(1.25);
+            }
+            80% {
+                filter: blur(0px);
+                /* Небольшой отскок назад для эффекта пружины */
+                transform: translateX(-50%) scale(0.95);
             }
             100% {
                 opacity: 1;
                 filter: blur(0px);
+                /* Возврат к идеальному финальному размеру */
                 transform: translateX(-50%) scale(1);
             }
         }
 
-        /* Keyframes: Импульс вспышки света (свечение букв) */
+        /* Keyframes: Импульс вспышки света (синхронизирован с пиком прыжка) */
         @keyframes accountGlowPulse {
             0% {
                 text-shadow: 0 0 0px rgba(255, 255, 255, 0);
             }
-            50% {
-                /* Пик вспышки света */
-                text-shadow: 0 0 35px rgba(255, 255, 255, 0.9), 0 0 15px rgba(52, 152, 219, 0.6);
+            55% {
+                /* Пик вспышки попадает ровно на максимум увеличения */
+                text-shadow: 0 0 40px rgba(255, 255, 255, 1), 0 0 20px rgba(52, 152, 219, 0.8);
             }
             100% {
-                /* Стабильное мягкое свечение */
+                /* Финальное мягкое свечение */
                 text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
             }
         }
 
-        /* Keyframes: Блик света, пробегающий слева направо */
+        /* Keyframes: Блик света, пробегающий по тексту */
         @keyframes lightFlash {
             0% {
                 left: -150%;
