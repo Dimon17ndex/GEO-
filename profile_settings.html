@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GEOГРАФИЯ — Характеристики профиля</title>
+    <title>GEOГРАФИЯ — Сессия</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js" defer></script>
@@ -13,15 +13,17 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800;900&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="beginning.css">
 
     <style>
+        /* Когда пользователь вошел — гарантированно скрываем центральную кнопку */
         body.user-logged-in #open-auth-btn {
             display: none !important;
         }
 
+        /* Плавное проявление и затухание страницы */
         body {
             opacity: 0;
             transition: opacity 0.5s ease;
@@ -31,10 +33,12 @@
             opacity: 1;
         }
 
+        /* Класс для плавного угасания перед переходом */
         body.page-hidden {
             opacity: 0 !important;
         }
 
+        /* Позиционирование бренд-блока в верхнем левом углу */
         .top-left-brand {
             position: fixed;
             top: 40px;
@@ -75,6 +79,7 @@
             animation: floatingText 4.5s ease-in-out infinite alternate !important;
         }
 
+        /* Анимация левитации */
         @keyframes floatingLogo {
             0% { transform: translateY(0px) rotate(0deg); }
             50% { transform: translateY(-8px) rotate(-1.5deg); }
@@ -88,140 +93,52 @@
         }
 
         /* =========================================================
-   ВИДЖЕТ ПРОФИЛЯ — ПОЛНАЯ ЗАЩИТА ОТ СРЫВА HOVER
-   ========================================================= */
-.top-right-profile {
-    position: fixed;
-    top: 40px;
-    right: 140px;
-    z-index: 10;
-}
+           БЛОК АККАУНТА ПО ЦЕНТРУ ВВЕРХУ (БЕЗ ПЛАШКИ)
+           ========================================================= */
+        .top-center-account {
+            position: fixed;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            text-align: center;
+        }
 
-/* 1. Карточка профиля */
-.profile-card {
-    position: relative;
-    display: inline-block;
-    padding: 10px 18px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 12px;
-    backdrop-filter: blur(10px);
-    cursor: pointer;
-    transition: background 0.3s ease, border-color 0.3s ease;
-}
+        .account-title-large {
+            font-family: 'Unbounded', sans-serif;
+            font-size: 24px;
+            font-weight: 900;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            white-space: nowrap;
+        }
 
-.profile-card:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.3);
-}
+        .logout-simple-btn {
+            background: transparent;
+            border: 1px solid rgba(231, 76, 60, 0.5);
+            color: #e74c3c;
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
 
-.profile-username {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    color: #ffffff;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
+        .logout-simple-btn:hover {
+            background: #e74c3c;
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+        }
 
-.profile-username::after {
-    content: '▾';
-    font-size: 10px;
-    opacity: 0.6;
-    transition: transform 0.2s ease;
-}
-
-.profile-card:hover .profile-username::after {
-    transform: rotate(180deg);
-}
-
-/* 2. Контейнер выпадающего меню */
-.profile-dropdown-menu {
-    position: absolute;
-    top: 100%;             /* Зацепка ровно за нижний край карточки */
-    left: 0;
-    right: 0;
-    padding-top: 8px;      /* Заменяем внешние зазоры внутренними */
-    display: flex;
-    flex-direction: column;
-    gap: 6px;              /* Расстояние между кнопками */
-
-    /* Визуальное скрытие */
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-4px);
-    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
-    
-    /* Отключаем клики в скрытом состоянии */
-    pointer-events: none;
-}
-
-/* 3. НЕВИДИМАЯ ПОДУШКА-СОЕДИНИТЕЛЬ (Убирает все провалы) */
-.profile-dropdown-menu::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -10px;           /* Немного расширяем зону по бокам */
-    right: -10px;
-    bottom: -10px;         /* И снизу, чтобы мышь не соскакивала */
-    z-index: -1;
-    background: transparent;
-}
-
-/* 4. Открытие и удержание при наведении на ЛЮБОЙ элемент этой зоны */
-.profile-card:hover .profile-dropdown-menu,
-.profile-dropdown-menu:hover {
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: translateY(0) !important;
-    pointer-events: auto !important;
-}
-
-/* 5. Кнопки внутри меню */
-.profile-settings-btn,
-.logout-dropdown-btn {
-    width: 100%;
-    border: none;
-    border-radius: 8px;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    cursor: pointer;
-    box-sizing: border-box;
-    position: relative;
-    z-index: 2;            /* Кнопки поверх невидимой подушки */
-}
-
-/* Синяя кнопка */
-.profile-settings-btn {
-    padding: 10px 8px;
-    background: #3498db;
-    color: #ffffff;
-    font-size: 12px;
-    transition: background 0.2s ease;
-    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
-    text-align: center;
-}
-
-.profile-settings-btn:hover {
-    background: #2980b9;
-}
-
-/* Красная кнопка */
-.logout-dropdown-btn {
-    padding: 10px 0;
-    background: #e74c3c;
-    color: #ffffff;
-    font-size: 13px;
-    transition: background 0.2s ease;
-    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
-}
-
-.logout-dropdown-btn:hover {
-    background: #c0392b;
-}
-
+        /* Контейнер для размещения статуса строго по центру экрана */
         .center-status-wrapper {
             position: fixed;
             top: 50%;
@@ -236,6 +153,7 @@
             pointer-events: auto;
         }
 
+        /* Серый статус "ЗДЕСЬ ПОКА ПУСТО" */
         .empty-status-message {
             font-family: 'Montserrat', sans-serif;
             font-size: 13px;
@@ -246,6 +164,7 @@
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
         }
 
+        /* Секретная панель администратора */
         .dev-side-panel {
             position: fixed;
             top: 50%;
@@ -293,6 +212,21 @@
             border-color: #3498db;
             background: rgba(52, 152, 219, 0.2);
         }
+
+        .reset-open-link {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+            text-decoration: underline;
+            transition: color 0.2s ease;
+        }
+
+        .reset-open-link:hover {
+            color: #ffffff;
+        }
     </style>
 </head>
 <body>
@@ -300,14 +234,15 @@
     <div class="app-banners-container">
         <div class="app-banner banner-warning">
             <span class="banner-icon">🛠</span>
-            <span>ХАРАКТЕРИСТИКИ ПРОФИЛЯ (Разработка)</span>
+            <span>Ведется разработка сайта в раннем доступе</span>
         </div>
     </div>
 
     <div class="shadow-layer"></div>
+
     <div id="bg-wave-container"></div>
 
-    <div class="top-left-brand" onclick="navigateToPage('beginning.html')" style="cursor: pointer;">
+    <div class="top-left-brand">
         <div class="db-brand-block">
             <img src="images/geo_logo.png" alt="Geo Logo" class="db-logo-icon">
             <div class="db-text-right">
@@ -316,59 +251,17 @@
         </div>
     </div>
 
+    <div id="user-profile-widget" class="top-center-account" style="display: none;">
+        <div class="account-title-large" id="profile-email-text">ПРОФИЛЬ</div>
+        <button type="button" class="logout-simple-btn" onclick="logoutUser()">Выйти</button>
+    </div>
+
     <div class="center-status-wrapper">
         <button type="button" id="open-auth-btn" class="auth-trigger-btn" onclick="showAuthModal()">
             Войти / Зарегистрироваться
         </button>
-        <div class="empty-status-message">ХАРАКТЕРИСТИКИ ПРОФИЛЯ</div>
-    </div>
 
-    <div class="settings-trigger-zone" id="settings-btn" style="opacity: 1; pointer-events: auto;">
-        <div class="settings-container-box">
-            <div class="settings-icon-box">
-                <svg class="gear-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.15a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                </svg>
-            </div>
-            <span class="settings-label">Настройки</span> 
-            <div class="settings-horizontal-line"></div>
-            <div class="settings-divider"></div>
-            <div class="volume-btn" id="volume-toggle-btn">
-                <svg class="volume-svg" id="volume-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                    <path class="volume-wave-1" d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-                    <path class="volume-wave-2" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                </svg>
-                <div class="volume-label" id="volume-status-label">музыка <span class="status-on">on</span> / <span class="status-off">off</span></div>
-            </div>
-            <div class="intensity-control-box">
-                <div class="intensity-btn">
-                    <svg class="intensity-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
-                        <circle cx="12" cy="12" r="4"/>
-                    </svg>
-                    <div class="intensity-label">интенсивность эмбиентных волн <span id="intensity-value">20%</span></div>
-                </div>
-                <div class="slider-wrapper">
-                    <input type="range" id="wave-intensity-slider" min="0" max="100" value="20">
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="user-profile-widget" class="top-right-profile" style="display: none;">
-        <div class="profile-card">
-            <span class="profile-username" id="profile-email-text">Профиль</span>
-            <div class="profile-dropdown-menu">
-                <button type="button" class="profile-settings-btn" onclick="navigateToPage('profile_settings.html')">
-                    Характеристики профиля
-                </button>
-                <button type="button" class="logout-dropdown-btn" onclick="logoutUser()">
-                    Выйти
-                </button>
-            </div>
-        </div>
+        <div class="empty-status-message">ЗДЕСЬ ПОКА ПУСТО</div>
     </div>
 
     <div id="dev-side-panel" class="dev-side-panel">
@@ -383,156 +276,114 @@
     <script src="auth-system.js?v=3"></script>
 
     <script>
-    const waveContainer = document.getElementById('bg-wave-container');
-    const volumeStatusLabel = document.getElementById('volume-status-label');
-    const intensitySlider = document.getElementById('wave-intensity-slider');
-    const intensityValueLabel = document.getElementById('intensity-value');
+// Переменные состояния
+const waveContainer = document.getElementById('bg-wave-container');
+let ambientTimeoutId = null;
 
-    let intensityPercent = 20;
-    let ambientTimeoutId = null;
+function createBackgroundRipple(x, y, className, duration = 1500) {
+    if (!waveContainer) return;
+    const ripple = document.createElement('div');
+    ripple.classList.add(className);
+    ripple.style.left = `${x}px`;
+    ripple.style.top = `${y}px`;
+    waveContainer.appendChild(ripple);
+    setTimeout(() => { ripple.remove(); }, duration);
+}
 
-    function createBackgroundRipple(x, y, className, duration = 1500) {
-        if (!waveContainer) return;
-        const ripple = document.createElement('div');
-        ripple.classList.add(className);
-        ripple.style.left = `${x}px`;
-        ripple.style.top = `${y}px`;
-        waveContainer.appendChild(ripple);
-        setTimeout(() => { ripple.remove(); }, duration);
+function spawnAmbientWave() {
+    clearTimeout(ambientTimeoutId);
+
+    let spawnX = 0, spawnY = 0;
+    const side = Math.floor(Math.random() * 4);
+    switch(side) {
+        case 0: spawnX = Math.random() * window.innerWidth; spawnY = -50; break;
+        case 1: spawnX = window.innerWidth + 50; spawnY = Math.random() * window.innerHeight; break;
+        case 2: spawnX = Math.random() * window.innerWidth; spawnY = window.innerHeight + 50; break;
+        case 3: spawnX = -50; spawnY = Math.random() * window.innerHeight; break;
     }
 
-    function spawnAmbientWave() {
-        clearTimeout(ambientTimeoutId);
-        if (intensityPercent === 0) { 
-            ambientTimeoutId = setTimeout(spawnAmbientWave, 1000); 
-            return; 
-        }
+    createBackgroundRipple(spawnX, spawnY, 'bg-ambient-ripple', 3000);
+    ambientTimeoutId = setTimeout(spawnAmbientWave, 3000 + Math.random() * 4000);
+}
 
-        let spawnX = 0, spawnY = 0;
-        const side = Math.floor(Math.random() * 4);
-        switch(side) {
-            case 0: spawnX = Math.random() * window.innerWidth; spawnY = -50; break;
-            case 1: spawnX = window.innerWidth + 50; spawnY = Math.random() * window.innerHeight; break;
-            case 2: spawnX = Math.random() * window.innerWidth; spawnY = window.innerHeight + 50; break;
-            case 3: spawnX = -50; spawnY = Math.random() * window.innerHeight; break;
-        }
+document.body.addEventListener('mousedown', (e) => {
+    createBackgroundRipple(e.clientX, e.clientY, 'bg-click-ripple');
+});
 
-        createBackgroundRipple(spawnX, spawnY, 'bg-ambient-ripple', 3000);
+// Навигация с анимацией
+history.pushState(null, null, location.href);
+window.addEventListener('popstate', function () {
+    navigateToPage('index.html');
+});
 
-        const baseDelay = 500, maxAdditionalDelay = 8000; 
-        const factor = (100 - intensityPercent) / 100;
-        const nextDelay = baseDelay + (Math.random() * maxAdditionalDelay * factor);
+function navigateToPage(targetPage) {
+    const currentPage = window.location.pathname.split('/').pop() || 'beginning.html';
+    if (currentPage === targetPage) return;
 
-        ambientTimeoutId = setTimeout(spawnAmbientWave, nextDelay);
-    }
+    document.body.classList.add('page-hidden');
+    setTimeout(() => {
+        window.location.href = targetPage;
+    }, 500);
+}
 
-    const bgMusic = new Audio('audio/melody_start.mp3');
-    bgMusic.volume = 0.4; 
-    let musicStarted = false;
-
-    function playMusic() {
-        if (musicStarted || bgMusic.muted) return;
-        bgMusic.play().then(() => { musicStarted = true; }).catch(() => {});
-    }
-
-    bgMusic.addEventListener('ended', () => {
-        setTimeout(() => { if (!bgMusic.muted) bgMusic.play(); }, 5000); 
+// Загрузка страницы
+document.addEventListener('DOMContentLoaded', () => {
+    requestAnimationFrame(() => {
+        document.body.classList.add('page-loaded');
     });
 
-    document.body.addEventListener('mousedown', (e) => {
-        if (e.target.closest('#settings-btn') || e.target.closest('.settings-trigger-zone')) return;
-        playMusic();
-        createBackgroundRipple(e.clientX, e.clientY, 'bg-click-ripple');
-    });
+    setTimeout(() => { spawnAmbientWave(); }, 1000);
 
-    const volumeBtn = document.getElementById('volume-toggle-btn');
-    const volumeIcon = document.getElementById('volume-icon');
-    let isMuted = false;
+    const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
+    const sidePanel = document.getElementById('dev-side-panel');
+    let hideTimeout = null;
 
-    volumeBtn?.addEventListener('click', (e) => {
-        e.stopPropagation(); 
-        isMuted = !isMuted;
-        bgMusic.muted = isMuted;
-        
-        if (isMuted) {
-            volumeStatusLabel?.classList.add('muted-mode');
-            volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15" stroke="currentColor" stroke-width="1.5"></line><line x1="17" y1="9" x2="23" y2="15" stroke="currentColor" stroke-width="1.5"></line>`;
-        } else {
-            volumeStatusLabel?.classList.remove('muted-mode');
-            volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path class="volume-wave-1" d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path class="volume-wave-2" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>`;
-            playMusic();
-        }
-    });
+    async function initDevPanel() {
+        const client = window.supabaseClient || window.supabase;
+        if (!client) return;
 
-    intensitySlider?.addEventListener('mousedown', (e) => { e.stopPropagation(); });
-    intensitySlider?.addEventListener('input', (e) => {
-        intensityPercent = parseInt(e.target.value);
-        if (intensityValueLabel) intensityValueLabel.innerText = `${intensityPercent}%`;
-    });
-
-    function navigateToPage(targetPage) {
-        const currentPage = window.location.pathname.split('/').pop() || 'profile_settings.html';
-        if (currentPage === targetPage) return;
-
-        document.body.classList.add('page-hidden');
-        setTimeout(() => {
-            window.location.href = targetPage;
-        }, 500);
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        requestAnimationFrame(() => {
-            document.body.classList.add('page-loaded');
-        });
-
-        setTimeout(() => { spawnAmbientWave(); }, 1000);
-
-        const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
-        const sidePanel = document.getElementById('dev-side-panel');
-        let hideTimeout = null;
-
-        async function initDevPanel() {
-            const client = window.supabaseClient || window.supabase;
-            if (!client) return;
-
-            try {
-                const { data: { session } } = await client.auth.getSession();
-                if (session?.user?.email === DEV_EMAIL) {
-                    setupHoverDetection();
-                }
-            } catch (err) {
-                console.error('Ошибка проверки прав разработчика:', err);
+        try {
+            const { data: { session } } = await client.auth.getSession();
+            if (session?.user?.email === DEV_EMAIL) {
+                setupHoverDetection();
             }
+        } catch (err) {
+            console.error('Ошибка проверки прав разработчика:', err);
         }
+    }
 
-        function setupHoverDetection() {
-            if (!sidePanel) return;
+    function setupHoverDetection() {
+        if (!sidePanel) return;
 
-            document.addEventListener('mousemove', (e) => {
-                const distanceFromRight = window.innerWidth - e.clientX;
-                if (distanceFromRight <= 60) {
-                    clearTimeout(hideTimeout);
-                    sidePanel.classList.add('visible');
-                }
-            });
-
-            sidePanel.addEventListener('mouseenter', () => {
+        document.addEventListener('mousemove', (e) => {
+            const distanceFromRight = window.innerWidth - e.clientX;
+            if (distanceFromRight <= 60) {
                 clearTimeout(hideTimeout);
                 sidePanel.classList.add('visible');
-            });
+            }
+        });
 
-            sidePanel.addEventListener('mouseleave', () => {
-                hideTimeout = setTimeout(() => {
-                    sidePanel.classList.remove('visible');
-                }, 2000);
-            });
-        }
+        sidePanel.addEventListener('mouseenter', () => {
+            clearTimeout(hideTimeout);
+            sidePanel.classList.add('visible');
+        });
 
-        initDevPanel();
-    });
-    </script>
+        sidePanel.addEventListener('mouseleave', () => {
+            hideTimeout = setTimeout(() => {
+                sidePanel.classList.remove('visible');
+            }, 2000);
+        });
+    }
+
+    initDevPanel();
+});
+</script>
 
     <script src="app.js"></script>
     <script src="reset-password.js"></script>
+
+    <button type="button" class="reset-open-link" onclick="showResetModal('request')">
+        Забыли пароль?
+    </button>
 </body>
 </html>
