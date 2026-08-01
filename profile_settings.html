@@ -88,7 +88,7 @@
         }
 
         /* =========================================================
-   ВИДЖЕТ ПРОФИЛЯ В ВЕРХНЕМ ПРАВОМ УГЛУ (Без мерцания)
+   ВИДЖЕТ ПРОФИЛЯ (БЕЗ ПРОВАЛОВ И МЕРЦАНИЯ)
    ========================================================= */
 .top-right-profile {
     position: fixed;
@@ -139,46 +139,35 @@
 /* Выпадающий контейнер для кнопок */
 .profile-dropdown-menu {
     position: absolute;
-    top: 100%;             /* Привязываем строго к нижнему краю карточки */
+    top: 100%;             /* Привязываем вплотную к низу карточки */
     left: 0;
     width: 100%;
-    padding-top: 8px;      /* Отступ переносим внутрь контейнера, чтобы не было дыры */
+    padding-top: 8px;      /* Отступ от названия профиля до синей кнопки */
     display: flex;
     flex-direction: column;
-    gap: 6px;
     
     /* Скрыто по умолчанию */
     opacity: 0;
     visibility: hidden;
     transform: translateY(-5px);
     transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
-    pointer-events: none;  /* Запрещаем клики в скрытом состоянии */
+    pointer-events: none;
 }
 
-/* Невидимый мостик-прокладка, исключающий срыв ховера */
-.profile-dropdown-menu::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-}
-
-/* Появление меню при наведении на карточку или на само меню */
+/* При наведении на карточку ИЛИ на само меню — оно остается видимым */
 .profile-card:hover .profile-dropdown-menu,
 .profile-dropdown-menu:hover {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
-    pointer-events: auto; /* Включаем клики при открытии */
+    pointer-events: auto;
 }
 
 /* Синяя кнопка "Характеристики профиля" */
 .profile-settings-btn {
     width: 100%;
     padding: 10px 8px;
+    margin-bottom: 6px;    /* Безопасный отступ до красной кнопки без разрыва ховера */
     background: #3498db;
     color: #ffffff;
     border: none;
