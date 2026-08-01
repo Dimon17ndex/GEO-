@@ -168,7 +168,7 @@ function injectResetStyles() {
             box-shadow: none !important;
             padding: 0 !important;
             width: 100% !important;
-            max-width: 320px !important;
+            max-width: 300px !important;
             position: relative !important;
             color: #ffffff !important;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
@@ -231,16 +231,13 @@ function injectResetStyles() {
             transform: scale(0.9) rotate(90deg) !important;
         }
 
-        /* Выделенный независимый блок заголовка выше табов */
         .reset-header-title {
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 18px !important;
-            margin-top: -35px !important;
-            margin-bottom: 35px !important;
-            width: 100% !important;
-            pointer-events: none !important; /* Чтобы лого и текст не перехватывали клики */
+            gap: 20px !important;
+            margin-top: -30px !important;
+            margin-bottom: 30px !important;
         }
 
         .reset-logo-wrapper {
@@ -252,7 +249,7 @@ function injectResetStyles() {
         }
 
         .reset-header-logo {
-            height: 90px !important;
+            height: 105px !important;
             width: auto !important;
             display: block !important;
             object-fit: contain !important;
@@ -265,7 +262,7 @@ function injectResetStyles() {
         }
 
         .reset-title-ticker {
-            height: 50px !important;
+            height: 55px !important;
             overflow: hidden !important;
             position: relative !important;
         }
@@ -277,10 +274,10 @@ function injectResetStyles() {
         }
 
         .reset-title-track span {
-            height: 50px !important;
-            line-height: 50px !important;
+            height: 55px !important;
+            line-height: 55px !important;
             font-family: 'Unbounded', sans-serif !important;
-            font-size: 26px !important;
+            font-size: 32px !important;
             font-weight: 900 !important;
             letter-spacing: -0.5px !important;
             color: #ffffff !important;
@@ -292,8 +289,8 @@ function injectResetStyles() {
 
         @keyframes resetTitleVerticalScroll {
             0%, 20% { transform: translateY(0); }
-            25%, 45% { transform: translateY(-50px); }
-            50%, 70% { transform: translateY(-50px); }
+            25%, 45% { transform: translateY(-55px); }
+            50%, 70% { transform: translateY(-55px); }
             75%, 100% { transform: translateY(0); }
         }
 
@@ -305,9 +302,8 @@ function injectResetStyles() {
             border-radius: 24px !important;
             padding: 3px !important;
             width: 100% !important;
-            margin-bottom: 25px !important;
+            margin-bottom: 30px !important;
             box-sizing: border-box !important;
-            z-index: 10 !important;
         }
 
         .reset-tab-pill {
@@ -331,7 +327,7 @@ function injectResetStyles() {
             position: relative !important;
             z-index: 2 !important;
             flex: 1 !important;
-            padding: 8px 14px !important;
+            padding: 7px 14px !important;
             background: transparent !important;
             border: none !important;
             color: rgba(255, 255, 255, 0.5) !important;
@@ -607,7 +603,6 @@ function initResetModalUI() {
             <img src="images/geo_logo.png" alt="" class="reset-bg-watermark">
 
             <div class="reset-modal-container">
-                
                 <div class="reset-header-title">
                     <div class="reset-logo-wrapper">
                         <img src="images/geo_logo.png" alt="Geo Logo" class="reset-header-logo">
