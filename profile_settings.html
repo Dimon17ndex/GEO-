@@ -289,7 +289,7 @@
             cursor: pointer;
             backdrop-filter: blur(10px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease, color 0.25s ease;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .action-btn-styled:hover {
@@ -349,13 +349,12 @@
         }
 
         /* =========================================================
-           БЛОК ВЫХОДА ВНУТРИ КОНТЕЙНЕРА (ВЫРАВНЕН ПО ПРАВОМУ КРАЮ)
+           БЛОК ВЫХОДА ВНУТРИ КОНТЕЙНЕРА
            ========================================================= */
         .session-logout-section {
             display: flex;
             flex-direction: column;
-            align-items: flex-end; /* Выравнивание по правому краю */
-            gap: 10px;
+            gap: 12px;
             width: 100%;
         }
 
@@ -366,16 +365,21 @@
             color: rgba(255, 255, 255, 0.7);
             letter-spacing: 0.5px;
             text-transform: uppercase;
-            text-align: right;
+            align-self: flex-start; /* Выравнивание текста по левому краю */
+            text-align: left;
         }
 
-        /* Переопределение поведения для кнопки выхода со стилями action-btn-styled */
+        .logout-btn-override {
+            align-self: flex-end; /* Выравнивание кнопки по правому краю */
+        }
+
+        /* Эффект наведения как на профиль из beginning */
         .logout-btn-override:hover {
-            background: rgba(231, 76, 60, 0.2);
-            border-color: rgba(231, 76, 60, 0.6);
-            color: #ff6b6b;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(231, 76, 60, 0.2);
+            background: rgba(255, 255, 255, 0.22);
+            border-color: rgba(255, 255, 255, 0.5);
+            color: #ffffff;
+            transform: scale(1.03);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.25), 0 10px 25px rgba(0, 0, 0, 0.3);
         }
 
         .center-status-wrapper {
