@@ -108,7 +108,7 @@
             text-align: center;
         }
 
-        /* ТЕКСТ АККАУНТА — ПРЫЖОК, БЛЮР И ВСПЫШКА НАЗНАЧЕНЫ СУДА */
+        /* ТЕКСТ АККАУНТА — ПРЫЖОК, БЛЮР И ВСПЫШКА */
         .account-title-large {
             position: relative;
             font-family: 'Unbounded', sans-serif;
@@ -126,25 +126,27 @@
             will-change: transform, filter, opacity;
         }
 
-        /* Бегущий световой блик по надписи */
+        /* СВЕТОВОЙ БЛИК (Улетает за края экрана и растворяется) */
         .account-title-large::after {
             content: '';
             position: absolute;
-            top: 0;
-            left: -150%;
-            width: 100%;
-            height: 100%;
+            top: -50%;
+            left: -200vw;
+            width: 100vw;
+            height: 200%;
             background: linear-gradient(
                 90deg, 
                 transparent 0%, 
-                rgba(255, 255, 255, 0.9) 50%, 
+                rgba(255, 255, 255, 0.95) 50%, 
                 transparent 100%
             );
-            transform: skewX(-25deg);
-            animation: lightFlash 1.2s ease-out 0.3s 1 forwards;
+            transform: skewX(-30deg);
+            pointer-events: none;
+            /* Запуск блика во время пика прыжка */
+            animation: lightFlash 1.2s ease-out 0.4s 1 forwards;
         }
 
-        /* Keyframes: АНИМАЦИЯ ПРЫЖКА И БЛЮРА (относительно своего центра) */
+        /* Keyframes: АНИМАЦИЯ ПРЫЖКА И БЛЮРА */
         @keyframes accountBlurBounce {
             0% {
                 opacity: 0;
@@ -154,16 +156,16 @@
             60% {
                 opacity: 1;
                 filter: blur(2px);
-                transform: scale(1.35); /* Пиковый прыжок / увеличение */
+                transform: scale(1.35); /* Пиковый прыжок */
             }
             80% {
                 filter: blur(0px);
-                transform: scale(0.92);  /* Пружинящий отскок назад */
+                transform: scale(0.92);  /* Пружинящий отскок */
             }
             100% {
                 opacity: 1;
                 filter: blur(0px);
-                transform: scale(1);     /* Финальный нормальный размер */
+                transform: scale(1);     /* Окончательный размер */
             }
         }
 
@@ -180,13 +182,21 @@
             }
         }
 
-        /* Keyframes: БЛИК */
+        /* Keyframes: ДВИЖЕНИЕ БЛИКА ЗА ПРЕДЕЛЫ ЭКРАНА И ЕГО ИСЧЕЗНОВЕНИЕ */
         @keyframes lightFlash {
             0% {
-                left: -150%;
+                left: -200vw;
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
             }
             100% {
-                left: 150%;
+                left: 200vw;
+                opacity: 0; /* Полное исчезновение */
             }
         }
 
