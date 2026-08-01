@@ -105,7 +105,7 @@
         }
 
         /* =========================================================
-           ВИДЖЕТ ПРОФИЛЯ В ВЕРХНЕМ ПРАВОМ УГЛУ (выпадает Выйти)
+           ВИДЖЕТ ПРОФИЛЯ В ВЕРХНЕМ ПРАВОМ УГЛУ
            ========================================================= */
         .top-right-profile {
             position: fixed;
@@ -154,11 +154,53 @@
             transform: rotate(180deg);
         }
 
-        /* Выпадающая кнопка "Выйти" */
-        .logout-dropdown-btn {
+        /* Выпадающее меню профиля */
+        .profile-dropdown-menu {
             position: absolute;
             top: calc(100% + 8px);
             left: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            
+            /* Скрыто по умолчанию */
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-5px);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Появление меню при наведении на карточку профиля */
+        .profile-card:hover .profile-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        /* Синяя кнопка "Характеристики профиля" */
+        .profile-settings-btn {
+            width: 100%;
+            padding: 10px 8px;
+            background: #3498db;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            text-align: center;
+        }
+
+        .profile-settings-btn:hover {
+            background: #2980b9;
+        }
+
+        /* Красная кнопка "Выйти" */
+        .logout-dropdown-btn {
             width: 100%;
             padding: 10px 0;
             background: #e74c3c;
@@ -169,20 +211,8 @@
             font-size: 13px;
             font-weight: 700;
             cursor: pointer;
-            
-            /* Скрыта по умолчанию */
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-5px);
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: background 0.2s ease;
             box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
-        }
-
-        /* Появление кнопки при наведении на карточку профиля */
-        .profile-card:hover .logout-dropdown-btn {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
         }
 
         .logout-dropdown-btn:hover {
@@ -268,19 +298,19 @@
         }
 
         .reset-open-link {
-    background: transparent;
-    border: none;
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 13px;
-    font-family: 'Montserrat', sans-serif;
-    cursor: pointer;
-    text-decoration: underline;
-    transition: color 0.2s ease;
-}
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+            text-decoration: underline;
+            transition: color 0.2s ease;
+        }
 
-.reset-open-link:hover {
-    color: #ffffff;
-}
+        .reset-open-link:hover {
+            color: #ffffff;
+        }
     </style>
 </head>
 <body>
@@ -350,7 +380,14 @@
     <div id="user-profile-widget" class="top-right-profile" style="display: none;">
         <div class="profile-card">
             <span class="profile-username" id="profile-email-text">Профиль</span>
-            <button type="button" class="logout-dropdown-btn" onclick="logoutUser()">Выйти</button>
+            <div class="profile-dropdown-menu">
+                <button type="button" class="profile-settings-btn" onclick="navigateToPage('profile_settings.html')">
+                    Характеристики профиля
+                </button>
+                <button type="button" class="logout-dropdown-btn" onclick="logoutUser()">
+                    Выйти
+                </button>
+            </div>
         </div>
     </div>
 
@@ -550,7 +587,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <script src="reset-password.js"></script>
 
     <button type="button" class="reset-open-link" onclick="showResetModal('request')">
-    Забыли пароль?
-</button>
+        Забыли пароль?
+    </button>
 </body>
 </html>
