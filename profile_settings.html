@@ -200,7 +200,7 @@
         }
 
         /* =========================================================
-           БЛОК С КНОПКАМИ (БЕЗ ИКОНОК И ПОДСВЕТКИ ПРИ НАВЕДЕНИИ)
+           БЛОК С КНОПКАМИ (ВЫДЕЛЕНИЕ ПРИ НАВЕДЕНИИ БЕЗ ПОДСВЕТКИ СНИЗУ)
            ========================================================= */
         .account-actions-container {
             position: absolute;
@@ -216,7 +216,7 @@
             filter: blur(10px);
             transform: translateY(15px);
 
-            /* Задержка появления под анимацию аккаунта */
+            /* Появление с задержкой под конец прыжка аккаунта */
             animation: actionsAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.2s forwards;
         }
 
@@ -235,15 +235,15 @@
             cursor: pointer;
             backdrop-filter: blur(10px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            /* Убраны анимации изменения цвета при наведении */
-            transition: none;
+            transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
         }
 
-        /* Наведение оставлено базовым без подсветки и движения */
+        /* Выделение при наведении: кнопка становиться ярче и немного сдвигается, без внешнего свечения */
         .action-btn-styled:hover {
-            background: rgba(255, 255, 255, 0.07);
-            border-color: rgba(255, 255, 255, 0.18);
-            transform: none;
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateX(4px);
+            /* Обычная тень остаётся базовой, без цветного свечения */
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         }
 
