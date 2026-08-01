@@ -12,6 +12,7 @@ if (!window.supabaseClient && window.supabase) {
 }
 
 let currentResetMode = 'request'; // 'request' или 'update'
+let isUpdateUnlocked = false;    // Флаг доступности вкладки «Замена»
 
 // --- ГЛОБАЛЬНЫЕ ФУНКЦИИ ---
 window.showResetModal = function(mode = 'request') {
@@ -39,7 +40,6 @@ window.hideResetModal = function() {
     }
 };
 
-// Показ плашки подтверждения закрытия с радиальной волной
 function showResetConfirmToast() {
     const toast = document.getElementById('reset-confirm-toast');
     const wave = document.getElementById('reset-confirm-wave');
@@ -48,7 +48,7 @@ function showResetConfirmToast() {
         toast.classList.remove('hiding', 'visible');
         if (wave) wave.classList.remove('active');
 
-        void toast.offsetWidth; // Перезапуск анимации
+        void toast.offsetWidth;
 
         toast.classList.add('visible');
         if (wave) wave.classList.add('active');
@@ -74,27 +74,28 @@ function hideResetConfirmToast(immediate = false) {
 }
 
 function setResetMode(mode) {
-    if (currentResetMode === mode && document.querySelector('.reset-form.visible')) return;
+    // Если пытаемся перейти на "Замену", но она ещё не разблокирована
+    if (mode === 'update' && !isUpdateUnlocked && currentResetMode !== 'update') {
+        return; 
+    }
+
     currentResetMode = mode;
 
-    const resetTabs = document.getElementById('reset-tabs');
     const tabRequest = document.getElementById('tab-request-btn');
     const tabUpdate = document.getElementById('tab-update-btn');
     
     const formRequest = document.getElementById('reset-form-request');
     const formUpdate = document.getElementById('reset-form-update');
 
-    if (!resetTabs || !tabRequest || !tabUpdate || !formRequest || !formUpdate) return;
+    if (!tabRequest || !tabUpdate || !formRequest || !formUpdate) return;
 
     if (mode === 'request') {
-        resetTabs.classList.remove('update-mode');
         tabRequest.classList.add('active');
         tabUpdate.classList.remove('active');
 
         formUpdate.classList.remove('visible');
         formRequest.classList.add('visible');
     } else {
-        resetTabs.classList.add('update-mode');
         tabUpdate.classList.add('active');
         tabRequest.classList.remove('active');
 
@@ -113,13 +114,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.supabaseClient) {
         window.supabaseClient.auth.onAuthStateChange((event) => {
             if (event === 'PASSWORD_RECOVERY') {
+                isUpdateUnlocked = true;
+                const tabUpdate = document.getElementById('tab-update-btn');
+                if (tabUpdate) {
+                    tabUpdate.classList.remove('disabled');
+                    tabUpdate.removeAttribute('disabled');
+                }
                 window.showResetModal('update');
             }
         });
     }
 });
 
-// --- СТИЛИ (ПОЛНОЕ СООТВЕТСТВИЕ AUTH-SYSTEM) ---
+// --- СТИЛИ ---
 function injectResetStyles() {
     const existingStyle = document.getElementById('reset-system-styles');
     if (existingStyle) existingStyle.remove();
@@ -131,9 +138,9 @@ function injectResetStyles() {
             left: 0 !important;
             width: 100vw !important;
             height: 100vh !important;
-            background: rgba(10, 10, 12, 0.94) !important;
-            backdrop-filter: blur(12px) !important;
-            -webkit-backdrop-filter: blur(12px) !important;
+            background: rgba(8, 9, 11, 0.95) !important;
+            backdrop-filter: blur(16px) !important;
+            -webkit-backdrop-filter: blur(16px) !important;
             z-index: 9999999 !important;
             display: flex !important;
             align-items: center !important;
@@ -141,7 +148,6 @@ function injectResetStyles() {
             padding: 20px !important;
             box-sizing: border-box !important;
             overflow: hidden !important;
-            
             opacity: 0 !important;
             visibility: hidden !important;
             pointer-events: none !important;
@@ -155,20 +161,18 @@ function injectResetStyles() {
         }
 
         .reset-modal-container {
+            position: relative !important;
+            width: 100% !important;
+            max-width: 760px !important;
+            padding: 40px 50px 60px 50px !important;
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
-            padding: 0 !important;
-            width: 100% !important;
-            max-width: 300px !important;
-            position: relative !important;
             color: #ffffff !important;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            font-family: 'Montserrat', sans-serif !important;
             box-sizing: border-box !important;
             display: flex !important;
             flex-direction: column !important;
-            align-items: center !important;
-            
             transform: scale(0.96) !important;
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
             z-index: 5 !important;
@@ -189,62 +193,44 @@ function injectResetStyles() {
             40%, 60% { transform: scale(1) translateX(6px); }
         }
 
-        /* --- КРЕСТИК ЗАКРЫТИЯ --- */
+        /* КРЕСТИК ЗАКРЫТИЯ */
         .reset-close-btn {
             position: absolute !important;
-            top: 30px !important;
-            right: 30px !important;
+            top: -10px !important;
+            right: 0px !important;
             background: transparent !important;
             border: none !important;
-            color: rgba(255, 255, 255, 0.4) !important;
-            font-size: 28px !important;
+            color: rgba(255, 255, 255, 0.3) !important;
+            font-size: 26px !important;
             line-height: 1 !important;
             cursor: pointer !important;
             z-index: 99999999 !important;
-            padding: 0 !important;
-            transform-origin: center center !important;
             transition: color 0.25s ease, transform 0.25s ease !important;
-        }
-
-        .reset-close-btn::before {
-            content: '' !important;
-            position: absolute !important;
-            top: -12px !important;
-            bottom: -12px !important;
-            left: -12px !important;
-            right: -12px !important;
         }
 
         .reset-close-btn:hover {
             color: #ffffff !important;
-            transform: scale(1.15) rotate(90deg) !important;
+            transform: scale(1.15) !important;
         }
 
-        .reset-close-btn:active {
-            transform: scale(0.9) rotate(90deg) !important;
-        }
-
-        /* --- ШАПКА, ЛОГОТИП И СКРОЛЛ ТЕКСТА --- */
+        /* ВЕРХНИЙ ЛОГОТИП С НАЗВАНИЕМ */
         .reset-header-title {
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 20px !important;
-            margin-top: -150px !important; /* Подняли еще выше к самому краю */
-            margin-bottom: 45px !important;  /* Комфортный отступ до табов */
-            transition: all 0.3s ease !important;
+            gap: 16px !important;
+            margin-bottom: 50px !important;
         }
 
         .reset-logo-wrapper {
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            will-change: transform !important;
-            animation: resetLogoHover 3s ease-in-out infinite alternate !important;
+            animation: resetLogoHover 4s ease-in-out infinite alternate !important;
         }
 
         .reset-header-logo {
-            height: 105px !important;
+            height: 48px !important;
             width: auto !important;
             display: block !important;
             object-fit: contain !important;
@@ -252,97 +238,61 @@ function injectResetStyles() {
 
         @keyframes resetLogoHover {
             0% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-8px) rotate(-2deg); }
-            100% { transform: translateY(6px) rotate(2deg); }
+            50% { transform: translateY(-5px) rotate(-1deg); }
+            100% { transform: translateY(4px) rotate(1deg); }
         }
 
-        .reset-title-ticker {
-            height: 55px !important;
-            overflow: hidden !important;
-            position: relative !important;
-        }
-
-        .reset-title-track {
-            display: flex !important;
-            flex-direction: column !important;
-            animation: resetTitleVerticalScroll 8s cubic-bezier(0.77, 0, 0.175, 1) infinite !important;
-        }
-
-        .reset-title-track span {
-            height: 55px !important;
-            line-height: 55px !important;
+        .reset-brand-text {
             font-family: 'Unbounded', sans-serif !important;
-            font-size: 32px !important;
+            font-size: 26px !important;
             font-weight: 900 !important;
             letter-spacing: -0.5px !important;
             color: #ffffff !important;
             text-transform: uppercase !important;
-            white-space: nowrap !important;
-            display: flex !important;
-            align-items: center !important;
         }
 
-        @keyframes resetTitleVerticalScroll {
-            0%, 20% { transform: translateY(0); }
-            25%, 45% { transform: translateY(-55px); }
-            50%, 70% { transform: translateY(-55px); }
-            75%, 100% { transform: translateY(0); }
-        }
-
-        /* --- ТАБЫ И ФОРМЫ --- */
+        /* ТАБЫ "ЗАПРОС" И "ЗАМЕНА" */
         .reset-tabs {
             position: relative !important;
             display: flex !important;
-            background: rgba(255, 255, 255, 0.04) !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
-            border-radius: 24px !important;
-            padding: 3px !important;
+            justify-content: space-between !important;
+            align-items: center !important;
             width: 100% !important;
-            margin-bottom: 110px !important;
-            box-sizing: border-box !important;
-        }
-
-        .reset-tab-pill {
-            position: absolute !important;
-            top: 3px !important;
-            left: 3px !important;
-            width: calc(50% - 3px) !important;
-            height: calc(100% - 6px) !important;
-            background: #ffffff !important;
-            border-radius: 20px !important;
-            z-index: 1 !important;
-            transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1) !important;
-            pointer-events: none !important;
-        }
-
-        .reset-tabs.update-mode .reset-tab-pill {
-            transform: translateX(100%) !important;
+            margin-bottom: 70px !important;
         }
 
         .reset-tab-btn {
             position: relative !important;
             z-index: 2 !important;
-            flex: 1 !important;
-            padding: 7px 14px !important;
+            padding: 10px 36px !important;
             background: transparent !important;
-            border: none !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 14px !important;
             color: rgba(255, 255, 255, 0.5) !important;
             font-size: 13px !important;
-            font-weight: 500 !important;
+            font-weight: 700 !important;
             cursor: pointer !important;
-            transition: color 0.3s ease !important;
-            text-align: center !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .reset-tab-btn.disabled {
+            opacity: 0.25 !important;
+            cursor: not-allowed !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
         }
 
         .reset-tab-btn.active {
+            background: #ffffff !important;
+            border-color: #ffffff !important;
             color: #000000 !important;
-            font-weight: 600 !important;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2) !important;
         }
 
+        /* ОБЕРТКА ФОРМ */
         .reset-forms-wrapper {
             position: relative !important;
             width: 100% !important;
-            min-height: 220px !important;
+            min-height: 180px !important;
         }
 
         .reset-form {
@@ -352,13 +302,12 @@ function injectResetStyles() {
             width: 100% !important;
             display: flex !important;
             flex-direction: column !important;
-            gap: 45px !important;
-            
+            align-items: flex-start !important;
+            gap: 50px !important;
             opacity: 0 !important;
             filter: blur(8px) !important;
             pointer-events: none !important;
-            transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
-                        filter 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            transition: opacity 0.35s ease, filter 0.35s ease !important;
         }
 
         .reset-form.visible {
@@ -367,28 +316,33 @@ function injectResetStyles() {
             pointer-events: auto !important;
         }
 
+        /* Форма замены выравнивается вправо согласно макету */
+        #reset-form-update {
+            align-items: flex-end !important;
+        }
+
         .reset-input-group {
             position: relative !important;
             width: 100% !important;
+            max-width: 320px !important;
         }
 
         .reset-input {
             background: transparent !important;
             border: none !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
-            padding: 4px 0 8px 0 !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
+            padding: 8px 0 !important;
             color: #ffffff !important;
             font-size: 13px !important;
-            text-align: center !important;
+            font-weight: 500 !important;
             outline: none !important;
             width: 100% !important;
             box-sizing: border-box !important;
-            transition: border-color 0.25s !important;
+            transition: border-color 0.25s ease !important;
         }
 
         .reset-input::placeholder {
             color: rgba(255, 255, 255, 0.35) !important;
-            text-align: center !important;
         }
 
         .reset-input:focus {
@@ -398,28 +352,47 @@ function injectResetStyles() {
         .reset-submit-btn {
             background: transparent !important;
             color: #ffffff !important;
-            border: 1px solid #ffffff !important;
-            border-radius: 24px !important;
-            padding: 10px 20px !important;
-            font-size: 14px !important;
-            font-weight: 500 !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            border-radius: 14px !important;
+            padding: 12px 36px !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
             cursor: pointer !important;
-            width: 100% !important;
-            margin-top: 45px !important;
-            transition: all 0.2s ease !important;
-            text-align: center !important;
+            transition: all 0.25s ease !important;
         }
 
         .reset-submit-btn:hover {
-            background: #ffffff !important;
-            color: #000000 !important;
+            background: rgba(255, 255, 255, 0.1) !important;
+            border-color: rgba(255, 255, 255, 0.6) !important;
         }
 
-        .reset-submit-btn:active {
-            transform: scale(0.98) !important;
+        /* ЛЕВИТИРУЮЩИЙ ЗАДНИЙ ФОНОВЫЙ ЛОГОТИП */
+        .reset-bg-watermark {
+            position: absolute !important;
+            top: 50% !important;
+            right: -10% !important;
+            width: 900px !important;
+            height: auto !important;
+            pointer-events: none !important;
+            z-index: 1 !important;
+            opacity: 0 !important;
+            filter: blur(20px) brightness(0.6) !important;
+            transition: opacity 1s ease-out, filter 1s ease-out !important;
+            animation: resetIntenseFloat 7s ease-in-out infinite alternate !important;
         }
 
-        /* --- СВЕТОВАЯ РАДИАЛЬНАЯ ВОЛНА --- */
+        .reset-modal-overlay.active .reset-bg-watermark {
+            opacity: 0.15 !important;
+            filter: blur(10px) brightness(0.8) !important;
+        }
+
+        @keyframes resetIntenseFloat {
+            0% { transform: translateY(-50%) rotate(0deg) scale(1); }
+            50% { transform: translateY(-55%) rotate(-4deg) scale(1.03); }
+            100% { transform: translateY(-45%) rotate(3deg) scale(0.97); }
+        }
+
+        /* ВОЛНА И ТОАСТ ПОДТВЕРЖДЕНИЯ ЗАКРЫТИЯ */
         .reset-confirm-wave {
             position: fixed !important;
             bottom: 20px !important;
@@ -427,7 +400,7 @@ function injectResetStyles() {
             width: 10px !important;
             height: 10px !important;
             border-radius: 50% !important;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.25) 30%, rgba(255, 255, 255, 0) 70%) !important;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 70%) !important;
             transform: translate(-50%, 50%) scale(0) !important;
             pointer-events: none !important;
             z-index: 8 !important;
@@ -439,20 +412,10 @@ function injectResetStyles() {
         }
 
         @keyframes resetFullScreenWave {
-            0% {
-                transform: translate(-50%, 50%) scale(1);
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.7;
-            }
-            100% {
-                transform: translate(-50%, 50%) scale(280);
-                opacity: 0;
-            }
+            0% { transform: translate(-50%, 50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, 50%) scale(280); opacity: 0; }
         }
 
-        /* --- ПАНЕЛЬ ПОДТВЕРЖДЕНИЯ --- */
         .reset-confirm-toast {
             position: fixed !important;
             bottom: 30px !important;
@@ -471,39 +434,14 @@ function injectResetStyles() {
             pointer-events: none !important;
             white-space: nowrap !important;
             z-index: 10 !important;
-            transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease !important;
+            transition: all 0.35s ease !important;
         }
 
         .reset-confirm-toast.visible {
             opacity: 1 !important;
             visibility: visible !important;
             pointer-events: auto !important;
-            animation: resetBounceInUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
-        }
-
-        .reset-confirm-toast.hiding {
-            opacity: 0 !important;
-            transform: translateX(-50%) translateY(40px) scale(0.9) !important;
-            pointer-events: none !important;
-            animation: none !important;
-        }
-
-        @keyframes resetBounceInUp {
-            0% {
-                opacity: 0;
-                transform: translateX(-50%) translateY(100px) scale(0.7);
-            }
-            65% {
-                opacity: 1;
-                transform: translateX(-50%) translateY(-12px) scale(1.03);
-            }
-            85% {
-                transform: translateX(-50%) translateY(4px) scale(0.98);
-            }
-            100% {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0) scale(1);
-            }
+            transform: translateX(-50%) translateY(0) scale(1) !important;
         }
 
         .reset-confirm-text {
@@ -525,11 +463,6 @@ function injectResetStyles() {
             border-radius: 12px !important;
             font-size: 12px !important;
             cursor: pointer !important;
-            transition: all 0.2s ease !important;
-        }
-
-        .reset-confirm-btn:hover {
-            background: rgba(255, 255, 255, 0.12) !important;
         }
 
         .reset-confirm-btn.danger {
@@ -537,46 +470,6 @@ function injectResetStyles() {
             color: #000000 !important;
             border-color: #ffffff !important;
             font-weight: 600 !important;
-        }
-
-        .reset-confirm-btn.danger:hover {
-            background: rgba(255, 255, 255, 0.85) !important;
-        }
-
-        /* --- ОГРОМНЫЙ ФОНОВЫЙ ЛОГОТИП СПРАВА С БЛЮРОМ --- */
-        .reset-bg-watermark {
-            position: absolute !important;
-            top: 45% !important;
-            right: -15% !important;
-            left: auto !important;
-            width: 1200px !important;
-            height: auto !important;
-            max-width: none !important;
-            pointer-events: none !important;
-            z-index: 1 !important;
-            transform-origin: center right !important;
-            
-            opacity: 0 !important;
-            filter: blur(45px) brightness(0.6) !important;
-            transition: opacity 1.2s ease-out, filter 1.2s ease-out !important;
-            animation: resetIntenseFloat 6s ease-in-out infinite alternate !important;
-        }
-
-        .reset-modal-overlay.active .reset-bg-watermark {
-            opacity: 0.22 !important;
-            filter: blur(12px) brightness(0.9) !important;
-        }
-
-        @keyframes resetIntenseFloat {
-            0% {
-                transform: translateY(-50%) translateX(0px) rotate(0deg) scale(1);
-            }
-            50% {
-                transform: translateY(-58%) translateX(-25px) rotate(-5deg) scale(1.04);
-            }
-            100% {
-                transform: translateY(-42%) translateX(15px) rotate(4deg) scale(0.96);
-            }
         }
     `;
 
@@ -592,28 +485,21 @@ function initResetModalUI() {
 
     const modalHTML = `
         <div id="reset-modal-overlay" class="reset-modal-overlay">
-            <button id="reset-close-btn" class="reset-close-btn" type="button">&times;</button>
-
             <img src="images/geo_logo.png" alt="" class="reset-bg-watermark">
 
             <div class="reset-modal-container">
+                <button id="reset-close-btn" class="reset-close-btn" type="button">&times;</button>
+
                 <div class="reset-header-title">
                     <div class="reset-logo-wrapper">
                         <img src="images/geo_logo.png" alt="Geo Logo" class="reset-header-logo">
                     </div>
-
-                    <div class="reset-title-ticker">
-                        <div class="reset-title-track">
-                            <span>GEOГРАФИЯ</span>
-                            <span>СБРОС ПАРОЛЯ</span>
-                        </div>
-                    </div>
+                    <span class="reset-brand-text">GEOГРАФИЯ</span>
                 </div>
                 
                 <div class="reset-tabs" id="reset-tabs">
-                    <div class="reset-tab-pill"></div>
                     <button type="button" class="reset-tab-btn active" id="tab-request-btn">Запрос</button>
-                    <button type="button" class="reset-tab-btn" id="tab-update-btn">Замена</button>
+                    <button type="button" class="reset-tab-btn disabled" id="tab-update-btn" disabled>Замена</button>
                 </div>
 
                 <div class="reset-forms-wrapper">
@@ -626,7 +512,7 @@ function initResetModalUI() {
 
                     <form id="reset-form-update" class="reset-form">
                         <div class="reset-input-group">
-                            <input type="password" id="reset-new-password" placeholder="Новый пароль (мин. 6)..." required minlength="6" class="reset-input" autocomplete="new-password">
+                            <input type="password" id="reset-new-password" placeholder="Новый пароль (мин. 6 )..." required minlength="6" class="reset-input" autocomplete="new-password">
                         </div>
                         <button type="submit" class="reset-submit-btn" id="reset-update-btn-text">Сохранить пароль</button>
                     </form>
@@ -645,29 +531,6 @@ function initResetModalUI() {
         </div>
     `;
     document.body.insertAdjacentHTML('beforeend', modalHTML);
-
-    // Добавление тестовой кнопки внизу экрана для быстрой проверки
-    const testBtn = `
-        <button id="test-reset-trigger-btn" type="button" style="
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 99999;
-            padding: 8px 16px;
-            background: #ffffff;
-            color: #000000;
-            border: none;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            transition: transform 0.2s ease;
-        ">
-            🔑 Тест: Сброс пароля
-        </button>
-    `;
-    document.body.insertAdjacentHTML('beforeend', testBtn);
 }
 
 // --- СОБЫТИЯ И ЛОГИКА ---
@@ -682,23 +545,18 @@ function initResetEvents() {
 
     const btnConfirmYes = document.getElementById('reset-confirm-close-btn');
     const btnConfirmNo = document.getElementById('reset-cancel-close-btn');
-    const testTrigger = document.getElementById('test-reset-trigger-btn');
-
-    testTrigger?.addEventListener('click', () => window.showResetModal('request'));
 
     btnConfirmYes?.addEventListener('click', window.hideResetModal);
     btnConfirmNo?.addEventListener('click', () => hideResetConfirmToast(false));
 
     closeBtn?.addEventListener('click', window.hideResetModal);
 
-    // Двойной клик по темному фону вызывает плашку + волну
     overlay?.addEventListener('dblclick', (e) => {
         if (e.target === overlay) {
             showResetConfirmToast();
         }
     });
 
-    // Одиночный клик вызывает покачивание карточки
     overlay?.addEventListener('click', (e) => {
         if (e.target === overlay) {
             const container = document.querySelector('.reset-modal-container');
@@ -721,9 +579,13 @@ function initResetEvents() {
     });
 
     tabRequest?.addEventListener('click', () => setResetMode('request'));
-    tabUpdate?.addEventListener('click', () => setResetMode('update'));
+    tabUpdate?.addEventListener('click', () => {
+        if (isUpdateUnlocked) {
+            setResetMode('update');
+        }
+    });
 
-    // Отправка запроса на получение ссылки сброса
+    // Отправка запроса на письмо
     formRequest?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
@@ -744,8 +606,15 @@ function initResetEvents() {
         if (error) {
             alert(`Ошибка отправки: ${error.message}`);
         } else {
-            alert('Ссылка для сброса пароля успешно отправлена на вашу почту!');
-            window.hideResetModal();
+            alert('Ссылка для сброса пароля отправлена на почту! Теперь активирован режим замены.');
+            
+            // Разблокируем вкладку "Замена" и сразу переключаем на неё
+            isUpdateUnlocked = true;
+            if (tabUpdate) {
+                tabUpdate.classList.remove('disabled');
+                tabUpdate.removeAttribute('disabled');
+            }
+            setResetMode('update');
         }
     });
 
@@ -768,7 +637,7 @@ function initResetEvents() {
         btn.textContent = 'Сохранить пароль';
 
         if (error) {
-            alert(`Ошибка обмена пароля: ${error.message}`);
+            alert(`Ошибка обновления пароля: ${error.message}`);
         } else {
             alert('Пароль успешно изменён!');
             window.hideResetModal();
