@@ -259,58 +259,6 @@
            ========================================================= */
         .account-actions-container {
             position: absolute;
-            top: 255px; /* Сразу под линией */
-            left: 40px;  /* Четко слева */
-            z-index: 95;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            align-items: flex-start;
-
-            opacity: 0;
-            filter: blur(10px);
-            transform: translateY(15px);
-
-            /* Появление после линии */
-            animation: actionsAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.3s forwards;
-        }
-
-        /* =========================================================
-           КРУПНЫЙ ЦЕНТРАЛЬНЫЙ КОНТЕЙНЕР (СКОРРЕКТИРОВАННАЯ ШИРИНА)
-           ========================================================= */
-        .main-profile-container {
-            position: absolute;
-            top: 255px;
-            left: 50%;
-            transform: translateX(-50%) translateY(20px);
-            
-            /* Чуть меньше по бокам: 84% экрана, максимум 920px */
-            width: 84vw;
-            max-width: 920px;
-            
-            /* Высота с комфортным запасом */
-            min-height: 460px; 
-            padding: 30px;
-            box-sizing: border-box;
-
-            /* Стеклянный стиль */
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 22px;
-            backdrop-filter: blur(15px);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-            z-index: 92;
-
-            opacity: 0;
-            filter: blur(12px);
-
-            /* Появление контейнера */
-            animation: containerAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.5s forwards;
-        }
-
-        /* Кнопка слева (задаём z-index выше, чтобы она была поверх расширенного контейнера, если перекрывается) */
-        .account-actions-container {
-            position: absolute;
             top: 255px;
             left: 40px;
             z-index: 98; /* Поверх контейнера */
@@ -324,19 +272,6 @@
             transform: translateY(15px);
 
             animation: actionsAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.3s forwards;
-        }
-
-        @keyframes containerAppear {
-            0% {
-                opacity: 0;
-                filter: blur(12px);
-                transform: translateX(-50%) translateY(20px) scale(0.97);
-            }
-            100% {
-                opacity: 1;
-                filter: blur(0px);
-                transform: translateX(-50%) translateY(0) scale(1);
-            }
         }
 
         .action-btn-styled {
@@ -367,6 +302,95 @@
         @keyframes actionsAppear {
             0% { opacity: 0; filter: blur(10px); transform: translateY(15px); }
             100% { opacity: 1; filter: blur(0px); transform: translateY(0); }
+        }
+
+        /* =========================================================
+           КРУПНЫЙ ЦЕНТРАЛЬНЫЙ КОНТЕЙНЕР
+           ========================================================= */
+        .main-profile-container {
+            position: absolute;
+            top: 255px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            
+            width: 84vw;
+            max-width: 920px;
+            
+            min-height: 460px; 
+            padding: 30px;
+            box-sizing: border-box;
+
+            /* Стеклянный стиль */
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 22px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            z-index: 92;
+
+            opacity: 0;
+            filter: blur(12px);
+
+            /* Появление контейнера */
+            animation: containerAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.5s forwards;
+        }
+
+        @keyframes containerAppear {
+            0% {
+                opacity: 0;
+                filter: blur(12px);
+                transform: translateX(-50%) translateY(20px) scale(0.97);
+            }
+            100% {
+                opacity: 1;
+                filter: blur(0px);
+                transform: translateX(-50%) translateY(0) scale(1);
+            }
+        }
+
+        /* =========================================================
+           БЛОК ВЫХОДА ВНУТРИ КОНТЕЙНЕРА
+           ========================================================= */
+        .session-logout-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* Выравнивание по левому краю */
+            gap: 10px;
+        }
+
+        .logout-label-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .logout-btn-styled {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 32px;
+            background: rgba(231, 76, 60, 0.15);
+            border: 1px solid rgba(231, 76, 60, 0.4);
+            border-radius: 12px;
+            color: #ff6b6b;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .logout-btn-styled:hover {
+            background: rgba(231, 76, 60, 0.3);
+            border-color: rgba(231, 76, 60, 0.7);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(231, 76, 60, 0.3);
         }
 
         .center-status-wrapper {
@@ -480,7 +504,13 @@
     </div>
 
     <div class="main-profile-container" id="main-profile-block">
+        <div class="session-logout-section">
+            <span class="logout-label-text">Завершение сессии/выход из аккаунт</span>
+            <button type="button" class="logout-btn-styled" onclick="handleLogout()">
+                Выйти
+            </button>
         </div>
+    </div>
 
     <div class="center-status-wrapper">
         <button type="button" id="open-auth-btn" class="auth-trigger-btn" onclick="showAuthModal()">
@@ -546,6 +576,20 @@ function navigateToPage(targetPage) {
     setTimeout(() => {
         window.location.href = targetPage;
     }, 500);
+}
+
+async function handleLogout() {
+    const client = window.supabaseClient || window.supabase;
+    
+    try {
+        if (client && client.auth) {
+            await client.auth.signOut();
+        }
+    } catch (err) {
+        console.error('Ошибка при выходе из аккаунта:', err);
+    } finally {
+        navigateToPage('beginning.html');
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
