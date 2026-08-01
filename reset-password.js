@@ -11,8 +11,8 @@ if (!window.supabaseClient && window.supabase) {
     }
 }
 
-let currentResetMode = 'request'; // 'request' или 'update'
-let isUpdateUnlocked = false;    // Флаг доступности вкладки «Замена»
+let currentResetMode = 'request'; 
+let isUpdateUnlocked = false;    
 
 // --- ГЛОБАЛЬНЫЕ ФУНКЦИИ ---
 window.showResetModal = function(mode = 'request') {
@@ -74,7 +74,6 @@ function hideResetConfirmToast(immediate = false) {
 }
 
 function setResetMode(mode) {
-    // Если пытаемся перейти на "Замену", но она ещё не разблокирована
     if (mode === 'update' && !isUpdateUnlocked && currentResetMode !== 'update') {
         return; 
     }
@@ -110,7 +109,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initResetModalUI();
     initResetEvents();
 
-    // Слушатель перехода по ссылке восстановления из письма Supabase
     if (window.supabaseClient) {
         window.supabaseClient.auth.onAuthStateChange((event) => {
             if (event === 'PASSWORD_RECOVERY') {
@@ -141,7 +139,7 @@ function injectResetStyles() {
             background: rgba(8, 9, 11, 0.95) !important;
             backdrop-filter: blur(16px) !important;
             -webkit-backdrop-filter: blur(16px) !important;
-            z-index: 9999999 !important;
+            z-index: 999999 !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
@@ -193,7 +191,6 @@ function injectResetStyles() {
             40%, 60% { transform: scale(1) translateX(6px); }
         }
 
-        /* КРЕСТИК ЗАКРЫТИЯ */
         .reset-close-btn {
             position: absolute !important;
             top: -10px !important;
@@ -213,7 +210,6 @@ function injectResetStyles() {
             transform: scale(1.15) !important;
         }
 
-        /* ВЕРХНИЙ ЛОГОТИП С НАЗВАНИЕМ */
         .reset-header-title {
             display: flex !important;
             align-items: center !important;
@@ -251,7 +247,6 @@ function injectResetStyles() {
             text-transform: uppercase !important;
         }
 
-        /* ТАБЫ "ЗАПРОС" И "ЗАМЕНА" */
         .reset-tabs {
             position: relative !important;
             display: flex !important;
@@ -288,7 +283,6 @@ function injectResetStyles() {
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.2) !important;
         }
 
-        /* ОБЕРТКА ФОРМ */
         .reset-forms-wrapper {
             position: relative !important;
             width: 100% !important;
@@ -316,7 +310,6 @@ function injectResetStyles() {
             pointer-events: auto !important;
         }
 
-        /* Форма замены выравнивается вправо согласно макету */
         #reset-form-update {
             align-items: flex-end !important;
         }
@@ -366,7 +359,6 @@ function injectResetStyles() {
             border-color: rgba(255, 255, 255, 0.6) !important;
         }
 
-        /* ЛЕВИТИРУЮЩИЙ ЗАДНИЙ ФОНОВЫЙ ЛОГОТИП */
         .reset-bg-watermark {
             position: absolute !important;
             top: 50% !important;
@@ -392,7 +384,6 @@ function injectResetStyles() {
             100% { transform: translateY(-45%) rotate(3deg) scale(0.97); }
         }
 
-        /* ВОЛНА И ТОАСТ ПОДТВЕРЖДЕНИЯ ЗАКРЫТИЯ */
         .reset-confirm-wave {
             position: fixed !important;
             bottom: 20px !important;
@@ -585,7 +576,6 @@ function initResetEvents() {
         }
     });
 
-    // Отправка запроса на письмо
     formRequest?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
@@ -608,7 +598,6 @@ function initResetEvents() {
         } else {
             alert('Ссылка для сброса пароля отправлена на почту! Теперь активирован режим замены.');
             
-            // Разблокируем вкладку "Замена" и сразу переключаем на неё
             isUpdateUnlocked = true;
             if (tabUpdate) {
                 tabUpdate.classList.remove('disabled');
@@ -618,7 +607,6 @@ function initResetEvents() {
         }
     });
 
-    // Сохранение нового пароля
     formUpdate?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
