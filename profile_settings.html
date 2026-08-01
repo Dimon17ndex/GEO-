@@ -200,31 +200,30 @@
         }
 
         /* =========================================================
-           БЛОК С КНОПКАМИ (ПОЯВЛЯЕТСЯ ПОСЛЕ АНИМАЦИИ АККАУНТА)
+           БЛОК С КНОПКАМИ (БЕЗ ИКОНОК И ПОДСВЕТКИ ПРИ НАВЕДЕНИИ)
            ========================================================= */
         .account-actions-container {
             position: absolute;
             top: 245px;
-            left: 40px; /* Выравнивание по левому краю страницы или смещение */
+            left: 40px;
             z-index: 95;
             display: flex;
             flex-direction: column;
             gap: 12px;
             align-items: flex-start;
 
-            /* Изначально невидима */
             opacity: 0;
             filter: blur(10px);
             transform: translateY(15px);
 
-            /* Задержка запуск 1.2s (ровно под конец анимации прыжка) */
+            /* Задержка появления под анимацию аккаунта */
             animation: actionsAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.2s forwards;
         }
 
         .action-btn-styled {
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
             padding: 12px 24px;
             background: rgba(255, 255, 255, 0.07);
             border: 1px solid rgba(255, 255, 255, 0.18);
@@ -236,17 +235,18 @@
             cursor: pointer;
             backdrop-filter: blur(10px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            /* Убраны анимации изменения цвета при наведении */
+            transition: none;
         }
 
+        /* Наведение оставлено базовым без подсветки и движения */
         .action-btn-styled:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.4);
-            transform: translateX(5px);
-            box-shadow: 0 12px 30px rgba(52, 152, 219, 0.25);
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(255, 255, 255, 0.18);
+            transform: none;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         }
 
-        /* Keyframes: Появление кнопок */
         @keyframes actionsAppear {
             0% {
                 opacity: 0;
@@ -363,7 +363,7 @@
 
     <div class="account-actions-container" id="account-actions-block">
         <button type="button" class="action-btn-styled" onclick="console.log('Основные настройки')">
-            <span>⚙️</span> Основные настройки
+            Основные настройки
         </button>
     </div>
 
