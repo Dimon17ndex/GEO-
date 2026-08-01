@@ -276,7 +276,7 @@
         }
 
         /* =========================================================
-           КРУПНЫЙ ЦЕНТРАЛЬНЫЙ КОНТЕЙНЕР (РАСШИРЕН ДО КНОПКИ И ВНИЗ)
+           КРУПНЫЙ ЦЕНТРАЛЬНЫЙ КОНТЕЙНЕР (СКОРРЕКТИРОВАННАЯ ШИРИНА)
            ========================================================= */
         .main-profile-container {
             position: absolute;
@@ -284,20 +284,19 @@
             left: 50%;
             transform: translateX(-50%) translateY(20px);
             
-            /* Расширяем ширину: адаптивно до 92% экрана или максимум 1100px, 
-               чтобы левый край как раз подходил к кнопке */
-            width: 92vw;
-            max-width: 1100px;
+            /* Чуть меньше по бокам: 84% экрана, максимум 920px */
+            width: 84vw;
+            max-width: 920px;
             
-            /* Расширяем вниз */
-            min-height: 480px; 
-            padding: 32px;
+            /* Высота с комфортным запасом */
+            min-height: 460px; 
+            padding: 30px;
             box-sizing: border-box;
 
             /* Стеклянный стиль */
             background: rgba(255, 255, 255, 0.06);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 24px;
+            border-radius: 22px;
             backdrop-filter: blur(15px);
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
             z-index: 92;
