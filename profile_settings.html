@@ -369,7 +369,7 @@
             text-align: left;
         }
 
-        /* Красная кнопка выхода с аккуратным выделением без увеличения */
+        /* Красная кнопка выхода с выравниванием вправо */
         .red-primary-btn {
             align-self: flex-end; /* Выравнивание по правому краю */
             display: inline-flex;
@@ -393,7 +393,7 @@
         .red-primary-btn:hover {
             background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
             border-color: rgba(255, 255, 255, 0.45);
-            transform: translateY(-2px); /* Легкий сдвиг вверх вместо скалирования */
+            transform: translateY(-2px); /* Без изменения размера (scale) */
             box-shadow: 0 6px 20px rgba(229, 57, 53, 0.35);
         }
 
@@ -515,7 +515,7 @@
         <div class="session-logout-section">
             <span class="logout-label-text">Завершение сессии/выход из аккаунта</span>
             <button type="button" class="red-primary-btn" onclick="handleLogout()">
-                Выход из аккаунта
+                Выйти из аккаунта
             </button>
         </div>
     </div>
