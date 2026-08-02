@@ -148,7 +148,7 @@
         }
 
         /* =========================================================
-           БЛОК АККАУНТА (БЛИК - БЫСТРЫЙ ПРОЛЁТ)
+           БЛОК АККАУНТА (БЛИК ОТ КРАЯ ДО КРАЯ ЭКРАНА, НО В ВЫСОТУ ТЕКСТА)
            ========================================================= */
         #user-profile-widget,
         .top-center-account {
@@ -167,6 +167,7 @@
 
         .account-title-large {
             position: relative;
+            /* Новый шрифт Montserrat */
             font-family: 'Montserrat', sans-serif;
             font-size: 28px;
             font-weight: 900;
@@ -182,24 +183,24 @@
             will-change: transform, filter, opacity;
         }
 
-        /* Блик: время уменьшено до 0.6s для быстрой вспышки */
+        /* Блик: фиксированная позиция по высоте блока, пролетает от -100vw до 100vw */
         .account-title-large::after {
             content: '';
             position: absolute;
             top: 0;
             bottom: 0;
             left: -100vw;
-            width: 35vw;
+            width: 40vw;
             background: linear-gradient(
                 90deg, 
                 transparent 0%, 
-                rgba(255, 255, 255, 0.85) 50%, 
+                rgba(255, 255, 255, 0.75) 50%, 
                 transparent 100%
             );
             transform: skewX(-25deg);
             pointer-events: none;
             z-index: 2;
-            animation: lightFlashFullWidth 0.6s cubic-bezier(0.25, 1, 0.5, 1) 0.5s 1 forwards;
+            animation: lightFlashFullWidth 1.4s ease-out 0.4s 1 forwards;
         }
 
         @keyframes accountBlurBounce {
@@ -215,16 +216,16 @@
             100% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
         }
 
-        /* Быстрый пролёт слева направо */
+        /* Анимация пролета блика от левой границы экрана к правой */
         @keyframes lightFlashFullWidth {
             0% { 
                 left: -100vw; 
                 opacity: 0; 
             }
-            20% { 
+            30% { 
                 opacity: 1; 
             }
-            80% { 
+            70% { 
                 opacity: 1; 
             }
             100% { 
