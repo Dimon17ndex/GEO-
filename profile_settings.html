@@ -175,6 +175,7 @@
             letter-spacing: 2px;
             white-space: nowrap;
             display: inline-block;
+            overflow: hidden; /* Обрезает блик строго по границам заголовка */
 
             animation: accountBlurBounce 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
                         accountGlowPulse 1.6s ease-out forwards;
@@ -212,11 +213,12 @@
             100% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
         }
 
+        /* Исправленная вспышка слева направо */
         @keyframes lightFlash {
             0% { left: -200vw; opacity: 0; }
             20% { opacity: 1; }
             80% { opacity: 1; }
-            100% { left: -200vw; opacity: 0; }
+            100% { left: 200vw; opacity: 0; }
         }
 
         /* =========================================================
