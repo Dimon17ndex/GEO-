@@ -369,15 +369,15 @@
             text-align: left;
         }
 
-        /* Красная кнопка, аналогичная главной кнопке из beginning (акцентный градиент и свечение) */
+        /* Красная кнопка выхода с аккуратным выделением без увеличения */
         .red-primary-btn {
             align-self: flex-end; /* Выравнивание по правому краю */
             display: inline-flex;
             align-items: center;
             justify-content: center;
             padding: 14px 28px;
-            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 14px;
             color: #ffffff;
             font-family: 'Montserrat', sans-serif;
@@ -386,19 +386,19 @@
             letter-spacing: 0.5px;
             cursor: pointer;
             backdrop-filter: blur(10px);
-            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 15px rgba(183, 28, 28, 0.25);
+            transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
         }
 
         .red-primary-btn:hover {
-            background: linear-gradient(135deg, #ff5252 0%, #d32f2f 100%);
-            border-color: rgba(255, 255, 255, 0.5);
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 12px 30px rgba(231, 76, 60, 0.6), 0 0 20px rgba(255, 82, 82, 0.4);
+            background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+            border-color: rgba(255, 255, 255, 0.45);
+            transform: translateY(-2px); /* Легкий сдвиг вверх вместо скалирования */
+            box-shadow: 0 6px 20px rgba(229, 57, 53, 0.35);
         }
 
         .red-primary-btn:active {
-            transform: translateY(-1px) scale(0.99);
+            transform: translateY(0);
         }
 
         .center-status-wrapper {
