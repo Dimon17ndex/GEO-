@@ -204,9 +204,9 @@
 
         @keyframes accountBlurBounce {
             0% { opacity: 0; filter: blur(20px); transform: scale(0.3); }
-            60% { opacity: 1; filter: blur(2px); transform: scale(1.35); } /* Пик увеличения */
-            80% { filter: blur(0px); transform: scale(0.92); }             /* Этап уменьшения */
-            100% { opacity: 1; filter: blur(0px); transform: scale(1); }   /* Конечный размер */
+            60% { opacity: 1; filter: blur(2px); transform: scale(1.35); }
+            80% { filter: blur(0px); transform: scale(0.92); }
+            100% { opacity: 1; filter: blur(0px); transform: scale(1); }
         }
 
         @keyframes accountGlowPulse {
@@ -269,23 +269,17 @@
         }
 
         /* =========================================================
-           КНОПКИ СЛЕВА (НИЖЕ ЛИНИИ, ОТДЕЛЬНО ОТ КОНТЕЙНЕРА)
+           КНОПКИ СЛЕВА (СТУПЕНЧАТОЕ/КАСКАДНОЕ ПОЯВЛЕНИЕ)
            ========================================================= */
         .account-actions-container {
             position: absolute;
             top: 255px;
             left: 40px;
-            z-index: 98; /* Поверх контейнера */
+            z-index: 98;
             display: flex;
             flex-direction: column;
             gap: 12px;
             align-items: flex-start;
-
-            opacity: 0;
-            filter: blur(10px);
-            transform: translateY(15px);
-
-            animation: actionsAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.3s forwards;
         }
 
         .action-btn-styled {
@@ -303,9 +297,33 @@
             cursor: pointer;
             backdrop-filter: blur(10px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: background 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+                        border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+                        transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+                        box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
             width: 100%;
             box-sizing: border-box;
+
+            /* Начальное состояние кнопок до анимации */
+            opacity: 0;
+            filter: blur(10px);
+            transform: translateY(15px);
+            will-change: transform, opacity, filter;
+            
+            animation: actionsAppear 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Задержки по очереди для ступенчатого эффекта */
+        .action-btn-styled:nth-child(1) {
+            animation-delay: 1.2s;
+        }
+
+        .action-btn-styled:nth-child(2) {
+            animation-delay: 1.35s;
+        }
+
+        .action-btn-styled:nth-child(3) {
+            animation-delay: 1.5s;
         }
 
         .action-btn-styled:hover {
@@ -316,8 +334,16 @@
         }
 
         @keyframes actionsAppear {
-            0% { opacity: 0; filter: blur(10px); transform: translateY(15px); }
-            100% { opacity: 1; filter: blur(0px); transform: translateY(0); }
+            0% { 
+                opacity: 0; 
+                filter: blur(10px); 
+                transform: translateY(15px); 
+            }
+            100% { 
+                opacity: 1; 
+                filter: blur(0px); 
+                transform: translateY(0); 
+            }
         }
 
         /* =========================================================
@@ -381,13 +407,13 @@
             color: rgba(255, 255, 255, 0.7);
             letter-spacing: 0.5px;
             text-transform: uppercase;
-            align-self: flex-start; /* Выравнивание текста по левому краю */
+            align-self: flex-start;
             text-align: left;
         }
 
         /* Красная кнопка выхода с выравниванием вправо */
         .red-primary-btn {
-            align-self: flex-end; /* Выравнивание по правому краю */
+            align-self: flex-end;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -409,7 +435,7 @@
         .red-primary-btn:hover {
             background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
             border-color: rgba(255, 255, 255, 0.45);
-            transform: translateY(-2px); /* Без изменения размера (scale) */
+            transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(229, 57, 53, 0.35);
         }
 
