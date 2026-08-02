@@ -13,7 +13,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800;900&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="beginning.css">
 
@@ -148,7 +148,7 @@
         }
 
         /* =========================================================
-           БЛОК АККАУНТА (БЛИК СТРОГО ПО ВЫСОТЕ ТЕКСТА)
+           БЛОК АККАУНТА (БЛИК ОТ КРАЯ ДО КРАЯ ЭКРАНА, НО В ВЫСОТУ ТЕКСТА)
            ========================================================= */
         #user-profile-widget,
         .top-center-account {
@@ -167,42 +167,40 @@
 
         .account-title-large {
             position: relative;
-            font-family: 'Unbounded', sans-serif;
-            font-size: 26px;
+            /* Новый шрифт Montserrat */
+            font-family: 'Montserrat', sans-serif;
+            font-size: 28px;
             font-weight: 900;
             color: #ffffff;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             white-space: nowrap;
             display: inline-block;
-            padding: 4px 10px;
-
-            /* Ограничиваем блик границами текста */
-            overflow: hidden;
+            padding: 4px 12px;
 
             animation: accountBlurBounce 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
                         accountGlowPulse 1.6s ease-out forwards;
             will-change: transform, filter, opacity;
         }
 
-        /* Блик, ограниченный размерами самого текста */
+        /* Блик: фиксированная позиция по высоте блока, пролетает от -100vw до 100vw */
         .account-title-large::after {
             content: '';
             position: absolute;
             top: 0;
-            left: -150%;
-            width: 80%;
-            height: 100%;
+            bottom: 0;
+            left: -100vw;
+            width: 40vw;
             background: linear-gradient(
                 90deg, 
                 transparent 0%, 
-                rgba(255, 255, 255, 0.8) 50%, 
+                rgba(255, 255, 255, 0.75) 50%, 
                 transparent 100%
             );
             transform: skewX(-25deg);
             pointer-events: none;
             z-index: 2;
-            animation: lightFlash 1.4s ease-out 0.4s 1 forwards;
+            animation: lightFlashFullWidth 1.4s ease-out 0.4s 1 forwards;
         }
 
         @keyframes accountBlurBounce {
@@ -218,10 +216,10 @@
             100% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
         }
 
-        /* Анимация пролёта блика слева направо по ширине текста */
-        @keyframes lightFlash {
+        /* Анимация пролета блика от левой границы экрана к правой */
+        @keyframes lightFlashFullWidth {
             0% { 
-                left: -150%; 
+                left: -100vw; 
                 opacity: 0; 
             }
             30% { 
@@ -231,7 +229,7 @@
                 opacity: 1; 
             }
             100% { 
-                left: 150%; 
+                left: 100vw; 
                 opacity: 0; 
             }
         }
