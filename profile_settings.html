@@ -216,7 +216,7 @@
             0% { left: -200vw; opacity: 0; }
             20% { opacity: 1; }
             80% { opacity: 1; }
-            100% { left: 200vw; opacity: 0; }
+            100% { left: -200vw; opacity: 0; }
         }
 
         /* =========================================================
@@ -255,7 +255,7 @@
         }
 
         /* =========================================================
-           КНОПКА СЛЕВА (НИЖЕ ЛИНИИ, ОТДЕЛЬНО ОТ КОНТЕЙНЕРА)
+           КНОПКИ СЛЕВА (НИЖЕ ЛИНИИ, ОТДЕЛЬНО ОТ КОНТЕЙНЕРА)
            ========================================================= */
         .account-actions-container {
             position: absolute;
@@ -290,6 +290,8 @@
             backdrop-filter: blur(10px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .action-btn-styled:hover {
@@ -508,6 +510,12 @@
     <div class="account-actions-container" id="account-actions-block">
         <button type="button" class="action-btn-styled" onclick="console.log('Основные настройки')">
             Основные настройки
+        </button>
+        <button type="button" class="action-btn-styled" onclick="console.log('Профиль')">
+            Профиль
+        </button>
+        <button type="button" class="action-btn-styled" onclick="console.log('Техническая поддержка')">
+            Техническая поддержка
         </button>
     </div>
 
