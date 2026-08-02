@@ -148,7 +148,7 @@
         }
 
         /* =========================================================
-           БЛОК АККАУНТА (ОТЛОЖЕННЫЙ БЛИК)
+           БЛОК АККАУНТА (СИНХРОНИЗИРОВАННЫЙ БЛИК)
            ========================================================= */
         #user-profile-widget,
         .top-center-account {
@@ -182,7 +182,7 @@
             will-change: transform, filter, opacity;
         }
 
-        /* Блик: задержка заменена на 1.2s (запускается после появления текста) */
+        /* Блик: задержка 0.6s заставляет блик пролетать точно во время сжатия текста */
         .account-title-large::after {
             content: '';
             position: absolute;
@@ -193,20 +193,20 @@
             background: linear-gradient(
                 90deg, 
                 transparent 0%, 
-                rgba(255, 255, 255, 0.8) 50%, 
+                rgba(255, 255, 255, 0.85) 50%, 
                 transparent 100%
             );
             transform: skewX(-25deg);
             pointer-events: none;
             z-index: 2;
-            animation: lightFlashFullWidth 0.9s cubic-bezier(0.25, 1, 0.5, 1) 1.2s 1 forwards;
+            animation: lightFlashFullWidth 0.7s cubic-bezier(0.25, 1, 0.5, 1) 0.6s 1 forwards;
         }
 
         @keyframes accountBlurBounce {
             0% { opacity: 0; filter: blur(20px); transform: scale(0.3); }
-            60% { opacity: 1; filter: blur(2px); transform: scale(1.35); }
-            80% { filter: blur(0px); transform: scale(0.92); }
-            100% { opacity: 1; filter: blur(0px); transform: scale(1); }
+            60% { opacity: 1; filter: blur(2px); transform: scale(1.35); } /* Пик увеличения */
+            80% { filter: blur(0px); transform: scale(0.92); }             /* Этап уменьшения */
+            100% { opacity: 1; filter: blur(0px); transform: scale(1); }   /* Конечный размер */
         }
 
         @keyframes accountGlowPulse {
