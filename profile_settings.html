@@ -182,7 +182,7 @@
             will-change: transform, filter, opacity;
         }
 
-        /* Блик: время пролёта замедлено до 1.1s */
+        /* Блик: время пролёта 1.1s */
         .account-title-large::after {
             content: '';
             position: absolute;
@@ -347,7 +347,7 @@
         }
 
         /* =========================================================
-           КРУПНЫЙ ЦЕНТРАЛЬНЫЙ КОНТЕЙНЕР
+           КРУПНЫЙ ЦЕНТРАЛЬНЫЙ КОНТЕЙНЕР (ПОЯВЛЯЕТСЯ РАНЬШЕ КНОПОК)
            ========================================================= */
         .main-profile-container {
             position: absolute;
@@ -373,8 +373,8 @@
             opacity: 0;
             filter: blur(12px);
 
-            /* Появление контейнера */
-            animation: containerAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.5s forwards;
+            /* Задержка уменьшена до 1.0s (появляется до первой кнопки) */
+            animation: containerAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.0s forwards;
         }
 
         @keyframes containerAppear {
