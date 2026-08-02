@@ -148,7 +148,7 @@
         }
 
         /* =========================================================
-           БЛОК АККАУНТА (БЛИК - ПЛАВНЫЙ И УМЕРЕННЫЙ ПРОЛЁТ)
+           БЛОК АККАУНТА (ОТЛОЖЕННЫЙ БЛИК)
            ========================================================= */
         #user-profile-widget,
         .top-center-account {
@@ -182,7 +182,7 @@
             will-change: transform, filter, opacity;
         }
 
-        /* Блик: скорость сбалансирована (0.9s) */
+        /* Блик: задержка заменена на 1.2s (запускается после появления текста) */
         .account-title-large::after {
             content: '';
             position: absolute;
@@ -199,7 +199,7 @@
             transform: skewX(-25deg);
             pointer-events: none;
             z-index: 2;
-            animation: lightFlashFullWidth 0.9s cubic-bezier(0.25, 1, 0.5, 1) 0.4s 1 forwards;
+            animation: lightFlashFullWidth 0.9s cubic-bezier(0.25, 1, 0.5, 1) 1.2s 1 forwards;
         }
 
         @keyframes accountBlurBounce {
