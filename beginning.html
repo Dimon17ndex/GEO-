@@ -196,6 +196,18 @@
     pointer-events: auto !important;
 }
 
+/* При выходе: фиксируем меню видимым и блокируем клики во всех элементах */
+.profile-card.logging-out .profile-dropdown-menu {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
+    pointer-events: auto !important;
+}
+
+.profile-card.logging-out {
+    pointer-events: none !important; /* Блокируем клики и наведение на карточку и меню */
+}
+
 /* 5. Кнопки внутри меню */
 .profile-settings-btn,
 .logout-dropdown-btn {
@@ -225,6 +237,12 @@
     background: #2980b9;
 }
 
+/* Заблокированная кнопка параметров */
+.profile-settings-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 /* Красная кнопка */
 .logout-dropdown-btn {
     padding: 10px 0;
@@ -237,6 +255,11 @@
 
 .logout-dropdown-btn:hover {
     background: #c0392b;
+}
+
+.logout-dropdown-btn:disabled {
+    opacity: 0.8;
+    cursor: wait;
 }
 
         /* Контейнер для размещения статуса строго по центру экрана */
@@ -398,13 +421,13 @@
     </div>
 
     <div id="user-profile-widget" class="top-right-profile" style="display: none;">
-        <div class="profile-card">
+        <div class="profile-card" id="profile-card-element">
             <span class="profile-username" id="profile-email-text">Профиль</span>
             <div class="profile-dropdown-menu">
-                <button type="button" class="profile-settings-btn" onclick="navigateToPage('profile_settings.html')">
+                <button type="button" class="profile-settings-btn" id="profile-settings-btn" onclick="navigateToPage('profile_settings.html')">
                     Характеристики профиля
                 </button>
-                <button type="button" class="logout-dropdown-btn" onclick="logoutUser()">
+                <button type="button" class="logout-dropdown-btn" id="logout-btn" onclick="logoutUser()">
                     Выйти
                 </button>
             </div>
@@ -423,8 +446,28 @@
     <script src="auth-system.js?v=3"></script>
 
     <script>
-// Функция выхода из профиля
+// Функция выхода из профиля с состояниями загрузки и блокировкой
 async function logoutUser() {
+    const logoutBtn = document.getElementById('logout-btn');
+    const settingsBtn = document.getElementById('profile-settings-btn');
+    const profileCard = document.getElementById('profile-card-element');
+
+    // Меняем текст кнопки выхода
+    if (logoutBtn) {
+        logoutBtn.innerText = 'Выход из аккаунта и загрузка...';
+        logoutBtn.disabled = true;
+    }
+
+    // Замораживаем и блокируем синюю кнопку выше
+    if (settingsBtn) {
+        settingsBtn.disabled = true;
+    }
+
+    // Добавляем класс, заставляющий меню оставаться открытым и полностью блокирующий клики
+    if (profileCard) {
+        profileCard.classList.add('logging-out');
+    }
+
     try {
         const client = window.supabaseClient || window.supabase;
         if (client) {
