@@ -26,7 +26,7 @@
         /* Плавное проявление страницы */
         body {
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.4s ease;
         }
 
         body.page-loaded {
@@ -150,43 +150,37 @@
             cursor: pointer;
             backdrop-filter: blur(12px);
             color: #ffffff;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 
-            opacity: 0;
-            filter: blur(10px);
-            transform: scale(0.5);
-            animation: backArrowAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.8s forwards;
-            will-change: transform, opacity, filter;
+            /* Мгновенная реакция без анимаций появления */
+            transition: none; 
         }
 
         .back-arrow-btn svg {
             width: 24px;
             height: 24px;
-            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: none;
         }
 
-        @keyframes backArrowAppear {
-            0% { opacity: 0; filter: blur(10px); transform: scale(0.5); }
-            100% { opacity: 1; filter: blur(0px); transform: scale(1); }
-        }
-
+        /* Жесткий щелчок при наведении */
         .back-arrow-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.3);
-            transform: scale(1.08);
+            background: rgba(255, 255, 255, 0.25);
+            border-color: #ffffff;
+            transform: scale(1.05);
         }
 
         .back-arrow-btn:hover svg {
-            transform: rotate(-360deg);
+            transform: rotate(-90deg);
         }
 
+        /* Четкий «клик» вниз без сглаживания */
         .back-arrow-btn:active {
-            transform: scale(0.92);
+            transform: scale(0.9) translateY(2px);
+            background: rgba(255, 255, 255, 0.35);
         }
 
         /* =========================================================
-            БЛОК АККАУНТА (ЗАМЕДЛЕННЫЙ БЛИК)
+            БЛОК АККАУНТА
             ========================================================= */
         #user-profile-widget,
         .top-center-account {
@@ -214,81 +208,22 @@
             white-space: nowrap;
             display: inline-block;
             padding: 4px 12px;
-
-            animation: accountBlurBounce 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
-                        accountGlowPulse 1.6s ease-out forwards;
-            will-change: transform, filter, opacity;
         }
 
-        .account-title-large::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: -100vw;
-            width: 35vw;
-            background: linear-gradient(
-                90deg, 
-                transparent 0%, 
-                rgba(255, 255, 255, 0.85) 50%, 
-                transparent 100%
-            );
-            transform: skewX(-25deg);
-            pointer-events: none;
-            z-index: 2;
-            animation: lightFlashFullWidth 1.1s cubic-bezier(0.25, 1, 0.5, 1) 0.6s 1 forwards;
-        }
-
-        @keyframes accountBlurBounce {
-            0% { opacity: 0; filter: blur(20px); transform: scale(0.3); }
-            60% { opacity: 1; filter: blur(2px); transform: scale(1.35); }
-            80% { filter: blur(0px); transform: scale(0.92); }
-            100% { opacity: 1; filter: blur(0px); transform: scale(1); }
-        }
-
-        @keyframes accountGlowPulse {
-            0% { text-shadow: 0 0 0px rgba(255, 255, 255, 0); }
-            50% { text-shadow: 0 0 45px rgba(255, 255, 255, 1), 0 0 20px rgba(52, 152, 219, 0.9); }
-            100% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
-        }
-
-        @keyframes lightFlashFullWidth {
-            0% { left: -100vw; opacity: 0; }
-            20% { opacity: 1; }
-            80% { opacity: 1; }
-            100% { left: 100vw; opacity: 0; }
-        }
-
-        /* =========================================================
-            ЛИНИЯ-РАЗДЕЛИТЕЛЬ
-            ========================================================= */
         .account-divider-line {
             position: absolute;
             top: 230px;
             left: 50%;
-            transform: translateX(-50%) scaleX(0);
+            transform: translateX(-50%);
             width: 85vw;
             max-width: 900px;
             height: 1px;
-            background: linear-gradient(
-                90deg, 
-                transparent 0%, 
-                rgba(255, 255, 255, 0.4) 50%, 
-                transparent 100%
-            );
+            background: rgba(255, 255, 255, 0.4);
             z-index: 90;
-            
-            animation: lineExpandCenter 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.1s forwards;
-            will-change: transform, opacity;
-        }
-
-        @keyframes lineExpandCenter {
-            0% { opacity: 0; transform: translateX(-50%) scaleX(0); }
-            100% { opacity: 1; transform: translateX(-50%) scaleX(1); }
         }
 
         /* =========================================================
-            КНОПКИ СЛЕВА (СЯГКИЕ И ПЛАВНЫЕ АНИМАЦИИ)
+            КНОПКИ СЛЕВА (ЩЕЦКАЮЩИЕ И ИМПУЛЬСНЫЕ)
             ========================================================= */
         .account-actions-container {
             position: absolute;
@@ -315,56 +250,41 @@
             font-weight: 700;
             cursor: pointer;
             backdrop-filter: blur(10px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             
-            /* Сверхплавный кубический Безье для абсолютной мягкости движений */
-            transition: background 0.5s cubic-bezier(0.25, 1, 0.5, 1), 
-                        border-color 0.5s cubic-bezier(0.25, 1, 0.5, 1), 
-                        transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), 
-                        box-shadow 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            /* Убраны плавные переходы — отклик мгновенный */
+            transition: none; 
             width: 100%;
             box-sizing: border-box;
-
-            opacity: 0;
-            filter: blur(10px);
-            transform: translateY(15px);
-            will-change: transform, opacity, filter;
-            
-            animation: actionsAppear 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-
-        .action-btn-styled:nth-child(1) { animation-delay: 1.2s; }
-        .action-btn-styled:nth-child(2) { animation-delay: 1.35s; }
-        .action-btn-styled:nth-child(3) { animation-delay: 1.5s; }
 
         .action-btn-styled:hover {
-            background: rgba(255, 255, 255, 0.18);
-            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.22);
+            border-color: rgba(255, 255, 255, 0.6);
             transform: translateX(4px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         }
 
-        /* Мягкое активное состояние: белый контур и плавной сдвиг вправо */
+        /* Резкий щелчок активного состояния */
         .action-btn-styled.active-tab {
-            background: rgba(255, 255, 255, 0.15) !important;
+            background: rgba(255, 255, 255, 0.25) !important;
             border-color: #ffffff !important;
             transform: translateX(8px) !important;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
         }
 
-        @keyframes actionsAppear {
-            0% { opacity: 0; filter: blur(10px); transform: translateY(15px); }
-            100% { opacity: 1; filter: blur(0px); transform: translateY(0); }
+        .action-btn-styled:active {
+            transform: translateX(6px) scale(0.97);
+            background: rgba(255, 255, 255, 0.35) !important;
         }
 
         /* =========================================================
-            КРУПНЫЙ ЦЕНТРАЛЬНЫЙ КОНТЕЙНЕР (ПЛАВНАЯ СМЕНА ВКЛАДОК)
+            ЦЕНТРАЛЬНЫЙ КОНТЕЙНЕР И ВКЛАДКИ (ЩЕЛЧОК ПЕРЕКЛЮЧЕНИЯ)
             ========================================================= */
         .main-profile-container {
             position: absolute;
             top: 255px;
             left: 50%;
-            transform: translateX(-50%) translateY(20px);
+            transform: translateX(-50%);
             
             width: 84vw;
             max-width: 920px;
@@ -379,53 +299,21 @@
             backdrop-filter: blur(15px);
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
             z-index: 92;
-
-            opacity: 0;
-            filter: blur(12px);
-
-            animation: containerAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.0s forwards;
-            transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1), 
-                        filter 0.5s cubic-bezier(0.25, 1, 0.5, 1), 
-                        transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        @keyframes containerAppear {
-            0% {
-                opacity: 0;
-                filter: blur(12px);
-                transform: translateX(-50%) translateY(20px) scale(0.97);
-            }
-            100% {
-                opacity: 1;
-                filter: blur(0px);
-                transform: translateX(-50%) translateY(0) scale(1);
-            }
-        }
-
-        /* Система вкладок с мягким бесшовным кроссфейдом */
+        /* Мгновенное переключение вкладок без анимации затухания */
         .tab-content {
             position: absolute;
             top: 30px;
             left: 30px;
             right: 30px;
             bottom: 30px;
-            display: flex;
+            display: none; /* По умолчанию скрыты */
             flex-direction: column;
-            
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(8px);
-            transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
-                        transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
-                        visibility 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-            pointer-events: none;
         }
 
         .tab-content.active-content {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-            pointer-events: auto;
+            display: flex; /* Мгновенный показ по клику */
         }
 
         .empty-tab-placeholder {
@@ -438,7 +326,7 @@
         }
 
         /* =========================================================
-            БЛОК ВЫХОДА ВНУТРИ КОНТЕЙНЕРА И КНОПКА
+            КНОПКА ВЫХОДА (ЩЕЛКАЮЩАЯ)
             ========================================================= */
         .session-logout-section {
             display: flex;
@@ -478,27 +366,21 @@
             box-shadow: 0 4px 15px rgba(183, 28, 28, 0.25);
             white-space: nowrap;
             
-            transition: background 0.3s ease, 
-                        border-color 0.3s ease, 
-                        box-shadow 0.3s ease, 
-                        transform 0.3s ease, 
-                        padding 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-                        opacity 0.3s ease;
+            transition: none; /* Убран плавный переход */
         }
 
         .red-primary-btn:hover {
             background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
-            border-color: rgba(255, 255, 255, 0.45);
+            border-color: rgba(255, 255, 255, 0.5);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(229, 57, 53, 0.35);
         }
 
         .red-primary-btn:active {
-            transform: translateY(0);
+            transform: translateY(1px) scale(0.97);
+            box-shadow: 0 2px 8px rgba(183, 28, 28, 0.4);
         }
 
         .red-primary-btn.is-loading {
-            padding: 14px 34px;
             opacity: 0.85;
             pointer-events: none;
         }
@@ -550,7 +432,7 @@
             backdrop-filter: blur(15px);
             box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
             z-index: 9999;
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.3s ease;
         }
 
         .dev-side-panel.visible {
@@ -568,13 +450,12 @@
             font-weight: 700;
             cursor: pointer;
             white-space: nowrap;
-            transition: all 0.25s ease;
+            transition: none;
         }
 
         .dev-panel-btn:hover {
             background: rgba(255, 255, 255, 0.25);
             border-color: rgba(255, 255, 255, 0.4);
-            transform: translateX(-3px);
         }
 
         .reset-open-link {
@@ -585,7 +466,6 @@
             font-family: 'Montserrat', sans-serif;
             cursor: pointer;
             text-decoration: underline;
-            transition: color 0.2s ease;
         }
 
         .reset-open-link:hover {
@@ -727,10 +607,10 @@ function navigateToPage(targetPage) {
     document.body.classList.add('page-hidden');
     setTimeout(() => {
         window.location.href = targetPage;
-    }, 500);
+    }, 300);
 }
 
-/* Сверхплавное переключение разделов с мягким кроссфейдом */
+/* Мгновенное переключение вкладок щелчком */
 function switchTab(tabName) {
     const buttons = document.querySelectorAll('.action-btn-styled');
     const contents = document.querySelectorAll('.tab-content');
@@ -767,7 +647,7 @@ async function handleLogout() {
     } finally {
         setTimeout(() => {
             navigateToPage('beginning.html');
-        }, 600);
+        }, 300);
     }
 }
 
@@ -778,10 +658,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setTimeout(() => { spawnAmbientWave(); }, 1000);
 
-    // Плавное применение визуала первой кнопки сразу после её появления на экране
-    setTimeout(() => {
-        switchTab('settings');
-    }, 1400);
+    // Мгновенная активация вкладки по умолчанию
+    switchTab('settings');
 
     const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
     const sidePanel = document.getElementById('dev-side-panel');
