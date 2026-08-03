@@ -391,7 +391,7 @@
         }
 
         /* =========================================================
-           БЛОК ВЫХОДА ВНУТРИ КОНТЕЙНЕРА
+           БЛОК ВЫХОДА ВНУТРИ КОНТЕЙНЕРА И КНОПКА C АНИМАЦИЕЙ Расширения ВЛЕВО
            ========================================================= */
         .session-logout-section {
             display: flex;
@@ -417,6 +417,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            gap: 10px; /* Отступ для лоадера */
             padding: 14px 28px;
             background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -429,7 +430,15 @@
             cursor: pointer;
             backdrop-filter: blur(10px);
             box-shadow: 0 4px 15px rgba(183, 28, 28, 0.25);
-            transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+            white-space: nowrap; /* Гарантирует расширение вбок без переносов */
+            
+            /* Плавный переход для размера/паддингов/прозрачности */
+            transition: background 0.3s ease, 
+                        border-color 0.3s ease, 
+                        box-shadow 0.3s ease, 
+                        transform 0.3s ease, 
+                        padding 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                        opacity 0.3s ease;
         }
 
         .red-primary-btn:hover {
@@ -441,6 +450,31 @@
 
         .red-primary-btn:active {
             transform: translateY(0);
+        }
+
+        /* Состояние загрузки при выходе */
+        .red-primary-btn.is-loading {
+            padding: 14px 34px;
+            opacity: 0.85;
+            pointer-events: none;
+        }
+
+        /* Спиннер загрузки */
+        .btn-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.35);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: btnSpinnerRotate 0.8s linear infinite;
+            display: inline-block;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
+
+        @keyframes btnSpinnerRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .center-status-wrapper {
@@ -635,16 +669,26 @@ function navigateToPage(targetPage) {
 }
 
 async function handleLogout() {
-    const client = window.supabaseClient || window.supabase;
+    const btn = document.querySelector('.red-primary-btn');
     
+    if (btn) {
+        // Запускаем класс с анимацией расширения влево и вставляем спиннер
+        btn.classList.add('is-loading');
+        btn.innerHTML = `Выход из аккаунта <span class="btn-spinner"></span>`;
+    }
+
     try {
+        const client = window.supabaseClient || window.supabase;
         if (client && client.auth) {
             await client.auth.signOut();
         }
     } catch (err) {
         console.error('Ошибка при выходе из аккаунта:', err);
     } finally {
-        navigateToPage('beginning.html');
+        // Задержка перед переходом для красивой проигрываемости анимации
+        setTimeout(() => {
+            navigateToPage('beginning.html');
+        }, 600);
     }
 }
 
@@ -698,7 +742,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initDevPanel();
 });
-    </script>
+</script>
 
     <script src="app.js"></script>
     <script src="reset-password.js"></script>
