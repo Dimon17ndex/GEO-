@@ -129,7 +129,7 @@
         }
 
         /* =========================================================
-            КНОПКА-СТРЕЛКА В ВЕРХНЕМ ПРАВОМ УГЛУ
+            КНОПКА-СТРЕЛКА В ВЕРХНЕМ ПРАВОМ УГЛУ (С ВРАЩЕНИЕМ)
             ========================================================= */
         .back-nav-container {
             position: fixed;
@@ -150,7 +150,7 @@
             cursor: pointer;
             backdrop-filter: none;
             color: #ffffff;
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             box-shadow: none;
 
             opacity: 0;
@@ -163,7 +163,7 @@
         .back-arrow-btn svg {
             width: 28px;
             height: 28px;
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         @keyframes backArrowAppear {
@@ -172,13 +172,11 @@
         }
 
         .back-arrow-btn:hover {
-            background: transparent;
-            border-color: transparent;
-            transform: scale(1.15);
+            transform: scale(1.12);
         }
 
         .back-arrow-btn:hover svg {
-            transform: translateX(-4px);
+            transform: rotate(-360deg); /* Возвращает полный оборот при наведении */
         }
 
         .back-arrow-btn:active {
