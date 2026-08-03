@@ -118,6 +118,22 @@ function setAuthMode(mode) {
     }
 }
 
+// Управление состоянием кнопки (анимация загрузки / блокировка)
+function setButtonLoading(button, isLoading, originalText) {
+    if (!button) return;
+
+    if (isLoading) {
+        button.disabled = true;
+        button.classList.add('loading');
+        button.dataset.originalText = originalText;
+        button.innerHTML = '<span class="auth-spinner"></span>';
+    } else {
+        button.disabled = false;
+        button.classList.remove('loading');
+        button.innerHTML = button.dataset.originalText || originalText;
+    }
+}
+
 // --- ЗАГРУЗКА ---
 document.addEventListener('DOMContentLoaded', () => {
     injectAuthStyles();
@@ -400,7 +416,12 @@ function injectAuthStyles() {
             border-bottom-color: #ffffff !important;
         }
 
+        /* --- КНОПКА ОТПРАВКИ И АНИМАЦИЯ ЗАГРУЗКИ --- */
         .auth-submit-btn {
+            position: relative !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
             background: transparent !important;
             color: #ffffff !important;
             border: 1px solid #ffffff !important;
@@ -411,17 +432,46 @@ function injectAuthStyles() {
             cursor: pointer !important;
             width: 100% !important;
             margin-top: 15px !important;
-            transition: all 0.2s ease !important;
+            transition: all 0.25s ease !important;
             text-align: center !important;
+            min-height: 42px !important;
+            box-sizing: border-box !important;
         }
 
-        .auth-submit-btn:hover {
+        .auth-submit-btn:hover:not(:disabled) {
             background: #ffffff !important;
             color: #000000 !important;
         }
 
-        .auth-submit-btn:active {
+        .auth-submit-btn:active:not(:disabled) {
             transform: scale(0.98) !important;
+        }
+
+        /* Серый заблокированный вид кнопки при загрузке */
+        .auth-submit-btn.loading,
+        .auth-submit-btn:disabled {
+            background: rgba(255, 255, 255, 0.08) !important;
+            border-color: rgba(255, 255, 255, 0.25) !important;
+            color: rgba(255, 255, 255, 0.4) !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+        }
+
+        /* Анимация крутящегося спиннера */
+        .auth-spinner {
+            display: inline-block !important;
+            width: 18px !important;
+            height: 18px !important;
+            border: 2px solid rgba(255, 255, 255, 0.25) !important;
+            border-radius: 50% !important;
+            border-top-color: #ffffff !important;
+            animation: authSpinnerRotate 0.75s linear infinite !important;
+        }
+
+        @keyframes authSpinnerRotate {
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .auth-confirm-wave {
@@ -626,7 +676,7 @@ function initAuthModalUI() {
                         <div class="auth-input-group">
                             <input type="password" id="login-password" placeholder="Пароль..." required class="auth-input" autocomplete="current-password">
                         </div>
-                        <button type="submit" class="auth-submit-btn">Войти</button>
+                        <button type="submit" id="btn-submit-login" class="auth-submit-btn">Войти</button>
                     </form>
 
                     <form id="auth-form-register" class="auth-form">
@@ -639,7 +689,7 @@ function initAuthModalUI() {
                         <div class="auth-input-group">
                             <input type="password" id="reg-password" placeholder="Пароль (мин. 6 символов)..." required class="auth-input" autocomplete="new-password">
                         </div>
-                        <button type="submit" class="auth-submit-btn">Зарегистрироваться</button>
+                        <button type="submit" id="btn-submit-register" class="auth-submit-btn">Зарегистрироваться</button>
                     </form>
                 </div>
             </div>
@@ -716,46 +766,70 @@ function initAuthEvents() {
     tabLogin?.addEventListener('click', () => setAuthMode('login'));
     tabRegister?.addEventListener('click', () => setAuthMode('register'));
 
+    // Форма Входа
     formLogin?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
 
+        const submitBtn = document.getElementById('btn-submit-login');
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
 
-        const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
-        if (error) {
-            alert(`Ошибка входа: ${error.message}`);
-        } else {
-            window.hideAuthModal();
-            window.location.reload();
+        // Включаем статус загрузки
+        setButtonLoading(submitBtn, true, 'Войти');
+
+        try {
+            const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                alert(`Ошибка входа: ${error.message}`);
+                setButtonLoading(submitBtn, false, 'Войти');
+            } else {
+                window.hideAuthModal();
+                window.location.reload();
+            }
+        } catch (err) {
+            console.error(err);
+            setButtonLoading(submitBtn, false, 'Войти');
         }
     });
 
+    // Форма Регистрации
     formRegister?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
 
+        const submitBtn = document.getElementById('btn-submit-register');
         const name = document.getElementById('reg-name').value;
         const email = document.getElementById('reg-email').value;
         const password = document.getElementById('reg-password').value;
 
-        const { data, error } = await window.supabaseClient.auth.signUp({ 
-            email, 
-            password,
-            options: {
-                data: {
-                    full_name: name,
-                    username: name
-                }
-            }
-        });
+        // Включаем статус загрузки
+        setButtonLoading(submitBtn, true, 'Зарегистрироваться');
 
-        if (error) {
-            alert(`Ошибка регистрации: ${error.message}`);
-        } else {
-            window.hideAuthModal();
-            alert('Регистрация прошла успешно! Проверьте вашу почту для подтверждения.');
+        try {
+            const { data, error } = await window.supabaseClient.auth.signUp({ 
+                email, 
+                password,
+                options: {
+                    data: {
+                        full_name: name,
+                        username: name
+                    }
+                }
+            });
+
+            if (error) {
+                alert(`Ошибка регистрации: ${error.message}`);
+                setButtonLoading(submitBtn, false, 'Зарегистрироваться');
+            } else {
+                setButtonLoading(submitBtn, false, 'Зарегистрироваться');
+                window.hideAuthModal();
+                alert('Регистрация прошла успешно! Проверьте вашу почту для подтверждения.');
+            }
+        } catch (err) {
+            console.error(err);
+            setButtonLoading(submitBtn, false, 'Зарегистрироваться');
         }
     });
 }
