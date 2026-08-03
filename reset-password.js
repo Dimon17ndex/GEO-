@@ -1,4 +1,4 @@
-// reset-password.js
+// auth-system.js
 
 window.SUPABASE_URL = window.SUPABASE_URL || 'https://cwgkdpmxwgfypbiykafl.supabase.co'; 
 window.SUPABASE_KEY = window.SUPABASE_KEY || 'sb_publishable_mjHX0OTE6LSLh2qTVqMIng_mY9cvDcN';
@@ -12,37 +12,86 @@ if (!window.supabaseClient && window.supabase) {
     }
 }
 
-let currentResetMode = 'request'; // 'request' или 'update'
-let isResetUpdateUnlocked = false; 
-let resetOverlayClickTimeout = null;
+let currentAuthMode = 'login';
+let overlayClickTimeout = null;
 
 // --- ГЛОБАЛЬНЫЕ ФУНКЦИИ ---
-window.showResetModal = function(mode = 'request') {
-    injectResetStyles();
-    initResetModalUI();
-    initResetEvents();
+window.showAuthModal = function() {
+    injectAuthStyles();
+    initAuthModalUI();
+    initAuthEvents();
     
-    const modal = document.getElementById('reset-modal-overlay');
-    hideResetConfirmToast(true);
-    setResetMode(mode);
+    const modal = document.getElementById('auth-modal-overlay');
+    hideConfirmToast(true);
+    setAuthMode('login');
 
     if (modal) {
         modal.classList.add('active');
     }
 };
 
-window.hideResetModal = function() {
-    const modal = document.getElementById('reset-modal-overlay');
+window.hideAuthModal = function() {
+    const modal = document.getElementById('auth-modal-overlay');
     if (modal) {
         modal.classList.remove('active');
-        hideResetConfirmToast(true);
+        hideConfirmToast(true);
+    }
+};
+
+// Функция выхода из аккаунта
+window.logoutUser = async function(event) {
+    // 1. Находим кнопку, на которую нажали, или ищем её в DOM
+    let logoutBtn = event?.currentTarget || event?.target;
+    
+    if (!logoutBtn || !(logoutBtn instanceof HTMLElement)) {
+        logoutBtn = document.getElementById('user-logout-btn') || 
+                    document.querySelector('.user-logout-btn, .logout-btn, [onclick*="logoutUser"]');
+    }
+
+    if (logoutBtn) {
+        // Отключаем клики по кнопке выхода
+        logoutBtn.style.pointerEvents = 'none';
+
+        // Меняем текст на «Выход из аккаунта и загрузка»
+        const textContainer = logoutBtn.querySelector('.profile-action-text, span') || logoutBtn;
+        textContainer.textContent = 'Выход из аккаунта и загрузка';
+
+        // 2. Находим родительский контейнер (виджет/панель профиля)
+        const parentContainer = logoutBtn.closest('.profile-widget, .profile-dropdown, .side-panel, .user-menu') || logoutBtn.parentElement;
+
+        if (parentContainer) {
+            // Ищем все кнопки и ссылки внутри родителя
+            const allNavElements = Array.from(parentContainer.querySelectorAll('button, a, .btn, .profile-action-btn'));
+            const logoutIndex = allNavElements.indexOf(logoutBtn);
+
+            // Замораживаем все элементы, находящиеся выше кнопки выхода
+            allNavElements.forEach((el, index) => {
+                if (index < logoutIndex || (logoutIndex === -1 && el !== logoutBtn)) {
+                    el.classList.add('btn-frozen');
+                }
+            });
+        }
+    }
+
+    // 3. Выход из аккаунта и перезагрузка
+    try {
+        if (window.supabaseClient) {
+            await window.supabaseClient.auth.signOut();
+        }
+    } catch (error) {
+        console.error('Ошибка при выходе из аккаунта:', error);
+    } finally {
+        document.body.classList.add('page-hidden');
+        setTimeout(() => {
+            window.location.reload();
+        }, 500);
     }
 };
 
 // Функция показа всплывающей плашки с прыжком и радиальной волной
-function showResetConfirmToast() {
-    const toast = document.getElementById('reset-confirm-toast');
-    const wave = document.getElementById('reset-confirm-wave');
+function showConfirmToast() {
+    const toast = document.getElementById('auth-confirm-toast');
+    const wave = document.getElementById('auth-confirm-wave');
     
     if (toast) {
         toast.classList.remove('hiding', 'visible');
@@ -56,9 +105,9 @@ function showResetConfirmToast() {
 }
 
 // Функция мягкого скрытия плашки
-function hideResetConfirmToast(immediate = false) {
-    const toast = document.getElementById('reset-confirm-toast');
-    const wave = document.getElementById('reset-confirm-wave');
+function hideConfirmToast(immediate = false) {
+    const toast = document.getElementById('auth-confirm-toast');
+    const wave = document.getElementById('auth-confirm-wave');
 
     if (!toast) return;
 
@@ -74,66 +123,84 @@ function hideResetConfirmToast(immediate = false) {
     }
 }
 
-function setResetMode(mode) {
-    if (mode === 'update' && !isResetUpdateUnlocked && currentResetMode !== 'update') {
-        return; // Запрещаем переключение на замену, если режим еще не разблокирован
-    }
+function setAuthMode(mode) {
+    currentAuthMode = mode;
 
-    currentResetMode = mode;
-
-    const resetTabs = document.getElementById('reset-tabs');
-    const tabRequest = document.getElementById('tab-request-btn');
-    const tabUpdate = document.getElementById('tab-update-btn');
+    const authTabs = document.getElementById('auth-tabs');
+    const tabLogin = document.getElementById('tab-login-btn');
+    const tabRegister = document.getElementById('tab-register-btn');
     
-    const formRequest = document.getElementById('reset-form-request');
-    const formUpdate = document.getElementById('reset-form-update');
+    const formLogin = document.getElementById('auth-form-login');
+    const formRegister = document.getElementById('auth-form-register');
 
-    if (!resetTabs || !tabRequest || !tabUpdate || !formRequest || !formUpdate) return;
+    if (!authTabs || !tabLogin || !tabRegister || !formLogin || !formRegister) return;
 
-    if (mode === 'request') {
-        resetTabs.classList.remove('update-mode');
-        tabRequest.classList.add('active');
-        tabUpdate.classList.remove('active');
+    if (mode === 'login') {
+        authTabs.classList.remove('register-mode');
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
 
-        formUpdate.classList.remove('visible');
-        formRequest.classList.add('visible');
+        formRegister.classList.remove('visible');
+        formLogin.classList.add('visible');
     } else {
-        resetTabs.classList.add('update-mode');
-        tabUpdate.classList.add('active');
-        tabRequest.classList.remove('active');
+        authTabs.classList.add('register-mode');
+        tabRegister.classList.add('active');
+        tabLogin.classList.remove('active');
 
-        formRequest.classList.remove('visible');
-        formUpdate.classList.add('visible');
+        formLogin.classList.remove('visible');
+        formRegister.classList.add('visible');
+    }
+}
+
+// Управление состоянием кнопки (анимация загрузки / блокировка)
+function setButtonLoading(button, isLoading, originalText) {
+    if (!button) return;
+
+    if (isLoading) {
+        button.disabled = true;
+        button.classList.add('loading');
+        button.dataset.originalText = originalText;
+        button.innerHTML = '<span class="auth-spinner"></span>';
+    } else {
+        button.disabled = false;
+        button.classList.remove('loading');
+        button.innerHTML = button.dataset.originalText || originalText;
     }
 }
 
 // --- ЗАГРУЗКА ---
 document.addEventListener('DOMContentLoaded', () => {
-    injectResetStyles();
-    initResetModalUI();
-    initResetEvents();
-
+    injectAuthStyles();
+    initAuthModalUI();
+    initAuthEvents();
+    
     if (window.supabaseClient) {
-        window.supabaseClient.auth.onAuthStateChange((event) => {
-            if (event === 'PASSWORD_RECOVERY') {
-                isResetUpdateUnlocked = true;
-                const tabUpdate = document.getElementById('tab-update-btn');
-                if (tabUpdate) {
-                    tabUpdate.classList.remove('disabled');
-                    tabUpdate.removeAttribute('disabled');
-                }
-                window.showResetModal('update');
-            }
-        });
+        checkUserSession();
     }
 });
 
 // --- СТИЛИ ---
-function injectResetStyles() {
-    if (document.getElementById('reset-system-styles')) return;
+function injectAuthStyles() {
+    if (document.getElementById('auth-system-styles')) return;
 
     const css = `
-        .reset-modal-overlay {
+        /* Замораживание вышестоящих кнопок */
+        .btn-frozen,
+        .btn-frozen:hover,
+        .btn-frozen:active,
+        .btn-frozen:focus {
+            pointer-events: none !important;
+            user-select: none !important;
+            cursor: default !important;
+            opacity: 0.65 !important;
+            transform: none !important;
+            transition: none !important;
+            box-shadow: none !important;
+            background: inherit !important;
+            color: inherit !important;
+        }
+
+        .auth-modal-overlay {
             position: fixed !important;
             top: 0 !important;
             left: 0 !important;
@@ -156,13 +223,13 @@ function injectResetStyles() {
             transition: opacity 0.3s ease, visibility 0.3s ease !important;
         }
 
-        .reset-modal-overlay.active {
+        .auth-modal-overlay.active {
             opacity: 1 !important;
             visibility: visible !important;
             pointer-events: auto !important;
         }
 
-        .reset-modal-container {
+        .auth-modal-container {
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
@@ -182,22 +249,22 @@ function injectResetStyles() {
             z-index: 5 !important;
         }
 
-        .reset-modal-overlay.active .reset-modal-container {
+        .auth-modal-overlay.active .auth-modal-container {
             transform: scale(1) !important;
         }
 
-        .reset-modal-container.shake {
-            animation: resetShakeAnimation 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) !important;
+        .auth-modal-container.shake {
+            animation: shakeAnimation 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) !important;
         }
 
-        @keyframes resetShakeAnimation {
+        @keyframes shakeAnimation {
             10%, 90% { transform: scale(1) translateX(-3px); }
             20%, 80% { transform: scale(1) translateX(4px); }
             30%, 50%, 70% { transform: scale(1) translateX(-6px); }
             40%, 60% { transform: scale(1) translateX(6px); }
         }
 
-        .reset-close-btn {
+        .auth-close-btn {
             position: absolute !important;
             top: 30px !important;
             right: 30px !important;
@@ -213,7 +280,7 @@ function injectResetStyles() {
             transition: color 0.25s ease, transform 0.25s ease !important;
         }
 
-        .reset-close-btn::before {
+        .auth-close-btn::before {
             content: '' !important;
             position: absolute !important;
             top: -12px !important;
@@ -222,59 +289,58 @@ function injectResetStyles() {
             right: -12px !important;
         }
 
-        .reset-close-btn:hover {
+        .auth-close-btn:hover {
             color: #ffffff !important;
             transform: scale(1.15) rotate(90deg) !important;
         }
 
-        .reset-close-btn:active {
+        .auth-close-btn:active {
             transform: scale(0.9) rotate(90deg) !important;
         }
 
-        /* МАКСИМАЛЬНО ПОДНЯТО ВВЕРХ И УВЕЛИЧЕН ОТРЫВ ОТ КНОПОК */
-        .reset-header-title {
+        .auth-header-title {
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
             gap: 20px !important;
-            margin-top: -80px !important; 
-            margin-bottom: 75px !important; 
+            margin-top: -30px !important;
+            margin-bottom: 30px !important;
         }
 
-        .reset-logo-wrapper {
+        .auth-logo-wrapper {
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
             will-change: transform !important;
-            animation: resetLogoHover 3s ease-in-out infinite alternate !important;
+            animation: logoHover 3s ease-in-out infinite alternate !important;
         }
 
-        .reset-header-logo {
+        .auth-header-logo {
             height: 105px !important;
             width: auto !important;
             display: block !important;
             object-fit: contain !important;
         }
 
-        @keyframes resetLogoHover {
+        @keyframes logoHover {
             0% { transform: translateY(0px) rotate(0deg); }
             50% { transform: translateY(-8px) rotate(-2deg); }
             100% { transform: translateY(6px) rotate(2deg); }
         }
 
-        .reset-title-ticker {
+        .auth-title-ticker {
             height: 55px !important;
             overflow: hidden !important;
             position: relative !important;
         }
 
-        .reset-title-track {
+        .auth-title-track {
             display: flex !important;
             flex-direction: column !important;
-            animation: resetTitleVerticalScroll 8s cubic-bezier(0.77, 0, 0.175, 1) infinite !important;
+            animation: titleVerticalScroll 8s cubic-bezier(0.77, 0, 0.175, 1) infinite !important;
         }
 
-        .reset-title-track span {
+        .auth-title-track span {
             height: 55px !important;
             line-height: 55px !important;
             font-family: 'Unbounded', sans-serif !important;
@@ -288,14 +354,14 @@ function injectResetStyles() {
             align-items: center !important;
         }
 
-        @keyframes resetTitleVerticalScroll {
+        @keyframes titleVerticalScroll {
             0%, 20% { transform: translateY(0); }
             25%, 45% { transform: translateY(-55px); }
             50%, 70% { transform: translateY(-55px); }
             75%, 100% { transform: translateY(0); }
         }
 
-        .reset-tabs {
+        .auth-tabs {
             position: relative !important;
             display: flex !important;
             background: rgba(255, 255, 255, 0.04) !important;
@@ -307,7 +373,7 @@ function injectResetStyles() {
             box-sizing: border-box !important;
         }
 
-        .reset-tab-pill {
+        .auth-tab-pill {
             position: absolute !important;
             top: 3px !important;
             left: 3px !important;
@@ -320,11 +386,11 @@ function injectResetStyles() {
             pointer-events: none !important;
         }
 
-        .reset-tabs.update-mode .reset-tab-pill {
+        .auth-tabs.register-mode .auth-tab-pill {
             transform: translateX(100%) !important;
         }
 
-        .reset-tab-btn {
+        .auth-tab-btn {
             position: relative !important;
             z-index: 2 !important;
             flex: 1 !important;
@@ -335,27 +401,22 @@ function injectResetStyles() {
             font-size: 13px !important;
             font-weight: 500 !important;
             cursor: pointer !important;
-            transition: color 0.3s ease, opacity 0.3s ease !important;
+            transition: color 0.3s ease !important;
             text-align: center !important;
         }
 
-        .reset-tab-btn.disabled {
-            opacity: 0.3 !important;
-            cursor: not-allowed !important;
-        }
-
-        .reset-tab-btn.active {
+        .auth-tab-btn.active {
             color: #000000 !important;
             font-weight: 600 !important;
         }
 
-        .reset-forms-wrapper {
+        .auth-forms-wrapper {
             position: relative !important;
             width: 100% !important;
-            min-height: 180px !important;
+            min-height: 220px !important;
         }
 
-        .reset-form {
+        .auth-form {
             position: absolute !important;
             top: 0 !important;
             left: 0 !important;
@@ -371,18 +432,18 @@ function injectResetStyles() {
                         filter 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
 
-        .reset-form.visible {
+        .auth-form.visible {
             opacity: 1 !important;
             filter: blur(0px) !important;
             pointer-events: auto !important;
         }
 
-        .reset-input-group {
+        .auth-input-group {
             position: relative !important;
             width: 100% !important;
         }
 
-        .reset-input {
+        .auth-input {
             background: transparent !important;
             border: none !important;
             border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
@@ -396,16 +457,21 @@ function injectResetStyles() {
             transition: border-color 0.25s !important;
         }
 
-        .reset-input::placeholder {
+        .auth-input::placeholder {
             color: rgba(255, 255, 255, 0.35) !important;
             text-align: center !important;
         }
 
-        .reset-input:focus {
+        .auth-input:focus {
             border-bottom-color: #ffffff !important;
         }
 
-        .reset-submit-btn {
+        /* --- КНОПКА ОТПРАВКИ И АНИМАЦИЯ ЗАГРУЗКИ --- */
+        .auth-submit-btn {
+            position: relative !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
             background: transparent !important;
             color: #ffffff !important;
             border: 1px solid #ffffff !important;
@@ -416,20 +482,49 @@ function injectResetStyles() {
             cursor: pointer !important;
             width: 100% !important;
             margin-top: 15px !important;
-            transition: all 0.2s ease !important;
+            transition: all 0.25s ease !important;
             text-align: center !important;
+            min-height: 42px !important;
+            box-sizing: border-box !important;
         }
 
-        .reset-submit-btn:hover {
+        .auth-submit-btn:hover:not(:disabled) {
             background: #ffffff !important;
             color: #000000 !important;
         }
 
-        .reset-submit-btn:active {
+        .auth-submit-btn:active:not(:disabled) {
             transform: scale(0.98) !important;
         }
 
-        .reset-confirm-wave {
+        /* Серый заблокированный вид кнопки при загрузке */
+        .auth-submit-btn.loading,
+        .auth-submit-btn:disabled {
+            background: rgba(255, 255, 255, 0.08) !important;
+            border-color: rgba(255, 255, 255, 0.25) !important;
+            color: rgba(255, 255, 255, 0.4) !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+        }
+
+        /* Анимация крутящегося спиннера */
+        .auth-spinner {
+            display: inline-block !important;
+            width: 18px !important;
+            height: 18px !important;
+            border: 2px solid rgba(255, 255, 255, 0.25) !important;
+            border-radius: 50% !important;
+            border-top-color: #ffffff !important;
+            animation: authSpinnerRotate 0.75s linear infinite !important;
+        }
+
+        @keyframes authSpinnerRotate {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .auth-confirm-wave {
             position: fixed !important;
             bottom: 20px !important;
             left: 50% !important;
@@ -443,11 +538,11 @@ function injectResetStyles() {
             opacity: 0 !important;
         }
 
-        .reset-confirm-wave.active {
-            animation: resetFullScreenWave 0.85s cubic-bezier(0.1, 0.8, 0.3, 1) forwards !important;
+        .auth-confirm-wave.active {
+            animation: fullScreenWave 0.85s cubic-bezier(0.1, 0.8, 0.3, 1) forwards !important;
         }
 
-        @keyframes resetFullScreenWave {
+        @keyframes fullScreenWave {
             0% {
                 transform: translate(-50%, 50%) scale(1);
                 opacity: 1;
@@ -461,7 +556,7 @@ function injectResetStyles() {
             }
         }
 
-        .reset-confirm-toast {
+        .auth-confirm-toast {
             position: fixed !important;
             bottom: 30px !important;
             left: 50% !important;
@@ -482,21 +577,21 @@ function injectResetStyles() {
             transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease !important;
         }
 
-        .reset-confirm-toast.visible {
+        .auth-confirm-toast.visible {
             opacity: 1 !important;
             visibility: visible !important;
             pointer-events: auto !important;
-            animation: resetBounceInUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+            animation: bounceInUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
         }
 
-        .reset-confirm-toast.hiding {
+        .auth-confirm-toast.hiding {
             opacity: 0 !important;
             transform: translateX(-50%) translateY(40px) scale(0.9) !important;
             pointer-events: none !important;
             animation: none !important;
         }
 
-        @keyframes resetBounceInUp {
+        @keyframes bounceInUp {
             0% {
                 opacity: 0;
                 transform: translateX(-50%) translateY(100px) scale(0.7);
@@ -514,18 +609,18 @@ function injectResetStyles() {
             }
         }
 
-        .reset-confirm-text {
+        .auth-confirm-text {
             color: rgba(255, 255, 255, 0.95) !important;
             font-size: 13px !important;
             font-weight: 500 !important;
         }
 
-        .reset-confirm-actions {
+        .auth-confirm-actions {
             display: flex !important;
             gap: 8px !important;
         }
 
-        .reset-confirm-btn {
+        .auth-confirm-btn {
             background: transparent !important;
             border: 1px solid rgba(255, 255, 255, 0.2) !important;
             color: #ffffff !important;
@@ -536,22 +631,22 @@ function injectResetStyles() {
             transition: all 0.2s ease !important;
         }
 
-        .reset-confirm-btn:hover {
+        .auth-confirm-btn:hover {
             background: rgba(255, 255, 255, 0.12) !important;
         }
 
-        .reset-confirm-btn.danger {
+        .auth-confirm-btn.danger {
             background: #ffffff !important;
             color: #000000 !important;
             border-color: #ffffff !important;
             font-weight: 600 !important;
         }
 
-        .reset-confirm-btn.danger:hover {
+        .auth-confirm-btn.danger:hover {
             background: rgba(255, 255, 255, 0.85) !important;
         }
 
-        .reset-bg-watermark {
+        .auth-bg-watermark {
             position: absolute !important;
             top: 45% !important;
             right: -15% !important;
@@ -566,15 +661,15 @@ function injectResetStyles() {
             opacity: 0 !important;
             filter: blur(45px) brightness(0.6) !important;
             transition: opacity 1.2s ease-out, filter 1.2s ease-out !important;
-            animation: resetIntenseFloat 6s ease-in-out infinite alternate !important;
+            animation: intenseFloat 6s ease-in-out infinite alternate !important;
         }
 
-        .reset-modal-overlay.active .reset-bg-watermark {
+        .auth-modal-overlay.active .auth-bg-watermark {
             opacity: 0.22 !important;
             filter: blur(12px) brightness(0.9) !important;
         }
 
-        @keyframes resetIntenseFloat {
+        @keyframes intenseFloat {
             0% {
                 transform: translateY(-50%) translateX(0px) rotate(0deg) scale(1);
             }
@@ -588,65 +683,74 @@ function injectResetStyles() {
     `;
 
     const styleElement = document.createElement('style');
-    styleElement.id = 'reset-system-styles';
+    styleElement.id = 'auth-system-styles';
     styleElement.textContent = css;
     document.head.appendChild(styleElement);
 }
 
 // --- HTML РАЗМЕТКА ---
-function initResetModalUI() {
-    if (document.getElementById('reset-modal-overlay')) return;
+function initAuthModalUI() {
+    if (document.getElementById('auth-modal-overlay')) return;
 
     const modalHTML = `
-        <div id="reset-modal-overlay" class="reset-modal-overlay">
-            <button id="reset-close-btn" class="reset-close-btn" type="button">&times;</button>
+        <div id="auth-modal-overlay" class="auth-modal-overlay">
+            <button id="auth-close-btn" class="auth-close-btn" type="button">&times;</button>
 
-            <img src="images/geo_logo.png" alt="" class="reset-bg-watermark">
+            <img src="images/geo_logo.png" alt="" class="auth-bg-watermark">
 
-            <div class="reset-modal-container">
-                <div class="reset-header-title">
-                    <div class="reset-logo-wrapper">
-                        <img src="images/geo_logo.png" alt="Geo Logo" class="reset-header-logo">
+            <div class="auth-modal-container">
+                <div class="auth-header-title">
+                    <div class="auth-logo-wrapper">
+                        <img src="images/geo_logo.png" alt="Geo Logo" class="auth-header-logo">
                     </div>
 
-                    <div class="reset-title-ticker">
-                        <div class="reset-title-track">
+                    <div class="auth-title-ticker">
+                        <div class="auth-title-track">
                             <span>GEOГРАФИЯ</span>
-                            <span>СБРОС ПАРОЛЯ</span>
+                            <span>АВТОРИЗАЦИЯ</span>
                         </div>
                     </div>
                 </div>
                 
-                <div class="reset-tabs" id="reset-tabs">
-                    <div class="reset-tab-pill"></div>
-                    <button type="button" class="reset-tab-btn active" id="tab-request-btn">Запрос</button>
-                    <button type="button" class="reset-tab-btn disabled" id="tab-update-btn" disabled>Замена</button>
+                <div class="auth-tabs" id="auth-tabs">
+                    <div class="auth-tab-pill"></div>
+                    <button type="button" class="auth-tab-btn active" id="tab-login-btn">Вход</button>
+                    <button type="button" class="auth-tab-btn" id="tab-register-btn">Регистрация</button>
                 </div>
 
-                <div class="reset-forms-wrapper">
-                    <form id="reset-form-request" class="reset-form visible">
-                        <div class="reset-input-group">
-                            <input type="email" id="reset-request-email" placeholder="Ваш Email..." required class="reset-input" autocomplete="email">
+                <div class="auth-forms-wrapper">
+                    <form id="auth-form-login" class="auth-form visible">
+                        <div class="auth-input-group">
+                            <input type="email" id="login-email" placeholder="Email..." required class="auth-input" autocomplete="email">
                         </div>
-                        <button type="submit" class="reset-submit-btn" id="reset-request-btn-text">Отправить ссылку</button>
+                        <div class="auth-input-group">
+                            <input type="password" id="login-password" placeholder="Пароль..." required class="auth-input" autocomplete="current-password">
+                        </div>
+                        <button type="submit" id="btn-submit-login" class="auth-submit-btn">Войти</button>
                     </form>
 
-                    <form id="reset-form-update" class="reset-form">
-                        <div class="reset-input-group">
-                            <input type="password" id="reset-new-password" placeholder="Новый пароль (мин. 6)..." required minlength="6" class="reset-input" autocomplete="new-password">
+                    <form id="auth-form-register" class="auth-form">
+                        <div class="auth-input-group">
+                            <input type="text" id="reg-name" placeholder="Ваше имя / Никнейм..." required class="auth-input" autocomplete="nickname">
                         </div>
-                        <button type="submit" class="reset-submit-btn" id="reset-update-btn-text">Сохранить пароль</button>
+                        <div class="auth-input-group">
+                            <input type="email" id="reg-email" placeholder="Ваш Email..." required class="auth-input" autocomplete="email">
+                        </div>
+                        <div class="auth-input-group">
+                            <input type="password" id="reg-password" placeholder="Пароль (мин. 6 символов)..." required class="auth-input" autocomplete="new-password">
+                        </div>
+                        <button type="submit" id="btn-submit-register" class="auth-submit-btn">Зарегистрироваться</button>
                     </form>
                 </div>
             </div>
 
-            <div id="reset-confirm-wave" class="reset-confirm-wave"></div>
+            <div id="auth-confirm-wave" class="auth-confirm-wave"></div>
 
-            <div id="reset-confirm-toast" class="reset-confirm-toast">
-                <span class="reset-confirm-text">Закрыть сброс пароля?</span>
-                <div class="reset-confirm-actions">
-                    <button type="button" class="reset-confirm-btn" id="reset-cancel-close-btn">Отмена</button>
-                    <button type="button" class="reset-confirm-btn danger" id="reset-confirm-close-btn">Да</button>
+            <div id="auth-confirm-toast" class="auth-confirm-toast">
+                <span class="auth-confirm-text">Вы точно хотите покинуть авторизацию?</span>
+                <div class="auth-confirm-actions">
+                    <button type="button" class="auth-confirm-btn" id="auth-cancel-close-btn">Отмена</button>
+                    <button type="button" class="auth-confirm-btn danger" id="auth-confirm-close-btn">Да</button>
                 </div>
             </div>
         </div>
@@ -655,35 +759,35 @@ function initResetModalUI() {
 }
 
 // --- СОБЫТИЯ ---
-function initResetEvents() {
-    const overlay = document.getElementById('reset-modal-overlay');
-    const closeBtn = document.getElementById('reset-close-btn');
-    const tabRequest = document.getElementById('tab-request-btn');
-    const tabUpdate = document.getElementById('tab-update-btn');
+function initAuthEvents() {
+    const overlay = document.getElementById('auth-modal-overlay');
+    const closeBtn = document.getElementById('auth-close-btn');
+    const tabLogin = document.getElementById('tab-login-btn');
+    const tabRegister = document.getElementById('tab-register-btn');
     
-    const formRequest = document.getElementById('reset-form-request');
-    const formUpdate = document.getElementById('reset-form-update');
+    const formLogin = document.getElementById('auth-form-login');
+    const formRegister = document.getElementById('auth-form-register');
 
-    const btnConfirmYes = document.getElementById('reset-confirm-close-btn');
-    const btnConfirmNo = document.getElementById('reset-cancel-close-btn');
+    const btnConfirmYes = document.getElementById('auth-confirm-close-btn');
+    const btnConfirmNo = document.getElementById('auth-cancel-close-btn');
 
-    // Предотвращение дублирования обработчиков
+    // Предотвращение дублирования обработчиков при повторном вызове
     if (overlay && overlay.dataset.eventsInitialized) return;
     if (overlay) overlay.dataset.eventsInitialized = "true";
 
-    btnConfirmYes?.addEventListener('click', window.hideResetModal);
-    btnConfirmNo?.addEventListener('click', () => hideResetConfirmToast(false));
+    btnConfirmYes?.addEventListener('click', window.hideAuthModal);
+    btnConfirmNo?.addEventListener('click', () => hideConfirmToast(false));
 
-    closeBtn?.addEventListener('click', window.hideResetModal);
+    closeBtn?.addEventListener('click', window.hideAuthModal);
 
     // Разделение single/double click на оверлее
     overlay?.addEventListener('click', (e) => {
         if (e.target !== overlay) return;
 
-        if (resetOverlayClickTimeout) clearTimeout(resetOverlayClickTimeout);
+        if (overlayClickTimeout) clearTimeout(overlayClickTimeout);
 
-        resetOverlayClickTimeout = setTimeout(() => {
-            const container = document.querySelector('.reset-modal-container');
+        overlayClickTimeout = setTimeout(() => {
+            const container = document.querySelector('.auth-modal-container');
             if (container) {
                 container.classList.remove('shake');
                 void container.offsetWidth;
@@ -698,77 +802,138 @@ function initResetEvents() {
 
     overlay?.addEventListener('dblclick', (e) => {
         if (e.target === overlay) {
-            if (resetOverlayClickTimeout) clearTimeout(resetOverlayClickTimeout);
-            showResetConfirmToast();
+            if (overlayClickTimeout) clearTimeout(overlayClickTimeout);
+            showConfirmToast();
         }
     });
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            window.hideResetModal();
+            window.hideAuthModal();
         }
     });
 
-    tabRequest?.addEventListener('click', () => setResetMode('request'));
-    tabUpdate?.addEventListener('click', () => {
-        if (isResetUpdateUnlocked) {
-            setResetMode('update');
-        }
-    });
+    tabLogin?.addEventListener('click', () => setAuthMode('login'));
+    tabRegister?.addEventListener('click', () => setAuthMode('register'));
 
-    formRequest?.addEventListener('submit', async (e) => {
+    // Форма Входа
+    formLogin?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
 
-        const email = document.getElementById('reset-request-email').value;
-        const btn = document.getElementById('reset-request-btn-text');
+        const submitBtn = document.getElementById('btn-submit-login');
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
 
-        btn.disabled = true;
-        btn.textContent = 'Отправка...';
+        // Включаем статус загрузки
+        setButtonLoading(submitBtn, true, 'Войти');
 
-        const { error } = await window.supabaseClient.auth.resetPasswordForEmail(email, {
-            redirectTo: window.location.origin
-        });
+        try {
+            const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
 
-        btn.disabled = false;
-        btn.textContent = 'Отправить ссылку';
-
-        if (error) {
-            alert(`Ошибка отправки: ${error.message}`);
-        } else {
-            alert('Ссылка отправлена на вашу почту! Теперь активирована вкладка «Замена».');
-            
-            isResetUpdateUnlocked = true;
-            if (tabUpdate) {
-                tabUpdate.classList.remove('disabled');
-                tabUpdate.removeAttribute('disabled');
+            if (error) {
+                alert(`Ошибка входа: ${error.message}`);
+                setButtonLoading(submitBtn, false, 'Войти');
+            } else {
+                window.hideAuthModal();
+                window.location.reload();
             }
-            setResetMode('update');
+        } catch (err) {
+            console.error(err);
+            setButtonLoading(submitBtn, false, 'Войти');
         }
     });
 
-    formUpdate?.addEventListener('submit', async (e) => {
+    // Форма Регистрации
+    formRegister?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
 
-        const newPassword = document.getElementById('reset-new-password').value;
-        const btn = document.getElementById('reset-update-btn-text');
+        const submitBtn = document.getElementById('btn-submit-register');
+        const name = document.getElementById('reg-name').value;
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-password').value;
 
-        btn.disabled = true;
-        btn.textContent = 'Сохранение...';
+        // Включаем статус загрузки
+        setButtonLoading(submitBtn, true, 'Зарегистрироваться');
 
-        const { error } = await window.supabaseClient.auth.updateUser({
-            password: newPassword
-        });
+        try {
+            const { data, error } = await window.supabaseClient.auth.signUp({ 
+                email, 
+                password,
+                options: {
+                    data: {
+                        full_name: name,
+                        username: name
+                    }
+                }
+            });
 
-        btn.disabled = false;
-        btn.textContent = 'Сохранить пароль';
-
-        if (error) {
-            alert(`Ошибка изменения пароля: ${error.message}`);
-        } else {
-            alert('Пароль успешно обновлён!');
-            window.hideResetModal();
+            if (error) {
+                alert(`Ошибка регистрации: ${error.message}`);
+                setButtonLoading(submitBtn, false, 'Зарегистрироваться');
+            } else {
+                setButtonLoading(submitBtn, false, 'Зарегистрироваться');
+                window.hideAuthModal();
+                alert('Регистрация прошла успешно! Проверьте вашу почту для подтверждения.');
+            }
+        } catch (err) {
+            console.error(err);
+            setButtonLoading(submitBtn, false, 'Зарегистрироваться');
         }
     });
+}
+
+// --- ПРОВЕРКА СЕССИИ И ОБНОВЛЕНИЕ UI ---
+async function checkUserSession() {
+    if (!window.supabaseClient) return;
+
+    // 1. Проверка сессии при загрузке
+    const { data: { session } } = await window.supabaseClient.auth.getSession();
+    updateUIForUser(session ? session.user : null);
+
+    // 2. Отслеживание изменения состояния авторизации в режиме реального времени
+    window.supabaseClient.auth.onAuthStateChange((event, session) => {
+        const user = session ? session.user : null;
+        updateUIForUser(user);
+    });
+}
+
+function updateUIForUser(user) {
+    const mainAuthBtn = document.getElementById('open-auth-btn') || document.getElementById('auth-main-btn');
+    const profileWidget = document.getElementById('user-profile-widget');
+    
+    // Элементы профиля
+    const profileNameText = document.getElementById('profile-name-text');
+    const profileEmailText = document.getElementById('profile-email-text');
+
+    if (user) {
+        document.body.classList.add('user-logged-in');
+
+        if (mainAuthBtn) mainAuthBtn.style.display = 'none';
+
+        if (profileWidget) {
+            const userEmail = user.email || '';
+            const customName = user.user_metadata?.full_name || user.user_metadata?.username;
+            const username = customName || (userEmail ? userEmail.split('@')[0] : 'Пользователь');
+
+            // Выводим имя
+            if (profileNameText) {
+                profileNameText.textContent = username;
+            }
+
+            // Выводим почту
+            if (profileEmailText) {
+                profileEmailText.textContent = userEmail;
+            }
+
+            profileWidget.style.display = 'block';
+        }
+    } else {
+        document.body.classList.remove('user-logged-in');
+
+        if (mainAuthBtn) mainAuthBtn.style.display = 'inline-block';
+
+        if (profileWidget) profileWidget.style.display = 'none';
+    }
 }
