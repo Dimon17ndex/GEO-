@@ -595,21 +595,32 @@
         `;
 
         try {
-            // 1. Проверяем ID текущего авторизованного пользователя
+            // 1. Проверяем ID текущего авторизованного пользователя и факт подтверждения его email
             let currentUserId = null;
             if (client.auth) {
                 const { data: { session } } = await client.auth.getSession();
-                if (session?.user) {
+                if (session?.user && session.user.email_confirmed_at) {
                     currentUserId = session.user.id;
                 }
             }
 
             // 2. Запрос к публичной таблице profiles
-            const { data: users, error } = await client
+            const { data: rawUsers, error } = await client
                 .from('profiles')
                 .select('*');
 
             if (error) throw error;
+
+            // 3. Фильтруем только подтверждённых пользователей
+            const users = (rawUsers || []).filter(u => {
+                if ('email_confirmed_at' in u) {
+                    return u.email_confirmed_at !== null;
+                }
+                if ('is_confirmed' in u) {
+                    return u.is_confirmed === true;
+                }
+                return true;
+            });
 
             if (!users || users.length === 0) {
                 container.innerHTML = `
@@ -617,13 +628,13 @@
                         <span class="geouser-number">0</span>
                         <div class="geouser-card-box">
                             ${userIconSVG}
-                            <span>Пользователи не найдены</span>
+                            <span>Подтверждённые пользователи не найдены</span>
                         </div>
                     </div>`;
                 return;
             }
 
-            // 3. Если пользователь авторизован, гарантированно поднимаем его на 1-е место
+            // 4. Если текущий пользователь авторизован и его профиль в списке — поднимаем на 1-е место
             if (currentUserId) {
                 const myIndex = users.findIndex(u => u.id === currentUserId);
                 if (myIndex !== -1) {
@@ -632,7 +643,7 @@
                 }
             }
 
-            // 4. Рендерим пользователей
+            // 5. Рендерим пользователей
             container.innerHTML = users.map((u, index) => {
                 const isSelf = currentUserId && u.id === currentUserId;
                 const hasUsername = u.username && u.username.trim() !== '' && u.username !== '—';
