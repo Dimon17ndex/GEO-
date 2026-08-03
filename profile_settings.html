@@ -397,7 +397,7 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         }
 
-        /* Активное состояние кнопки (клик): белая граница и сдвиг вправо */
+        /* Активное состояние кнопки (клик или автовыбор): белая граница и сдвиг вправо */
         .action-btn-styled.active-tab {
             background: rgba(255, 255, 255, 0.15) !important;
             border-color: #ffffff !important;
@@ -684,7 +684,7 @@
     <div class="account-divider-line"></div>
 
     <div class="account-actions-container" id="account-actions-block">
-        <button type="button" class="action-btn-styled active-tab" data-tab="settings" onclick="switchTab('settings')">
+        <button type="button" class="action-btn-styled" data-tab="settings" onclick="switchTab('settings')">
             Основные настройки
         </button>
         <button type="button" class="action-btn-styled" data-tab="profile" onclick="switchTab('profile')">
@@ -696,7 +696,7 @@
     </div>
 
     <div class="main-profile-container" id="main-profile-block">
-        <div class="tab-content active-content" id="tab-settings">
+        <div class="tab-content" id="tab-settings">
             <div class="session-logout-section">
                 <span class="logout-label-text">Завершение сессии/выход из аккаунта</span>
                 <button type="button" class="red-primary-btn" onclick="handleLogout()">
@@ -782,21 +782,17 @@ function navigateToPage(targetPage) {
 
 /* Логика переключения разделов/вкладок слева */
 function switchTab(tabName) {
-    // Находим все кнопки и контент-панели
     const buttons = document.querySelectorAll('.action-btn-styled');
     const contents = document.querySelectorAll('.tab-content');
 
-    // Убираем активный класс у всех кнопок и сбрасываем контент
     buttons.forEach(btn => btn.classList.remove('active-tab'));
     contents.forEach(content => content.classList.remove('active-content'));
 
-    // Активируем нужную кнопку
     const selectedBtn = document.querySelector(`.action-btn-styled[data-tab="${tabName}"]`);
     if (selectedBtn) {
         selectedBtn.classList.add('active-tab');
     }
 
-    // Показываем соответствующий контейнер содержимого
     const selectedContent = document.getElementById(`tab-${tabName}`);
     if (selectedContent) {
         selectedContent.classList.add('active-content');
@@ -831,6 +827,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     setTimeout(() => { spawnAmbientWave(); }, 1000);
+
+    // Автоматически применяем визуал первой кнопки (Основные настройки)
+    // ровно по окончании анимации её появления (через 1.4 секунды)
+    setTimeout(() => {
+        switchTab('settings');
+    }, 1400);
 
     const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
     const sidePanel = document.getElementById('dev-side-panel');
