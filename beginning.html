@@ -8,6 +8,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js" defer></script>
     <script src="console.js" defer></script>
+    <script src="auth-system.js?v=3" defer></script>
+    <script src="reset-password.js" defer></script>
+    <script src="app.js" defer></script>
 
     <link rel="icon" type="image/png" href="images/favicon.png">
 
@@ -105,161 +108,161 @@
         }
 
         /* =========================================================
-   ВИДЖЕТ ПРОФИЛЯ — ПОЛНАЯ ЗАЩИТА ОТ СРЫВА HOVER
-   ========================================================= */
-.top-right-profile {
-    position: fixed;
-    top: 40px;
-    right: 140px;
-    z-index: 10;
-}
+           ВИДЖЕТ ПРОФИЛЯ — ПОЛНАЯ ЗАЩИТА ОТ СРЫВА HOVER
+           ========================================================= */
+        .top-right-profile {
+            position: fixed;
+            top: 40px;
+            right: 140px;
+            z-index: 10;
+        }
 
-/* 1. Карточка профиля */
-.profile-card {
-    position: relative;
-    display: inline-block;
-    padding: 10px 18px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 12px;
-    backdrop-filter: blur(10px);
-    cursor: pointer;
-    transition: background 0.3s ease, border-color 0.3s ease;
-}
+        /* 1. Карточка профиля */
+        .profile-card {
+            position: relative;
+            display: inline-block;
+            padding: 10px 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
 
-.profile-card:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.3);
-}
+        .profile-card:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
 
-.profile-username {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    color: #ffffff;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
+        .profile-username {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: #ffffff;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-.profile-username::after {
-    content: '▾';
-    font-size: 10px;
-    opacity: 0.6;
-    transition: transform 0.2s ease;
-}
+        .profile-username::after {
+            content: '▾';
+            font-size: 10px;
+            opacity: 0.6;
+            transition: transform 0.2s ease;
+        }
 
-.profile-card:hover .profile-username::after {
-    transform: rotate(180deg);
-}
+        .profile-card:hover .profile-username::after {
+            transform: rotate(180deg);
+        }
 
-/* 2. Контейнер выпадающего меню */
-.profile-dropdown-menu {
-    position: absolute;
-    top: 100%;              /* Зацепка ровно за нижний край карточки */
-    left: 0;
-    right: 0;
-    padding-top: 8px;      /* Заменяем внешние зазоры внутренними */
-    display: flex;
-    flex-direction: column;
-    gap: 6px;              /* Расстояние между кнопками */
+        /* 2. Контейнер выпадающего меню */
+        .profile-dropdown-menu {
+            position: absolute;
+            top: 100%;             /* Зацепка ровно за нижний край карточки */
+            left: 0;
+            right: 0;
+            padding-top: 8px;      /* Заменяем внешние зазоры внутренними */
+            display: flex;
+            flex-direction: column;
+            gap: 6px;              /* Расстояние между кнопками */
 
-    /* Визуальное скрытие */
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-4px);
-    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
-    
-    /* Отключаем клики в скрытом состоянии */
-    pointer-events: none;
-}
+            /* Визуальное скрытие */
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-4px);
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+            
+            /* Отключаем клики в скрытом состоянии */
+            pointer-events: none;
+        }
 
-/* 3. НЕВИДИМАЯ ПОДУШКА-СОЕДИНИТЕЛЬ (Убирает все провалы) */
-.profile-dropdown-menu::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -10px;            /* Немного расширяем зону по бокам */
-    right: -10px;
-    bottom: -10px;          /* И снизу, чтобы мышь не соскакивала */
-    z-index: -1;
-    background: transparent;
-}
+        /* 3. НЕВИДИМАЯ ПОДУШКА-СОЕДИНИТЕЛЬ (Убирает все провалы) */
+        .profile-dropdown-menu::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -10px;            /* Немного расширяем зону по бокам */
+            right: -10px;
+            bottom: -10px;          /* И снизу, чтобы мышь не соскакивала */
+            z-index: -1;
+            background: transparent;
+        }
 
-/* 4. Открытие и удержание при наведении на ЛЮБОЙ элемент этой зоны */
-.profile-card:hover .profile-dropdown-menu,
-.profile-dropdown-menu:hover {
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: translateY(0) !important;
-    pointer-events: auto !important;
-}
+        /* 4. Открытие и удержание при наведении на ЛЮБОЙ элемент этой зоны */
+        .profile-card:hover .profile-dropdown-menu,
+        .profile-dropdown-menu:hover {
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: translateY(0) !important;
+            pointer-events: auto !important;
+        }
 
-/* 5. Кнопки внутри меню */
-.profile-settings-btn,
-.logout-dropdown-btn {
-    width: 100%;
-    border: none;
-    border-radius: 8px;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    cursor: pointer;
-    box-sizing: border-box;
-    position: relative;
-    z-index: 2;            /* Кнопки поверх невидимой подушки */
-}
+        /* 5. Кнопки внутри меню */
+        .profile-settings-btn,
+        .logout-dropdown-btn {
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 2;            /* Кнопки поверх невидимой подушки */
+        }
 
-/* Синяя кнопка */
-.profile-settings-btn {
-    padding: 10px 8px;
-    background: #3498db;
-    color: #ffffff;
-    font-size: 12px;
-    transition: background 0.2s ease;
-    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
-    text-align: center;
-}
+        /* Синяя кнопка */
+        .profile-settings-btn {
+            padding: 10px 8px;
+            background: #3498db;
+            color: #ffffff;
+            font-size: 12px;
+            transition: background 0.2s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            text-align: center;
+        }
 
-.profile-settings-btn:hover {
-    background: #2980b9;
-}
+        .profile-settings-btn:hover {
+            background: #2980b9;
+        }
 
-/* Красная кнопка */
-.logout-dropdown-btn {
-    padding: 10px 12px;
-    background: #e74c3c;
-    color: #ffffff;
-    font-size: 13px;
-    transition: background 0.2s ease, opacity 0.2s ease;
-    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
+        /* Красная кнопка */
+        .logout-dropdown-btn {
+            padding: 10px 12px;
+            background: #e74c3c;
+            color: #ffffff;
+            font-size: 13px;
+            transition: background 0.2s ease, opacity 0.2s ease;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
 
-.logout-dropdown-btn:hover {
-    background: #c0392b;
-}
+        .logout-dropdown-btn:hover {
+            background: #c0392b;
+        }
 
-/* Крутящийся лоадер загрузки в кнопке */
-.btn-spinner {
-    width: 14px;
-    height: 14px;
-    border: 2px solid rgba(255, 255, 255, 0.35);
-    border-top-color: #ffffff;
-    border-radius: 50%;
-    animation: btnSpinnerRotate 0.8s linear infinite;
-    display: inline-block;
-    box-sizing: border-box;
-    flex-shrink: 0;
-}
+        /* Крутящийся лоадер загрузки в кнопке */
+        .btn-spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.35);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: btnSpinnerRotate 0.8s linear infinite;
+            display: inline-block;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
 
-@keyframes btnSpinnerRotate {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
+        @keyframes btnSpinnerRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
         /* Контейнер для размещения статуса строго по центру экрана */
         .center-status-wrapper {
@@ -270,10 +273,15 @@
             z-index: 5;
             pointer-events: none;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
         }
 
-        /* Разрешаем клики по кнопке внутри pointer-events: none контейнера */
-        .auth-trigger-btn {
+        /* Разрешаем клики по элементам управления внутри центрального контейнера */
+        .auth-trigger-btn,
+        .reset-open-link {
             pointer-events: auto;
         }
 
@@ -286,6 +294,22 @@
             text-transform: uppercase;
             color: rgba(255, 255, 255, 0.4);
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+        }
+
+        /* Ссылка восстановления пароля */
+        .reset-open-link {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+            text-decoration: underline;
+            transition: color 0.2s ease;
+        }
+
+        .reset-open-link:hover {
+            color: #ffffff;
         }
 
         /* =========================================================
@@ -338,21 +362,6 @@
             border-color: #3498db;
             background: rgba(52, 152, 219, 0.2);
         }
-
-        .reset-open-link {
-            background: transparent;
-            border: none;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 13px;
-            font-family: 'Montserrat', sans-serif;
-            cursor: pointer;
-            text-decoration: underline;
-            transition: color 0.2s ease;
-        }
-
-        .reset-open-link:hover {
-            color: #ffffff;
-        }
     </style>
 </head>
 <body>
@@ -380,6 +389,10 @@
     <div class="center-status-wrapper">
         <button type="button" id="open-auth-btn" class="auth-trigger-btn" onclick="showAuthModal()">
             Войти / Зарегистрироваться
+        </button>
+
+        <button type="button" class="reset-open-link" onclick="showResetModal('request')">
+            Забыли пароль?
         </button>
 
         <div class="empty-status-message">ЗДЕСЬ ПОКА ПУСТО</div>
@@ -441,8 +454,6 @@
             Профиль администратора
         </button>
     </div>
-
-    <script src="auth-system.js?v=3"></script>
 
     <script>
 // Переменные состояния
@@ -648,12 +659,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initDevPanel();
 });
 </script>
-
-    <script src="app.js"></script>
-    <script src="reset-password.js"></script>
-
-    <button type="button" class="reset-open-link" onclick="showResetModal('request')">
-        Забыли пароль?
-    </button>
 </body>
 </html>
