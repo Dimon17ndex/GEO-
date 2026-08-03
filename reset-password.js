@@ -121,7 +121,6 @@ function injectResetStyles() {
             background: #3498db; border: none; border-radius: 10px;
             color: #fff; font-weight: 700; font-size: 15px; cursor: pointer;
             transition: background 0.3s, opacity 0.3s;
-            position: relative;
         }
         .auth-btn:hover { background: #2980b9; }
         .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -162,9 +161,7 @@ function initResetModalUI() {
                     <label for="reset-email">Ваш Email</label>
                     <input type="email" id="reset-email" placeholder="name@domain.com" required>
                 </div>
-                <button type="submit" class="auth-btn auth-btn-primary" id="reset-request-btn">
-                    <span id="reset-request-btn-text">Отправить ссылку</span>
-                </button>
+                <button type="submit" class="auth-btn auth-btn-primary" id="reset-request-btn-text">Отправить ссылку</button>
             </form>
 
             <form id="reset-form-update" style="display: none;">
@@ -172,9 +169,7 @@ function initResetModalUI() {
                     <label for="reset-new-password">Новый пароль</label>
                     <input type="password" id="reset-new-password" placeholder="••••••••" required minlength="6">
                 </div>
-                <button type="submit" class="auth-btn auth-btn-primary" id="reset-update-btn">
-                    <span id="reset-update-btn-text">Сохранить пароль</span>
-                </button>
+                <button type="submit" class="auth-btn auth-btn-primary" id="reset-update-btn-text">Сохранить пароль</button>
             </form>
 
             <div class="auth-confirm-toast" id="reset-confirm-toast">
@@ -224,19 +219,6 @@ function hideResetConfirmToast(immediate = false) {
     }
 }
 
-function setButtonLoading(button, textElement, isLoading, loadingText, defaultText) {
-    if (!button) return;
-    if (isLoading) {
-        button.disabled = true;
-        button.classList.add('is-loading');
-        if (textElement) textElement.textContent = loadingText;
-    } else {
-        button.disabled = false;
-        button.classList.remove('is-loading');
-        if (textElement) textElement.textContent = defaultText;
-    }
-}
-
 function initResetEvents() {
     const overlay = document.getElementById('reset-modal-overlay');
     const closeBtn = document.getElementById('reset-modal-close-btn');
@@ -258,29 +240,29 @@ function initResetEvents() {
         if (isResetUpdateUnlocked) setResetMode('update');
     });
 
-    // Запрос ссылки
+    // Обработчик отправки ссылки
     formRequest?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
 
         const email = document.getElementById('reset-email').value;
-        const btn = document.getElementById('reset-request-btn');
-        const btnText = document.getElementById('reset-request-btn-text');
+        const btn = document.getElementById('reset-request-btn-text');
 
-        setButtonLoading(btn, btnText, true, 'Отправка...', 'Отправить ссылку');
+        btn.disabled = true;
+        btn.textContent = 'Отправка...';
 
         const { error } = await window.supabaseClient.auth.resetPasswordForEmail(email, {
             redirectTo: window.location.origin
         });
 
-        setButtonLoading(btn, btnText, false, '', 'Отправить ссылку');
+        btn.disabled = false;
+        btn.textContent = 'Отправить ссылку';
 
         if (error) {
             alert(`Ошибка отправки: ${error.message}`);
         } else {
-            showResetConfirmToast('Ссылка отправлена! Откройте письмо.');
-            hideResetConfirmToast();
-
+            alert('Ссылка отправлена на вашу почту! Теперь активирована вкладка «Замена».');
+            
             isResetUpdateUnlocked = true;
             if (tabUpdate) {
                 tabUpdate.classList.remove('disabled');
@@ -290,31 +272,29 @@ function initResetEvents() {
         }
     });
 
-    // Сохранение пароля
+    // Обработчик сохранения пароля
     formUpdate?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
 
         const newPassword = document.getElementById('reset-new-password').value;
-        const btn = document.getElementById('reset-update-btn');
-        const btnText = document.getElementById('reset-update-btn-text');
+        const btn = document.getElementById('reset-update-btn-text');
 
-        setButtonLoading(btn, btnText, true, 'Сохранение...', 'Сохранить пароль');
+        btn.disabled = true;
+        btn.textContent = 'Сохранение...';
 
         const { error } = await window.supabaseClient.auth.updateUser({
             password: newPassword
         });
 
-        setButtonLoading(btn, btnText, false, '', 'Сохранить пароль');
+        btn.disabled = false;
+        btn.textContent = 'Сохранить пароль';
 
         if (error) {
             alert(`Ошибка изменения пароля: ${error.message}`);
         } else {
-            showResetConfirmToast('Пароль успешно обновлён!');
-            hideResetConfirmToast();
-            setTimeout(() => {
-                window.hideResetModal();
-            }, 1500);
+            alert('Пароль успешно обновлён!');
+            window.hideResetModal();
         }
     });
 }
