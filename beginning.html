@@ -157,7 +157,7 @@
 /* 2. Контейнер выпадающего меню */
 .profile-dropdown-menu {
     position: absolute;
-    top: 100%;             /* Зацепка ровно за нижний край карточки */
+    top: 100%;              /* Зацепка ровно за нижний край карточки */
     left: 0;
     right: 0;
     padding-top: 8px;      /* Заменяем внешние зазоры внутренними */
@@ -180,9 +180,9 @@
     content: '';
     position: absolute;
     top: 0;
-    left: -10px;           /* Немного расширяем зону по бокам */
+    left: -10px;            /* Немного расширяем зону по бокам */
     right: -10px;
-    bottom: -10px;         /* И снизу, чтобы мышь не соскакивала */
+    bottom: -10px;          /* И снизу, чтобы мышь не соскакивала */
     z-index: -1;
     background: transparent;
 }
@@ -227,16 +227,38 @@
 
 /* Красная кнопка */
 .logout-dropdown-btn {
-    padding: 10px 0;
+    padding: 10px 12px;
     background: #e74c3c;
     color: #ffffff;
     font-size: 13px;
-    transition: background 0.2s ease;
+    transition: background 0.2s ease, opacity 0.2s ease;
     box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .logout-dropdown-btn:hover {
     background: #c0392b;
+}
+
+/* Крутящийся лоадер загрузки в кнопке */
+.btn-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: btnSpinnerRotate 0.8s linear infinite;
+    display: inline-block;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+@keyframes btnSpinnerRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
         /* Контейнер для размещения статуса строго по центру экрана */
@@ -431,6 +453,30 @@ const intensityValueLabel = document.getElementById('intensity-value');
 
 let intensityPercent = 20;
 let ambientTimeoutId = null; // Фикс параллельных циклов волн
+
+// Функция выхода из аккаунта со спиннером и новым текстом
+async function logoutUser() {
+    const btn = document.querySelector('.logout-dropdown-btn');
+    if (btn) {
+        // Устанавливаем новый текст и добавляем спиннер справа
+        btn.innerHTML = `Выход из аккаунта <span class="btn-spinner"></span>`;
+        btn.style.pointerEvents = 'none';
+        btn.style.opacity = '0.85';
+    }
+
+    try {
+        const client = window.supabaseClient || window.supabase;
+        if (client && client.auth) {
+            await client.auth.signOut();
+        }
+    } catch (err) {
+        console.error('Ошибка выходу из аккаунта:', err);
+    } finally {
+        setTimeout(() => {
+            window.location.reload();
+        }, 600);
+    }
+}
 
 // Генерация визуальных волн
 function createBackgroundRipple(x, y, className, duration = 1500) {
