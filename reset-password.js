@@ -39,20 +39,6 @@ window.hideResetModal = function() {
     }
 };
 
-// Функция управления состоянием загрузки на кнопке
-function setButtonLoading(button, textSpan, isLoading, loadingText, defaultText) {
-    if (!button) return;
-    if (isLoading) {
-        button.disabled = true;
-        button.classList.add('loading');
-        if (textSpan) textSpan.textContent = loadingText;
-    } else {
-        button.disabled = false;
-        button.classList.remove('loading');
-        if (textSpan) textSpan.textContent = defaultText;
-    }
-}
-
 function injectResetStyles() {
     if (document.getElementById('reset-modal-styles')) return;
 
@@ -135,12 +121,10 @@ function injectResetStyles() {
             background: #3498db; border: none; border-radius: 10px;
             color: #fff; font-weight: 700; font-size: 15px; cursor: pointer;
             transition: background 0.3s, opacity 0.3s, transform 0.2s;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        .reset-submit-btn:hover:not(:disabled) { background: #2980b9; transform: translateY(-1px); }
+        .reset-submit-btn:hover:not(:disabled) { background: #2980b9; }
         .reset-submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        /* Плашка подтверждения разблокировки заменяющего пароля */
         .reset-confirm-toast {
             position: absolute; bottom: -60px; left: 0; right: 0;
             background: rgba(46, 204, 113, 0.9);
@@ -260,7 +244,7 @@ function initResetEvents() {
         if (isResetUpdateUnlocked) setResetMode('update');
     });
 
-    // Обработка запроса ссылки
+    // Запрос ссылки
     formRequest?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
@@ -269,22 +253,23 @@ function initResetEvents() {
         const btn = document.getElementById('reset-request-btn');
         const btnText = document.getElementById('reset-request-btn-text');
 
-        // Включаем загрузку
-        setButtonLoading(btn, btnText, true, 'Отправка...', 'Отправить ссылку');
+        // Блокировка и процесс
+        btn.disabled = true;
+        if (btnText) btnText.textContent = 'Отправка...';
 
         const { error } = await window.supabaseClient.auth.resetPasswordForEmail(email, {
             redirectTo: window.location.origin
         });
 
-        // Выключаем загрузку
-        setButtonLoading(btn, btnText, false, '', 'Отправить ссылку');
+        // Снятие блокировки
+        btn.disabled = false;
+        if (btnText) btnText.textContent = 'Отправить ссылку';
 
         if (error) {
             alert(`Ошибка отправки: ${error.message}`);
         } else {
-            showResetConfirmToast('Ссылка отправлена на ваш Email!');
-            hideResetConfirmToast();
-
+            alert('Ссылка отправлена на вашу почту! Теперь активирована вкладка «Замена пароля».');
+            
             isResetUpdateUnlocked = true;
             if (tabUpdate) {
                 tabUpdate.classList.remove('disabled');
@@ -294,7 +279,7 @@ function initResetEvents() {
         }
     });
 
-    // Обработка обновления пароля
+    // Сохранение пароля
     formUpdate?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
@@ -303,24 +288,23 @@ function initResetEvents() {
         const btn = document.getElementById('reset-update-btn');
         const btnText = document.getElementById('reset-update-btn-text');
 
-        // Включаем загрузку
-        setButtonLoading(btn, btnText, true, 'Сохранение...', 'Сохранить новый пароль');
+        // Блокировка и процесс
+        btn.disabled = true;
+        if (btnText) btnText.textContent = 'Сохранение...';
 
         const { error } = await window.supabaseClient.auth.updateUser({
             password: newPassword
         });
 
-        // Выключаем загрузку
-        setButtonLoading(btn, btnText, false, '', 'Сохранить новый пароль');
+        // Снятие блокировки
+        btn.disabled = false;
+        if (btnText) btnText.textContent = 'Сохранить новый пароль';
 
         if (error) {
             alert(`Ошибка изменения пароля: ${error.message}`);
         } else {
-            showResetConfirmToast('Пароль успешно изменён!');
-            hideResetConfirmToast();
-            setTimeout(() => {
-                window.hideResetModal();
-            }, 1500);
+            alert('Пароль успешно обновлён!');
+            window.hideResetModal();
         }
     });
 }
