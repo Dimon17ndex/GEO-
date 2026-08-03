@@ -81,18 +81,15 @@
             white-space: nowrap;
             will-change: transform;
             
-            /* Сохраняем парение/левитацию */
             animation: floatingText 4.5s ease-in-out infinite alternate !important;
         }
 
-        /* Текстовые слои для плавного переключения */
         .title-text-main,
         .title-text-alt {
             display: inline-block;
             transition: opacity 0.8s ease-in-out, filter 0.8s ease-in-out;
         }
 
-        /* Вторая надпись накладывается поверх первой */
         .title-text-alt {
             position: absolute;
             top: 0;
@@ -101,7 +98,6 @@
             filter: blur(8px);
         }
 
-        /* Циклическая смена названий каждые 6 секунд */
         .top-left-brand .db-main-title .title-text-main {
             animation: swapTextMain 7s ease-in-out infinite;
         }
@@ -110,7 +106,6 @@
             animation: swapTextAlt 7s ease-in-out infinite;
         }
 
-        /* Keyframes: Анимации парения (левитации) */
         @keyframes floatingLogo {
             0% { transform: translateY(0px) rotate(0deg); }
             50% { transform: translateY(-8px) rotate(-1.5deg); }
@@ -123,28 +118,14 @@
             100% { transform: translateY(4px); }
         }
 
-        /* Keyframes: Смена первого текста «GEOГРАФИЯ» */
         @keyframes swapTextMain {
-            0%, 40%, 100% {
-                opacity: 1;
-                filter: blur(0px);
-            }
-            50%, 90% {
-                opacity: 0;
-                filter: blur(8px);
-            }
+            0%, 40%, 100% { opacity: 1; filter: blur(0px); }
+            50%, 90% { opacity: 0; filter: blur(8px); }
         }
 
-        /* Keyframes: Смена второго текста «НАСТРОЙКИ ПРОФИЛЯ» */
         @keyframes swapTextAlt {
-            0%, 40%, 100% {
-                opacity: 0;
-                filter: blur(8px);
-            }
-            50%, 90% {
-                opacity: 1;
-                filter: blur(0px);
-            }
+            0%, 40%, 100% { opacity: 0; filter: blur(8px); }
+            50%, 90% { opacity: 1; filter: blur(0px); }
         }
 
         /* =========================================================
@@ -172,7 +153,6 @@
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 
-            /* Начальное состояние для плавной анимации появления */
             opacity: 0;
             filter: blur(10px);
             transform: scale(0.5);
@@ -187,16 +167,8 @@
         }
 
         @keyframes backArrowAppear {
-            0% {
-                opacity: 0;
-                filter: blur(10px);
-                transform: scale(0.5);
-            }
-            100% {
-                opacity: 1;
-                filter: blur(0px);
-                transform: scale(1);
-            }
+            0% { opacity: 0; filter: blur(10px); transform: scale(0.5); }
+            100% { opacity: 1; filter: blur(0px); transform: scale(1); }
         }
 
         .back-arrow-btn:hover {
@@ -281,24 +253,14 @@
         }
 
         @keyframes lightFlashFullWidth {
-            0% { 
-                left: -100vw; 
-                opacity: 0; 
-            }
-            20% { 
-                opacity: 1; 
-            }
-            80% { 
-                opacity: 1; 
-            }
-            100% { 
-                left: 100vw; 
-                opacity: 0; 
-            }
+            0% { left: -100vw; opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { left: 100vw; opacity: 0; }
         }
 
         /* =========================================================
-            ЛИНИЯ-РАЗДЕЛИТЕЛЬ (ПО ЦЕНТРУ ПОД АККАУНТОМ)
+            ЛИНИЯ-РАЗДЕЛИТЕЛЬ
             ========================================================= */
         .account-divider-line {
             position: absolute;
@@ -321,18 +283,12 @@
         }
 
         @keyframes lineExpandCenter {
-            0% {
-                opacity: 0;
-                transform: translateX(-50%) scaleX(0);
-            }
-            100% {
-                opacity: 1;
-                transform: translateX(-50%) scaleX(1);
-            }
+            0% { opacity: 0; transform: translateX(-50%) scaleX(0); }
+            100% { opacity: 1; transform: translateX(-50%) scaleX(1); }
         }
 
         /* =========================================================
-            КНОПКИ СЛЕВА (СТУПЕНЧАТОЕ ПОЯВЛЕНИЕ + ВЫДЕЛЕНИЕ/СДВИГ)
+            КНОПКИ СЛЕВА (СЯГКИЕ И ПЛАВНЫЕ АНИМАЦИИ)
             ========================================================= */
         .account-actions-container {
             position: absolute;
@@ -361,11 +317,11 @@
             backdrop-filter: blur(10px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             
-            /* Унифицированные плавные переходы для ховера и активного состояния */
-            transition: background 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
-                        border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
-                        transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
-                        box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            /* Сверхплавный кубический Безье для абсолютной мягкости движений */
+            transition: background 0.5s cubic-bezier(0.25, 1, 0.5, 1), 
+                        border-color 0.5s cubic-bezier(0.25, 1, 0.5, 1), 
+                        transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), 
+                        box-shadow 0.5s cubic-bezier(0.25, 1, 0.5, 1);
             width: 100%;
             box-sizing: border-box;
 
@@ -377,18 +333,9 @@
             animation: actionsAppear 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* Задержки по очереди для ступенчатого эффекта */
-        .action-btn-styled:nth-child(1) {
-            animation-delay: 1.2s;
-        }
-
-        .action-btn-styled:nth-child(2) {
-            animation-delay: 1.35s;
-        }
-
-        .action-btn-styled:nth-child(3) {
-            animation-delay: 1.5s;
-        }
+        .action-btn-styled:nth-child(1) { animation-delay: 1.2s; }
+        .action-btn-styled:nth-child(2) { animation-delay: 1.35s; }
+        .action-btn-styled:nth-child(3) { animation-delay: 1.5s; }
 
         .action-btn-styled:hover {
             background: rgba(255, 255, 255, 0.18);
@@ -397,7 +344,7 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         }
 
-        /* Активное состояние кнопки (клик или автовыбор): белая граница и сдвиг вправо */
+        /* Мягкое активное состояние: белый контур и плавной сдвиг вправо */
         .action-btn-styled.active-tab {
             background: rgba(255, 255, 255, 0.15) !important;
             border-color: #ffffff !important;
@@ -406,20 +353,12 @@
         }
 
         @keyframes actionsAppear {
-            0% { 
-                opacity: 0; 
-                filter: blur(10px); 
-                transform: translateY(15px); 
-            }
-            100% { 
-                opacity: 1; 
-                filter: blur(0px); 
-                transform: translateY(0); 
-            }
+            0% { opacity: 0; filter: blur(10px); transform: translateY(15px); }
+            100% { opacity: 1; filter: blur(0px); transform: translateY(0); }
         }
 
         /* =========================================================
-            КРУПНЫЙ ЦЕНТРАЛЬНЫЙ КОНТЕЙНЕР (СИСТЕМА ВКЛАДОК)
+            КРУПНЫЙ ЦЕНТРАЛЬНЫЙ КОНТЕЙНЕР (ПЛАВНАЯ СМЕНА ВКЛАДОК)
             ========================================================= */
         .main-profile-container {
             position: absolute;
@@ -434,7 +373,6 @@
             padding: 30px;
             box-sizing: border-box;
 
-            /* Стеклянный стиль */
             background: rgba(255, 255, 255, 0.06);
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 22px;
@@ -446,7 +384,9 @@
             filter: blur(12px);
 
             animation: containerAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.0s forwards;
-            transition: opacity 0.4s ease, filter 0.4s ease, transform 0.4s ease;
+            transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1), 
+                        filter 0.5s cubic-bezier(0.25, 1, 0.5, 1), 
+                        transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         @keyframes containerAppear {
@@ -462,22 +402,32 @@
             }
         }
 
-        /* Скрытые панели вкладок */
+        /* Система вкладок с мягким бесшовным кроссфейдом */
         .tab-content {
-            display: none;
-            width: 100%;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        /* Активная панель отображается и плавно проявляется */
-        .tab-content.active-content {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            right: 30px;
+            bottom: 30px;
             display: flex;
             flex-direction: column;
-            opacity: 1;
+            
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(8px);
+            transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+                        transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+                        visibility 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            pointer-events: none;
         }
 
-        /* Пустой контент-заглушка для будущих разделов */
+        .tab-content.active-content {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
         .empty-tab-placeholder {
             font-family: 'Montserrat', sans-serif;
             font-size: 15px;
@@ -488,7 +438,7 @@
         }
 
         /* =========================================================
-            БЛОК ВЫХОДА ВНУТРИ КОНТЕЙНЕРА И КНОПКА C АНИМАЦИЕЙ
+            БЛОК ВЫХОДА ВНУТРИ КОНТЕЙНЕРА И КНОПКА
             ========================================================= */
         .session-logout-section {
             display: flex;
@@ -780,7 +730,7 @@ function navigateToPage(targetPage) {
     }, 500);
 }
 
-/* Логика переключения разделов/вкладок слева */
+/* Сверхплавное переключение разделов с мягким кроссфейдом */
 function switchTab(tabName) {
     const buttons = document.querySelectorAll('.action-btn-styled');
     const contents = document.querySelectorAll('.tab-content');
@@ -828,8 +778,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setTimeout(() => { spawnAmbientWave(); }, 1000);
 
-    // Автоматически применяем визуал первой кнопки (Основные настройки)
-    // ровно по окончании анимации её появления (через 1.4 секунды)
+    // Плавное применение визуала первой кнопки сразу после её появления на экране
     setTimeout(() => {
         switchTab('settings');
     }, 1400);
