@@ -723,8 +723,8 @@ function initResetEvents() {
         const email = document.getElementById('reset-request-email').value;
         const btn = document.getElementById('reset-request-btn-text');
 
-        btn.textContent = 'Отправка...';
         btn.disabled = true;
+        btn.textContent = 'Отправка...';
 
         const { error } = await window.supabaseClient.auth.resetPasswordForEmail(email, {
             redirectTo: window.location.origin
@@ -754,8 +754,8 @@ function initResetEvents() {
         const newPassword = document.getElementById('reset-new-password').value;
         const btn = document.getElementById('reset-update-btn-text');
 
-        btn.textContent = 'Сохранение...';
         btn.disabled = true;
+        btn.textContent = 'Сохранение...';
 
         const { error } = await window.supabaseClient.auth.updateUser({
             password: newPassword
