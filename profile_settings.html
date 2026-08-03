@@ -18,12 +18,10 @@
     <link rel="stylesheet" href="beginning.css">
 
     <style>
-        /* Когда пользователь вошел — скрываем центральную кнопку */
         body.user-logged-in #open-auth-btn {
             display: none !important;
         }
 
-        /* Плавное проявление страницы */
         body {
             opacity: 0;
             transition: opacity 0.5s ease;
@@ -37,7 +35,6 @@
             opacity: 0 !important;
         }
 
-        /* Бренд-блок в верхнем левом углу */
         .top-left-brand {
             position: fixed;
             top: 40px;
@@ -66,9 +63,6 @@
             justify-content: center;
         }
 
-        /* =========================================================
-           ЛЕВИТИРУЮЩИЙ И СМЕНЯЮЩИЙСЯ ТЕКСТ БРЕНД-БЛОКА
-           ========================================================= */
         .top-left-brand .db-main-title {
             position: relative;
             margin: 0;
@@ -80,19 +74,14 @@
             color: #ffffff;
             white-space: nowrap;
             will-change: transform;
-            
-            /* Сохраняем парение/левитацию */
             animation: floatingText 4.5s ease-in-out infinite alternate !important;
         }
 
-        /* Текстовые слои для плавного переключения */
-        .title-text-main,
-        .title-text-alt {
+        .title-text-main, .title-text-alt {
             display: inline-block;
             transition: opacity 0.8s ease-in-out, filter 0.8s ease-in-out;
         }
 
-        /* Вторая надпись накладывается поверх первой */
         .title-text-alt {
             position: absolute;
             top: 0;
@@ -101,7 +90,6 @@
             filter: blur(8px);
         }
 
-        /* Циклическая смена названий каждые 6 секунд */
         .top-left-brand .db-main-title .title-text-main {
             animation: swapTextMain 7s ease-in-out infinite;
         }
@@ -110,7 +98,6 @@
             animation: swapTextAlt 7s ease-in-out infinite;
         }
 
-        /* Keyframes: Анимации парения (левитации) */
         @keyframes floatingLogo {
             0% { transform: translateY(0px) rotate(0deg); }
             50% { transform: translateY(-8px) rotate(-1.5deg); }
@@ -123,41 +110,72 @@
             100% { transform: translateY(4px); }
         }
 
-        /* Keyframes: Смена первого текста «GEOГРАФИЯ» */
         @keyframes swapTextMain {
-            0%, 40%, 100% {
-                opacity: 1;
-                filter: blur(0px);
-            }
-            50%, 90% {
-                opacity: 0;
-                filter: blur(8px);
-            }
+            0%, 40%, 100% { opacity: 1; filter: blur(0px); }
+            50%, 90% { opacity: 0; filter: blur(8px); }
         }
 
-        /* Keyframes: Смена второго текста «НАСТРОЙКИ ПРОФИЛЯ» */
         @keyframes swapTextAlt {
-            0%, 40%, 100% {
-                opacity: 0;
-                filter: blur(8px);
-            }
-            50%, 90% {
-                opacity: 1;
-                filter: blur(0px);
-            }
+            0%, 40%, 100% { opacity: 0; filter: blur(8px); }
+            50%, 90% { opacity: 1; filter: blur(0px); }
         }
 
         /* =========================================================
-           БЛОК АККАУНТА (ЗАМЕДЛЕННЫЙ БЛИК)
+           КНОПКА-СТРЕЛКА НАЗАД (ВМЕСТО ШЕСТЕРЕНКИ)
            ========================================================= */
-        #user-profile-widget,
-        .top-center-account {
+        .back-nav-container {
+            position: fixed;
+            bottom: 40px; /* Позиция как у шестеренки в других файлах */
+            left: 40px;
+            z-index: 100;
+        }
+
+        .back-arrow-btn {
+            width: 56px;
+            height: 56px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(12px);
+            color: white;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .back-arrow-btn svg {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Анимация: круговое движение вниз при наведении */
+        .back-arrow-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .back-arrow-btn:hover svg {
+            /* Круговое движение через Rotate */
+            transform: rotate(-360deg);
+        }
+
+        .back-arrow-btn:active {
+            transform: scale(0.9);
+        }
+
+        /* =========================================================
+           БЛОК АККАУНТА И КОНТЕЙНЕРЫ
+           ========================================================= */
+        #user-profile-widget, .top-center-account {
             position: absolute !important;
             top: 180px !important;
             left: 50% !important;
             transform: translateX(-50%) !important;
-            right: auto !important;
-            bottom: auto !important;
             z-index: 100 !important;
             display: flex;
             flex-direction: column;
@@ -174,31 +192,17 @@
             text-transform: uppercase;
             letter-spacing: 3px;
             white-space: nowrap;
-            display: inline-block;
             padding: 4px 12px;
-
-            animation: accountBlurBounce 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
-                        accountGlowPulse 1.6s ease-out forwards;
-            will-change: transform, filter, opacity;
+            animation: accountBlurBounce 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, accountGlowPulse 1.6s ease-out forwards;
         }
 
-        /* Блик: время пролёта 1.1s */
         .account-title-large::after {
             content: '';
             position: absolute;
-            top: 0;
-            bottom: 0;
-            left: -100vw;
-            width: 35vw;
-            background: linear-gradient(
-                90deg, 
-                transparent 0%, 
-                rgba(255, 255, 255, 0.85) 50%, 
-                transparent 100%
-            );
+            top: 0; left: -100vw;
+            width: 35vw; height: 100%;
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.85) 50%, transparent 100%);
             transform: skewX(-25deg);
-            pointer-events: none;
-            z-index: 2;
             animation: lightFlashFullWidth 1.1s cubic-bezier(0.25, 1, 0.5, 1) 0.6s 1 forwards;
         }
 
@@ -215,27 +219,13 @@
             100% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
         }
 
-        /* Плавный пролёт слева направо */
         @keyframes lightFlashFullWidth {
-            0% { 
-                left: -100vw; 
-                opacity: 0; 
-            }
-            20% { 
-                opacity: 1; 
-            }
-            80% { 
-                opacity: 1; 
-            }
-            100% { 
-                left: 100vw; 
-                opacity: 0; 
-            }
+            0% { left: -100vw; opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { left: 100vw; opacity: 0; }
         }
 
-        /* =========================================================
-           ЛИНИЯ-РАЗДЕЛИТЕЛЬ (ПО ЦЕНТРУ ПОД АККАУНТОМ)
-           ========================================================= */
         .account-divider-line {
             position: absolute;
             top: 230px;
@@ -244,33 +234,15 @@
             width: 85vw;
             max-width: 900px;
             height: 1px;
-            background: linear-gradient(
-                90deg, 
-                transparent 0%, 
-                rgba(255, 255, 255, 0.4) 50%, 
-                transparent 100%
-            );
-            z-index: 90;
-            
-            /* Появление линии из центра */
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
             animation: lineExpandCenter 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.1s forwards;
-            will-change: transform, opacity;
         }
 
         @keyframes lineExpandCenter {
-            0% {
-                opacity: 0;
-                transform: translateX(-50%) scaleX(0);
-            }
-            100% {
-                opacity: 1;
-                transform: translateX(-50%) scaleX(1);
-            }
+            0% { opacity: 0; transform: translateX(-50%) scaleX(0); }
+            100% { opacity: 1; transform: translateX(-50%) scaleX(1); }
         }
 
-        /* =========================================================
-           КНОПКИ СЛЕВА (СТУПЕНЧАТОЕ/КАСКАДНОЕ ПОЯВЛЕНИЕ)
-           ========================================================= */
         .account-actions-container {
             position: absolute;
             top: 255px;
@@ -279,13 +251,11 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            align-items: flex-start;
         }
 
         .action-btn-styled {
             display: inline-flex;
             align-items: center;
-            justify-content: center;
             padding: 12px 24px;
             background: rgba(255, 255, 255, 0.07);
             border: 1px solid rgba(255, 255, 255, 0.18);
@@ -296,272 +266,93 @@
             font-weight: 700;
             cursor: pointer;
             backdrop-filter: blur(10px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            transition: background 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
-                        border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
-                        transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
-                        box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            width: 100%;
-            box-sizing: border-box;
-
-            /* Начальное состояние кнопок до анимации */
             opacity: 0;
-            filter: blur(10px);
             transform: translateY(15px);
-            will-change: transform, opacity, filter;
-            
             animation: actionsAppear 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* Задержки по очереди для ступенчатого эффекта */
-        .action-btn-styled:nth-child(1) {
-            animation-delay: 1.2s;
-        }
-
-        .action-btn-styled:nth-child(2) {
-            animation-delay: 1.35s;
-        }
-
-        .action-btn-styled:nth-child(3) {
-            animation-delay: 1.5s;
-        }
-
-        .action-btn-styled:hover {
-            background: rgba(255, 255, 255, 0.18);
-            border-color: rgba(255, 255, 255, 0.4);
-            transform: translateX(4px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-        }
+        .action-btn-styled:nth-child(1) { animation-delay: 1.2s; }
+        .action-btn-styled:nth-child(2) { animation-delay: 1.35s; }
+        .action-btn-styled:nth-child(3) { animation-delay: 1.5s; }
 
         @keyframes actionsAppear {
-            0% { 
-                opacity: 0; 
-                filter: blur(10px); 
-                transform: translateY(15px); 
-            }
-            100% { 
-                opacity: 1; 
-                filter: blur(0px); 
-                transform: translateY(0); 
-            }
+            0% { opacity: 0; filter: blur(10px); transform: translateY(15px); }
+            100% { opacity: 1; filter: blur(0px); transform: translateY(0); }
         }
 
-        /* =========================================================
-           КРУПНЫЙ ЦЕНТРАЛЬНЫЙ КОНТЕЙНЕР (ПОЯВЛЯЕТСЯ РАНЬШЕ КНОПОК)
-           ========================================================= */
         .main-profile-container {
             position: absolute;
             top: 255px;
             left: 50%;
-            transform: translateX(-50%) translateY(20px);
-            
+            transform: translateX(-50%);
             width: 84vw;
             max-width: 920px;
-            
-            min-height: 460px; 
+            min-height: 460px;
             padding: 30px;
-            box-sizing: border-box;
-
-            /* Стеклянный стиль */
             background: rgba(255, 255, 255, 0.06);
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 22px;
             backdrop-filter: blur(15px);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-            z-index: 92;
-
             opacity: 0;
-            filter: blur(12px);
-
-            /* Задержка уменьшена до 1.0s (появляется до первой кнопки) */
             animation: containerAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.0s forwards;
         }
 
         @keyframes containerAppear {
-            0% {
-                opacity: 0;
-                filter: blur(12px);
-                transform: translateX(-50%) translateY(20px) scale(0.97);
-            }
-            100% {
-                opacity: 1;
-                filter: blur(0px);
-                transform: translateX(-50%) translateY(0) scale(1);
-            }
+            0% { opacity: 0; filter: blur(12px); transform: translateX(-50%) translateY(20px) scale(0.97); }
+            100% { opacity: 1; filter: blur(0px); transform: translateX(-50%) translateY(0) scale(1); }
         }
 
-        /* =========================================================
-           БЛОК ВЫХОДА ВНУТРИ КОНТЕЙНЕРА И КНОПКА C АНИМАЦИЕЙ Расширения ВЛЕВО
-           ========================================================= */
-        .session-logout-section {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            width: 100%;
-        }
-
-        .logout-label-text {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 14px;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.7);
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            align-self: flex-start;
-            text-align: left;
-        }
-
-        /* Красная кнопка выхода с выравниванием вправо */
         .red-primary-btn {
             align-self: flex-end;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            gap: 10px; /* Отступ для лоадера */
+            gap: 10px;
             padding: 14px 28px;
             background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 14px;
-            color: #ffffff;
+            color: white;
             font-family: 'Montserrat', sans-serif;
-            font-size: 14px;
             font-weight: 800;
-            letter-spacing: 0.5px;
             cursor: pointer;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 15px rgba(183, 28, 28, 0.25);
-            white-space: nowrap; /* Гарантирует расширение вбок без переносов */
-            
-            /* Плавный переход для размера/паддингов/прозрачности */
-            transition: background 0.3s ease, 
-                        border-color 0.3s ease, 
-                        box-shadow 0.3s ease, 
-                        transform 0.3s ease, 
-                        padding 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-                        opacity 0.3s ease;
+            white-space: nowrap;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .red-primary-btn:hover {
-            background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
-            border-color: rgba(255, 255, 255, 0.45);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(229, 57, 53, 0.35);
-        }
+        .red-primary-btn.is-loading { padding: 14px 34px; opacity: 0.85; pointer-events: none; }
 
-        .red-primary-btn:active {
-            transform: translateY(0);
-        }
-
-        /* Состояние загрузки при выходе */
-        .red-primary-btn.is-loading {
-            padding: 14px 34px;
-            opacity: 0.85;
-            pointer-events: none;
-        }
-
-        /* Спиннер загрузки */
         .btn-spinner {
-            width: 16px;
-            height: 16px;
+            width: 16px; height: 16px;
             border: 2px solid rgba(255, 255, 255, 0.35);
             border-top-color: #ffffff;
             border-radius: 50%;
             animation: btnSpinnerRotate 0.8s linear infinite;
-            display: inline-block;
-            box-sizing: border-box;
-            flex-shrink: 0;
         }
 
-        @keyframes btnSpinnerRotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .center-status-wrapper {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 5;
-            pointer-events: none;
-            text-align: center;
-        }
-
-        .auth-trigger-btn {
-            pointer-events: auto;
-        }
+        @keyframes btnSpinnerRotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         .dev-side-panel {
             position: fixed;
-            top: 50%;
-            right: 0;
+            top: 50%; right: 0;
             transform: translate(100%, -50%);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            padding: 15px;
             background: rgba(15, 15, 20, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-right: none;
+            padding: 15px;
             border-radius: 16px 0 0 16px;
-            backdrop-filter: blur(15px);
-            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
-            z-index: 9999;
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .dev-side-panel.visible {
-            transform: translate(0, -50%);
-        }
-
-        .dev-panel-btn {
-            padding: 12px 20px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #ffffff;
-            border-radius: 10px;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.25s ease;
-        }
-
-        .dev-panel-btn:hover {
-            background: rgba(255, 255, 255, 0.25);
-            border-color: rgba(255, 255, 255, 0.4);
-            transform: translateX(-3px);
-        }
+        .dev-side-panel.visible { transform: translate(0, -50%); }
 
         .reset-open-link {
-            background: transparent;
-            border: none;
+            background: transparent; border: none;
             color: rgba(255, 255, 255, 0.6);
-            font-size: 13px;
             font-family: 'Montserrat', sans-serif;
             cursor: pointer;
             text-decoration: underline;
-            transition: color 0.2s ease;
-        }
-
-        .reset-open-link:hover {
-            color: #ffffff;
         }
     </style>
 </head>
 <body>
-
-    <div class="app-banners-container">
-        <div class="app-banner banner-warning">
-            <span class="banner-icon">🛠</span>
-            <span>Ведется разработка сайта в раннем доступе</span>
-        </div>
-    </div>
-
-    <div class="shadow-layer"></div>
-
-    <div id="bg-wave-container"></div>
 
     <div class="top-left-brand">
         <div class="db-brand-block">
@@ -575,6 +366,15 @@
         </div>
     </div>
 
+    <div class="back-nav-container">
+        <div class="back-arrow-btn" onclick="navigateToPage('beginning.html')" title="Вернуться назад">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+        </div>
+    </div>
+
     <div id="user-profile-widget" class="top-center-account" style="display: none;">
         <div class="account-title-large" id="profile-email-text">ПРОФИЛЬ</div>
     </div>
@@ -582,15 +382,9 @@
     <div class="account-divider-line"></div>
 
     <div class="account-actions-container" id="account-actions-block">
-        <button type="button" class="action-btn-styled" onclick="console.log('Основные настройки')">
-            Основные настройки
-        </button>
-        <button type="button" class="action-btn-styled" onclick="console.log('Профиль')">
-            Профиль
-        </button>
-        <button type="button" class="action-btn-styled" onclick="console.log('Техническая поддержка')">
-            Техническая поддержка
-        </button>
+        <button type="button" class="action-btn-styled" onclick="console.log('Основные настройки')">Основные настройки</button>
+        <button type="button" class="action-btn-styled" onclick="console.log('Профиль')">Профиль</button>
+        <button type="button" class="action-btn-styled" onclick="console.log('Техническая поддержка')">Техническая поддержка</button>
     </div>
 
     <div class="main-profile-container" id="main-profile-block">
@@ -602,153 +396,47 @@
         </div>
     </div>
 
-    <div class="center-status-wrapper">
-        <button type="button" id="open-auth-btn" class="auth-trigger-btn" onclick="showAuthModal()">
-            Войти / Зарегистрироваться
-        </button>
-    </div>
-
     <div id="dev-side-panel" class="dev-side-panel">
-        <button type="button" class="dev-panel-btn" id="btn-main-profile" onclick="navigateToPage('beginning.html')">
-            Основной профиль
-        </button>
-        <button type="button" class="dev-panel-btn" id="btn-admin-profile" onclick="navigateToPage('admin.html')">
-            Профиль администратора
-        </button>
+        <button type="button" class="action-btn-styled" onclick="navigateToPage('beginning.html')">Основной профиль</button>
     </div>
-
-    <script src="auth-system.js?v=3"></script>
 
     <script>
-const waveContainer = document.getElementById('bg-wave-container');
-let ambientTimeoutId = null;
-
-function createBackgroundRipple(x, y, className, duration = 1500) {
-    if (!waveContainer) return;
-    const ripple = document.createElement('div');
-    ripple.classList.add(className);
-    ripple.style.left = `${x}px`;
-    ripple.style.top = `${y}px`;
-    waveContainer.appendChild(ripple);
-    setTimeout(() => { ripple.remove(); }, duration);
-}
-
-function spawnAmbientWave() {
-    clearTimeout(ambientTimeoutId);
-
-    let spawnX = 0, spawnY = 0;
-    const side = Math.floor(Math.random() * 4);
-    switch(side) {
-        case 0: spawnX = Math.random() * window.innerWidth; spawnY = -50; break;
-        case 1: spawnX = window.innerWidth + 50; spawnY = Math.random() * window.innerHeight; break;
-        case 2: spawnX = Math.random() * window.innerWidth; spawnY = window.innerHeight + 50; break;
-        case 3: spawnX = -50; spawnY = Math.random() * window.innerHeight; break;
-    }
-
-    createBackgroundRipple(spawnX, spawnY, 'bg-ambient-ripple', 3000);
-    ambientTimeoutId = setTimeout(spawnAmbientWave, 3000 + Math.random() * 4000);
-}
-
-document.body.addEventListener('mousedown', (e) => {
-    createBackgroundRipple(e.clientX, e.clientY, 'bg-click-ripple');
-});
-
-history.pushState(null, null, location.href);
-window.addEventListener('popstate', function () {
-    navigateToPage('index.html');
-});
-
-function navigateToPage(targetPage) {
-    const currentPage = window.location.pathname.split('/').pop() || 'beginning.html';
-    if (currentPage === targetPage) return;
-
-    document.body.classList.add('page-hidden');
-    setTimeout(() => {
-        window.location.href = targetPage;
-    }, 500);
-}
-
-async function handleLogout() {
-    const btn = document.querySelector('.red-primary-btn');
-    
-    if (btn) {
-        // Запускаем класс с анимацией расширения влево и вставляем спиннер
-        btn.classList.add('is-loading');
-        btn.innerHTML = `Выход из аккаунта <span class="btn-spinner"></span>`;
-    }
-
-    try {
-        const client = window.supabaseClient || window.supabase;
-        if (client && client.auth) {
-            await client.auth.signOut();
+        // Навигация с анимацией
+        function navigateToPage(targetPage) {
+            document.body.classList.add('page-hidden');
+            setTimeout(() => {
+                window.location.href = targetPage;
+            }, 500);
         }
-    } catch (err) {
-        console.error('Ошибка при выходе из аккаунта:', err);
-    } finally {
-        // Задержка перед переходом для красивой проигрываемости анимации
-        setTimeout(() => {
-            navigateToPage('beginning.html');
-        }, 600);
-    }
-}
 
-document.addEventListener('DOMContentLoaded', () => {
-    requestAnimationFrame(() => {
-        document.body.classList.add('page-loaded');
-    });
-
-    setTimeout(() => { spawnAmbientWave(); }, 1000);
-
-    const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
-    const sidePanel = document.getElementById('dev-side-panel');
-    let hideTimeout = null;
-
-    async function initDevPanel() {
-        const client = window.supabaseClient || window.supabase;
-        if (!client) return;
-
-        try {
-            const { data: { session } } = await client.auth.getSession();
-            if (session?.user?.email === DEV_EMAIL) {
-                setupHoverDetection();
+        // Выход из аккаунта
+        async function handleLogout() {
+            const btn = document.querySelector('.red-primary-btn');
+            if (btn) {
+                btn.classList.add('is-loading');
+                btn.innerHTML = `Выход из аккаунта <span class="btn-spinner"></span>`;
             }
-        } catch (err) {
-            console.error('Ошибка проверки прав разработчика:', err);
+
+            try {
+                const client = window.supabaseClient || window.supabase;
+                if (client && client.auth) {
+                    await client.auth.signOut();
+                }
+            } catch (err) {
+                console.error('Ошибка при выходе:', err);
+            } finally {
+                setTimeout(() => {
+                    navigateToPage('beginning.html');
+                }, 600);
+            }
         }
-    }
 
-    function setupHoverDetection() {
-        if (!sidePanel) return;
-
-        document.addEventListener('mousemove', (e) => {
-            const distanceFromRight = window.innerWidth - e.clientX;
-            if (distanceFromRight <= 60) {
-                clearTimeout(hideTimeout);
-                sidePanel.classList.add('visible');
-            }
+        // Появление страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            requestAnimationFrame(() => {
+                document.body.classList.add('page-loaded');
+            });
         });
-
-        sidePanel.addEventListener('mouseenter', () => {
-            clearTimeout(hideTimeout);
-            sidePanel.classList.add('visible');
-        });
-
-        sidePanel.addEventListener('mouseleave', () => {
-            hideTimeout = setTimeout(() => {
-                sidePanel.classList.remove('visible');
-            }, 2000);
-        });
-    }
-
-    initDevPanel();
-});
-</script>
-
-    <script src="app.js"></script>
-    <script src="reset-password.js"></script>
-
-    <button type="button" class="reset-open-link" onclick="showResetModal('request')">
-        Забыли пароль?
-    </button>
+    </script>
 </body>
 </html>
