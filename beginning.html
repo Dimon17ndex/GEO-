@@ -157,7 +157,7 @@
 /* 2. Контейнер выпадающего меню */
 .profile-dropdown-menu {
     position: absolute;
-    top: 100%;             /* Зацепка ровно за нижний край карточки */
+    top: 100%;              /* Зацепка ровно за нижний край карточки */
     left: 0;
     right: 0;
     padding-top: 8px;      /* Заменяем внешние зазоры внутренними */
@@ -423,6 +423,24 @@
     <script src="auth-system.js?v=3"></script>
 
     <script>
+// Функция выхода из профиля
+async function logoutUser() {
+    try {
+        const client = window.supabaseClient || window.supabase;
+        if (client) {
+            await client.auth.signOut();
+        }
+    } catch (e) {
+        console.error('Ошибка при выходе из системы:', e);
+    } finally {
+        if (typeof navigateToPage === 'function') {
+            navigateToPage('index.html');
+        } else {
+            window.location.href = 'index.html';
+        }
+    }
+}
+
 // Переменные состояния
 const waveContainer = document.getElementById('bg-wave-container');
 const volumeStatusLabel = document.getElementById('volume-status-label');
