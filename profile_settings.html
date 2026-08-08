@@ -652,7 +652,7 @@
         <div class="tab-content" id="tab-settings">
             <div class="session-logout-section">
                 <span class="logout-label-text">Завершение сессии/выход из аккаунта</span>
-                <button type="button" class="red-primary-btn" onclick="handleLogout()">
+                <button type="button" class="red-primary-btn logout-btn-trigger" onclick="handleLogout()">
                     Выйти из аккаунта
                 </button>
             </div>
@@ -661,7 +661,7 @@
         <div class="tab-content" id="tab-profile">
             <div class="session-logout-section">
                 <span class="logout-label-text">Завершение сессии/выход из аккаунта</span>
-                <button type="button" class="red-primary-btn" onclick="handleLogout()">
+                <button type="button" class="red-primary-btn logout-btn-trigger" onclick="handleLogout()">
                     Выйти из аккаунта
                 </button>
             </div>
@@ -758,12 +758,12 @@ function switchTab(tabName) {
 }
 
 async function handleLogout() {
-    const btn = document.querySelector('.red-primary-btn');
+    const buttons = document.querySelectorAll('.logout-btn-trigger');
     
-    if (btn) {
+    buttons.forEach(btn => {
         btn.classList.add('is-loading');
         btn.innerHTML = `Выход из аккаунта <span class="btn-spinner"></span>`;
-    }
+    });
 
     try {
         const client = window.supabaseClient || window.supabase;
