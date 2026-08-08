@@ -255,7 +255,7 @@ function injectEditNameStyles() {
             height: 55px !important;
             line-height: 55px !important;
             font-family: 'Unbounded', sans-serif !important;
-            font-size: 24px !important;
+            font-size: 32px !important;
             font-weight: 900 !important;
             letter-spacing: -0.5px !important;
             color: #ffffff !important;
