@@ -768,29 +768,28 @@
         </div>
 
         <div class="tab-content" id="tab-profile">
-    <div class="profile-info-row">
-        <div class="profile-info-item align-left">
-            <span class="profile-info-label">Имя пользователя</span>
-            <div class="profile-info-value-wrapper">
-                <span class="profile-info-value" id="user-display-name">НЕТ ИМЕНИ</span>
-                <button type="button" class="edit-name-btn" onclick="showEditNameModal()" title="Редактировать имя">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 20h9"></path>
-                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                    </svg>
-                </button>
+            <div class="profile-info-row">
+                <div class="profile-info-item align-left">
+                    <span class="profile-info-label">Имя пользователя</span>
+                    <div class="profile-info-value-wrapper">
+                        <button type="button" class="edit-name-btn" onclick="showEditNameModal()" title="Редактировать имя">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 20h9"></path>
+        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+    </svg>
+</button>
+                        <span class="profile-info-value" id="user-display-name">НЕТ ИМЕНИ</span>
+                    </div>
+                </div>
+                <div class="profile-info-item align-center">
+                    <span class="profile-info-label">Номер телефона</span>
+                    <span class="profile-info-value" id="user-display-phone">БЕЗ НОМЕРА</span>
+                </div>
+                <div class="profile-info-item align-right">
+                    <span class="profile-info-label">Электронная почта</span>
+                    <span class="profile-info-value" id="user-display-email">—</span>
+                </div>
             </div>
-        </div>
-        <div class="profile-info-item align-center">
-            <span class="profile-info-label">Номер телефона</span>
-            <span class="profile-info-value" id="user-display-phone">БЕЗ НОМЕРА</span>
-        </div>
-        <div class="profile-info-item align-right">
-            <span class="profile-info-label">Электронная почта</span>
-            <span class="profile-info-value" id="user-display-email">—</span>
-        </div>
-    </div>
-</div>
             
             <div class="session-logout-section">
                 <span class="logout-label-text">Завершение сессии/выход из аккаунта</span>
