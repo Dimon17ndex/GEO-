@@ -467,7 +467,7 @@
         }
 
         /* =========================================================
-            НОВЫЙ СТИЛЬ ДЛЯ ИНФОРМАЦИИ ПРОФИЛЯ (ИМЯ СЛЕВА, ПОЧТА СПРАВА)
+            ИНФОРМАЦИЯ ПРОФИЛЯ (ИМЯ, ТЕЛЕФОН И ПОЧТА НА ОДНОЙ ЛИНИИ)
             ========================================================= */
         .profile-info-row {
             display: flex;
@@ -483,11 +483,17 @@
             display: flex;
             flex-direction: column;
             gap: 4px;
+            flex: 1;
         }
 
         .profile-info-item.align-left {
             align-items: flex-start;
             text-align: left;
+        }
+
+        .profile-info-item.align-center {
+            align-items: center;
+            text-align: center;
         }
 
         .profile-info-item.align-right {
@@ -710,6 +716,10 @@
                     <span class="profile-info-label">Имя пользователя</span>
                     <span class="profile-info-value" id="user-display-name">НЕТ ИМЕНИ</span>
                 </div>
+                <div class="profile-info-item align-center">
+                    <span class="profile-info-label">Номер телефона</span>
+                    <span class="profile-info-value" id="user-display-phone">БЕЗ НОМЕРА</span>
+                </div>
                 <div class="profile-info-item align-right">
                     <span class="profile-info-label">Электронная почта</span>
                     <span class="profile-info-value" id="user-display-email">—</span>
@@ -839,6 +849,7 @@ async function handleLogout() {
 // Функция для обновления информации пользователя в профиле
 async function updateProfileUserData() {
     const nameEl = document.getElementById('user-display-name');
+    const phoneEl = document.getElementById('user-display-phone');
     const emailEl = document.getElementById('user-display-email');
     if (!nameEl || !emailEl) return;
 
@@ -853,12 +864,20 @@ async function updateProfileUserData() {
             // Почта
             emailEl.textContent = user.email || '—';
 
-            // Имя (проверяем метаданные или user_metadata)
+            // Имя
             const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.user_metadata?.display_name;
             if (fullName && fullName.trim() !== '') {
                 nameEl.textContent = fullName;
             } else {
                 nameEl.textContent = 'НЕТ ИМЕНИ';
+            }
+
+            // Телефон (если появится в метаданных в будущем)
+            const phone = user.user_metadata?.phone || user.phone;
+            if (phone && phone.trim() !== '') {
+                if (phoneEl) phoneEl.textContent = phone;
+            } else {
+                if (phoneEl) phoneEl.textContent = 'БЕЗ НОМЕРА';
             }
         }
     } catch (err) {
