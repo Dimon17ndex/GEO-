@@ -166,7 +166,6 @@
             transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        /* Анимация появления справа налево */
         @keyframes slideInFromRight {
             0% {
                 opacity: 0;
@@ -293,7 +292,7 @@
         }
 
         /* =========================================================
-            КНОПКИ СЛЕВА (УЛУЧШЕНА ПЛАВНОСТЬ И ОТКЛИК)
+            КНОПКИ СЛЕВА
             ========================================================= */
         .account-actions-container {
             position: absolute;
@@ -322,7 +321,6 @@
             backdrop-filter: blur(10px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             
-            /* Сверхплавный переход для всех состояний */
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             width: 100%;
             box-sizing: border-box;
@@ -346,7 +344,6 @@
             box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
         }
 
-        /* Активная вкладка: мягкий сдвиг и подсветка */
         .action-btn-styled.active-tab {
             background: rgba(255, 255, 255, 0.18) !important;
             border-color: #ffffff !important;
@@ -354,7 +351,6 @@
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
         }
 
-        /* Эффект клика (нажатия) */
         .action-btn-styled:active {
             transform: translateX(6px) scale(0.97) !important;
             transition: transform 0.1s ease;
@@ -366,7 +362,7 @@
         }
 
         /* =========================================================
-            КРУПНЫЙ ЦЕНТРАЛЬНЫЙ КОНТЕЙНЕР (ПЛАВНАЯ СМЕНА ВКЛАДОК)
+            ЦЕНТРАЛЬНЫЙ КОНТЕЙНЕР И ВКЛАДКИ
             ========================================================= */
         .main-profile-container {
             position: absolute;
@@ -410,7 +406,6 @@
             }
         }
 
-        /* Система вкладок с мягким бесшовным кроссфейдом */
         .tab-content {
             position: absolute;
             top: 30px;
@@ -446,28 +441,7 @@
         }
 
         /* =========================================================
-            БЛОК ВЫХОДА ВНУТРИ КОНТЕЙНЕРА И КНОПКА
-            ========================================================= */
-        .session-logout-section {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            width: 100%;
-        }
-
-        .logout-label-text {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 14px;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.7);
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            align-self: flex-start;
-            text-align: left;
-        }
-
-        /* =========================================================
-            ИНФОРМАЦИЯ ПРОФИЛЯ
+            ИНФОРМАЦИЯ ПРОФИЛЯ И ВЫРАВНИВАНИЕ
             ========================================================= */
         .profile-info-row {
             display: flex;
@@ -501,20 +475,15 @@
             text-align: right;
         }
 
-        /* Контейнеры-обертки с фиксированной шириной для NAME и @, идентичные телефонному */
-        .profile-badge-name-wrapper,
-        .profile-icon-email-wrapper,
-        .profile-icon-phone {
-            position: relative;
+        /* Универсальный верхний контейнер для выравнивания всех иконки/бейджей по высоте */
+        .profile-icon-top-wrapper {
+            height: 32px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            height: 32px;
-            width: 40px;
             margin-bottom: 12px;
         }
 
-        /* Крупный закругленный прямоугольник для NAME */
+        /* Бейдж NAME */
         .profile-badge-name {
             display: inline-flex;
             align-items: center;
@@ -527,19 +496,26 @@
             letter-spacing: 1px;
             color: rgba(255, 255, 255, 0.95);
             white-space: nowrap;
+            margin-bottom: 0 !important;
         }
 
-        /* Сама трубка телефона */
+        /* Блок телефона */
+        .profile-icon-phone {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .profile-icon-phone svg {
             width: 26px;
             height: 26px;
             color: rgba(255, 255, 255, 0.95);
         }
 
-        /* Плюсик */
         .phone-plus-sign {
             position: absolute;
-            right: 2px;
+            right: -10px;
             top: -2px;
             font-size: 16px;
             font-weight: 800;
@@ -580,7 +556,7 @@
             letter-spacing: 0.3px;
         }
 
-        /* Стиль для интерактивной иконки карандаша */
+        /* Кнопка карандаша */
         .edit-name-btn {
             background: transparent;
             border: none;
@@ -618,6 +594,25 @@
 
         .edit-name-btn:active {
             transform: scale(0.9);
+        }
+
+        /* Кнопки действий внутри */
+        .session-logout-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .logout-label-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            align-self: flex-start;
+            text-align: left;
         }
 
         .red-primary-btn {
@@ -691,6 +686,7 @@
             pointer-events: auto;
         }
 
+        /* Панель разработчика */
         .dev-side-panel {
             position: fixed;
             top: 50%;
@@ -748,29 +744,6 @@
         .reset-open-link:hover {
             color: #ffffff;
         }
-
-        /* Одинаковый контейнер для верхней части всех трех колонок, чтобы выровнять их по высоте */
-.profile-icon-top-wrapper {
-    height: 32px;
-    display: flex;
-    align-items: center;
-    margin-bottom: 12px;
-}
-
-/* Корректировка значка NAME, чтобы он встал ровно в этот контейнер */
-.profile-badge-name {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 4px 10px;
-    border: 2px solid rgba(255, 255, 255, 0.5);
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    color: rgba(255, 255, 255, 0.95);
-    margin-bottom: 0 !important; /* Убираем старый маргин */
-}
 </style>
 </head>
 <body>
