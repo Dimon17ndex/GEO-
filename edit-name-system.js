@@ -1,6 +1,7 @@
 // edit-name-system.js
 
-let editNameClickTimeout = null;
+let editNameOverlayClickTimeout = null;
+let editNameTitleInterval = null;
 
 // --- ГЛОБАЛЬНЫЕ ФУНКЦИИ ---
 window.showEditNameModal = function() {
@@ -56,13 +57,14 @@ function showEditNameConfirmToast() {
         toast.classList.remove('hiding', 'visible');
         if (wave) wave.classList.remove('active');
 
-        void toast.offsetWidth;
+        void toast.offsetWidth; // Перезапуск анимации
 
         toast.classList.add('visible');
         if (wave) wave.classList.add('active');
     }
 }
 
+// Функция мягкого скрытия плашки
 function hideEditNameConfirmToast(immediate = false) {
     const toast = document.getElementById('edit-name-confirm-toast');
     const wave = document.getElementById('edit-name-confirm-wave');
@@ -81,7 +83,7 @@ function hideEditNameConfirmToast(immediate = false) {
     }
 }
 
-// Управление состоянием кнопки (анимация загрузки)
+// Управление состоянием кнопки (анимация загрузки / блокировка)
 function setEditNameButtonLoading(button, isLoading, originalText) {
     if (!button) return;
 
@@ -138,42 +140,13 @@ function injectEditNameStyles() {
             pointer-events: auto !important;
         }
 
-        /* Большой качающийся логотип на фоне */
-        .edit-name-bg-logo-wrap {
-            position: absolute !important;
-            top: 50% !important;
-            left: 50% !important;
-            transform: translate(-50%, -50%) !important;
-            width: 450px !important;
-            height: 450px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            pointer-events: none !important;
-            z-index: 1 !important;
-            opacity: 0.04 !important;
-            animation: editNameLogoSway 8s ease-in-out infinite alternate !important;
-        }
-
-        .edit-name-bg-logo-wrap img {
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: contain !important;
-            filter: grayscale(100%) brightness(200%) !important;
-        }
-
-        @keyframes editNameLogoSway {
-            0% { transform: translate(-50%, -50%) scale(0.95) rotate(-3deg); }
-            100% { transform: translate(-50%, -50%) scale(1.05) rotate(3deg); }
-        }
-
         .edit-name-modal-container {
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
             padding: 0 !important;
             width: 100% !important;
-            max-width: 340px !important;
+            max-width: 300px !important;
             position: relative !important;
             color: #ffffff !important;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
@@ -236,52 +209,66 @@ function injectEditNameStyles() {
             transform: scale(0.9) rotate(90deg) !important;
         }
 
-        /* Верхний брендовый блок с иконкой и меняющимся текстом */
-        .edit-name-brand-block {
+        .edit-name-header-title {
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 15px !important;
-            margin-bottom: 35px !important;
-            text-align: center !important;
+            gap: 20px !important;
+            margin-top: -30px !important;
+            margin-bottom: 30px !important;
         }
 
-        .edit-name-logo-icon {
-            width: 38px !important;
-            height: 38px !important;
+        .edit-name-logo-wrapper {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            will-change: transform !important;
+            animation: editNameLogoHover 3s ease-in-out infinite alternate !important;
+        }
+
+        .edit-name-header-logo {
+            height: 105px !important;
+            width: auto !important;
+            display: block !important;
             object-fit: contain !important;
-            flex-shrink: 0 !important;
         }
 
-        .edit-name-title-container {
+        @keyframes editNameLogoHover {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(-2deg); }
+            100% { transform: translateY(6px) rotate(2deg); }
+        }
+
+        .edit-name-title-ticker {
+            height: 55px !important;
+            overflow: hidden !important;
+            position: relative !important;
+        }
+
+        .edit-name-title-track {
             display: flex !important;
             flex-direction: column !important;
-            align-items: flex-start !important;
+            animation: editNameTitleVerticalScroll 6s cubic-bezier(0.77, 0, 0.175, 1) infinite !important;
         }
 
-        .edit-name-main-title {
+        .edit-name-title-track span {
+            height: 55px !important;
+            line-height: 55px !important;
             font-family: 'Unbounded', sans-serif !important;
-            font-size: 16px !important;
+            font-size: 24px !important;
             font-weight: 900 !important;
             letter-spacing: -0.5px !important;
             color: #ffffff !important;
-            line-height: 1.1 !important;
-        }
-
-        .edit-name-alt-title {
-            font-family: 'Montserrat', sans-serif !important;
-            font-size: 11px !important;
-            font-weight: 600 !important;
-            color: rgba(255, 255, 255, 0.45) !important;
-            letter-spacing: 0.5px !important;
-            margin-top: 3px !important;
             text-transform: uppercase !important;
-            animation: editNameSubFade 3s ease-in-out infinite alternate !important;
+            white-space: nowrap !important;
+            display: flex !important;
+            align-items: center !important;
         }
 
-        @keyframes editNameSubFade {
-            0% { opacity: 0.3; }
-            100% { opacity: 0.8; }
+        @keyframes editNameTitleVerticalScroll {
+            0%, 40% { transform: translateY(0); }
+            50%, 90% { transform: translateY(-55px); }
+            100% { transform: translateY(0); }
         }
 
         .edit-name-form {
@@ -300,11 +287,9 @@ function injectEditNameStyles() {
             background: transparent !important;
             border: none !important;
             border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
-            padding: 6px 0 10px 0 !important;
+            padding: 4px 0 8px 0 !important;
             color: #ffffff !important;
-            font-size: 15px !important;
-            font-family: 'Montserrat', sans-serif !important;
-            font-weight: 600 !important;
+            font-size: 13px !important;
             text-align: center !important;
             outline: none !important;
             width: 100% !important;
@@ -314,7 +299,7 @@ function injectEditNameStyles() {
 
         .edit-name-input::placeholder {
             color: rgba(255, 255, 255, 0.35) !important;
-            font-weight: 400 !important;
+            text-align: center !important;
         }
 
         .edit-name-input:focus {
@@ -330,16 +315,15 @@ function injectEditNameStyles() {
             color: #ffffff !important;
             border: 1px solid #ffffff !important;
             border-radius: 24px !important;
-            padding: 12px 20px !important;
+            padding: 10px 20px !important;
             font-size: 14px !important;
-            font-family: 'Montserrat', sans-serif !important;
-            font-weight: 700 !important;
+            font-weight: 500 !important;
             cursor: pointer !important;
             width: 100% !important;
-            margin-top: 10px !important;
+            margin-top: 15px !important;
             transition: all 0.25s ease !important;
             text-align: center !important;
-            min-height: 44px !important;
+            min-height: 42px !important;
             box-sizing: border-box !important;
         }
 
@@ -477,6 +461,35 @@ function injectEditNameStyles() {
         .edit-name-confirm-btn.danger:hover {
             background: rgba(255, 255, 255, 0.85) !important;
         }
+
+        .edit-name-bg-watermark {
+            position: absolute !important;
+            top: 45% !important;
+            right: -15% !important;
+            left: auto !important;
+            width: 1200px !important;
+            height: auto !important;
+            max-width: none !important;
+            pointer-events: none !important;
+            z-index: 1 !important;
+            transform-origin: center right !important;
+            
+            opacity: 0 !important;
+            filter: blur(45px) brightness(0.6) !important;
+            transition: opacity 1.2s ease-out, filter 1.2s ease-out !important;
+            animation: editNameIntenseFloat 6s ease-in-out infinite alternate !important;
+        }
+
+        .edit-name-modal-overlay.active .edit-name-bg-watermark {
+            opacity: 0.22 !important;
+            filter: blur(12px) brightness(0.9) !important;
+        }
+
+        @keyframes editNameIntenseFloat {
+            0% { transform: translateY(-50%) translateX(0px) rotate(0deg) scale(1); }
+            50% { transform: translateY(-58%) translateX(-25px) rotate(-5deg) scale(1.04); }
+            100% { transform: translateY(-42%) translateX(15px) rotate(4deg) scale(0.96); }
+        }
     `;
 
     const styleElement = document.createElement('style');
@@ -485,32 +498,33 @@ function injectEditNameStyles() {
     document.head.appendChild(styleElement);
 }
 
-// --- HTML РАЗМЕТКА МОДАЛЬНОГО ОКНА ---
-let editNameTitleInterval = null;
-
+// --- HTML РАЗМЕТКА ---
 function initEditNameModalUI() {
     if (document.getElementById('edit-name-modal-overlay')) return;
 
     const modalHTML = `
         <div id="edit-name-modal-overlay" class="edit-name-modal-overlay">
-            <div class="edit-name-bg-logo-wrap">
-                <img src="images/geo_logo.png" alt="Background Logo">
-            </div>
-
             <button id="edit-name-close-btn" class="edit-name-close-btn" type="button">&times;</button>
 
+            <img src="images/geo_logo.png" alt="" class="edit-name-bg-watermark">
+
             <div class="edit-name-modal-container">
-                <div class="edit-name-brand-block">
-                    <img src="images/geo_logo.png" alt="Geo Logo" class="edit-name-logo-icon">
-                    <div class="edit-name-title-container">
-                        <span class="edit-name-main-title">GEOГРАФИЯ</span>
-                        <span id="edit-name-alt-text" class="edit-name-alt-title">ИЗМЕНЕНИЕ ИМЕНИ</span>
+                <div class="edit-name-header-title">
+                    <div class="edit-name-logo-wrapper">
+                        <img src="images/geo_logo.png" alt="Geo Logo" class="edit-name-header-logo">
+                    </div>
+
+                    <div class="edit-name-title-ticker">
+                        <div class="edit-name-title-track">
+                            <span>GEOГРАФИЯ</span>
+                            <span>ПРОФИЛЬ</span>
+                        </div>
                     </div>
                 </div>
                 
                 <form id="edit-name-form" class="edit-name-form">
                     <div class="edit-name-input-group">
-                        <input type="text" id="edit-name-input" placeholder="Введите новое имя..." required class="edit-name-input" autocomplete="nickname">
+                        <input type="text" id="edit-name-input" placeholder="Новое имя / Никнейм..." required class="edit-name-input" autocomplete="nickname">
                     </div>
                     <button type="submit" id="btn-submit-edit-name" class="edit-name-submit-btn">Сохранить</button>
                 </form>
@@ -528,37 +542,6 @@ function initEditNameModalUI() {
         </div>
     `;
     document.body.insertAdjacentHTML('beforeend', modalHTML);
-
-    // Запуск динамической смены подзаголовка, как в других модальных окнах
-    startEditNameTitleSwitching();
-}
-
-// Функция сменяющегося текста подзаголовка
-function startEditNameTitleSwitching() {
-    if (editNameTitleInterval) clearInterval(editNameTitleInterval);
-    
-    const altTitles = [
-        "ИЗМЕНЕНИЕ ИМЕНИ",
-        "ПЕРСОНАЛИЗАЦИЯ",
-        "ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ"
-    ];
-    let titleIndex = 0;
-    
-    const altTextEl = document.getElementById('edit-name-alt-text');
-    if (!altTextEl) return;
-
-    editNameTitleInterval = setInterval(() => {
-        const modal = document.getElementById('edit-name-modal-overlay');
-        if (!modal || !modal.classList.contains('active')) return;
-
-        titleIndex = (titleIndex + 1) % altTitles.length;
-        
-        altTextEl.style.opacity = '0';
-        setTimeout(() => {
-            altTextEl.textContent = altTitles[titleIndex];
-            altTextEl.style.opacity = '0.8';
-        }, 200);
-    }, 4000);
 }
 
 // --- СОБЫТИЯ ---
@@ -580,13 +563,13 @@ function initEditNameEvents() {
         showEditNameConfirmToast();
     });
 
-    // Клик по фону оверлея
+    // Обработка клика по фону (анимация встряски)
     overlay?.addEventListener('click', (e) => {
         if (e.target !== overlay) return;
 
-        if (editNameClickTimeout) clearTimeout(editNameClickTimeout);
+        if (editNameOverlayClickTimeout) clearTimeout(editNameOverlayClickTimeout);
 
-        editNameClickTimeout = setTimeout(() => {
+        editNameOverlayClickTimeout = setTimeout(() => {
             const container = document.querySelector('.edit-name-modal-container');
             if (container) {
                 container.classList.remove('shake');
@@ -600,9 +583,10 @@ function initEditNameEvents() {
         }, 250);
     });
 
+    // Двойной клик по фону вызывает предупреждение о закрытии
     overlay?.addEventListener('dblclick', (e) => {
         if (e.target === overlay) {
-            if (editNameClickTimeout) clearTimeout(editNameClickTimeout);
+            if (editNameOverlayClickTimeout) clearTimeout(editNameOverlayClickTimeout);
             showEditNameConfirmToast();
         }
     });
@@ -613,15 +597,15 @@ function initEditNameEvents() {
         }
     });
 
-    // Сохранение имени в Supabase
+    // Отправка формы (Сохранение нового имени в Supabase)
     form?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const client = window.supabaseClient || window.supabase;
         if (!client) return alert('Supabase клиент не найден!');
 
         const submitBtn = document.getElementById('btn-submit-edit-name');
-        const newNameInput = document.getElementById('edit-name-input');
-        const newName = newNameInput ? newNameInput.value.trim() : '';
+        const inputField = document.getElementById('edit-name-input');
+        const newName = inputField ? inputField.value.trim() : '';
 
         if (!newName) {
             alert('Имя не может быть пустым!');
