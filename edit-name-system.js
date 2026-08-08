@@ -1,6 +1,10 @@
 // edit-name-system.js
 
 let editNameOverlayClickTimeout = null;
+let editNameToastMoveTimer = null;
+let editNameLastMouseX = 0;
+let editNameLastMouseY = 0;
+let editNameToastActivePos = null;
 
 // --- ГЛОБАЛЬНЫЕ ФУНКЦИИ ---
 window.showEditNameModal = function() {
@@ -97,6 +101,7 @@ function showEditNameConfirmToast(type = 'close-btn', clientX = 0, clientY = 0) 
         return;
     }
 
+    clearTimeout(editNameToastMoveTimer);
     toast.classList.remove('hiding', 'visible');
     if (wave) wave.classList.remove('active');
 
@@ -112,33 +117,44 @@ function showEditNameConfirmToast(type = 'close-btn', clientX = 0, clientY = 0) 
     const toastWidth = toast.offsetWidth || 260;
     const toastHeight = toast.offsetHeight || 50;
 
+    let targetLeft = 0;
+    let targetTop = 0;
+
     if (type === 'close-btn' && closeBtn) {
-        // Позиционируем слева от крестика с защитой от вылета за левый край экрана
         const btnRect = closeBtn.getBoundingClientRect();
         toast.style.position = 'fixed';
         
         let calculatedRight = window.innerWidth - btnRect.left + 12;
-        // Проверяем, не упрется ли плашка в левую границу (если правый отступ слишком большой)
         const maxRight = window.innerWidth - toastWidth - 15;
         const finalRight = Math.min(calculatedRight, maxRight);
 
-        toast.style.right = Math.max(15, finalRight) + 'px';
-        toast.style.top = Math.max(15, Math.min(btnRect.top + btnRect.height / 2, window.innerHeight - toastHeight - 15)) + 'px';
+        targetRight = Math.max(15, finalRight);
+        targetTop = Math.max(15, Math.min(btnRect.top + btnRect.height / 2, window.innerHeight - toastHeight - 15));
+        
+        toast.style.right = targetRight + 'px';
+        toast.style.top = targetTop + 'px';
         toast.style.transform = 'translateY(-50%) scale(0.85)';
+
+        // Вычисляем абсолютные координаты для логики слежения за курсором
+        requestAnimationFrame(() => {
+            const rect = toast.getBoundingClientRect();
+            editNameToastActivePos = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+        });
     } else if (type === 'double-click') {
-        // Позиционируем под курсором с защитой от выхода за любые границы экрана
         toast.style.position = 'fixed';
         
-        let safeLeft = Math.max(15, Math.min(clientX - toastWidth / 2, window.innerWidth - toastWidth - 15));
-        let safeTop = Math.max(15, Math.min(clientY + 15, window.innerHeight - toastHeight - 15));
+        targetLeft = Math.max(15, Math.min(clientX - toastWidth / 2, window.innerWidth - toastWidth - 15));
+        targetTop = Math.max(15, Math.min(clientY + 15, window.innerHeight - toastHeight - 15));
 
-        toast.style.left = safeLeft + 'px';
-        toast.style.top = safeTop + 'px';
+        toast.style.left = targetLeft + 'px';
+        toast.style.top = targetTop + 'px';
         toast.style.transform = 'translateY(0) scale(0.85)';
+
+        editNameToastActivePos = { x: targetLeft + toastWidth / 2, y: targetTop + toastHeight / 2 };
     }
 
-    toast.style.visibility = ''; // возвращаем видимость для анимации
-    void toast.offsetWidth; // Перезапуск анимации
+    toast.style.visibility = ''; 
+    void toast.offsetWidth; 
 
     toast.classList.add('visible');
     if (wave && type === 'double-click') {
@@ -152,6 +168,9 @@ function showEditNameConfirmToast(type = 'close-btn', clientX = 0, clientY = 0) 
 function hideEditNameConfirmToast(immediate = false) {
     const toast = document.getElementById('edit-name-confirm-toast');
     const wave = document.getElementById('edit-name-confirm-wave');
+
+    clearTimeout(editNameToastMoveTimer);
+    editNameToastActivePos = null;
 
     if (!toast) return;
 
@@ -178,7 +197,7 @@ function setEditNameButtonLoading(button, isLoading, originalText) {
         button.innerHTML = '<span class="edit-name-spinner"></span>';
     } else {
         button.classList.remove('loading');
-        validateEditNameInputState(); // Возвращает дефолтный текст или "Такого не может быть"
+        validateEditNameInputState();
     }
 }
 
@@ -487,7 +506,8 @@ function injectEditNameStyles() {
             pointer-events: none !important;
             white-space: nowrap !important;
             z-index: 10 !important;
-            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease !important;
+            /* Плавный переход для перемещения плашки к курсору */
+            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease, left 0.4s cubic-bezier(0.16, 1, 0.3, 1), top 0.4s cubic-bezier(0.16, 1, 0.3, 1), right 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
 
         .edit-name-confirm-toast.visible {
@@ -637,18 +657,61 @@ function initEditNameEvents() {
     btnConfirmYes?.addEventListener('click', window.hideEditNameModal);
     btnConfirmNo?.addEventListener('click', () => hideEditNameConfirmToast(false));
 
-    // Клик по крестику показывает плашку слева от него (если еще не открыта)
+    // Отслеживание движения мыши по всему документу для плашки
+    document.addEventListener('mousemove', (e) => {
+        editNameLastMouseX = e.clientX;
+        editNameLastMouseY = e.clientY;
+
+        const toast = document.getElementById('edit-name-confirm-toast');
+        if (!toast || !toast.classList.contains('visible') || !editNameToastActivePos) return;
+
+        // Расстояние от курсора до центра плашки
+        const distance = Math.hypot(e.clientX - editNameToastActivePos.x, e.clientY - editNameToastActivePos.y);
+        const thresholdDistance = 150; // Примерно 5 см (150 пикселей)
+
+        if (distance > thresholdDistance) {
+            // Если курсор отодвинулся > 150px и таймер еще не запущен — запускаем на 0.5 сек
+            if (!editNameToastMoveTimer) {
+                editNameToastMoveTimer = setTimeout(() => {
+                    const currentToast = document.getElementById('edit-name-confirm-toast');
+                    if (!currentToast || !currentToast.classList.contains('visible')) return;
+
+                    const tWidth = currentToast.offsetWidth || 260;
+                    const tHeight = currentToast.offsetHeight || 50;
+
+                    // Новые безопасные координаты под текущим курсором
+                    let newLeft = Math.max(15, Math.min(editNameLastMouseX - tWidth / 2, window.innerWidth - tWidth - 15));
+                    let newTop = Math.max(15, Math.min(editNameLastMouseY + 15, window.innerHeight - tHeight - 15));
+
+                    // Сбрасываем правое позиционирование (если было от крестика) и задаем left/top
+                    currentToast.style.right = '';
+                    currentToast.style.left = newLeft + 'px';
+                    currentToast.style.top = newTop + 'px';
+                    currentToast.style.transform = 'translateY(0) scale(0.85)';
+
+                    // Обновляем текущую активную позицию плашки
+                    editNameToastActivePos = { x: newLeft + tWidth / 2, y: newTop + tHeight / 2 };
+                    editNameToastMoveTimer = null;
+                }, 500); // 0.5 секунды задержки
+            }
+        } else {
+            // Если курсор снова поднесли ближе чем на 5 см — отменяем перелет
+            if (editNameToastMoveTimer) {
+                clearTimeout(editNameToastMoveTimer);
+                editNameToastMoveTimer = null;
+            }
+        }
+    });
+
     closeBtn?.addEventListener('click', (e) => {
         e.stopPropagation();
         showEditNameConfirmToast('close-btn');
     });
 
-    // Динамическая проверка ввода при наборе текста
     inputField?.addEventListener('input', () => {
         validateEditNameInputState();
     });
 
-    // Одиночный клик по фону — легкая встряска
     overlay?.addEventListener('click', (e) => {
         if (e.target !== overlay) return;
 
@@ -668,7 +731,6 @@ function initEditNameEvents() {
         }, 250);
     });
 
-    // Двойной клик по фону вызывает предупреждение под курсором с проверкой границ
     overlay?.addEventListener('dblclick', (e) => {
         if (e.target === overlay) {
             if (editNameOverlayClickTimeout) clearTimeout(editNameOverlayClickTimeout);
@@ -682,7 +744,6 @@ function initEditNameEvents() {
         }
     });
 
-    // Отправка формы (Сохранение нового имени в Supabase)
     form?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const client = window.supabaseClient || window.supabase;
