@@ -135,7 +135,6 @@ function showEditNameConfirmToast(type = 'close-btn', clientX = 0, clientY = 0) 
         toast.style.top = targetTop + 'px';
         toast.style.transform = 'translateY(-50%) scale(0.85)';
 
-        // Вычисляем абсолютные координаты для логики слежения за курсором
         requestAnimationFrame(() => {
             const rect = toast.getBoundingClientRect();
             editNameToastActivePos = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
@@ -198,6 +197,20 @@ function setEditNameButtonLoading(button, isLoading, originalText) {
     } else {
         button.classList.remove('loading');
         validateEditNameInputState();
+    }
+}
+
+// Функция локального обновления имени на странице без перезагрузки
+function updateUIAfterNameChange(newName) {
+    // Обновляем элемент отображения имени в виджете профиля, если он есть
+    const profileNameText = document.getElementById('profile-name-text');
+    if (profileNameText) {
+        profileNameText.textContent = newName;
+    }
+
+    // Если в других частях интерфейса имя хранится в глобальном объекте или атрибутах
+    if (window.currentUserData) {
+        window.currentUserData.full_name = newName;
     }
 }
 
@@ -506,7 +519,6 @@ function injectEditNameStyles() {
             pointer-events: none !important;
             white-space: nowrap !important;
             z-index: 10 !important;
-            /* Плавный переход для перемещения плашки к курсору */
             transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease, left 0.4s cubic-bezier(0.16, 1, 0.3, 1), top 0.4s cubic-bezier(0.16, 1, 0.3, 1), right 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
 
@@ -657,7 +669,7 @@ function initEditNameEvents() {
     btnConfirmYes?.addEventListener('click', window.hideEditNameModal);
     btnConfirmNo?.addEventListener('click', () => hideEditNameConfirmToast(false));
 
-    // Отслеживание движения мыши по всему документу для плашки
+    // Отслеживание движения мыши для магнитной плашки
     document.addEventListener('mousemove', (e) => {
         editNameLastMouseX = e.clientX;
         editNameLastMouseY = e.clientY;
@@ -665,12 +677,10 @@ function initEditNameEvents() {
         const toast = document.getElementById('edit-name-confirm-toast');
         if (!toast || !toast.classList.contains('visible') || !editNameToastActivePos) return;
 
-        // Расстояние от курсора до центра плашки
         const distance = Math.hypot(e.clientX - editNameToastActivePos.x, e.clientY - editNameToastActivePos.y);
-        const thresholdDistance = 150; // Примерно 5 см (150 пикселей)
+        const thresholdDistance = 150; // Около 5 см
 
         if (distance > thresholdDistance) {
-            // Если курсор отодвинулся > 150px и таймер еще не запущен — запускаем на 0.5 сек
             if (!editNameToastMoveTimer) {
                 editNameToastMoveTimer = setTimeout(() => {
                     const currentToast = document.getElementById('edit-name-confirm-toast');
@@ -679,23 +689,19 @@ function initEditNameEvents() {
                     const tWidth = currentToast.offsetWidth || 260;
                     const tHeight = currentToast.offsetHeight || 50;
 
-                    // Новые безопасные координаты под текущим курсором
                     let newLeft = Math.max(15, Math.min(editNameLastMouseX - tWidth / 2, window.innerWidth - tWidth - 15));
                     let newTop = Math.max(15, Math.min(editNameLastMouseY + 15, window.innerHeight - tHeight - 15));
 
-                    // Сбрасываем правое позиционирование (если было от крестика) и задаем left/top
                     currentToast.style.right = '';
                     currentToast.style.left = newLeft + 'px';
                     currentToast.style.top = newTop + 'px';
                     currentToast.style.transform = 'translateY(0) scale(0.85)';
 
-                    // Обновляем текущую активную позицию плашки
                     editNameToastActivePos = { x: newLeft + tWidth / 2, y: newTop + tHeight / 2 };
                     editNameToastMoveTimer = null;
-                }, 500); // 0.5 секунды задержки
+                }, 500);
             }
         } else {
-            // Если курсор снова поднесли ближе чем на 5 см — отменяем перелет
             if (editNameToastMoveTimer) {
                 clearTimeout(editNameToastMoveTimer);
                 editNameToastMoveTimer = null;
@@ -744,6 +750,7 @@ function initEditNameEvents() {
         }
     });
 
+    // Отправка формы (Сохранение нового имени в Supabase без перезагрузки страницы)
     form?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const client = window.supabaseClient || window.supabase;
@@ -771,8 +778,12 @@ function initEditNameEvents() {
                 setEditNameButtonLoading(submitBtn, false, 'Сохранить');
             } else {
                 setEditNameButtonLoading(submitBtn, false, 'Сохранить');
+                
+                // Обновляем имя локально на странице без перезагрузки
+                updateUIAfterNameChange(newName);
+                
+                // Просто закрываем модальное окно
                 window.hideEditNameModal();
-                window.location.reload();
             }
         } catch (err) {
             console.error('Ошибка:', err);
