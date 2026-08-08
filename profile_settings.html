@@ -342,7 +342,7 @@
         .action-btn-styled:hover {
             background: rgba(255, 255, 255, 0.15);
             border-color: rgba(255, 255, 255, 0.35);
-            transform: translateX6px) scale(1.02);
+            transform: translateX(6px) scale(1.02);
             box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
         }
 
@@ -467,12 +467,12 @@
         }
 
         /* =========================================================
-            ИНФОРМАЦИЯ ПРОФИЛЯ (ИМЯ, ТЕЛЕФОН И ПОЧТА НА ОДНОЙ ЛИНИИ)
+            ИНФОРМАЦИЯ ПРОФИЛЯ
             ========================================================= */
         .profile-info-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start; /* Изменено на flex-start для ровного выравнивания по верхнему краю */
             width: 100%;
             margin-bottom: 25px;
             padding-bottom: 15px;
@@ -482,7 +482,7 @@
         .profile-info-item {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            padding: 10px 0;
             flex: 1;
         }
 
@@ -501,6 +501,39 @@
             text-align: right;
         }
 
+        /* Крупный закругленный прямоугольник для NAME */
+        .profile-badge-name {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 14px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 12px; /* Увеличенный отступ, чтобы опустить данные ниже */
+        }
+
+        /* Крупные иконки телефона и почты (@) */
+        .profile-icon-phone,
+        .profile-icon-email {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 32px;
+            font-size: 24px;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 12px; /* Опускаем данные ниже */
+        }
+
+        .profile-icon-phone svg {
+            width: 26px;
+            height: 26px;
+        }
+
         .profile-info-label {
             font-family: 'Montserrat', sans-serif;
             font-size: 11px;
@@ -508,6 +541,7 @@
             color: rgba(255, 255, 255, 0.45);
             letter-spacing: 0.5px;
             text-transform: uppercase;
+            margin-bottom: 4px;
         }
 
         .profile-info-value-wrapper {
@@ -548,27 +582,16 @@
             color: #ffffff;
         }
 
-        /* Анимация пишущего карандаша при наведении */
         .edit-name-btn:hover svg {
             animation: pencilWriting 0.6s ease-in-out infinite alternate;
         }
 
         @keyframes pencilWriting {
-            0% {
-                transform: rotate(0deg) translateY(0px);
-            }
-            25% {
-                transform: rotate(-10deg) translateY(-2px);
-            }
-            50% {
-                transform: rotate(5deg) translateY(1px);
-            }
-            75% {
-                transform: rotate(-8deg) translateY(-1px);
-            }
-            100% {
-                transform: rotate(4deg) translateY(0px);
-            }
+            0% { transform: rotate(0deg) translateY(0px); }
+            25% { transform: rotate(-10deg) translateY(-2px); }
+            50% { transform: rotate(5deg) translateY(1px); }
+            75% { transform: rotate(-8deg) translateY(-1px); }
+            100% { transform: rotate(4deg) translateY(0px); }
         }
 
         .edit-name-btn:active {
@@ -703,32 +726,6 @@
         .reset-open-link:hover {
             color: #ffffff;
         }
-
-        /* Прямоугольник без заливки для NAME */
-.profile-badge-name {
-    display: inline-block;
-    padding: 3px 8px;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    border-radius: 6px;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 6px;
-}
-
-/* Иконка телефона с плюсиком и значок собаки (@) */
-.profile-icon-phone,
-.profile-icon-email {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 22px;
-    font-size: 15px;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.8);
-    margin-bottom: 6px;
-}
     </style>
 </head>
 <body>
