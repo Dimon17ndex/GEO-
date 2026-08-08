@@ -84,13 +84,18 @@ function validateEditNameInputState() {
     }
 }
 
-// Функция показа всплывающей плашки подтверждения с позиционированием
+// Функция показа всплывающей плашки подтверждения с позиционированием и защитой от границ
 function showEditNameConfirmToast(type = 'close-btn', clientX = 0, clientY = 0) {
     const toast = document.getElementById('edit-name-confirm-toast');
     const wave = document.getElementById('edit-name-confirm-wave');
     const closeBtn = document.getElementById('edit-name-close-btn');
     
     if (!toast) return;
+
+    // Если плашка уже открыта и запрос идет с крестика — игнорируем повторное дергание
+    if (type === 'close-btn' && toast.classList.contains('visible')) {
+        return;
+    }
 
     toast.classList.remove('hiding', 'visible');
     if (wave) wave.classList.remove('active');
@@ -101,21 +106,38 @@ function showEditNameConfirmToast(type = 'close-btn', clientX = 0, clientY = 0) 
     toast.style.bottom = '';
     toast.style.right = '';
 
+    // Даем браузеру обновить размеры перед расчетом
+    toast.style.visibility = 'hidden';
+    toast.style.display = 'flex';
+    const toastWidth = toast.offsetWidth || 260;
+    const toastHeight = toast.offsetHeight || 50;
+
     if (type === 'close-btn' && closeBtn) {
-        // Позиционируем слева от крестика
+        // Позиционируем слева от крестика с защитой от вылета за левый край экрана
         const btnRect = closeBtn.getBoundingClientRect();
         toast.style.position = 'fixed';
-        toast.style.right = (window.innerWidth - btnRect.left + 12) + 'px';
-        toast.style.top = (btnRect.top + btnRect.height / 2) + 'px';
+        
+        let calculatedRight = window.innerWidth - btnRect.left + 12;
+        // Проверяем, не упрется ли плашка в левую границу (если правый отступ слишком большой)
+        const maxRight = window.innerWidth - toastWidth - 15;
+        const finalRight = Math.min(calculatedRight, maxRight);
+
+        toast.style.right = Math.max(15, finalRight) + 'px';
+        toast.style.top = Math.max(15, Math.min(btnRect.top + btnRect.height / 2, window.innerHeight - toastHeight - 15)) + 'px';
         toast.style.transform = 'translateY(-50%) scale(0.85)';
     } else if (type === 'double-click') {
-        // Позиционируем под курсором снизу
+        // Позиционируем под курсором с защитой от выхода за любые границы экрана
         toast.style.position = 'fixed';
-        toast.style.left = Math.min(clientX, window.innerWidth - 280) + 'px';
-        toast.style.top = Math.min(clientY + 15, window.innerHeight - 80) + 'px';
+        
+        let safeLeft = Math.max(15, Math.min(clientX - toastWidth / 2, window.innerWidth - toastWidth - 15));
+        let safeTop = Math.max(15, Math.min(clientY + 15, window.innerHeight - toastHeight - 15));
+
+        toast.style.left = safeLeft + 'px';
+        toast.style.top = safeTop + 'px';
         toast.style.transform = 'translateY(0) scale(0.85)';
     }
 
+    toast.style.visibility = ''; // возвращаем видимость для анимации
     void toast.offsetWidth; // Перезапуск анимации
 
     toast.classList.add('visible');
@@ -615,7 +637,7 @@ function initEditNameEvents() {
     btnConfirmYes?.addEventListener('click', window.hideEditNameModal);
     btnConfirmNo?.addEventListener('click', () => hideEditNameConfirmToast(false));
 
-    // Клик по крестику показывает плашку точно слева от него
+    // Клик по крестику показывает плашку слева от него (если еще не открыта)
     closeBtn?.addEventListener('click', (e) => {
         e.stopPropagation();
         showEditNameConfirmToast('close-btn');
@@ -646,7 +668,7 @@ function initEditNameEvents() {
         }, 250);
     });
 
-    // Двойной клик по фону вызывает предупреждение под курсором
+    // Двойной клик по фону вызывает предупреждение под курсором с проверкой границ
     overlay?.addEventListener('dblclick', (e) => {
         if (e.target === overlay) {
             if (editNameOverlayClickTimeout) clearTimeout(editNameOverlayClickTimeout);
