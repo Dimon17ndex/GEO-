@@ -16,8 +16,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="beginning.css">
-
-    <style>
+    
+<style>
         /* Когда пользователь вошел — скрываем центральную кнопку */
         body.user-logged-in #open-auth-btn {
             display: none !important;
@@ -472,7 +472,7 @@
         .profile-info-row {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start; /* Изменено на flex-start для ровного выравнивания по верхнему краю */
+            align-items: flex-start;
             width: 100%;
             margin-bottom: 25px;
             padding-bottom: 15px;
@@ -501,61 +501,60 @@
             text-align: right;
         }
 
+        /* Контейнеры-обертки с фиксированной шириной для NAME и @, идентичные телефонному */
+        .profile-badge-name-wrapper,
+        .profile-icon-email-wrapper,
+        .profile-icon-phone {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 32px;
+            width: 40px;
+            margin-bottom: 12px;
+        }
+
         /* Крупный закругленный прямоугольник для NAME */
         .profile-badge-name {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 6px 14px;
+            padding: 4px 10px;
             border: 2px solid rgba(255, 255, 255, 0.5);
-            border-radius: 10px;
-            font-size: 14px;
+            border-radius: 8px;
+            font-size: 13px;
             font-weight: 800;
             letter-spacing: 1px;
             color: rgba(255, 255, 255, 0.95);
-            margin-bottom: 12px; /* Увеличенный отступ, чтобы опустить данные ниже */
+            white-space: nowrap;
         }
 
-        /* Крупные иконки телефона и почты (@) */
-        .profile-icon-phone,
+        /* Сама трубка телефона */
+        .profile-icon-phone svg {
+            width: 26px;
+            height: 26px;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        /* Плюсик */
+        .phone-plus-sign {
+            position: absolute;
+            right: 2px;
+            top: -2px;
+            font-size: 16px;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        /* Иконка почты (@) */
         .profile-icon-email {
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 32px;
             font-size: 24px;
             font-weight: 800;
             color: rgba(255, 255, 255, 0.95);
-            margin-bottom: 12px; /* Опускаем данные ниже */
         }
-
-        /* Контейнер для иконки телефона и плюсика */
-.profile-icon-phone {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 32px;
-    width: 40px; /* Задаем ширину, чтобы было место для смещения */
-    margin-bottom: 12px;
-}
-
-/* Сама трубка телефона */
-.profile-icon-phone svg {
-    width: 26px;
-    height: 26px;
-    color: rgba(255, 255, 255, 0.95);
-}
-
-/* Плюсик, который можно двигать вправо */
-.phone-plus-sign {
-    position: absolute;
-    right: 2px; /* Изменяйте это число: чем оно меньше, тем правее уйдет плюсик */
-    top: -2px;  /* Можно также регулировать высоту */
-    font-size: 16px;
-    font-weight: 800;
-    color: rgba(255, 255, 255, 0.95);
-}
 
         .profile-info-label {
             font-family: 'Montserrat', sans-serif;
@@ -749,7 +748,7 @@
         .reset-open-link:hover {
             color: #ffffff;
         }
-    </style>
+</style>
 </head>
 <body>
 
@@ -815,7 +814,7 @@
 
         <div class="tab-content" id="tab-profile">
     <div class="profile-info-row">
-        <div class="profile-info-item align-left">
+        <div class="profile-info-item align-center">
             <div class="profile-badge-name">NAME</div>
             <span class="profile-info-label">Имя пользователя</span>
             <div class="profile-info-value-wrapper">
@@ -830,18 +829,20 @@
         </div>
 
         <div class="profile-info-item align-center">
-    <div class="profile-icon-phone">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="26" height="26">
-            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-        </svg>
-        <span class="phone-plus-sign">+</span>
-    </div>
-    <span class="profile-info-label">Номер телефона</span>
-    <span class="profile-info-value" id="user-display-phone">БЕЗ НОМЕРА</span>
-</div>
+            <div class="profile-icon-phone">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="26" height="26">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                </svg>
+                <span class="phone-plus-sign">+</span>
+            </div>
+            <span class="profile-info-label">Номер телефона</span>
+            <span class="profile-info-value" id="user-display-phone">БЕЗ НОМЕРА</span>
+        </div>
 
-        <div class="profile-info-item align-right">
-            <div class="profile-icon-email">@</div>
+        <div class="profile-info-item align-center">
+            <div class="profile-icon-email-wrapper">
+                <div class="profile-icon-email">@</div>
+            </div>
             <span class="profile-info-label">Электронная почта</span>
             <span class="profile-info-value" id="user-display-email">—</span>
         </div>
