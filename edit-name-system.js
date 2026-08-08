@@ -84,19 +84,45 @@ function validateEditNameInputState() {
     }
 }
 
-// Функция показа всплывающей плашки подтверждения закрытия
-function showEditNameConfirmToast() {
+// Функция показа всплывающей плашки подтверждения с позиционированием
+function showEditNameConfirmToast(type = 'close-btn', clientX = 0, clientY = 0) {
     const toast = document.getElementById('edit-name-confirm-toast');
     const wave = document.getElementById('edit-name-confirm-wave');
+    const closeBtn = document.getElementById('edit-name-close-btn');
     
-    if (toast) {
-        toast.classList.remove('hiding', 'visible');
-        if (wave) wave.classList.remove('active');
+    if (!toast) return;
 
-        void toast.offsetWidth; // Перезапуск анимации
+    toast.classList.remove('hiding', 'visible');
+    if (wave) wave.classList.remove('active');
 
-        toast.classList.add('visible');
-        if (wave) wave.classList.add('active');
+    // Сбрасываем старые инлайн-стили позиционирования
+    toast.style.left = '';
+    toast.style.top = '';
+    toast.style.bottom = '';
+    toast.style.right = '';
+
+    if (type === 'close-btn' && closeBtn) {
+        // Позиционируем слева от крестика
+        const btnRect = closeBtn.getBoundingClientRect();
+        toast.style.position = 'fixed';
+        toast.style.right = (window.innerWidth - btnRect.left + 12) + 'px';
+        toast.style.top = (btnRect.top + btnRect.height / 2) + 'px';
+        toast.style.transform = 'translateY(-50%) scale(0.85)';
+    } else if (type === 'double-click') {
+        // Позиционируем под курсором снизу
+        toast.style.position = 'fixed';
+        toast.style.left = Math.min(clientX, window.innerWidth - 280) + 'px';
+        toast.style.top = Math.min(clientY + 15, window.innerHeight - 80) + 'px';
+        toast.style.transform = 'translateY(0) scale(0.85)';
+    }
+
+    void toast.offsetWidth; // Перезапуск анимации
+
+    toast.classList.add('visible');
+    if (wave && type === 'double-click') {
+        wave.style.left = clientX + 'px';
+        wave.style.bottom = (window.innerHeight - clientY) + 'px';
+        wave.classList.add('active');
     }
 }
 
@@ -380,7 +406,6 @@ function injectEditNameStyles() {
             transform: none !important;
         }
 
-        /* Стиль для состояния "Такого не может быть" — прозрачный фон, ярко-красная рамка и текст */
         .edit-name-submit-btn.forbidden {
             background: transparent !important;
             border-color: #ff3b30 !important;
@@ -405,13 +430,11 @@ function injectEditNameStyles() {
 
         .edit-name-confirm-wave {
             position: fixed !important;
-            bottom: 20px !important;
-            left: 50% !important;
             width: 10px !important;
             height: 10px !important;
             border-radius: 50% !important;
             background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.25) 30%, rgba(255, 255, 255, 0) 70%) !important;
-            transform: translate(-50%, 50%) scale(0) !important;
+            transform: translate(-50%, -50%) scale(0) !important;
             pointer-events: none !important;
             z-index: 8 !important;
             opacity: 0 !important;
@@ -422,16 +445,13 @@ function injectEditNameStyles() {
         }
 
         @keyframes editNameFullScreenWave {
-            0% { transform: translate(-50%, 50%) scale(1); opacity: 1; }
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
             50% { opacity: 0.7; }
-            100% { transform: translate(-50%, 50%) scale(280); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(280); opacity: 0; }
         }
 
         .edit-name-confirm-toast {
             position: fixed !important;
-            bottom: 30px !important;
-            left: 50% !important;
-            transform: translateX(-50%) translateY(100px) scale(0.85);
             background: rgba(22, 22, 28, 0.96) !important;
             border: 1px solid rgba(255, 255, 255, 0.25) !important;
             border-radius: 16px !important;
@@ -445,28 +465,19 @@ function injectEditNameStyles() {
             pointer-events: none !important;
             white-space: nowrap !important;
             z-index: 10 !important;
-            transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease !important;
+            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease !important;
         }
 
         .edit-name-confirm-toast.visible {
             opacity: 1 !important;
             visibility: visible !important;
             pointer-events: auto !important;
-            animation: editNameBounceInUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
         }
 
         .edit-name-confirm-toast.hiding {
             opacity: 0 !important;
-            transform: translateX(-50%) translateY(40px) scale(0.9) !important;
+            transform: scale(0.9) !important;
             pointer-events: none !important;
-            animation: none !important;
-        }
-
-        @keyframes editNameBounceInUp {
-            0% { opacity: 0; transform: translateX(-50%) translateY(100px) scale(0.7); }
-            65% { opacity: 1; transform: translateX(-50%) translateY(-12px) scale(1.03); }
-            85% { transform: translateX(-50%) translateY(4px) scale(0.98); }
-            100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
         }
 
         .edit-name-confirm-text {
@@ -604,8 +615,10 @@ function initEditNameEvents() {
     btnConfirmYes?.addEventListener('click', window.hideEditNameModal);
     btnConfirmNo?.addEventListener('click', () => hideEditNameConfirmToast(false));
 
-    closeBtn?.addEventListener('click', () => {
-        showEditNameConfirmToast();
+    // Клик по крестику показывает плашку точно слева от него
+    closeBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showEditNameConfirmToast('close-btn');
     });
 
     // Динамическая проверка ввода при наборе текста
@@ -613,7 +626,7 @@ function initEditNameEvents() {
         validateEditNameInputState();
     });
 
-    // Обработка клика по фону (анимация встряски)
+    // Одиночный клик по фону — легкая встряска
     overlay?.addEventListener('click', (e) => {
         if (e.target !== overlay) return;
 
@@ -633,17 +646,17 @@ function initEditNameEvents() {
         }, 250);
     });
 
-    // Двойной клик по фону вызывает предупреждение о закрытии
+    // Двойной клик по фону вызывает предупреждение под курсором
     overlay?.addEventListener('dblclick', (e) => {
         if (e.target === overlay) {
             if (editNameOverlayClickTimeout) clearTimeout(editNameOverlayClickTimeout);
-            showEditNameConfirmToast();
+            showEditNameConfirmToast('double-click', e.clientX, e.clientY);
         }
     });
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && document.getElementById('edit-name-modal-overlay')?.classList.contains('active')) {
-            showEditNameConfirmToast();
+            showEditNameConfirmToast('close-btn');
         }
     });
 
