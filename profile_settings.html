@@ -1,654 +1,1025 @@
-// edit-name-system.js
-
-let editNameClickTimeout = null;
-
-// --- ГЛОБАЛЬНЫЕ ФУНКЦИИ ---
-window.showEditNameModal = function() {
-    injectEditNameStyles();
-    initEditNameModalUI();
-    initEditNameEvents();
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEOГРАФИЯ — Сессия</title>
     
-    const modal = document.getElementById('edit-name-modal-overlay');
-    hideEditNameConfirmToast(true);
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js" defer></script>
+    <script src="console.js" defer></script>
+
+    <link rel="icon" type="image/png" href="images/favicon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
     
-    // Предзаполняем поле текущим именем
-    loadCurrentNameToInput();
+    <link rel="stylesheet" href="beginning.css">
 
-    if (modal) {
-        modal.classList.add('active');
+    <style>
+        /* Когда пользователь вошел — скрываем центральную кнопку */
+        body.user-logged-in #open-auth-btn {
+            display: none !important;
+        }
+
+        /* Плавное проявление страницы */
+        body {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        body.page-loaded {
+            opacity: 1;
+        }
+
+        body.page-hidden {
+            opacity: 0 !important;
+        }
+
+        /* Бренд-блок в верхнем левом углу */
+        .top-left-brand {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            z-index: 10;
+        }
+
+        .top-left-brand .db-brand-block {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .top-left-brand .db-logo-icon {
+            height: auto;
+            max-width: 110px;
+            width: 100%;
+            display: block;
+            will-change: transform;
+            animation: floatingLogo 4s ease-in-out infinite alternate !important;
+        }
+
+        .top-left-brand .db-text-right {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* =========================================================
+            ЛЕВИТИРУЮЩИЙ И СМЕНЯЮЩИЙСЯ ТЕКСТ БРЕНД-БЛОКА
+            ========================================================= */
+        .top-left-brand .db-main-title {
+            position: relative;
+            margin: 0;
+            font-family: 'Unbounded', sans-serif;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            line-height: 1;
+            color: #ffffff;
+            white-space: nowrap;
+            will-change: transform;
+            
+            animation: floatingText 4.5s ease-in-out infinite alternate !important;
+        }
+
+        .title-text-main,
+        .title-text-alt {
+            display: inline-block;
+            transition: opacity 0.8s ease-in-out, filter 0.8s ease-in-out;
+        }
+
+        .title-text-alt {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            filter: blur(8px);
+        }
+
+        .top-left-brand .db-main-title .title-text-main {
+            animation: swapTextMain 7s ease-in-out infinite;
+        }
+
+        .top-left-brand .db-main-title .title-text-alt {
+            animation: swapTextAlt 7s ease-in-out infinite;
+        }
+
+        @keyframes floatingLogo {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(-1.5deg); }
+            100% { transform: translateY(5px) rotate(1.5deg); }
+        }
+
+        @keyframes floatingText {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+            100% { transform: translateY(4px); }
+        }
+
+        @keyframes swapTextMain {
+            0%, 40%, 100% { opacity: 1; filter: blur(0px); }
+            50%, 90% { opacity: 0; filter: blur(8px); }
+        }
+
+        @keyframes swapTextAlt {
+            0%, 40%, 100% { opacity: 0; filter: blur(8px); }
+            50%, 90% { opacity: 1; filter: blur(0px); }
+        }
+
+        /* =========================================================
+            КНОПКА-СТРЕЛКА (ВЫЛЕТАЕТ СПРАВА НАЛЕВО)
+            ========================================================= */
+        .back-nav-container {
+            position: fixed;
+            top: 40px;
+            right: 40px;
+            z-index: 100;
+        }
+
+        .back-arrow-btn {
+            width: auto;
+            height: auto;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: none;
+            color: #ffffff;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: none;
+
+            /* Начальное положение: смещена вправо и скрыта */
+            opacity: 0;
+            transform: translateX(40px) scale(0.8);
+            animation: slideInFromRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.8s forwards;
+            will-change: transform, opacity;
+        }
+
+        .back-arrow-btn svg {
+            width: 28px;
+            height: 28px;
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Анимация появления справа налево */
+        @keyframes slideInFromRight {
+            0% {
+                opacity: 0;
+                transform: translateX(40px) scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        .back-arrow-btn:hover {
+            transform: scale(1.12);
+        }
+
+        .back-arrow-btn:hover svg {
+            transform: rotate(-360deg);
+        }
+
+        .back-arrow-btn:active {
+            transform: scale(0.9);
+        }
+
+        /* =========================================================
+            БЛОК АККАУНТА (ЗАМЕДЛЕННЫЙ БЛИК)
+            ========================================================= */
+        #user-profile-widget,
+        .top-center-account {
+            position: absolute !important;
+            top: 180px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            right: auto !important;
+            bottom: auto !important;
+            z-index: 100 !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .account-title-large {
+            position: relative;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 28px;
+            font-weight: 900;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            white-space: nowrap;
+            display: inline-block;
+            padding: 4px 12px;
+
+            animation: accountBlurBounce 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+                       accountGlowPulse 1.6s ease-out forwards;
+            will-change: transform, filter, opacity;
+        }
+
+        .account-title-large::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: -100vw;
+            width: 35vw;
+            background: linear-gradient(
+                90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.85) 50%, 
+                transparent 100%
+            );
+            transform: skewX(-25deg);
+            pointer-events: none;
+            z-index: 2;
+            animation: lightFlashFullWidth 1.1s cubic-bezier(0.25, 1, 0.5, 1) 0.6s 1 forwards;
+        }
+
+        @keyframes accountBlurBounce {
+            0% { opacity: 0; filter: blur(20px); transform: scale(0.3); }
+            60% { opacity: 1; filter: blur(2px); transform: scale(1.35); }
+            80% { filter: blur(0px); transform: scale(0.92); }
+            100% { opacity: 1; filter: blur(0px); transform: scale(1); }
+        }
+
+        @keyframes accountGlowPulse {
+            0% { text-shadow: 0 0 0px rgba(255, 255, 255, 0); }
+            50% { text-shadow: 0 0 45px rgba(255, 255, 255, 1), 0 0 20px rgba(52, 152, 219, 0.9); }
+            100% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
+        }
+
+        @keyframes lightFlashFullWidth {
+            0% { left: -100vw; opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { left: 100vw; opacity: 0; }
+        }
+
+        /* =========================================================
+            ЛИНИЯ-РАЗДЕЛИТЕЛЬ
+            ========================================================= */
+        .account-divider-line {
+            position: absolute;
+            top: 230px;
+            left: 50%;
+            transform: translateX(-50%) scaleX(0);
+            width: 85vw;
+            max-width: 900px;
+            height: 1px;
+            background: linear-gradient(
+                90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.4) 50%, 
+                transparent 100%
+            );
+            z-index: 90;
+            
+            animation: lineExpandCenter 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.1s forwards;
+            will-change: transform, opacity;
+        }
+
+        @keyframes lineExpandCenter {
+            0% { opacity: 0; transform: translateX(-50%) scaleX(0); }
+            100% { opacity: 1; transform: translateX(-50%) scaleX(1); }
+        }
+
+        /* =========================================================
+            КНОПКИ СЛЕВА (УЛУЧШЕНА ПЛАВНОСТЬ И ОТКЛИК)
+            ========================================================= */
+        .account-actions-container {
+            position: absolute;
+            top: 255px;
+            left: 40px;
+            z-index: 98;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .action-btn-styled {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 12px;
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            
+            /* Сверхплавный переход для всех состояний */
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            width: 100%;
+            box-sizing: border-box;
+
+            opacity: 0;
+            filter: blur(10px);
+            transform: translateY(15px);
+            will-change: transform, opacity, filter, background, border-color, box-shadow;
+            
+            animation: actionsAppear 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .action-btn-styled:nth-child(1) { animation-delay: 1.2s; }
+        .action-btn-styled:nth-child(2) { animation-delay: 1.35s; }
+        .action-btn-styled:nth-child(3) { animation-delay: 1.5s; }
+
+        .action-btn-styled:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.35);
+            transform: translateX6px) scale(1.02);
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        /* Активная вкладка: мягкий сдвиг и подсветка */
+        .action-btn-styled.active-tab {
+            background: rgba(255, 255, 255, 0.18) !important;
+            border-color: #ffffff !important;
+            transform: translateX(10px) !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
+        }
+
+        /* Эффект клика (нажатия) */
+        .action-btn-styled:active {
+            transform: translateX(6px) scale(0.97) !important;
+            transition: transform 0.1s ease;
+        }
+
+        @keyframes actionsAppear {
+            0% { opacity: 0; filter: blur(10px); transform: translateY(15px); }
+            100% { opacity: 1; filter: blur(0px); transform: translateY(0); }
+        }
+
+        /* =========================================================
+            КРУПНЫЙ ЦЕНТРАЛЬНЫЙ КОНТЕЙНЕР (ПЛАВНАЯ СМЕНА ВКЛАДОК)
+            ========================================================= */
+        .main-profile-container {
+            position: absolute;
+            top: 255px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            
+            width: 84vw;
+            max-width: 920px;
+            
+            min-height: 460px; 
+            padding: 30px;
+            box-sizing: border-box;
+
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 22px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            z-index: 92;
+
+            opacity: 0;
+            filter: blur(12px);
+
+            animation: containerAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.0s forwards;
+            transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1), 
+                        filter 0.5s cubic-bezier(0.25, 1, 0.5, 1), 
+                        transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        @keyframes containerAppear {
+            0% {
+                opacity: 0;
+                filter: blur(12px);
+                transform: translateX(-50%) translateY(20px) scale(0.97);
+            }
+            100% {
+                opacity: 1;
+                filter: blur(0px);
+                transform: translateX(-50%) translateY(0) scale(1);
+            }
+        }
+
+        /* Система вкладок с мягким бесшовным кроссфейдом */
+        .tab-content {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            right: 30px;
+            bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(8px);
+            transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+                        transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+                        visibility 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            pointer-events: none;
+        }
+
+        .tab-content.active-content {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .empty-tab-placeholder {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.5);
+            text-align: left;
+            padding: 20px 0;
+        }
+
+        /* =========================================================
+            БЛОК ВЫХОДА ВНУТРИ КОНТЕЙНЕРА И КНОПКА
+            ========================================================= */
+        .session-logout-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .logout-label-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            align-self: flex-start;
+            text-align: left;
+        }
+
+        /* =========================================================
+            ИНФОРМАЦИЯ ПРОФИЛЯ (ИМЯ, ТЕЛЕФОН И ПОЧТА НА ОДНОЙ ЛИНИИ)
+            ========================================================= */
+        .profile-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .profile-info-item.align-left {
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        .profile-info-item.align-center {
+            align-items: center;
+            text-align: center;
+        }
+
+        .profile-info-item.align-right {
+            align-items: flex-end;
+            text-align: right;
+        }
+
+        .profile-info-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.45);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .profile-info-value-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .profile-info-value {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.3px;
+        }
+
+        /* Стиль для интерактивной иконки карандаша */
+        .edit-name-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 2px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.6);
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .edit-name-btn svg {
+            width: 15px;
+            height: 15px;
+            transition: transform 0.3s ease;
+            transform-origin: bottom left;
+        }
+
+        .edit-name-btn:hover {
+            color: #ffffff;
+        }
+
+        /* Анимация пишущего карандаша при наведении */
+        .edit-name-btn:hover svg {
+            animation: pencilWriting 0.6s ease-in-out infinite alternate;
+        }
+
+        @keyframes pencilWriting {
+            0% {
+                transform: rotate(0deg) translateY(0px);
+            }
+            25% {
+                transform: rotate(-10deg) translateY(-2px);
+            }
+            50% {
+                transform: rotate(5deg) translateY(1px);
+            }
+            75% {
+                transform: rotate(-8deg) translateY(-1px);
+            }
+            100% {
+                transform: rotate(4deg) translateY(0px);
+            }
+        }
+
+        .edit-name-btn:active {
+            transform: scale(0.9);
+        }
+
+        .red-primary-btn {
+            align-self: flex-end;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 14px;
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(183, 28, 28, 0.25);
+            white-space: nowrap;
+            
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .red-primary-btn:hover {
+            background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+            border-color: rgba(255, 255, 255, 0.45);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(229, 57, 53, 0.4);
+        }
+
+        .red-primary-btn:active {
+            transform: translateY(0) scale(0.97);
+        }
+
+        .red-primary-btn.is-loading {
+            padding: 14px 34px;
+            opacity: 0.85;
+            pointer-events: none;
+        }
+
+        .btn-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.35);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: btnSpinnerRotate 0.8s linear infinite;
+            display: inline-block;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
+
+        @keyframes btnSpinnerRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .center-status-wrapper {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+            pointer-events: none;
+            text-align: center;
+        }
+
+        .auth-trigger-btn {
+            pointer-events: auto;
+        }
+
+        .dev-side-panel {
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translate(100%, -50%);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 15px;
+            background: rgba(15, 15, 20, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-right: none;
+            border-radius: 16px 0 0 16px;
+            backdrop-filter: blur(15px);
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .dev-side-panel.visible {
+            transform: translate(0, -50%);
+        }
+
+        .dev-panel-btn {
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            border-radius: 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.25s ease;
+        }
+
+        .dev-panel-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateX(-3px);
+        }
+
+        .reset-open-link {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+            text-decoration: underline;
+            transition: color 0.2s ease;
+        }
+
+        .reset-open-link:hover {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-banners-container">
+        <div class="app-banner banner-warning">
+            <span class="banner-icon">🛠</span>
+            <span>Ведется разработка сайта в раннем доступе</span>
+        </div>
+    </div>
+
+    <div class="shadow-layer"></div>
+
+    <div id="bg-wave-container"></div>
+
+    <div class="top-left-brand">
+        <div class="db-brand-block">
+            <img src="images/geo_logo.png" alt="Geo Logo" class="db-logo-icon">
+            <div class="db-text-right">
+                <h1 class="db-main-title">
+                    <span class="title-text-main">GEOГРАФИЯ</span>
+                    <span class="title-text-alt">НАСТРОЙКИ ПРОФИЛЯ</span>
+                </h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="back-nav-container">
+        <div class="back-arrow-btn" onclick="navigateToPage('beginning.html')" title="Вернуться назад">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+        </div>
+    </div>
+
+    <div id="user-profile-widget" class="top-center-account" style="display: none;">
+        <div class="account-title-large" id="profile-email-text">ПРОФИЛЬ</div>
+    </div>
+
+    <div class="account-divider-line"></div>
+
+    <div class="account-actions-container" id="account-actions-block">
+        <button type="button" class="action-btn-styled" data-tab="settings" onclick="switchTab('settings')">
+            Основные настройки
+        </button>
+        <button type="button" class="action-btn-styled" data-tab="profile" onclick="switchTab('profile')">
+            Профиль
+        </button>
+        <button type="button" class="action-btn-styled" data-tab="support" onclick="switchTab('support')">
+            Техническая поддержка
+        </button>
+    </div>
+
+    <div class="main-profile-container" id="main-profile-block">
+        <div class="tab-content" id="tab-settings">
+            <div class="session-logout-section">
+                <span class="logout-label-text">Завершение сессии/выход из аккаунта</span>
+                <button type="button" class="red-primary-btn logout-btn-trigger" onclick="handleLogout()">
+                    Выйти из аккаунта
+                </button>
+            </div>
+        </div>
+
+        <div class="tab-content" id="tab-profile">
+            <div class="profile-info-row">
+                <div class="profile-info-item align-left">
+                    <span class="profile-info-label">Имя пользователя</span>
+                    <div class="profile-info-value-wrapper">
+                        <span class="profile-info-value" id="user-display-name">НЕТ ИМЕНИ</span>
+                        <button type="button" class="edit-name-btn" onclick="showEditNameModal()" title="Редактировать имя">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 20h9"></path>
+                                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="profile-info-item align-center">
+                    <span class="profile-info-label">Номер телефона</span>
+                    <span class="profile-info-value" id="user-display-phone">БЕЗ НОМЕРА</span>
+                </div>
+                <div class="profile-info-item align-right">
+                    <span class="profile-info-label">Электронная почта</span>
+                    <span class="profile-info-value" id="user-display-email">—</span>
+                </div>
+            </div>
+            
+            <div class="session-logout-section">
+                <span class="logout-label-text">Завершение сессии/выход из аккаунта</span>
+                <button type="button" class="red-primary-btn logout-btn-trigger" onclick="handleLogout()">
+                    Выйти из аккаунта
+                </button>
+            </div>
+        </div>
+
+        <div class="tab-content" id="tab-support">
+            <div class="empty-tab-placeholder">Раздел технической поддержки находится в разработке...</div>
+        </div>
+    </div>
+
+    <div class="center-status-wrapper">
+        <button type="button" id="open-auth-btn" class="auth-trigger-btn" onclick="showAuthModal()">
+            Войти / Зарегистрироваться
+        </button>
+    </div>
+
+    <div id="dev-side-panel" class="dev-side-panel">
+        <button type="button" class="dev-panel-btn" id="btn-main-profile" onclick="navigateToPage('beginning.html')">
+            Основной профиль
+        </button>
+        <button type="button" class="dev-panel-btn" id="btn-admin-profile" onclick="navigateToPage('admin.html')">
+            Профиль администратора
+        </button>
+    </div>
+
+    <script src="auth-system.js?v=3"></script>
+
+    <script>
+const waveContainer = document.getElementById('bg-wave-container');
+let ambientTimeoutId = null;
+
+function createBackgroundRipple(x, y, className, duration = 1500) {
+    if (!waveContainer) return;
+    const ripple = document.createElement('div');
+    ripple.classList.add(className);
+    ripple.style.left = `${x}px`;
+    ripple.style.top = `${y}px`;
+    waveContainer.appendChild(ripple);
+    setTimeout(() => { ripple.remove(); }, duration);
+}
+
+function spawnAmbientWave() {
+    clearTimeout(ambientTimeoutId);
+
+    let spawnX = 0, spawnY = 0;
+    const side = Math.floor(Math.random() * 4);
+    switch(side) {
+        case 0: spawnX = Math.random() * window.innerWidth; spawnY = -50; break;
+        case 1: spawnX = window.innerWidth + 50; spawnY = Math.random() * window.innerHeight; break;
+        case 2: spawnX = Math.random() * window.innerWidth; spawnY = window.innerHeight + 50; break;
+        case 3: spawnX = -50; spawnY = Math.random() * window.innerHeight; break;
     }
-};
 
-window.hideEditNameModal = function() {
-    const modal = document.getElementById('edit-name-modal-overlay');
-    if (modal) {
-        modal.classList.remove('active');
-        hideEditNameConfirmToast(true);
+    createBackgroundRipple(spawnX, spawnY, 'bg-ambient-ripple', 3000);
+    ambientTimeoutId = setTimeout(spawnAmbientWave, 3000 + Math.random() * 4000);
+}
+
+document.body.addEventListener('mousedown', (e) => {
+    createBackgroundRipple(e.clientX, e.clientY, 'bg-click-ripple');
+});
+
+history.pushState(null, null, location.href);
+window.addEventListener('popstate', function () {
+    navigateToPage('index.html');
+});
+
+function navigateToPage(targetPage) {
+    const currentPage = window.location.pathname.split('/').pop() || 'beginning.html';
+    if (currentPage === targetPage) return;
+
+    document.body.classList.add('page-hidden');
+    setTimeout(() => {
+        window.location.href = targetPage;
+    }, 500);
+}
+
+/* Сверхплавное переключение разделов с мягким кроссфейдом */
+function switchTab(tabName) {
+    const buttons = document.querySelectorAll('.action-btn-styled');
+    const contents = document.querySelectorAll('.tab-content');
+
+    buttons.forEach(btn => btn.classList.remove('active-tab'));
+    contents.forEach(content => content.classList.remove('active-content'));
+
+    const selectedBtn = document.querySelector(`.action-btn-styled[data-tab="${tabName}"]`);
+    if (selectedBtn) {
+        selectedBtn.classList.add('active-tab');
     }
-};
 
-// Функция загрузки текущего имени из сессии Supabase в инпут
-async function loadCurrentNameToInput() {
-    const inputField = document.getElementById('edit-name-input');
-    if (!inputField) return;
+    const selectedContent = document.getElementById(`tab-${tabName}`);
+    if (selectedContent) {
+        selectedContent.classList.add('active-content');
+    }
+}
+
+function handleEditNameClick() {
+    window.showEditNameModal();
+}
+
+async function handleLogout() {
+    const buttons = document.querySelectorAll('.logout-btn-trigger');
+    
+    buttons.forEach(btn => {
+        btn.classList.add('is-loading');
+        btn.innerHTML = `Выход из аккаунта <span class="btn-spinner"></span>`;
+    });
 
     try {
         const client = window.supabaseClient || window.supabase;
         if (client && client.auth) {
-            const { data: { session } } = await client.auth.getSession();
-            if (session && session.user) {
-                const user = session.user;
-                const currentName = user.user_metadata?.full_name || user.user_metadata?.name || user.user_metadata?.username || '';
-                inputField.value = currentName;
+            await client.auth.signOut();
+        }
+    } catch (err) {
+        console.error('Ошибка при выходе из аккаунта:', err);
+    } finally {
+        setTimeout(() => {
+            navigateToPage('beginning.html');
+        }, 600);
+    }
+}
+
+// Функция для обновления информации пользователя в профиле
+async function updateProfileUserData() {
+    const nameEl = document.getElementById('user-display-name');
+    const phoneEl = document.getElementById('user-display-phone');
+    const emailEl = document.getElementById('user-display-email');
+    if (!nameEl || !emailEl) return;
+
+    try {
+        const client = window.supabaseClient || window.supabase;
+        if (!client || !client.auth) return;
+
+        const { data: { session } } = await client.auth.getSession();
+        if (session && session.user) {
+            const user = session.user;
+            
+            // Почта
+            emailEl.textContent = user.email || '—';
+
+            // Имя
+            const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.user_metadata?.display_name;
+            if (fullName && fullName.trim() !== '') {
+                nameEl.textContent = fullName;
+            } else {
+                nameEl.textContent = 'НЕТ ИМЕНИ';
+            }
+
+            // Телефон
+            const phone = user.user_metadata?.phone || user.phone;
+            if (phone && phone.trim() !== '') {
+                if (phoneEl) phoneEl.textContent = phone;
+            } else {
+                if (phoneEl) phoneEl.textContent = 'БЕЗ НОМЕРА';
             }
         }
     } catch (err) {
-        console.error('Ошибка получения имени пользователя:', err);
+        console.error('Ошибка загрузки данных профиля:', err);
     }
 }
 
-// Функция показа всплывающей плашки подтверждения закрытия
-function showEditNameConfirmToast() {
-    const toast = document.getElementById('edit-name-confirm-toast');
-    const wave = document.getElementById('edit-name-confirm-wave');
-    
-    if (toast) {
-        toast.classList.remove('hiding', 'visible');
-        if (wave) wave.classList.remove('active');
-
-        void toast.offsetWidth;
-
-        toast.classList.add('visible');
-        if (wave) wave.classList.add('active');
-    }
-}
-
-function hideEditNameConfirmToast(immediate = false) {
-    const toast = document.getElementById('edit-name-confirm-toast');
-    const wave = document.getElementById('edit-name-confirm-wave');
-
-    if (!toast) return;
-
-    if (wave) wave.classList.remove('active');
-
-    if (immediate) {
-        toast.classList.remove('visible', 'hiding');
-    } else {
-        toast.classList.add('hiding');
-        setTimeout(() => {
-            toast.classList.remove('visible', 'hiding');
-        }, 350);
-    }
-}
-
-// Управление состоянием кнопки (анимация загрузки)
-function setEditNameButtonLoading(button, isLoading, originalText) {
-    if (!button) return;
-
-    if (isLoading) {
-        button.disabled = true;
-        button.classList.add('loading');
-        button.dataset.originalText = originalText;
-        button.innerHTML = '<span class="edit-name-spinner"></span>';
-    } else {
-        button.disabled = false;
-        button.classList.remove('loading');
-        button.innerHTML = button.dataset.originalText || originalText;
-    }
-}
-
-// --- ЗАГРУЗКА ---
 document.addEventListener('DOMContentLoaded', () => {
-    injectEditNameStyles();
-    initEditNameModalUI();
-    initEditNameEvents();
-});
-
-// --- СТИЛИ ---
-function injectEditNameStyles() {
-    if (document.getElementById('edit-name-system-styles')) return;
-
-    const css = `
-        .edit-name-modal-overlay {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            background: rgba(10, 10, 12, 0.94) !important;
-            backdrop-filter: blur(12px) !important;
-            -webkit-backdrop-filter: blur(12px) !important;
-            z-index: 9999999 !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            padding: 20px !important;
-            box-sizing: border-box !important;
-            overflow: hidden !important;
-            
-            opacity: 0 !important;
-            visibility: hidden !important;
-            pointer-events: none !important;
-            transition: opacity 0.3s ease, visibility 0.3s ease !important;
-        }
-
-        .edit-name-modal-overlay.active {
-            opacity: 1 !important;
-            visibility: visible !important;
-            pointer-events: auto !important;
-        }
-
-        /* Большой качающийся логотип на фоне */
-        .edit-name-bg-logo-wrap {
-            position: absolute !important;
-            top: 50% !important;
-            left: 50% !important;
-            transform: translate(-50%, -50%) !important;
-            width: 450px !important;
-            height: 450px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            pointer-events: none !important;
-            z-index: 1 !important;
-            opacity: 0.04 !important;
-            animation: editNameLogoSway 8s ease-in-out infinite alternate !important;
-        }
-
-        .edit-name-bg-logo-wrap img {
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: contain !important;
-            filter: grayscale(100%) brightness(200%) !important;
-        }
-
-        @keyframes editNameLogoSway {
-            0% { transform: translate(-50%, -50%) scale(0.95) rotate(-3deg); }
-            100% { transform: translate(-50%, -50%) scale(1.05) rotate(3deg); }
-        }
-
-        .edit-name-modal-container {
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-            width: 100% !important;
-            max-width: 340px !important;
-            position: relative !important;
-            color: #ffffff !important;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-            box-sizing: border-box !important;
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            
-            transform: scale(0.96) !important;
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-            z-index: 5 !important;
-        }
-
-        .edit-name-modal-overlay.active .edit-name-modal-container {
-            transform: scale(1) !important;
-        }
-
-        .edit-name-modal-container.shake {
-            animation: editNameShakeAnimation 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) !important;
-        }
-
-        @keyframes editNameShakeAnimation {
-            10%, 90% { transform: scale(1) translateX(-3px); }
-            20%, 80% { transform: scale(1) translateX(4px); }
-            30%, 50%, 70% { transform: scale(1) translateX(-6px); }
-            40%, 60% { transform: scale(1) translateX(6px); }
-        }
-
-        .edit-name-close-btn {
-            position: absolute !important;
-            top: 30px !important;
-            right: 30px !important;
-            background: transparent !important;
-            border: none !important;
-            color: rgba(255, 255, 255, 0.4) !important;
-            font-size: 28px !important;
-            line-height: 1 !important;
-            cursor: pointer !important;
-            z-index: 99999999 !important;
-            padding: 0 !important;
-            transform-origin: center center !important;
-            transition: color 0.25s ease, transform 0.25s ease !important;
-        }
-
-        .edit-name-close-btn::before {
-            content: '' !important;
-            position: absolute !important;
-            top: -12px !important;
-            bottom: -12px !important;
-            left: -12px !important;
-            right: -12px !important;
-        }
-
-        .edit-name-close-btn:hover {
-            color: #ffffff !important;
-            transform: scale(1.15) rotate(90deg) !important;
-        }
-
-        .edit-name-close-btn:active {
-            transform: scale(0.9) rotate(90deg) !important;
-        }
-
-        /* Верхний брендовый блок с иконкой и меняющимся текстом */
-        .edit-name-brand-block {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            gap: 15px !important;
-            margin-bottom: 35px !important;
-            text-align: center !important;
-        }
-
-        .edit-name-logo-icon {
-            width: 38px !important;
-            height: 38px !important;
-            object-fit: contain !important;
-            flex-shrink: 0 !important;
-        }
-
-        .edit-name-title-container {
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: flex-start !important;
-        }
-
-        .edit-name-main-title {
-            font-family: 'Unbounded', sans-serif !important;
-            font-size: 16px !important;
-            font-weight: 900 !important;
-            letter-spacing: -0.5px !important;
-            color: #ffffff !important;
-            line-height: 1.1 !important;
-        }
-
-        .edit-name-alt-title {
-            font-family: 'Montserrat', sans-serif !important;
-            font-size: 11px !important;
-            font-weight: 600 !important;
-            color: rgba(255, 255, 255, 0.45) !important;
-            letter-spacing: 0.5px !important;
-            margin-top: 3px !important;
-            text-transform: uppercase !important;
-            animation: editNameSubFade 3s ease-in-out infinite alternate !important;
-        }
-
-        @keyframes editNameSubFade {
-            0% { opacity: 0.3; }
-            100% { opacity: 0.8; }
-        }
-
-        .edit-name-form {
-            width: 100% !important;
-            display: flex !important;
-            flex-direction: column !important;
-            gap: 25px !important;
-        }
-
-        .edit-name-input-group {
-            position: relative !important;
-            width: 100% !important;
-        }
-
-        .edit-name-input {
-            background: transparent !important;
-            border: none !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
-            padding: 6px 0 10px 0 !important;
-            color: #ffffff !important;
-            font-size: 15px !important;
-            font-family: 'Montserrat', sans-serif !important;
-            font-weight: 600 !important;
-            text-align: center !important;
-            outline: none !important;
-            width: 100% !important;
-            box-sizing: border-box !important;
-            transition: border-color 0.25s !important;
-        }
-
-        .edit-name-input::placeholder {
-            color: rgba(255, 255, 255, 0.35) !important;
-            font-weight: 400 !important;
-        }
-
-        .edit-name-input:focus {
-            border-bottom-color: #ffffff !important;
-        }
-
-        .edit-name-submit-btn {
-            position: relative !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            background: transparent !important;
-            color: #ffffff !important;
-            border: 1px solid #ffffff !important;
-            border-radius: 24px !important;
-            padding: 12px 20px !important;
-            font-size: 14px !important;
-            font-family: 'Montserrat', sans-serif !important;
-            font-weight: 700 !important;
-            cursor: pointer !important;
-            width: 100% !important;
-            margin-top: 10px !important;
-            transition: all 0.25s ease !important;
-            text-align: center !important;
-            min-height: 44px !important;
-            box-sizing: border-box !important;
-        }
-
-        .edit-name-submit-btn:hover:not(:disabled) {
-            background: #ffffff !important;
-            color: #000000 !important;
-        }
-
-        .edit-name-submit-btn:active:not(:disabled) {
-            transform: scale(0.98) !important;
-        }
-
-        .edit-name-submit-btn.loading,
-        .edit-name-submit-btn:disabled {
-            background: rgba(255, 255, 255, 0.08) !important;
-            border-color: rgba(255, 255, 255, 0.25) !important;
-            color: rgba(255, 255, 255, 0.4) !important;
-            cursor: not-allowed !important;
-            transform: none !important;
-        }
-
-        .edit-name-spinner {
-            display: inline-block !important;
-            width: 18px !important;
-            height: 18px !important;
-            border: 2px solid rgba(255, 255, 255, 0.25) !important;
-            border-radius: 50% !important;
-            border-top-color: #ffffff !important;
-            animation: editNameSpinnerRotate 0.75s linear infinite !important;
-        }
-
-        @keyframes editNameSpinnerRotate {
-            to { transform: rotate(360deg); }
-        }
-
-        .edit-name-confirm-wave {
-            position: fixed !important;
-            bottom: 20px !important;
-            left: 50% !important;
-            width: 10px !important;
-            height: 10px !important;
-            border-radius: 50% !important;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.25) 30%, rgba(255, 255, 255, 0) 70%) !important;
-            transform: translate(-50%, 50%) scale(0) !important;
-            pointer-events: none !important;
-            z-index: 8 !important;
-            opacity: 0 !important;
-        }
-
-        .edit-name-confirm-wave.active {
-            animation: editNameFullScreenWave 0.85s cubic-bezier(0.1, 0.8, 0.3, 1) forwards !important;
-        }
-
-        @keyframes editNameFullScreenWave {
-            0% { transform: translate(-50%, 50%) scale(1); opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { transform: translate(-50%, 50%) scale(280); opacity: 0; }
-        }
-
-        .edit-name-confirm-toast {
-            position: fixed !important;
-            bottom: 30px !important;
-            left: 50% !important;
-            transform: translateX(-50%) translateY(100px) scale(0.85);
-            background: rgba(22, 22, 28, 0.96) !important;
-            border: 1px solid rgba(255, 255, 255, 0.25) !important;
-            border-radius: 16px !important;
-            padding: 12px 20px !important;
-            display: flex !important;
-            align-items: center !important;
-            gap: 15px !important;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7) !important;
-            opacity: 0 !important;
-            visibility: hidden !important;
-            pointer-events: none !important;
-            white-space: nowrap !important;
-            z-index: 10 !important;
-            transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease !important;
-        }
-
-        .edit-name-confirm-toast.visible {
-            opacity: 1 !important;
-            visibility: visible !important;
-            pointer-events: auto !important;
-            animation: editNameBounceInUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
-        }
-
-        .edit-name-confirm-toast.hiding {
-            opacity: 0 !important;
-            transform: translateX(-50%) translateY(40px) scale(0.9) !important;
-            pointer-events: none !important;
-            animation: none !important;
-        }
-
-        @keyframes editNameBounceInUp {
-            0% { opacity: 0; transform: translateX(-50%) translateY(100px) scale(0.7); }
-            65% { opacity: 1; transform: translateX(-50%) translateY(-12px) scale(1.03); }
-            85% { transform: translateX(-50%) translateY(4px) scale(0.98); }
-            100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
-        }
-
-        .edit-name-confirm-text {
-            color: rgba(255, 255, 255, 0.95) !important;
-            font-size: 13px !important;
-            font-weight: 500 !important;
-        }
-
-        .edit-name-confirm-actions {
-            display: flex !important;
-            gap: 8px !important;
-        }
-
-        .edit-name-confirm-btn {
-            background: transparent !important;
-            border: 1px solid rgba(255, 255, 255, 0.2) !important;
-            color: #ffffff !important;
-            padding: 5px 12px !important;
-            border-radius: 12px !important;
-            font-size: 12px !important;
-            cursor: pointer !important;
-            transition: all 0.2s ease !important;
-        }
-
-        .edit-name-confirm-btn:hover {
-            background: rgba(255, 255, 255, 0.12) !important;
-        }
-
-        .edit-name-confirm-btn.danger {
-            background: #ffffff !important;
-            color: #000000 !important;
-            border-color: #ffffff !important;
-            font-weight: 600 !important;
-        }
-
-        .edit-name-confirm-btn.danger:hover {
-            background: rgba(255, 255, 255, 0.85) !important;
-        }
-    `;
-
-    const styleElement = document.createElement('style');
-    styleElement.id = 'edit-name-system-styles';
-    styleElement.textContent = css;
-    document.head.appendChild(styleElement);
-}
-
-// --- HTML РАЗМЕТКА МОДАЛЬНОГО ОКНА ---
-let editNameTitleInterval = null;
-
-function initEditNameModalUI() {
-    if (document.getElementById('edit-name-modal-overlay')) return;
-
-    const modalHTML = `
-        <div id="edit-name-modal-overlay" class="edit-name-modal-overlay">
-            <div class="edit-name-bg-logo-wrap">
-                <img src="images/geo_logo.png" alt="Background Logo">
-            </div>
-
-            <button id="edit-name-close-btn" class="edit-name-close-btn" type="button">&times;</button>
-
-            <div class="edit-name-modal-container">
-                <div class="edit-name-brand-block">
-                    <img src="images/geo_logo.png" alt="Geo Logo" class="edit-name-logo-icon">
-                    <div class="edit-name-title-container">
-                        <span class="edit-name-main-title">GEOГРАФИЯ</span>
-                        <span id="edit-name-alt-text" class="edit-name-alt-title">ИЗМЕНЕНИЕ ИМЕНИ</span>
-                    </div>
-                </div>
-                
-                <form id="edit-name-form" class="edit-name-form">
-                    <div class="edit-name-input-group">
-                        <input type="text" id="edit-name-input" placeholder="Введите новое имя..." required class="edit-name-input" autocomplete="nickname">
-                    </div>
-                    <button type="submit" id="btn-submit-edit-name" class="edit-name-submit-btn">Сохранить</button>
-                </form>
-            </div>
-
-            <div id="edit-name-confirm-wave" class="edit-name-confirm-wave"></div>
-
-            <div id="edit-name-confirm-toast" class="edit-name-confirm-toast">
-                <span class="edit-name-confirm-text">Закрыть без сохранения?</span>
-                <div class="edit-name-confirm-actions">
-                    <button type="button" class="edit-name-confirm-btn" id="edit-name-cancel-close-btn">Отмена</button>
-                    <button type="button" class="edit-name-confirm-btn danger" id="edit-name-confirm-close-btn">Да</button>
-                </div>
-            </div>
-        </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-
-    // Запуск динамической смены подзаголовка, как в других модальных окнах
-    startEditNameTitleSwitching();
-}
-
-// Функция сменяющегося текста подзаголовка
-function startEditNameTitleSwitching() {
-    if (editNameTitleInterval) clearInterval(editNameTitleInterval);
-    
-    const altTitles = [
-        "ИЗМЕНЕНИЕ ИМЕНИ",
-        "ПЕРСОНАЛИЗАЦИЯ",
-        "ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ"
-    ];
-    let titleIndex = 0;
-    
-    const altTextEl = document.getElementById('edit-name-alt-text');
-    if (!altTextEl) return;
-
-    editNameTitleInterval = setInterval(() => {
-        const modal = document.getElementById('edit-name-modal-overlay');
-        if (!modal || !modal.classList.contains('active')) return;
-
-        titleIndex = (titleIndex + 1) % altTitles.length;
-        
-        altTextEl.style.opacity = '0';
-        setTimeout(() => {
-            altTextEl.textContent = altTitles[titleIndex];
-            altTextEl.style.opacity = '0.8';
-        }, 200);
-    }, 4000);
-}
-
-// --- СОБЫТИЯ ---
-function initEditNameEvents() {
-    const overlay = document.getElementById('edit-name-modal-overlay');
-    const closeBtn = document.getElementById('edit-name-close-btn');
-    const form = document.getElementById('edit-name-form');
-
-    const btnConfirmYes = document.getElementById('edit-name-confirm-close-btn');
-    const btnConfirmNo = document.getElementById('edit-name-cancel-close-btn');
-
-    if (overlay && overlay.dataset.eventsInitialized) return;
-    if (overlay) overlay.dataset.eventsInitialized = "true";
-
-    btnConfirmYes?.addEventListener('click', window.hideEditNameModal);
-    btnConfirmNo?.addEventListener('click', () => hideEditNameConfirmToast(false));
-
-    closeBtn?.addEventListener('click', () => {
-        showEditNameConfirmToast();
+    requestAnimationFrame(() => {
+        document.body.classList.add('page-loaded');
     });
 
-    // Клик по фону оверлея
-    overlay?.addEventListener('click', (e) => {
-        if (e.target !== overlay) return;
+    setTimeout(() => { spawnAmbientWave(); }, 1000);
 
-        if (editNameClickTimeout) clearTimeout(editNameClickTimeout);
+    // Плавное применение визуала первой кнопки сразу после её появления на экране
+    setTimeout(() => {
+        switchTab('settings');
+    }, 1400);
 
-        editNameClickTimeout = setTimeout(() => {
-            const container = document.querySelector('.edit-name-modal-container');
-            if (container) {
-                container.classList.remove('shake');
-                void container.offsetWidth;
-                container.classList.add('shake');
-                
-                setTimeout(() => {
-                    container.classList.remove('shake');
-                }, 400);
-            }
-        }, 250);
-    });
+    // Загружаем данные пользователя
+    updateProfileUserData();
 
-    overlay?.addEventListener('dblclick', (e) => {
-        if (e.target === overlay) {
-            if (editNameClickTimeout) clearTimeout(editNameClickTimeout);
-            showEditNameConfirmToast();
-        }
-    });
+    const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
+    const sidePanel = document.getElementById('dev-side-panel');
+    let hideTimeout = null;
 
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && document.getElementById('edit-name-modal-overlay')?.classList.contains('active')) {
-            showEditNameConfirmToast();
-        }
-    });
-
-    // Сохранение имени в Supabase
-    form?.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    async function initDevPanel() {
         const client = window.supabaseClient || window.supabase;
-        if (!client) return alert('Supabase клиент не найден!');
-
-        const submitBtn = document.getElementById('btn-submit-edit-name');
-        const newNameInput = document.getElementById('edit-name-input');
-        const newName = newNameInput ? newNameInput.value.trim() : '';
-
-        if (!newName) {
-            alert('Имя не может быть пустым!');
-            return;
-        }
-
-        setEditNameButtonLoading(submitBtn, true, 'Сохранить');
+        if (!client) return;
 
         try {
-            const { data, error } = await client.auth.updateUser({
-                data: {
-                    full_name: newName,
-                    username: newName
-                }
-            });
-
-            if (error) {
-                alert(`Ошибка при сохранении имени: ${error.message}`);
-                setEditNameButtonLoading(submitBtn, false, 'Сохранить');
-            } else {
-                setEditNameButtonLoading(submitBtn, false, 'Сохранить');
-                window.hideEditNameModal();
-                window.location.reload();
+            const { data: { session } } = await client.auth.getSession();
+            if (session?.user?.email === DEV_EMAIL) {
+                setupHoverDetection();
             }
         } catch (err) {
-            console.error('Ошибка:', err);
-            setEditNameButtonLoading(submitBtn, false, 'Сохранить');
+            console.error('Ошибка проверки прав разработчика:', err);
         }
-    });
-}
+    }
+
+    function setupHoverDetection() {
+        if (!sidePanel) return;
+
+        document.addEventListener('mousemove', (e) => {
+            const distanceFromRight = window.innerWidth - e.clientX;
+            if (distanceFromRight <= 60) {
+                clearTimeout(hideTimeout);
+                sidePanel.classList.add('visible');
+            }
+        });
+
+        sidePanel.addEventListener('mouseenter', () => {
+            clearTimeout(hideTimeout);
+            sidePanel.classList.add('visible');
+        });
+
+        sidePanel.addEventListener('mouseleave', () => {
+            hideTimeout = setTimeout(() => {
+                sidePanel.classList.remove('visible');
+            }, 2000);
+        });
+    }
+
+    initDevPanel();
+});
+</script>
+
+    <script src="app.js"></script>
+    <script src="reset-password.js"></script>
+    <script src="edit-name-system.js"></script>
+
+    <button type="button" class="reset-open-link" onclick="showResetModal('request')">
+        Забыли пароль?
+    </button>
+</body>
+</html>
