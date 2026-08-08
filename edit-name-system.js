@@ -202,13 +202,13 @@ function setEditNameButtonLoading(button, isLoading, originalText) {
 
 // Функция локального обновления имени на странице без перезагрузки
 function updateUIAfterNameChange(newName) {
-    // Обновляем элемент отображения имени в виджете профиля, если он есть
-    const profileNameText = document.getElementById('profile-name-text');
+    // Используем правильный ID из вашего HTML-кода
+    const profileNameText = document.getElementById('user-display-name'); 
     if (profileNameText) {
         profileNameText.textContent = newName;
     }
 
-    // Если в других частях интерфейса имя хранится в глобальном объекте или атрибутах
+    // Если у вас где-то еще дублируется имя
     if (window.currentUserData) {
         window.currentUserData.full_name = newName;
     }
