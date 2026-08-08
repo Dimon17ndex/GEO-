@@ -466,6 +466,52 @@
             text-align: left;
         }
 
+        /* =========================================================
+            НОВЫЙ СТИЛЬ ДЛЯ ИНФОРМАЦИИ ПРОФИЛЯ (ИМЯ СЛЕВА, ПОЧТА СПРАВА)
+            ========================================================= */
+        .profile-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .profile-info-item.align-left {
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        .profile-info-item.align-right {
+            align-items: flex-end;
+            text-align: right;
+        }
+
+        .profile-info-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.45);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .profile-info-value {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.3px;
+        }
+
         .red-primary-btn {
             align-self: flex-end;
             display: inline-flex;
@@ -659,6 +705,17 @@
         </div>
 
         <div class="tab-content" id="tab-profile">
+            <div class="profile-info-row">
+                <div class="profile-info-item align-left">
+                    <span class="profile-info-label">Имя пользователя</span>
+                    <span class="profile-info-value" id="user-display-name">НЕТ ИМЕНИ</span>
+                </div>
+                <div class="profile-info-item align-right">
+                    <span class="profile-info-label">Электронная почта</span>
+                    <span class="profile-info-value" id="user-display-email">—</span>
+                </div>
+            </div>
+            
             <div class="session-logout-section">
                 <span class="logout-label-text">Завершение сессии/выход из аккаунта</span>
                 <button type="button" class="red-primary-btn logout-btn-trigger" onclick="handleLogout()">
@@ -779,6 +836,36 @@ async function handleLogout() {
     }
 }
 
+// Функция для обновления информации пользователя в профиле
+async function updateProfileUserData() {
+    const nameEl = document.getElementById('user-display-name');
+    const emailEl = document.getElementById('user-display-email');
+    if (!nameEl || !emailEl) return;
+
+    try {
+        const client = window.supabaseClient || window.supabase;
+        if (!client || !client.auth) return;
+
+        const { data: { session } } = await client.auth.getSession();
+        if (session && session.user) {
+            const user = session.user;
+            
+            // Почта
+            emailEl.textContent = user.email || '—';
+
+            // Имя (проверяем метаданные или user_metadata)
+            const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.user_metadata?.display_name;
+            if (fullName && fullName.trim() !== '') {
+                nameEl.textContent = fullName;
+            } else {
+                nameEl.textContent = 'НЕТ ИМЕНИ';
+            }
+        }
+    } catch (err) {
+        console.error('Ошибка загрузки данных профиля:', err);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(() => {
         document.body.classList.add('page-loaded');
@@ -790,6 +877,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         switchTab('settings');
     }, 1400);
+
+    // Загружаем данные пользователя
+    updateProfileUserData();
 
     const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
     const sidePanel = document.getElementById('dev-side-panel');
