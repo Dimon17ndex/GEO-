@@ -3,8 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Личный кабинет</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Unbounded:wght@900&display=swap" rel="stylesheet">
+    <title>GEOГРАФИЯ — Сессия</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js" defer></script>
+    <script src="console.js" defer></script>
+
+    <link rel="icon" type="image/png" href="images/favicon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="beginning.css">
+
     <style>
         /* Когда пользователь вошел — скрываем центральную кнопку */
         body.user-logged-in #open-auth-btn {
@@ -15,12 +27,6 @@
         body {
             opacity: 0;
             transition: opacity 0.5s ease;
-            background-color: #0f0f14;
-            color: #ffffff;
-            margin: 0;
-            padding: 0;
-            font-family: 'Montserrat', sans-serif;
-            overflow-x: hidden;
         }
 
         body.page-loaded {
@@ -466,7 +472,7 @@
         .profile-info-row {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: flex-start; /* Изменено на flex-start для ровного выравнивания по верхнему краю */
             width: 100%;
             margin-bottom: 25px;
             padding-bottom: 15px;
@@ -495,6 +501,7 @@
             text-align: right;
         }
 
+        /* Крупный закругленный прямоугольник для NAME */
         .profile-badge-name {
             display: inline-flex;
             align-items: center;
@@ -506,9 +513,10 @@
             font-weight: 800;
             letter-spacing: 1px;
             color: rgba(255, 255, 255, 0.95);
-            margin-bottom: 12px;
+            margin-bottom: 12px; /* Увеличенный отступ, чтобы опустить данные ниже */
         }
 
+        /* Крупные иконки телефона и почты (@) */
         .profile-icon-phone,
         .profile-icon-email {
             display: flex;
@@ -518,7 +526,7 @@
             font-size: 24px;
             font-weight: 800;
             color: rgba(255, 255, 255, 0.95);
-            margin-bottom: 12px;
+            margin-bottom: 12px; /* Опускаем данные ниже */
         }
 
         .profile-icon-phone svg {
@@ -550,6 +558,7 @@
             letter-spacing: 0.3px;
         }
 
+        /* Стиль для интерактивной иконки карандаша */
         .edit-name-btn {
             background: transparent;
             border: none;
@@ -719,114 +728,331 @@
         }
     </style>
 </head>
-<body class="user-logged-in page-loaded">
+<body>
+
+    <div class="app-banners-container">
+        <div class="app-banner banner-warning">
+            <span class="banner-icon">🛠</span>
+            <span>Ведется разработка сайта в раннем доступе</span>
+        </div>
+    </div>
+
+    <div class="shadow-layer"></div>
+
+    <div id="bg-wave-container"></div>
 
     <div class="top-left-brand">
         <div class="db-brand-block">
-            <svg class="db-logo-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="40" stroke="#ffffff" stroke-width="8"/>
-                <path d="M30 50L45 65L70 35" stroke="#ffffff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <img src="images/geo_logo.png" alt="Geo Logo" class="db-logo-icon">
             <div class="db-text-right">
                 <h1 class="db-main-title">
-                    <span class="title-text-main">BRAND</span>
-                    <span class="title-text-alt">NAME</span>
+                    <span class="title-text-main">GEOГРАФИЯ</span>
+                    <span class="title-text-alt">НАСТРОЙКИ ПРОФИЛЯ</span>
                 </h1>
             </div>
         </div>
     </div>
 
     <div class="back-nav-container">
-        <button class="back-arrow-btn" onclick="history.back();" title="Назад">
+        <div class="back-arrow-btn" onclick="navigateToPage('beginning.html')" title="Вернуться назад">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="19" y1="12" x2="5" y2="12"></line>
                 <polyline points="12 19 5 12 12 5"></polyline>
             </svg>
-        </button>
+        </div>
     </div>
 
-    <div id="user-profile-widget" class="top-center-account">
-        <div class="account-title-large">ЛИЧНЫЙ КАБИНЕТ</div>
+    <div id="user-profile-widget" class="top-center-account" style="display: none;">
+        <div class="account-title-large" id="profile-email-text">ПРОФИЛЬ</div>
     </div>
 
     <div class="account-divider-line"></div>
 
-    <div class="account-actions-container">
-        <button class="action-btn-styled active-tab" onclick="switchTab('profile-tab', this)">Профиль</button>
-        <button class="action-btn-styled" onclick="switchTab('settings-tab', this)">Настройки</button>
-        <button class="action-btn-styled" onclick="switchTab('security-tab', this)">Безопасность</button>
+    <div class="account-actions-container" id="account-actions-block">
+        <button type="button" class="action-btn-styled" data-tab="settings" onclick="switchTab('settings')">
+            Основные настройки
+        </button>
+        <button type="button" class="action-btn-styled" data-tab="profile" onclick="switchTab('profile')">
+            Профиль
+        </button>
+        <button type="button" class="action-btn-styled" data-tab="support" onclick="switchTab('support')">
+            Техническая поддержка
+        </button>
     </div>
 
-    <main class="main-profile-container">
-        <div id="profile-tab" class="tab-content active-content">
-            <div class="profile-info-row">
-                <div class="profile-info-item align-left">
-                    <div class="profile-badge-name">NAME</div>
-                    <span class="profile-info-label">Имя пользователя</span>
-                    <div class="profile-info-value-wrapper">
-                        <span class="profile-info-value">Александр</span>
-                        <button class="edit-name-btn" title="Изменить имя">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="profile-info-item align-center">
-                    <div class="profile-icon-phone">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                        </svg>
-                    </div>
-                    <span class="profile-info-label">Телефон</span>
-                    <span class="profile-info-value">+7 (999) 000-00-00</span>
-                </div>
-
-                <div class="profile-info-item align-right">
-                    <div class="profile-icon-email">@</div>
-                    <span class="profile-info-label">Электронная почта</span>
-                    <span class="profile-info-value">user@example.com</span>
-                </div>
-            </div>
-
+    <div class="main-profile-container" id="main-profile-block">
+        <div class="tab-content" id="tab-settings">
             <div class="session-logout-section">
-                <span class="logout-label-text">Управление сеансом</span>
-                <button class="red-primary-btn" onclick="handleLogout(this)">Выйти из аккаунта</button>
+                <span class="logout-label-text">Завершение сессии/выход из аккаунта</span>
+                <button type="button" class="red-primary-btn logout-btn-trigger" onclick="handleLogout()">
+                    Выйти из аккаунта
+                </button>
             </div>
         </div>
 
-        <div id="settings-tab" class="tab-content">
-            <div class="empty-tab-placeholder">Здесь будут отображаться настройки приложения и темы оформления.</div>
+        <div class="tab-content" id="tab-profile">
+    <div class="profile-info-row">
+        <div class="profile-info-item align-left">
+            <div class="profile-badge-name">NAME</div>
+            <span class="profile-info-label">Имя пользователя</span>
+            <div class="profile-info-value-wrapper">
+                <span class="profile-info-value" id="user-display-name">НЕТ ИМЕНИ</span>
+                <button type="button" class="edit-name-btn" onclick="showEditNameModal()" title="Редактировать имя">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                    </svg>
+                </button>
+            </div>
         </div>
 
-        <div id="security-tab" class="tab-content">
-            <div class="empty-tab-placeholder">Раздел управления двухфакторной аутентификацией и сменой пароля.</div>
+        <div class="profile-info-item align-center">
+    <div class="profile-icon-phone">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="26" height="26">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+        </svg>
+        <span class="phone-plus-sign">+</span>
+    </div>
+    <span class="profile-info-label">Номер телефона</span>
+    <span class="profile-info-value" id="user-display-phone">БЕЗ НОМЕРА</span>
+</div>
+
+        <div class="profile-info-item align-right">
+            <div class="profile-icon-email">@</div>
+            <span class="profile-info-label">Электронная почта</span>
+            <span class="profile-info-value" id="user-display-email">—</span>
         </div>
-    </main>
+    </div>
+    
+    <div class="session-logout-section">
+        <span class="logout-label-text">Завершение сессии/выход из аккаунта</span>
+        <button type="button" class="red-primary-btn logout-btn-trigger" onclick="handleLogout()">
+            Выйти из аккаунта
+        </button>
+    </div>
+</div>
+
+        <div class="tab-content" id="tab-support">
+            <div class="empty-tab-placeholder">Раздел технической поддержки находится в разработке...</div>
+        </div>
+    </div>
+
+    <div class="center-status-wrapper">
+        <button type="button" id="open-auth-btn" class="auth-trigger-btn" onclick="showAuthModal()">
+            Войти / Зарегистрироваться
+        </button>
+    </div>
+
+    <div id="dev-side-panel" class="dev-side-panel">
+        <button type="button" class="dev-panel-btn" id="btn-main-profile" onclick="navigateToPage('beginning.html')">
+            Основной профиль
+        </button>
+        <button type="button" class="dev-panel-btn" id="btn-admin-profile" onclick="navigateToPage('admin.html')">
+            Профиль администратора
+        </button>
+    </div>
+
+    <script src="auth-system.js?v=3"></script>
 
     <script>
-        function switchTab(tabId, btnElement) {
-            // Убираем активный класс у всех кнопок и контента
-            document.querySelectorAll('.action-btn-styled').forEach(btn => btn.classList.remove('active-tab'));
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active-content'));
+const waveContainer = document.getElementById('bg-wave-container');
+let ambientTimeoutId = null;
 
-            // Активируем выбранную кнопку и вкладку
-            btnElement.classList.add('active-tab');
-            document.getElementById(tabId).classList.add('active-content');
+function createBackgroundRipple(x, y, className, duration = 1500) {
+    if (!waveContainer) return;
+    const ripple = document.createElement('div');
+    ripple.classList.add(className);
+    ripple.style.left = `${x}px`;
+    ripple.style.top = `${y}px`;
+    waveContainer.appendChild(ripple);
+    setTimeout(() => { ripple.remove(); }, duration);
+}
+
+function spawnAmbientWave() {
+    clearTimeout(ambientTimeoutId);
+
+    let spawnX = 0, spawnY = 0;
+    const side = Math.floor(Math.random() * 4);
+    switch(side) {
+        case 0: spawnX = Math.random() * window.innerWidth; spawnY = -50; break;
+        case 1: spawnX = window.innerWidth + 50; spawnY = Math.random() * window.innerHeight; break;
+        case 2: spawnX = Math.random() * window.innerWidth; spawnY = window.innerHeight + 50; break;
+        case 3: spawnX = -50; spawnY = Math.random() * window.innerHeight; break;
+    }
+
+    createBackgroundRipple(spawnX, spawnY, 'bg-ambient-ripple', 3000);
+    ambientTimeoutId = setTimeout(spawnAmbientWave, 3000 + Math.random() * 4000);
+}
+
+document.body.addEventListener('mousedown', (e) => {
+    createBackgroundRipple(e.clientX, e.clientY, 'bg-click-ripple');
+});
+
+history.pushState(null, null, location.href);
+window.addEventListener('popstate', function () {
+    navigateToPage('index.html');
+});
+
+function navigateToPage(targetPage) {
+    const currentPage = window.location.pathname.split('/').pop() || 'beginning.html';
+    if (currentPage === targetPage) return;
+
+    document.body.classList.add('page-hidden');
+    setTimeout(() => {
+        window.location.href = targetPage;
+    }, 500);
+}
+
+/* Сверхплавное переключение разделов с мягким кроссфейдом */
+function switchTab(tabName) {
+    const buttons = document.querySelectorAll('.action-btn-styled');
+    const contents = document.querySelectorAll('.tab-content');
+
+    buttons.forEach(btn => btn.classList.remove('active-tab'));
+    contents.forEach(content => content.classList.remove('active-content'));
+
+    const selectedBtn = document.querySelector(`.action-btn-styled[data-tab="${tabName}"]`);
+    if (selectedBtn) {
+        selectedBtn.classList.add('active-tab');
+    }
+
+    const selectedContent = document.getElementById(`tab-${tabName}`);
+    if (selectedContent) {
+        selectedContent.classList.add('active-content');
+    }
+}
+
+function handleEditNameClick() {
+    window.showEditNameModal();
+}
+
+async function handleLogout() {
+    const buttons = document.querySelectorAll('.logout-btn-trigger');
+    
+    buttons.forEach(btn => {
+        btn.classList.add('is-loading');
+        btn.innerHTML = `Выход из аккаунта <span class="btn-spinner"></span>`;
+    });
+
+    try {
+        const client = window.supabaseClient || window.supabase;
+        if (client && client.auth) {
+            await client.auth.signOut();
         }
+    } catch (err) {
+        console.error('Ошибка при выходе из аккаунта:', err);
+    } finally {
+        setTimeout(() => {
+            navigateToPage('beginning.html');
+        }, 600);
+    }
+}
 
-        function handleLogout(button) {
-            button.classList.add('is-loading');
-            button.innerHTML = '<span class="btn-spinner"></span> Выход...';
+// Функция для обновления информации пользователя в профиле
+async function updateProfileUserData() {
+    const nameEl = document.getElementById('user-display-name');
+    const phoneEl = document.getElementById('user-display-phone');
+    const emailEl = document.getElementById('user-display-email');
+    if (!nameEl || !emailEl) return;
+
+    try {
+        const client = window.supabaseClient || window.supabase;
+        if (!client || !client.auth) return;
+
+        const { data: { session } } = await client.auth.getSession();
+        if (session && session.user) {
+            const user = session.user;
             
-            setTimeout(() => {
-                // Имитация завершения сеанса
-                document.body.classList.remove('user-logged-in');
-                location.reload();
-            }, 1200);
+            // Почта
+            emailEl.textContent = user.email || '—';
+
+            // Имя
+            const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.user_metadata?.display_name;
+            if (fullName && fullName.trim() !== '') {
+                nameEl.textContent = fullName;
+            } else {
+                nameEl.textContent = 'НЕТ ИМЕНИ';
+            }
+
+            // Телефон
+            const phone = user.user_metadata?.phone || user.phone;
+            if (phone && phone.trim() !== '') {
+                if (phoneEl) phoneEl.textContent = phone;
+            } else {
+                if (phoneEl) phoneEl.textContent = 'БЕЗ НОМЕРА';
+            }
         }
-    </script>
+    } catch (err) {
+        console.error('Ошибка загрузки данных профиля:', err);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    requestAnimationFrame(() => {
+        document.body.classList.add('page-loaded');
+    });
+
+    setTimeout(() => { spawnAmbientWave(); }, 1000);
+
+    // Плавное применение визуала первой кнопки сразу после её появления на экране
+    setTimeout(() => {
+        switchTab('settings');
+    }, 1400);
+
+    // Загружаем данные пользователя
+    updateProfileUserData();
+
+    const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
+    const sidePanel = document.getElementById('dev-side-panel');
+    let hideTimeout = null;
+
+    async function initDevPanel() {
+        const client = window.supabaseClient || window.supabase;
+        if (!client) return;
+
+        try {
+            const { data: { session } } = await client.auth.getSession();
+            if (session?.user?.email === DEV_EMAIL) {
+                setupHoverDetection();
+            }
+        } catch (err) {
+            console.error('Ошибка проверки прав разработчика:', err);
+        }
+    }
+
+    function setupHoverDetection() {
+        if (!sidePanel) return;
+
+        document.addEventListener('mousemove', (e) => {
+            const distanceFromRight = window.innerWidth - e.clientX;
+            if (distanceFromRight <= 60) {
+                clearTimeout(hideTimeout);
+                sidePanel.classList.add('visible');
+            }
+        });
+
+        sidePanel.addEventListener('mouseenter', () => {
+            clearTimeout(hideTimeout);
+            sidePanel.classList.add('visible');
+        });
+
+        sidePanel.addEventListener('mouseleave', () => {
+            hideTimeout = setTimeout(() => {
+                sidePanel.classList.remove('visible');
+            }, 2000);
+        });
+    }
+
+    initDevPanel();
+});
+</script>
+
+    <script src="app.js"></script>
+    <script src="reset-password.js"></script>
+    <script src="edit-name-system.js"></script>
+
+    <button type="button" class="reset-open-link" onclick="showResetModal('request')">
+        Забыли пароль?
+    </button>
 </body>
 </html>
