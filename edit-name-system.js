@@ -372,7 +372,7 @@ function injectEditNameStyles() {
         }
 
         .edit-name-submit-btn.loading,
-        .edit-name-submit-btn:disabled {
+        .edit-name-submit-btn:disabled:not(.forbidden) {
             background: rgba(255, 255, 255, 0.08) !important;
             border-color: rgba(255, 255, 255, 0.25) !important;
             color: rgba(255, 255, 255, 0.4) !important;
@@ -380,9 +380,13 @@ function injectEditNameStyles() {
             transform: none !important;
         }
 
+        /* Стиль для состояния "Такого не может быть" — прозрачный фон, ярко-красная рамка и текст */
         .edit-name-submit-btn.forbidden {
-            color: rgba(255, 100, 100, 0.8) !important;
-            border-color: rgba(255, 100, 100, 0.3) !important;
+            background: transparent !important;
+            border-color: #ff3b30 !important;
+            color: #ff3b30 !important;
+            cursor: not-allowed !important;
+            transform: none !important;
         }
 
         .edit-name-spinner {
