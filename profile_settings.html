@@ -16,7 +16,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="beginning.css">
-    
+
 <style>
         /* Когда пользователь вошел — скрываем центральную кнопку */
         body.user-logged-in #open-auth-btn {
@@ -748,6 +748,29 @@
         .reset-open-link:hover {
             color: #ffffff;
         }
+
+        /* Одинаковый контейнер для верхней части всех трех колонок, чтобы выровнять их по высоте */
+.profile-icon-top-wrapper {
+    height: 32px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+/* Корректировка значка NAME, чтобы он встал ровно в этот контейнер */
+.profile-badge-name {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 10px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.95);
+    margin-bottom: 0 !important; /* Убираем старый маргин */
+}
 </style>
 </head>
 <body>
@@ -814,39 +837,43 @@
 
         <div class="tab-content" id="tab-profile">
     <div class="profile-info-row">
-        <div class="profile-info-item align-center">
+    <div class="profile-info-item align-left">
+        <div class="profile-icon-top-wrapper">
             <div class="profile-badge-name">NAME</div>
-            <span class="profile-info-label">Имя пользователя</span>
-            <div class="profile-info-value-wrapper">
-                <span class="profile-info-value" id="user-display-name">НЕТ ИМЕНИ</span>
-                <button type="button" class="edit-name-btn" onclick="showEditNameModal()" title="Редактировать имя">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 20h9"></path>
-                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                    </svg>
-                </button>
-            </div>
         </div>
+        <span class="profile-info-label">Имя пользователя</span>
+        <div class="profile-info-value-wrapper">
+            <span class="profile-info-value" id="user-display-name">НЕТ ИМЕНИ</span>
+            <button type="button" class="edit-name-btn" onclick="showEditNameModal()" title="Редактировать имя">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9"></path>
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
 
-        <div class="profile-info-item align-center">
+    <div class="profile-info-item align-center">
+        <div class="profile-icon-top-wrapper">
             <div class="profile-icon-phone">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="26" height="26">
                     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
                 </svg>
                 <span class="phone-plus-sign">+</span>
             </div>
-            <span class="profile-info-label">Номер телефона</span>
-            <span class="profile-info-value" id="user-display-phone">БЕЗ НОМЕРА</span>
         </div>
-
-        <div class="profile-info-item align-center">
-            <div class="profile-icon-email-wrapper">
-                <div class="profile-icon-email">@</div>
-            </div>
-            <span class="profile-info-label">Электронная почта</span>
-            <span class="profile-info-value" id="user-display-email">—</span>
-        </div>
+        <span class="profile-info-label">Номер телефона</span>
+        <span class="profile-info-value" id="user-display-phone">БЕЗ НОМЕРА</span>
     </div>
+
+    <div class="profile-info-item align-right">
+        <div class="profile-icon-top-wrapper">
+            <div class="profile-icon-email">@</div>
+        </div>
+        <span class="profile-info-label">Электронная почта</span>
+        <span class="profile-info-value" id="user-display-email">—</span>
+    </div>
+</div>
     
     <div class="session-logout-section">
         <span class="logout-label-text">Завершение сессии/выход из аккаунта</span>
