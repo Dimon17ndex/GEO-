@@ -1,7 +1,6 @@
 // edit-name-system.js
 
 let editNameOverlayClickTimeout = null;
-let editNameTitleInterval = null;
 
 // --- ГЛОБАЛЬНЫЕ ФУНКЦИИ ---
 window.showEditNameModal = function() {
@@ -12,7 +11,7 @@ window.showEditNameModal = function() {
     const modal = document.getElementById('edit-name-modal-overlay');
     hideEditNameConfirmToast(true);
     
-    // Предзаполняем поле текущим именем
+    // Предзаполняем поле и настраиваем заголовки тикера
     loadCurrentNameToInput();
 
     if (modal) {
@@ -28,10 +27,13 @@ window.hideEditNameModal = function() {
     }
 };
 
-// Функция загрузки текущего имени из сессии Supabase в инпут
+// Функция загрузки текущего имени из сессии Supabase и адаптации заголовков
 async function loadCurrentNameToInput() {
     const inputField = document.getElementById('edit-name-input');
+    const tickerSecondSpan = document.getElementById('edit-name-ticker-second');
     if (!inputField) return;
+
+    let hasName = false;
 
     try {
         const client = window.supabaseClient || window.supabase;
@@ -41,10 +43,44 @@ async function loadCurrentNameToInput() {
                 const user = session.user;
                 const currentName = user.user_metadata?.full_name || user.user_metadata?.name || user.user_metadata?.username || '';
                 inputField.value = currentName;
+                if (currentName.trim() !== '') {
+                    hasName = true;
+                }
             }
         }
     } catch (err) {
         console.error('Ошибка получения имени пользователя:', err);
+    }
+
+    // Динамически меняем второй слайд тикера в зависимости от наличия имени
+    if (tickerSecondSpan) {
+        tickerSecondSpan.textContent = hasName ? 'СМЕНА ИМЕНИ' : 'СОЗДАНИЕ ИМЕНИ';
+    }
+
+    // Проверяем первичное состояние введенного текста (на случай совпадения с "НЕТ ИМЕНИ")
+    validateEditNameInputState();
+}
+
+// Проверка валидности введенного текста (блокировка для "НЕТ ИМЕНИ")
+function validateEditNameInputState() {
+    const inputField = document.getElementById('edit-name-input');
+    const submitBtn = document.getElementById('btn-submit-edit-name');
+    if (!inputField || !submitBtn) return;
+
+    const val = inputField.value.trim().toUpperCase();
+    const isForbidden = (val === 'НЕТ ИМЕНИ');
+
+    if (isForbidden) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('forbidden');
+        submitBtn.innerHTML = 'Такого не может быть';
+    } else {
+        // Если кнопка не находится в процессе отправки (loading)
+        if (!submitBtn.classList.contains('loading')) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('forbidden');
+            submitBtn.innerHTML = 'Сохранить';
+        }
     }
 }
 
@@ -93,9 +129,8 @@ function setEditNameButtonLoading(button, isLoading, originalText) {
         button.dataset.originalText = originalText;
         button.innerHTML = '<span class="edit-name-spinner"></span>';
     } else {
-        button.disabled = false;
         button.classList.remove('loading');
-        button.innerHTML = button.dataset.originalText || originalText;
+        validateEditNameInputState(); // Возвращает дефолтный текст или "Такого не может быть"
     }
 }
 
@@ -345,6 +380,11 @@ function injectEditNameStyles() {
             transform: none !important;
         }
 
+        .edit-name-submit-btn.forbidden {
+            color: rgba(255, 100, 100, 0.8) !important;
+            border-color: rgba(255, 100, 100, 0.3) !important;
+        }
+
         .edit-name-spinner {
             display: inline-block !important;
             width: 18px !important;
@@ -517,7 +557,7 @@ function initEditNameModalUI() {
                     <div class="edit-name-title-ticker">
                         <div class="edit-name-title-track">
                             <span>GEOГРАФИЯ</span>
-                            <span>ПРОФИЛЬ</span>
+                            <span id="edit-name-ticker-second">СМЕНА ИМЕНИ</span>
                         </div>
                     </div>
                 </div>
@@ -549,6 +589,7 @@ function initEditNameEvents() {
     const overlay = document.getElementById('edit-name-modal-overlay');
     const closeBtn = document.getElementById('edit-name-close-btn');
     const form = document.getElementById('edit-name-form');
+    const inputField = document.getElementById('edit-name-input');
 
     const btnConfirmYes = document.getElementById('edit-name-confirm-close-btn');
     const btnConfirmNo = document.getElementById('edit-name-cancel-close-btn');
@@ -561,6 +602,11 @@ function initEditNameEvents() {
 
     closeBtn?.addEventListener('click', () => {
         showEditNameConfirmToast();
+    });
+
+    // Динамическая проверка ввода при наборе текста
+    inputField?.addEventListener('input', () => {
+        validateEditNameInputState();
     });
 
     // Обработка клика по фону (анимация встряски)
@@ -604,11 +650,9 @@ function initEditNameEvents() {
         if (!client) return alert('Supabase клиент не найден!');
 
         const submitBtn = document.getElementById('btn-submit-edit-name');
-        const inputField = document.getElementById('edit-name-input');
         const newName = inputField ? inputField.value.trim() : '';
 
-        if (!newName) {
-            alert('Имя не может быть пустым!');
+        if (!newName || newName.toUpperCase() === 'НЕТ ИМЕНИ') {
             return;
         }
 
