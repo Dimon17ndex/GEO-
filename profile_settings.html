@@ -129,7 +129,7 @@
         }
 
         /* =========================================================
-            КНОПКА-СТРЕЛКА В ВЕРХНЕМ ПРАВОМ УГЛУ (С ВРАЩЕНИЕМ)
+            КНОПКА-СТРЕЛКА (ВЫЛЕТАЕТ СПРАВА НАЛЕВО)
             ========================================================= */
         .back-nav-container {
             position: fixed;
@@ -153,11 +153,11 @@
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             box-shadow: none;
 
+            /* Начальное положение: смещена вправо и скрыта */
             opacity: 0;
-            filter: blur(10px);
-            transform: scale(0.5);
-            animation: backArrowAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.8s forwards;
-            will-change: transform, opacity, filter;
+            transform: translateX(40px) scale(0.8);
+            animation: slideInFromRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.8s forwards;
+            will-change: transform, opacity;
         }
 
         .back-arrow-btn svg {
@@ -166,9 +166,16 @@
             transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        @keyframes backArrowAppear {
-            0% { opacity: 0; filter: blur(10px); transform: scale(0.5); }
-            100% { opacity: 1; filter: blur(0px); transform: scale(1); }
+        /* Анимация появления справа налево */
+        @keyframes slideInFromRight {
+            0% {
+                opacity: 0;
+                transform: translateX(40px) scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
         }
 
         .back-arrow-btn:hover {
@@ -176,7 +183,7 @@
         }
 
         .back-arrow-btn:hover svg {
-            transform: rotate(-360deg); /* Возвращает полный оборот при наведении */
+            transform: rotate(-360deg);
         }
 
         .back-arrow-btn:active {
