@@ -529,10 +529,33 @@
             margin-bottom: 12px; /* Опускаем данные ниже */
         }
 
-        .profile-icon-phone svg {
-            width: 26px;
-            height: 26px;
-        }
+        /* Контейнер для иконки телефона и плюсика */
+.profile-icon-phone {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    width: 40px; /* Задаем ширину, чтобы было место для смещения */
+    margin-bottom: 12px;
+}
+
+/* Сама трубка телефона */
+.profile-icon-phone svg {
+    width: 26px;
+    height: 26px;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+/* Плюсик, который можно двигать вправо */
+.phone-plus-sign {
+    position: absolute;
+    right: 2px; /* Изменяйте это число: чем оно меньше, тем правее уйдет плюсик */
+    top: -2px;  /* Можно также регулировать высоту */
+    font-size: 16px;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.95);
+}
 
         .profile-info-label {
             font-family: 'Montserrat', sans-serif;
