@@ -458,24 +458,35 @@
             flex-direction: column;
             padding: 10px 0;
             flex: 1;
+            align-items: center; /* Центрируем верхние иконки ровно по центру колонок */
         }
 
+        /* Точечное выравнивание текстов и лейблов в зависимости от колонки */
         .profile-info-item.align-left {
-            align-items: flex-start;
             text-align: left;
+        }
+        .profile-info-item.align-left .profile-info-label,
+        .profile-info-item.align-left .profile-info-value-wrapper {
+            align-self: flex-start;
         }
 
         .profile-info-item.align-center {
-            align-items: center;
             text-align: center;
+        }
+        .profile-info-item.align-center .profile-info-label,
+        .profile-info-item.align-center .profile-info-value {
+            align-self: center;
         }
 
         .profile-info-item.align-right {
-            align-items: flex-end;
             text-align: right;
         }
+        .profile-info-item.align-right .profile-info-label,
+        .profile-info-item.align-right .profile-info-value {
+            align-self: flex-end;
+        }
 
-        /* Универсальный верхний контейнер для выравнивания всех иконки/бейджей по высоте */
+        /* Универсальный верхний контейнер для высоты */
         .profile-icon-top-wrapper {
             height: 32px;
             display: flex;
@@ -483,7 +494,7 @@
             margin-bottom: 12px;
         }
 
-        /* Крупный закругленный прямоугольник для NAME — выровнен по центру своей колонки */
+        /* Крупный закругленный прямоугольник для NAME — строго по центру */
         .profile-badge-name {
             display: inline-flex;
             align-items: center;
@@ -496,10 +507,10 @@
             letter-spacing: 1px;
             color: rgba(255, 255, 255, 0.95);
             margin-bottom: 12px;
-            align-self: center; /* Центрируем относительно левой колонки */
+            align-self: center; 
         }
 
-        /* Контейнер для иконки телефона и плюсика */
+        /* Контейнер для иконки телефона и плюсика — по центру */
         .profile-icon-phone {
             position: relative;
             display: flex;
@@ -518,27 +529,28 @@
             color: rgba(255, 255, 255, 0.95);
         }
 
-        /* Плюсик — сдвинут левее (изменили right на меньшее/отрицательное значение) */
+        /* Плюсик — сдвинут чуть левее */
         .phone-plus-sign {
             position: absolute;
-            right: 6px; /* Сдвинули чуть левее (было 2px) */
+            right: 5px; 
             top: -2px;  
             font-size: 16px;
             font-weight: 800;
             color: rgba(255, 255, 255, 0.95);
         }
 
-        /* Значок электронной почты (@) — выровнен по центру */
+        /* Значок электронной почты (@) — строго по центру */
         .profile-icon-email {
             display: flex;
             align-items: center;
             justify-content: center;
             height: 32px;
+            width: 32px;
             font-size: 24px;
             font-weight: 800;
             color: rgba(255, 255, 255, 0.95);
             margin-bottom: 12px;
-            align-self: center; /* Центрируем относительно правой колонки */
+            align-self: center; 
         }
 
         .profile-info-label {
