@@ -483,53 +483,62 @@
             margin-bottom: 12px;
         }
 
-        /* Бейдж NAME */
+        /* Крупный закругленный прямоугольник для NAME — выровнен по центру своей колонки */
         .profile-badge-name {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 4px 10px;
+            padding: 6px 14px;
             border: 2px solid rgba(255, 255, 255, 0.5);
-            border-radius: 8px;
-            font-size: 13px;
+            border-radius: 10px;
+            font-size: 14px;
             font-weight: 800;
             letter-spacing: 1px;
             color: rgba(255, 255, 255, 0.95);
-            white-space: nowrap;
-            margin-bottom: 0 !important;
+            margin-bottom: 12px;
+            align-self: center; /* Центрируем относительно левой колонки */
         }
 
-        /* Блок телефона */
+        /* Контейнер для иконки телефона и плюсика */
         .profile-icon-phone {
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
+            height: 32px;
+            width: 40px;
+            margin-bottom: 12px;
+            align-self: center;
         }
 
+        /* Сама трубка телефона */
         .profile-icon-phone svg {
             width: 26px;
             height: 26px;
             color: rgba(255, 255, 255, 0.95);
         }
 
+        /* Плюсик — сдвинут левее (изменили right на меньшее/отрицательное значение) */
         .phone-plus-sign {
             position: absolute;
-            right: -10px;
-            top: -2px;
+            right: 6px; /* Сдвинули чуть левее (было 2px) */
+            top: -2px;  
             font-size: 16px;
             font-weight: 800;
             color: rgba(255, 255, 255, 0.95);
         }
 
-        /* Иконка почты (@) */
+        /* Значок электронной почты (@) — выровнен по центру */
         .profile-icon-email {
             display: flex;
             align-items: center;
             justify-content: center;
+            height: 32px;
             font-size: 24px;
             font-weight: 800;
             color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 12px;
+            align-self: center; /* Центрируем относительно правой колонки */
         }
 
         .profile-info-label {
