@@ -441,7 +441,7 @@
         }
 
         /* =========================================================
-            ИНФОРМАЦИЯ ПРОФИЛЯ И ВЫРАВНИВАНИЕ (УВЕЛИЧЕННЫЕ ЗНАЧКИ)
+            ИНФОРМАЦИЯ ПРОФИЛЯ И ВЫРАВНИВАНИЕ (ЧЕТКО ПОД ЗНАЧКАМИ)
             ========================================================= */
         .profile-info-row {
             display: flex;
@@ -458,16 +458,16 @@
             flex-direction: column;
             padding: 10px 0;
             flex: 1;
-            align-items: center; /* Центрируем иконки ровно по центру колонок */
+            align-items: center; /* Центрируем контент ровно под иконками */
         }
 
-        /* Точечное выравнивание текстов и лейблов в зависимости от колонки */
+        /* Выравнивание по колонкам */
         .profile-info-item.align-left {
             text-align: left;
         }
         .profile-info-item.align-left .profile-info-label,
         .profile-info-item.align-left .profile-info-value-wrapper {
-            align-self: flex-start;
+            align-self: flex-start; /* Имя и подпись слева под своим значком NAME */
         }
 
         .profile-info-item.align-center {
@@ -475,7 +475,7 @@
         }
         .profile-info-item.align-center .profile-info-label,
         .profile-info-item.align-center .profile-info-value {
-            align-self: center;
+            align-self: center; /* Телефон и подпись строго по центру под трубкой */
         }
 
         .profile-info-item.align-right {
@@ -483,7 +483,7 @@
         }
         .profile-info-item.align-right .profile-info-label,
         .profile-info-item.align-right .profile-info-value {
-            align-self: flex-end;
+            align-self: flex-end; /* Почта и подпись справа под значком @ */
         }
 
         /* Увеличенный закругленный прямоугольник для NAME */
@@ -491,15 +491,15 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 8px 18px; /* Сделали крупнее */
+            padding: 8px 18px;
             border: 2.5px solid rgba(255, 255, 255, 0.5);
             border-radius: 12px;
-            font-size: 18px; /* Увеличили шрифт */
+            font-size: 18px;
             font-weight: 800;
             letter-spacing: 1.2px;
             color: rgba(255, 255, 255, 0.95);
             margin-bottom: 12px;
-            align-self: center; 
+            align-self: flex-start; /* Располагает значок NAME слева в своей колонке */
         }
 
         /* Увеличенный контейнер для иконки телефона и плюсика */
@@ -511,7 +511,7 @@
             height: 38px;
             width: 48px;
             margin-bottom: 12px;
-            align-self: center;
+            align-self: center; /* Строго по центру своей колонки */
         }
 
         /* Сама трубка телефона — увеличена */
@@ -521,12 +521,12 @@
             color: rgba(255, 255, 255, 0.95);
         }
 
-        /* Плюсик — увеличен и пропорционально смещен относительно большой трубки */
+        /* Плюсик — пропорционально смещен относительно большой трубки */
         .phone-plus-sign {
             position: absolute;
             right: 4px; 
             top: -3px;  
-            font-size: 20px; /* Увеличили шрифт плюсика */
+            font-size: 20px;
             font-weight: 800;
             color: rgba(255, 255, 255, 0.95);
         }
@@ -538,11 +538,11 @@
             justify-content: center;
             height: 38px;
             width: 38px;
-            font-size: 32px; /* Увеличили размер значка @ */
+            font-size: 32px;
             font-weight: 800;
             color: rgba(255, 255, 255, 0.95);
             margin-bottom: 12px;
-            align-self: center; 
+            align-self: flex-end; /* Располагает значок @ справа в своей колонке */
         }
 
         .profile-info-label {
