@@ -787,67 +787,6 @@
             letter-spacing: 0.8px;
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
         }
-
-        /* Внешний ряд иконок — располагается строго над уменьшенным контейнером */
-        .profile-info-row-external {
-            position: absolute;
-            top: -125px; /* Поднимает иконки выше верхнего края основного контейнера */
-            left: 30px;
-            right: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            z-index: 95;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Уменьшаем высоту самого основного контейнера профиля */
-        .main-profile-container {
-            top: 310px !important; /* Опускаем контейнер ниже, освобождая место для внешних иконок */
-            min-height: 290px !important; /* Делаем его компактнее по высоте */
-        }
-
-        /* Внутренний блок для нижних разделов */
-        .profile-inner-sections-box {
-            position: relative;
-            top: 20px; /* Сдвигаем содержимое чуть ниже из-за выноса иконок */
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-        }
-
-        /* Настройка элементов иконок и плавных меток */
-        .profile-info-item {
-            display: flex;
-            flex-direction: column;
-            padding: 10px 0;
-            flex: 1;
-            align-items: center;   
-            text-align: center;
-            cursor: pointer;
-        }
-
-        .profile-info-item .profile-info-label {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 11px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.45);
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            margin-bottom: 4px;
-            
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-4px);
-            transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease;
-        }
-
-        .profile-info-item:hover .profile-info-label {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
 </style>
 </head>
 <body>
@@ -913,8 +852,7 @@
         </div>
 
         <div class="tab-content" id="tab-profile">
-            
-            <div class="profile-info-row-external">
+            <div class="profile-info-row">
                 <div class="profile-info-item align-left">
                     <div class="profile-badge-name">NAME</div>
                     <span class="profile-info-label">Имя пользователя</span>
@@ -947,25 +885,22 @@
                 </div>
             </div>
 
-            <div class="profile-inner-sections-box">
-                <div class="session-logout-section" style="margin-bottom: 25px;">
-                    <span class="logout-label-text bright-label">Сбросить и заменить пароль</span>
-                    <p style="font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.65); text-align: left; margin: 4px 0 12px 0; line-height: 1.4;">
-                        Вы забыли пароль от своего аккаунта, находясь в нем, или уверены, что пароль узнал кто-то еще помимо вас?
-                    </p>
-                    <button type="button" class="blue-primary-btn" onclick="showResetModal('request')">
-                        Сбросить пароль от аккаунта
-                    </button>
-                </div>
-
-                <div class="session-logout-section">
-                    <span class="logout-label-text bright-label">Завершение сессии/выход из аккаунта</span>
-                    <button type="button" class="red-primary-btn logout-btn-trigger" onclick="handleLogout()">
-                        Выйти из аккаунта
-                    </button>
-                </div>
+            <div class="session-logout-section" style="margin-bottom: 25px;">
+                <span class="logout-label-text bright-label">Сбросить и заменить пароль</span>
+                <p style="font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.65); text-align: left; margin: 4px 0 12px 0; line-height: 1.4;">
+                    Вы забыли пароль от своего аккаунта, находясь в нем, или уверены, что пароль узнал кто-то еще помимо вас?
+                </p>
+                <button type="button" class="blue-primary-btn" onclick="showResetModal('request')">
+                    Сбросить пароль от аккаунта
+                </button>
             </div>
 
+            <div class="session-logout-section">
+                <span class="logout-label-text bright-label">Завершение сессии/выход из аккаунта</span>
+                <button type="button" class="red-primary-btn logout-btn-trigger" onclick="handleLogout()">
+                    Выйти из аккаунта
+                </button>
+            </div>
         </div>
 
         <div class="tab-content" id="tab-support">
