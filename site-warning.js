@@ -1,7 +1,7 @@
 (function() {
     // Ждем полной загрузки DOM
     document.addEventListener("DOMContentLoaded", function() {
-        // Проверяем, не добавлен ли уже этот блок (на всякий случай)
+        // Проверяем, не добавлен ли уже этот блок
         if (document.getElementById("region-warning-container")) return;
 
         // Создаем стили и добавляем их на страницу динамически
@@ -66,35 +66,10 @@
                 color: rgba(255, 255, 255, 0.9);
                 letter-spacing: 0.2px;
             }
-
-            /* Кнопка закрытия (крестик) */
-            .warning-close-btn {
-                position: absolute;
-                top: 8px;
-                right: 8px;
-                background: transparent;
-                border: none;
-                color: rgba(255, 255, 255, 0.4);
-                cursor: pointer;
-                padding: 4px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: color 0.2s ease;
-            }
-
-            .warning-close-btn:hover {
-                color: #ffffff;
-            }
-
-            .warning-close-btn svg {
-                width: 14px;
-                height: 14px;
-            }
         `;
         document.head.appendChild(style);
 
-        // Создаем HTML-разметку контейнера предупреждения
+        // Создаем HTML-разметку контейнера предупреждения (без крестика)
         const warningContainer = document.createElement("div");
         warningContainer.id = "region-warning-container";
         warningContainer.innerHTML = `
@@ -106,14 +81,8 @@
                 </svg>
             </div>
             <div class="warning-text-content">
-                Разработка сайта ограничена в связи со временными техническими ограничениями в регионе происхождения данного проекта!
+                Разработка сайта частично приостановлена в связи со временными техническими ограничениями в регионе происхождения и разработки данного проекта!
             </div>
-            <button type="button" class="warning-close-btn" title="Закрыть" onclick="this.parentElement.style.opacity='0'; this.parentElement.style.transform='translateY(10px) scale(0.95)'; setTimeout(() => this.parentElement.remove(), 400);">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
         `;
 
         // Добавляем готовый блок в тело страницы
