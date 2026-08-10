@@ -778,6 +778,15 @@
         .blue-primary-btn:active {
             transform: translateY(0) scale(0.97);
         }
+
+        /* Увеличенная яркость и выразительность для заголовков разделов */
+        .logout-label-text.bright-label {
+            color: #ffffff !important;
+            font-size: 14.5px;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
+        }
 </style>
 </head>
 <body>
@@ -877,7 +886,7 @@
             </div>
 
             <div class="session-logout-section" style="margin-bottom: 25px;">
-                <span class="logout-label-text">Сбросить и заменить пароль</span>
+                <span class="logout-label-text bright-label">Сбросить и заменить пароль</span>
                 <p style="font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.65); text-align: left; margin: 4px 0 12px 0; line-height: 1.4;">
                     Вы забыли пароль от своего аккаунта, находясь в нем, или уверены, что пароль узнал кто-то еще помимо вас?
                 </p>
@@ -887,7 +896,7 @@
             </div>
 
             <div class="session-logout-section">
-                <span class="logout-label-text">Завершение сессии/выход из аккаунта</span>
+                <span class="logout-label-text bright-label">Завершение сессии/выход из аккаунта</span>
                 <button type="button" class="red-primary-btn logout-btn-trigger" onclick="handleLogout()">
                     Выйти из аккаунта
                 </button>
