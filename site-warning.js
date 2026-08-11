@@ -4,6 +4,16 @@
         // Проверяем, не добавлен ли уже этот блок
         if (document.getElementById("region-warning-container")) return;
 
+        // Создаем и проигрываем звук предупреждения
+        // (путь зависит от того, где лежит файл: если в папке audio рядом со скриптом — 'audio/warning.mp3' или 'audio/warning.wav')
+        const warningSound = new Audio('audio/warning.mp3'); 
+        warningSound.volume = 0.5; // Громкость звука (от 0.0 до 1.0)
+        
+        // Пытаемся воспроизвести звук (некоторые браузеры могут блокировать звук без взаимодействия с пользователем)
+        warningSound.play().catch(function(error) {
+            console.log("Автозапуск звука был заблокирован браузером:", error);
+        });
+
         // Создаем стили и добавляем их на страницу динамически
         const style = document.createElement("style");
         style.innerHTML = `
@@ -69,7 +79,7 @@
         `;
         document.head.appendChild(style);
 
-        // Создаем HTML-разметку контейнера предупреждения (без крестика)
+        // Создаем HTML-разметку контейнера предупреждения
         const warningContainer = document.createElement("div");
         warningContainer.id = "region-warning-container";
         warningContainer.innerHTML = `
