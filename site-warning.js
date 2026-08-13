@@ -4,16 +4,6 @@
         // Проверяем, не добавлен ли уже этот блок
         if (document.getElementById("region-warning-container")) return;
 
-        // Создаем и проигрываем звук предупреждения
-        // (путь зависит от того, где лежит файл: если в папке audio рядом со скриптом — 'audio/warning.mp3' или 'audio/warning.wav')
-        const warningSound = new Audio('audio/warning.mp3'); 
-        warningSound.volume = 0.5; // Громкость звука (от 0.0 до 1.0)
-        
-        // Пытаемся воспроизвести звук (некоторые браузеры могут блокировать звук без взаимодействия с пользователем)
-        warningSound.play().catch(function(error) {
-            console.log("Автозапуск звука был заблокирован браузером:", error);
-        });
-
         // Создаем стили и добавляем их на страницу динамически
         const style = document.createElement("style");
         style.innerHTML = `
@@ -95,7 +85,20 @@
             </div>
         `;
 
-        // Добавляем готовый блок в тело страницы
+        // Инициализируем звук заранее, чтобы браузер успел его подгрузить
+        const warningSound = new Audio('audio/warning.mp3');
+        warningSound.volume = 0.5;
+        warningSound.load();
+
+        // Добавляем блок на страницу
         document.body.appendChild(warningContainer);
+
+        // Синхронизируем старт анимации появления и запуск звука
+        // (учитываем задержку animation-delay: 0.5s, которая прописана в CSS у плашки)
+        setTimeout(function() {
+            warningSound.play().catch(function(error) {
+                console.log("Автозапуск звука был заблокирован браузером:", error);
+            });
+        }, 500); // ровно 500 миллисекунд совпадает с задержкой появления плашки
     });
 })();
