@@ -366,8 +366,14 @@
     color: #ffffff;
 }
 
+/* Базовое состояние — контейнер скрыт */
 .app-banners-container {
-    display: none !important; /* Изначально скрыта, пока Supabase не разрешит её показать */
+    display: none; 
+}
+
+/* Когда плашка должна работать — добавляем этот класс */
+.app-banners-container.banner-active {
+    display: block !important; /* или flex, в зависимости от вашей верстки */
 }
     </style>
 </head>
