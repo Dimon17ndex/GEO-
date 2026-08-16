@@ -19,6 +19,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const consoleInput = document.getElementById('console-input');
     const consoleOutput = document.getElementById('console-output');
 
+    // === АВТОМАТИЧЕСКАЯ ПРОВЕРКА СТАТУСА ПЛАШКИ ПРИ ЗАГРУЗКЕ СТРАНИЦЫ ===
+    async function checkGlobalBanner() {
+        const bannerContainer = document.querySelector('.app-banners-container');
+        if (!supabaseClient || !bannerContainer) return;
+
+        try {
+            const { data, error } = await supabaseClient
+                .from('settings')
+                .select('value')
+                .eq('key', 'banner_enabled')
+                .single();
+
+            if (!error && data) {
+                if (data.value === true) {
+                    bannerContainer.classList.add('banner-active');
+                } else {
+                    bannerContainer.classList.remove('banner-active');
+                }
+            }
+        } catch (err) {
+            console.error('Ошибка проверки статуса плашки:', err);
+        }
+    }
+
+    // Запускаем проверку статуса при старте страницы
+    checkGlobalBanner();
+
     if (!devConsole) return;
 
     // Переключение экрана авторизации и консоли
@@ -195,6 +222,8 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'banner-on':
                 logToConsole('Отправка запроса в Supabase...', 'system');
                 if (await toggleGlobalBanner(true)) {
+                    // Сразу включаем класс локально на странице
+                    document.querySelector('.app-banners-container')?.classList.add('banner-active');
                     logToConsole('Плашка успешно ВКЛЮЧЕНА для всех пользователей!', 'success');
                 } else {
                     logToConsole('Ошибка при изменении статуса плашки. Проверьте настройки Supabase.', 'error');
@@ -204,6 +233,8 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'banner-off':
                 logToConsole('Отправка запроса в Supabase...', 'system');
                 if (await toggleGlobalBanner(false)) {
+                    // Сразу убираем класс локально на странице
+                    document.querySelector('.app-banners-container')?.classList.remove('banner-active');
                     logToConsole('Плашка успешно ОТКЛЮЧЕНА для всех пользователей!', 'success');
                 } else {
                     logToConsole('Ошибка при изменении статуса плашки. Проверьте настройки Supabase.', 'error');
