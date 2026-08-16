@@ -620,13 +620,13 @@ function navigateToPage(targetPage) {
 
 // ЕДИНЫЙ ОБРАБОТЧИК ЗАГРУЗКИ СТРАНИЦЫ
 document.addEventListener('DOMContentLoaded', () => {
-    // Проверка повторного входа и включение лоадера
-    const isReturningUser = localStorage.getItem('hasVisitedBeginning');
+    // Проверяем, заходили ли мы на эту страницу в текущей сессии
+    const hasVisitedSession = sessionStorage.getItem('hasVisitedBeginningSession');
 
-    if (isReturningUser) {
-        showLoader(); // Включаем крутилку и блокируем кнопки
-    } else {
-        localStorage.setItem('hasVisitedBeginning', 'true');
+    if (!hasVisitedSession) {
+        // Если это первый вход за сессию — ставим флаг и включаем лоадер
+        sessionStorage.setItem('hasVisitedBeginningSession', 'true');
+        showLoader();
     }
 
     // 1. Анимация появления
@@ -637,8 +637,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Запуск волн
     setTimeout(() => { spawnAmbientWave(); }, 1000);
 
-    // Если был повторный вход, скрываем лоадер через небольшую паузу (например, 1.2 сек)
-    if (isReturningUser) {
+    // Если это был первый вход за сессию, скрываем лоадер через 1.2 секунды
+    if (!hasVisitedSession) {
         setTimeout(() => {
             hideLoader();
         }, 1200);
