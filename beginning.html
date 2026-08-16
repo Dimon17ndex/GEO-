@@ -370,6 +370,10 @@
 </head>
 <body>
 
+    <div id="page-loader">
+    <div class="spinner"></div>
+</div>
+
     <div class="app-banners-container">
         <div class="app-banner banner-warning">
             <span class="banner-icon">🛠</span>
@@ -468,6 +472,23 @@ const intensityValueLabel = document.getElementById('intensity-value');
 
 let intensityPercent = 20;
 let ambientTimeoutId = null; // Фикс параллельных циклов волн
+
+// === ФУНКЦИИ ЛОАДЕРА И БЛОКИРОВКИ КНОПОК ===
+function showLoader() {
+    const loader = document.getElementById('page-loader');
+    if (loader) {
+        loader.classList.add('active');
+        document.body.classList.add('is-loading');
+    }
+}
+
+function hideLoader() {
+    const loader = document.getElementById('page-loader');
+    if (loader) {
+        loader.classList.remove('active');
+        document.body.classList.remove('is-loading');
+    }
+}
 
 // Функция выхода из аккаунта со спиннером и новым текстом
 async function logoutUser() {
@@ -588,13 +609,10 @@ window.addEventListener('popstate', function () {
 function navigateToPage(targetPage) {
     const currentPage = window.location.pathname.split('/').pop() || 'beginning.html';
     
-    // Если пытаемся перейти на ту же страницу — ничего не делаем и не гасим экран
     if (currentPage === targetPage) return;
 
-    // Плавно гасим страницу
     document.body.classList.add('page-hidden');
 
-    // Переходим на другую страницу после завершения CSS-транзишна (500мс)
     setTimeout(() => {
         window.location.href = targetPage;
     }, 500);
@@ -602,6 +620,15 @@ function navigateToPage(targetPage) {
 
 // ЕДИНЫЙ ОБРАБОТЧИК ЗАГРУЗКИ СТРАНИЦЫ
 document.addEventListener('DOMContentLoaded', () => {
+    // Проверка повторного входа и включение лоадера
+    const isReturningUser = localStorage.getItem('hasVisitedBeginning');
+
+    if (isReturningUser) {
+        showLoader(); // Включаем крутилку и блокируем кнопки
+    } else {
+        localStorage.setItem('hasVisitedBeginning', 'true');
+    }
+
     // 1. Анимация появления
     requestAnimationFrame(() => {
         document.body.classList.add('page-loaded');
@@ -610,12 +637,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Запуск волн
     setTimeout(() => { spawnAmbientWave(); }, 1000);
 
+    // Если был повторный вход, скрываем лоадер через небольшую паузу (например, 1.2 сек)
+    if (isReturningUser) {
+        setTimeout(() => {
+            hideLoader();
+        }, 1200);
+    }
+
     // 3. Инициализация панели администратора
     const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
     const sidePanel = document.getElementById('dev-side-panel');
     let hideTimeout = null;
 
-    // Подсветка активной страницы
     const currentPage = window.location.pathname.split('/').pop() || 'beginning.html';
     if (currentPage === 'beginning.html') {
         document.getElementById('btn-main-profile')?.classList.add('active-page');
