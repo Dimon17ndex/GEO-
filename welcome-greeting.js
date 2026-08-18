@@ -171,7 +171,6 @@ async function initGreetingUI() {
         console.error('Ошибка получения данных пользователя:', e);
     }
 
-    // Знак восклицания теперь внутри строки и станет частью последнего слова (или прикрепится к нему)
     const fullText = `ЗДРАВСТВУЙТЕ, ${displayName.toUpperCase()}!`;
     const words = fullText.split(' ').filter(w => w.length > 0);
 
