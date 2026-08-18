@@ -1,10 +1,5 @@
 // welcome-greeting.js
 
-document.addEventListener('DOMContentLoaded', () => {
-    injectGreetingStyles();
-    initGreetingUI();
-});
-
 // --- СТИЛИ ---
 function injectGreetingStyles() {
     if (document.getElementById('welcome-greeting-styles')) return;
@@ -56,14 +51,28 @@ function injectGreetingStyles() {
             margin: 0 !important;
             padding: 4px 12px !important;
             position: relative !important;
-            white-space: nowrap !important; /* Строго в строчку без переносов */
-            
-            animation: accountBlurBounce 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
-                       accountGlowPulse 1.6s ease-out forwards !important;
+            white-space: nowrap !important;
+            display: flex !important;
+            gap: 12px !important;
+            justify-content: center !important;
+            align-items: center !important;
+            animation: accountGlowPulse 1.6s ease-out forwards !important;
+        }
+
+        .welcome-word {
+            display: inline-block !important;
+            opacity: 0 !important;
+            filter: blur(15px) !important;
+            transform: translateY(25px) !important;
+            animation: wordBlurUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
             will-change: transform, filter, opacity;
         }
 
-        /* Эффект белого светового блика */
+        @keyframes wordBlurUp {
+            0% { opacity: 0 !important; filter: blur(15px) !important; transform: translateY(25px) !important; }
+            100% { opacity: 1 !important; filter: blur(0px) !important; transform: translateY(0px) !important; }
+        }
+
         .welcome-title::after {
             content: '' !important;
             position: absolute !important;
@@ -71,23 +80,11 @@ function injectGreetingStyles() {
             bottom: 0 !important;
             left: -100vw !important;
             width: 35vw !important;
-            background: linear-gradient(
-                90deg, 
-                transparent 0%, 
-                rgba(255, 255, 255, 0.85) 50%, 
-                transparent 100%
-            ) !important;
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.85) 50%, transparent 100%) !important;
             transform: skewX(-25deg) !important;
             pointer-events: none !important;
             z-index: 2 !important;
-            animation: lightFlashFullWidth 1.1s cubic-bezier(0.25, 1, 0.5, 1) 0.6s 1 forwards !important;
-        }
-
-        @keyframes accountBlurBounce {
-            0% { opacity: 0; filter: blur(20px); transform: scale(0.3); }
-            60% { opacity: 1; filter: blur(2px); transform: scale(1.35); }
-            80% { filter: blur(0px); transform: scale(0.92); }
-            100% { opacity: 1; filter: blur(0px); transform: scale(1); }
+            animation: lightFlashFullWidth 1.1s cubic-bezier(0.25, 1, 0.5, 1) 0.8s 1 forwards !important;
         }
 
         @keyframes accountGlowPulse {
@@ -133,8 +130,10 @@ function injectGreetingStyles() {
 }
 
 // --- СОЗДАНИЕ HTML И ПОЛУЧЕНИЕ ИМЕНИ ---
-async function initGreetingUI() {
+async function showWelcomeGreeting() {
     if (document.getElementById('welcome-greeting-overlay')) return;
+
+    injectGreetingStyles();
 
     let displayName = 'ПОЛЬЗОВАТЕЛЬ';
     
@@ -153,11 +152,20 @@ async function initGreetingUI() {
         console.error('Ошибка получения данных пользователя:', e);
     }
 
+    const cleanText = `ЗДРАВСТВУЙТЕ, ${displayName.toUpperCase()}`;
+    let words = cleanText.split(/\s+/).filter(w => w.length > 0);
+    words.push('!');
+
+    const wordsHTML = words.map((token, index) => {
+        const delay = (index * 0.25).toFixed(2);
+        return `<span class="welcome-word" style="animation-delay: ${delay}s;">${token}</span>`;
+    }).join('');
+
     const greetingHTML = `
         <div id="welcome-greeting-overlay" class="welcome-overlay">
             <img src="images/geo_logo.png" alt="" class="auth-bg-watermark">
             <div class="welcome-container">
-                <h1 class="welcome-title">ЗДРАВСТВУЙТЕ, ${displayName.toUpperCase()}</h1>
+                <h1 class="welcome-title">${wordsHTML}</h1>
             </div>
         </div>
     `;
