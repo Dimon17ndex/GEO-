@@ -22,7 +22,7 @@ function injectGreetingStyles() {
             box-sizing: border-box !important;
             overflow: hidden !important;
             opacity: 0 !important;
-            transition: opacity 0.8s ease !important; /* Нежное появление оверлея */
+            transition: opacity 0.8s ease !important;
         }
 
         .welcome-overlay.visible {
@@ -30,7 +30,7 @@ function injectGreetingStyles() {
         }
 
         .welcome-overlay.fade-out {
-            opacity: 0 !important; /* Нежное исчезновение */
+            opacity: 0 !important;
         }
 
         .welcome-container {
@@ -62,10 +62,33 @@ function injectGreetingStyles() {
             padding: 4px 12px !important;
             position: relative !important;
             white-space: nowrap !important;
+            
+            /* Общий пульс свечения для всего заголовка */
+            animation: accountGlowPulse 1.6s ease-out forwards !important;
+            will-change: filter, opacity;
+        }
 
-            animation: accountBlurBounce 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
-                       accountGlowPulse 1.6s ease-out forwards !important;
+        /* Посимвольная анимация появления снизу вверх с блюром */
+        .welcome-char {
+            display: inline-block !important;
+            opacity: 0 !important;
+            filter: blur(12px) !important;
+            transform: translateY(25px) scale(0.8) !important;
+            animation: charBlurSlideUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
             will-change: transform, filter, opacity;
+        }
+
+        @keyframes charBlurSlideUp {
+            0% {
+                opacity: 0;
+                filter: blur(12px);
+                transform: translateY(25px) scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                filter: blur(0px);
+                transform: translateY(0) scale(1);
+            }
         }
 
         .welcome-title::after {
@@ -85,13 +108,6 @@ function injectGreetingStyles() {
             pointer-events: none !important;
             z-index: 2 !important;
             animation: lightFlashFullWidth 1.1s cubic-bezier(0.25, 1, 0.5, 1) 0.6s 1 forwards !important;
-        }
-
-        @keyframes accountBlurBounce {
-            0% { opacity: 0; filter: blur(20px); transform: scale(0.3); }
-            60% { opacity: 1; filter: blur(2px); transform: scale(1.35); }
-            80% { filter: blur(0px); transform: scale(0.92); }
-            100% { opacity: 1; filter: blur(0px); transform: scale(1); }
         }
 
         @keyframes accountGlowPulse {
@@ -159,11 +175,19 @@ async function initGreetingUI() {
         console.error('Ошибка получения данных пользователя:', e);
     }
 
+    // Формируем текст и разбиваем каждую букву в отдельный тег <span> с нарастающей задержкой
+    const fullText = `ЗДРАВСТВУЙТЕ, ${displayName.toUpperCase()}!`;
+    const charsHTML = fullText.split('').map((char, index) => {
+        const safeChar = char === ' ' ? '&nbsp;' : char;
+        const delay = (index * 0.035).toFixed(3); // Скорость появления каждой последующей буквы
+        return `<span class="welcome-char" style="animation-delay: ${delay}s">${safeChar}</span>`;
+    }).join('');
+
     const greetingHTML = `
         <div id="welcome-greeting-overlay" class="welcome-overlay">
             <img src="images/geo_logo.png" alt="" class="auth-bg-watermark">
             <div class="welcome-container">
-                <h1 class="welcome-title">ЗДРАВСТВУЙТЕ, ${displayName.toUpperCase()}!</h1>
+                <h1 class="welcome-title">${charsHTML}</h1>
             </div>
         </div>
     `;
@@ -172,18 +196,16 @@ async function initGreetingUI() {
 
     const overlay = document.getElementById('welcome-greeting-overlay');
     
-    // Плавное появление (добавляем класс visible чуть-чуть погодя для срабатывания transition)
     requestAnimationFrame(() => {
         setTimeout(() => {
             overlay.classList.add('visible');
         }, 50);
     });
 
-    // Держим на экране 2 секунды после появления, затем плавно скрываем и удаляем
     setTimeout(() => {
         overlay.classList.add('fade-out');
         setTimeout(() => {
             overlay.remove();
-        }, 800); // Время должно совпадать с transition в CSS (0.8s)
+        }, 800);
     }, 2000); 
 }
