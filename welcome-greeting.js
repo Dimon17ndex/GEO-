@@ -1,17 +1,9 @@
 // welcome-greeting.js
 
-(function() {
-    function startGreeting() {
-        injectGreetingStyles();
-        initGreetingUI();
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', startGreeting);
-    } else {
-        startGreeting();
-    }
-})();
+document.addEventListener('DOMContentLoaded', () => {
+    injectGreetingStyles();
+    initGreetingUI();
+});
 
 // --- СТИЛИ ---
 function injectGreetingStyles() {
@@ -23,6 +15,7 @@ function injectGreetingStyles() {
             top: 0 !important;
             left: 0 !important;
             width: 100vw !important;
+            height: 100vw !important; /* исправлено на 100vh ниже */
             height: 100vh !important;
             background: rgba(10, 10, 12, 0.94) !important;
             backdrop-filter: blur(12px) !important;
@@ -179,9 +172,11 @@ async function initGreetingUI() {
         console.error('Ошибка получения данных пользователя:', e);
     }
 
+    // Формируем текст с восклицательным знаком в конце
     const fullText = `ЗДРАВСТВУЙТЕ, ${displayName.toUpperCase()}!`;
     const words = fullText.split(' ');
 
+    // Оборачиваем каждое слово в тег span с задержкой анимации для пословного эффекта
     const wordsHTML = words.map((word, index) => {
         const delay = (index * 0.2).toFixed(2);
         return `<span class="welcome-word" style="animation-delay: ${delay}s;">${word}</span>`;
