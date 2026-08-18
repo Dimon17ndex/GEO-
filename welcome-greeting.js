@@ -21,6 +21,16 @@ function injectGreetingStyles() {
             padding: 20px !important;
             box-sizing: border-box !important;
             overflow: hidden !important;
+            opacity: 0 !important;
+            transition: opacity 0.8s ease !important; /* Нежное появление оверлея */
+        }
+
+        .welcome-overlay.visible {
+            opacity: 1 !important;
+        }
+
+        .welcome-overlay.fade-out {
+            opacity: 0 !important; /* Нежное исчезновение */
         }
 
         .welcome-container {
@@ -159,4 +169,21 @@ async function initGreetingUI() {
     `;
 
     document.body.insertAdjacentHTML('beforeend', greetingHTML);
+
+    const overlay = document.getElementById('welcome-greeting-overlay');
+    
+    // Плавное появление (добавляем класс visible чуть-чуть погодя для срабатывания transition)
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            overlay.classList.add('visible');
+        }, 50);
+    });
+
+    // Держим на экране 2 секунды после появления, затем плавно скрываем и удаляем
+    setTimeout(() => {
+        overlay.classList.add('fade-out');
+        setTimeout(() => {
+            overlay.remove();
+        }, 800); // Время должно совпадать с transition в CSS (0.8s)
+    }, 2000); 
 }
