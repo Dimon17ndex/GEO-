@@ -62,27 +62,22 @@ function injectGreetingStyles() {
             padding: 4px 12px !important;
             position: relative !important;
             white-space: nowrap !important;
-            
-            /* Общий пульс свечения для всего заголовка */
             animation: accountGlowPulse 1.6s ease-out forwards !important;
-            will-change: filter, opacity;
         }
 
-        /* Посимвольная анимация появления снизу вверх с блюром */
         .welcome-char {
             display: inline-block !important;
             opacity: 0 !important;
-            filter: blur(12px) !important;
-            transform: translateY(25px) scale(0.8) !important;
-            animation: charBlurSlideUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
-            will-change: transform, filter, opacity;
+            filter: blur(10px) !important;
+            transform: translateY(20px) scale(0.8) !important;
+            animation: charBlurSlideUp 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
         }
 
         @keyframes charBlurSlideUp {
             0% {
                 opacity: 0;
-                filter: blur(12px);
-                transform: translateY(25px) scale(0.8);
+                filter: blur(10px);
+                transform: translateY(20px) scale(0.8);
             }
             100% {
                 opacity: 1;
@@ -175,11 +170,10 @@ async function initGreetingUI() {
         console.error('Ошибка получения данных пользователя:', e);
     }
 
-    // Формируем текст и разбиваем каждую букву в отдельный тег <span> с нарастающей задержкой
     const fullText = `ЗДРАВСТВУЙТЕ, ${displayName.toUpperCase()}!`;
     const charsHTML = fullText.split('').map((char, index) => {
         const safeChar = char === ' ' ? '&nbsp;' : char;
-        const delay = (index * 0.035).toFixed(3); // Скорость появления каждой последующей буквы
+        const delay = (index * 0.03).toFixed(3);
         return `<span class="welcome-char" style="animation-delay: ${delay}s">${safeChar}</span>`;
     }).join('');
 
