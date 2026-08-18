@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initGreetingUI();
 });
 
-// --- СТИЛИ (идентичные стилям модального окна и профиля) ---
+// --- СТИЛИ ---
 function injectGreetingStyles() {
     if (document.getElementById('welcome-greeting-styles')) return;
 
@@ -16,14 +16,16 @@ function injectGreetingStyles() {
             left: 0 !important;
             width: 100vw !important;
             height: 100vh !important;
-            background: transparent !important; /* Фон остается оригинальным, никакого серого цвета */
+            background: rgba(10, 10, 12, 0.94) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
             z-index: 9999999 !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
             padding: 20px !important;
             box-sizing: border-box !important;
-            pointer-events: none !important; /* Прокликивается насквозь */
+            overflow: hidden !important;
         }
 
         .welcome-container {
@@ -32,7 +34,7 @@ function injectGreetingStyles() {
             box-shadow: none !important;
             padding: 0 !important;
             width: 100% !important;
-            max-width: 500px !important;
+            max-width: 900px !important;
             position: relative !important;
             color: #ffffff !important;
             font-family: 'Montserrat', sans-serif !important;
@@ -41,10 +43,7 @@ function injectGreetingStyles() {
             flex-direction: column !important;
             align-items: center !important;
             text-align: center !important;
-            
-            animation: accountBlurBounce 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
-                       accountGlowPulse 1.6s ease-out forwards;
-            will-change: transform, filter, opacity;
+            z-index: 5 !important;
         }
 
         .welcome-title {
@@ -57,9 +56,14 @@ function injectGreetingStyles() {
             margin: 0 !important;
             padding: 4px 12px !important;
             position: relative !important;
+            white-space: nowrap !important; /* Строго в строчку без переносов */
+            
+            animation: accountBlurBounce 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+                       accountGlowPulse 1.6s ease-out forwards !important;
+            will-change: transform, filter, opacity;
         }
 
-        /* Эффект белого светового блика, как в профиле */
+        /* Эффект белого светового блика */
         .welcome-title::after {
             content: '' !important;
             position: absolute !important;
@@ -112,6 +116,13 @@ function injectGreetingStyles() {
             transform-origin: center right !important;
             opacity: 0.22 !important;
             filter: blur(12px) brightness(0.9) !important;
+            animation: intenseFloat 6s ease-in-out infinite alternate !important;
+        }
+
+        @keyframes intenseFloat {
+            0% { transform: translateY(-50%) translateX(0px) rotate(0deg) scale(1); }
+            50% { transform: translateY(-58%) translateX(-25px) rotate(-5deg) scale(1.04); }
+            100% { transform: translateY(-42%) translateX(15px) rotate(4deg) scale(0.96); }
         }
     `;
 
@@ -125,7 +136,6 @@ function injectGreetingStyles() {
 async function initGreetingUI() {
     if (document.getElementById('welcome-greeting-overlay')) return;
 
-    // Определяем имя или почту пользователя из Supabase (если сессия активна)
     let displayName = 'ПОЛЬЗОВАТЕЛЬ';
     
     try {
