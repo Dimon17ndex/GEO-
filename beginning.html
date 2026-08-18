@@ -376,10 +376,6 @@
 </head>
 <body>
 
-<div id="welcome-overlay">
-    <h1 id="welcome-text">ЗДРАВСТВУЙТЕ, ...</h1>
-</div>
-
     <div id="page-loader">
     <div class="spinner"></div>
 </div>
@@ -504,6 +500,7 @@ function hideLoader() {
 async function logoutUser() {
     const btn = document.querySelector('.logout-dropdown-btn');
     if (btn) {
+        // Устанавливаем новый текст и добавляем спиннер справа
         btn.innerHTML = `Выход из аккаунта <span class="btn-spinner"></span>`;
         btn.style.pointerEvents = 'none';
         btn.style.opacity = '0.85';
@@ -515,7 +512,7 @@ async function logoutUser() {
             await client.auth.signOut();
         }
     } catch (err) {
-        console.error('Ошибка выхода из аккаунта:', err);
+        console.error('Ошибка выходу из аккаунта:', err);
     } finally {
         setTimeout(() => {
             window.location.reload();
@@ -628,56 +625,14 @@ function navigateToPage(targetPage) {
 }
 
 // ЕДИНЫЙ ОБРАБОТЧИК ЗАГРУЗКИ СТРАНИЦЫ
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
+    // Проверяем, заходили ли мы на эту страницу в текущей сессии
     const hasVisitedSession = sessionStorage.getItem('hasVisitedBeginningSession');
-    const welcomeOverlay = document.getElementById('welcome-overlay');
-    const welcomeText = document.getElementById('welcome-text');
-    
-    const client = window.supabaseClient || window.supabase;
-    let session = null;
-
-    if (client) {
-        try {
-            const { data } = await client.auth.getSession();
-            session = data?.session;
-        } catch (err) {
-            console.error('Ошибка получения сессии:', err);
-        }
-    }
 
     if (!hasVisitedSession) {
+        // Если это первый вход за сессию — ставим флаг и включаем лоадер
         sessionStorage.setItem('hasVisitedBeginningSession', 'true');
         showLoader();
-
-        if (session?.user) {
-            // Если пользователь авторизован, показываем приветствие после загрузчика
-            const metaName = session.user.user_metadata?.full_name || session.user.user_metadata?.name;
-            const emailName = session.user.email ? session.user.email.split('@')[0] : 'Аккаунт';
-            const displayName = (metaName || emailName).toUpperCase();
-
-            setTimeout(() => {
-                hideLoader();
-                if (welcomeOverlay && welcomeText) {
-                    welcomeText.textContent = `ЗДРАВСТВУЙТЕ, ${displayName}`;
-                    welcomeOverlay.classList.add('active');
-
-                    // Плавное скрытие приветствия через 2.5 секунды
-                    setTimeout(() => {
-                        welcomeOverlay.style.opacity = '0';
-                        setTimeout(() => {
-                            welcomeOverlay.style.display = 'none';
-                        }, 800);
-                    }, 2500);
-                }
-            }, 1200);
-        } else {
-            // Если не авторизован — просто скрываем лоадер стандартно
-            setTimeout(() => {
-                hideLoader();
-            }, 1200);
-        }
-    } else {
-        if (welcomeOverlay) welcomeOverlay.style.display = 'none';
     }
 
     // 1. Анимация появления
@@ -687,6 +642,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 2. Запуск волн
     setTimeout(() => { spawnAmbientWave(); }, 1000);
+
+    // Если это был первый вход за сессию, скрываем лоадер через 1.2 секунды
+    if (!hasVisitedSession) {
+        setTimeout(() => {
+            hideLoader();
+        }, 1200);
+    }
 
     // 3. Инициализация панели администратора
     const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
@@ -701,11 +663,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function initDevPanel() {
+        const client = window.supabaseClient || window.supabase;
         if (!client) return;
 
         try {
-            const { data: { session: devSession } } = await client.auth.getSession();
-            if (devSession?.user?.email === DEV_EMAIL) {
+            const { data: { session } } = await client.auth.getSession();
+            if (session?.user?.email === DEV_EMAIL) {
                 setupHoverDetection();
             }
         } catch (err) {
