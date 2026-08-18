@@ -386,8 +386,7 @@
         <h1 id="welcome-text">ЗДРАВСТВУЙ, <span id="user-display-name">Гость</span></h1>
     </div>
 
-    <!-- Обертка для всего основного контента страницы -->
-<div id="page-content" class="content-hidden-initial" style="opacity: 0; visibility: hidden;">
+    <div id="page-content" class="content-hidden-initial" style="opacity: 0; visibility: hidden;">
 
         <div class="app-banners-container">
             <div class="app-banner banner-warning">
@@ -634,14 +633,13 @@ function navigateToPage(targetPage) {
     }, 500);
 }
 
-// ЕДИНЫЙ ОБРАБОТЧИК ЗАГРУЗКИ СТРАНИЦЫ
 document.addEventListener('DOMContentLoaded', async () => {
     const hasVisitedSession = sessionStorage.getItem('hasVisitedBeginningSession');
     const pageContent = document.getElementById('page-content');
     const welcomeOverlay = document.getElementById('welcome-overlay');
     const userDisplayName = document.getElementById('user-display-name');
 
-    // Получаем имя пользователя из Supabase
+    // Получаем имя пользователя
     const client = window.supabaseClient || window.supabase;
     if (client) {
         try {
@@ -657,81 +655,70 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (!hasVisitedSession) {
-        // Первый вход за сессию
         sessionStorage.setItem('hasVisitedBeginningSession', 'true');
         showLoader();
 
         setTimeout(() => {
-            hideLoader(); // Скрываем лоадер
+            hideLoader(); 
+            if (welcomeOverlay) welcomeOverlay.classList.add('active'); 
 
-            if (welcomeOverlay) welcomeOverlay.classList.add('active'); // Показываем приветствие
-
+            // Плавное скрытие приветствия после анимации (1.4с анимация + запас)
             setTimeout(() => {
-                if (welcomeOverlay) welcomeOverlay.style.display = 'none';
-                if (pageContent) pageContent.classList.add('content-visible'); // Проявляем контент сайта
+                if (welcomeOverlay) {
+                    welcomeOverlay.classList.remove('active');
+                    setTimeout(() => { welcomeOverlay.style.display = 'none'; }, 400); 
+                }
+                
+                // Проявляем контент
+                if (pageContent) {
+                    pageContent.classList.remove('content-hidden-initial');
+                    pageContent.classList.add('content-visible');
+                }
             }, 1500);
 
         }, 1200);
 
     } else {
-        // Повторный вход в рамках сессии — показываем сразу всё
-        if (pageContent) pageContent.classList.add('content-visible');
+        // Повторный вход: сразу показываем контент
+        if (pageContent) {
+            pageContent.classList.remove('content-hidden-initial');
+            pageContent.classList.add('content-visible');
+        }
         if (welcomeOverlay) welcomeOverlay.style.display = 'none';
     }
 
-    // 1. Анимация появления
-    requestAnimationFrame(() => {
-        document.body.classList.add('page-loaded');
-    });
-
-    // 2. Запуск волн
+    // Запуск визуальных эффектов
+    requestAnimationFrame(() => { document.body.classList.add('page-loaded'); });
     setTimeout(() => { spawnAmbientWave(); }, 1000);
 
-    // 3. Инициализация панели администратора
+    // Инициализация панели администратора
     const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
     const sidePanel = document.getElementById('dev-side-panel');
     let hideTimeout = null;
 
     const currentPage = window.location.pathname.split('/').pop() || 'beginning.html';
-    if (currentPage === 'beginning.html') {
-        document.getElementById('btn-main-profile')?.classList.add('active-page');
-    } else if (currentPage === 'admin.html') {
-        document.getElementById('btn-admin-profile')?.classList.add('active-page');
-    }
+    if (currentPage === 'beginning.html') document.getElementById('btn-main-profile')?.classList.add('active-page');
+    else if (currentPage === 'admin.html') document.getElementById('btn-admin-profile')?.classList.add('active-page');
 
     async function initDevPanel() {
         if (!client) return;
-
         try {
             const { data: { session } } = await client.auth.getSession();
-            if (session?.user?.email === DEV_EMAIL) {
-                setupHoverDetection();
-            }
-        } catch (err) {
-            console.error('Ошибка проверки прав разработчика:', err);
-        }
+            if (session?.user?.email === DEV_EMAIL) setupHoverDetection();
+        } catch (err) { console.error('Ошибка проверки прав:', err); }
     }
 
     function setupHoverDetection() {
         if (!sidePanel) return;
-
         document.addEventListener('mousemove', (e) => {
-            const distanceFromRight = window.innerWidth - e.clientX;
-            if (distanceFromRight <= 60) {
+            if (window.innerWidth - e.clientX <= 60) {
                 clearTimeout(hideTimeout);
                 sidePanel.classList.add('visible');
             }
         });
-
-        sidePanel.addEventListener('mouseenter', () => {
-            clearTimeout(hideTimeout);
-            sidePanel.classList.add('visible');
-        });
-
+        sidePanel.addEventListener('mouseenter', () => { clearTimeout(hideTimeout); sidePanel.classList.add('visible'); });
         sidePanel.addEventListener('mouseleave', () => {
-            hideTimeout = setTimeout(() => {
-                sidePanel.classList.remove('visible');
-            }, 2000);
+            hideTimeout = setTimeout(() => { sidePanel.classList.remove('visible'); }, 2000);
         });
     }
 
