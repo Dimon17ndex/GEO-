@@ -497,9 +497,9 @@ function hideLoader() {
         document.body.classList.remove('is-loading');
     }
     
-    // ВЫЗЫВАЕМ ПРИВЕТСТВИЕ СРАЗУ ПОСЛЕ СКРЫТИЯ ЛОАДЕРА
-    if (typeof showWelcomeGreeting === 'function') {
-        showWelcomeGreeting();
+    // ИСПРАВЛЕНО: вызываем initGreetingUI вместо showWelcomeGreeting
+    if (typeof initGreetingUI === 'function') {
+        initGreetingUI();
     }
 }
 
@@ -643,8 +643,9 @@ document.addEventListener('DOMContentLoaded', () => {
             hideLoader();
         }, 1200);
     } else {
-        if (typeof showWelcomeGreeting === 'function') {
-            showWelcomeGreeting();
+        // ИСПРАВЛЕНО: вызываем initGreetingUI вместо showWelcomeGreeting
+        if (typeof initGreetingUI === 'function') {
+            initGreetingUI();
         }
     }
 
