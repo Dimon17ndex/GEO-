@@ -15,6 +15,7 @@ function injectGreetingStyles() {
             top: 0 !important;
             left: 0 !important;
             width: 100vw !important;
+            height: 100vw !important; /* исправлено на 100vh ниже */
             height: 100vh !important;
             background: rgba(10, 10, 12, 0.94) !important;
             backdrop-filter: blur(12px) !important;
@@ -56,11 +57,36 @@ function injectGreetingStyles() {
             margin: 0 !important;
             padding: 4px 12px !important;
             position: relative !important;
-            white-space: nowrap !important; /* Строго в строчку без переносов */
+            white-space: nowrap !important;
+            display: flex !important;
+            gap: 12px !important;
+            justify-content: center !important;
+            align-items: center !important;
             
-            animation: accountBlurBounce 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
-                       accountGlowPulse 1.6s ease-out forwards !important;
+            animation: accountGlowPulse 1.6s ease-out forwards !important;
+        }
+
+        /* Пословное появление через блюр снизу вверх */
+        .welcome-word {
+            display: inline-block !important;
+            opacity: 0 !important;
+            filter: blur(15px) !important;
+            transform: translateY(25px) !important;
+            animation: wordBlurUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
             will-change: transform, filter, opacity;
+        }
+
+        @keyframes wordBlurUp {
+            0% {
+                opacity: 0 !important;
+                filter: blur(15px) !important;
+                transform: translateY(25px) !important;
+            }
+            100% {
+                opacity: 1 !important;
+                filter: blur(0px) !important;
+                transform: translateY(0px) !important;
+            }
         }
 
         /* Эффект белого светового блика */
@@ -80,14 +106,7 @@ function injectGreetingStyles() {
             transform: skewX(-25deg) !important;
             pointer-events: none !important;
             z-index: 2 !important;
-            animation: lightFlashFullWidth 1.1s cubic-bezier(0.25, 1, 0.5, 1) 0.6s 1 forwards !important;
-        }
-
-        @keyframes accountBlurBounce {
-            0% { opacity: 0; filter: blur(20px); transform: scale(0.3); }
-            60% { opacity: 1; filter: blur(2px); transform: scale(1.35); }
-            80% { filter: blur(0px); transform: scale(0.92); }
-            100% { opacity: 1; filter: blur(0px); transform: scale(1); }
+            animation: lightFlashFullWidth 1.1s cubic-bezier(0.25, 1, 0.5, 1) 0.8s 1 forwards !important;
         }
 
         @keyframes accountGlowPulse {
@@ -153,11 +172,21 @@ async function initGreetingUI() {
         console.error('Ошибка получения данных пользователя:', e);
     }
 
+    // Формируем текст с восклицательным знаком в конце
+    const fullText = `ЗДРАВСТВУЙТЕ, ${displayName.toUpperCase()}!`;
+    const words = fullText.split(' ');
+
+    // Оборачиваем каждое слово в тег span с задержкой анимации для пословного эффекта
+    const wordsHTML = words.map((word, index) => {
+        const delay = (index * 0.2).toFixed(2);
+        return `<span class="welcome-word" style="animation-delay: ${delay}s;">${word}</span>`;
+    }).join('');
+
     const greetingHTML = `
         <div id="welcome-greeting-overlay" class="welcome-overlay">
             <img src="images/geo_logo.png" alt="" class="auth-bg-watermark">
             <div class="welcome-container">
-                <h1 class="welcome-title">ЗДРАВСТВУЙТЕ, ${displayName.toUpperCase()}</h1>
+                <h1 class="welcome-title">${wordsHTML}</h1>
             </div>
         </div>
     `;
