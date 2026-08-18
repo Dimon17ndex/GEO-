@@ -171,12 +171,16 @@ async function initGreetingUI() {
         console.error('Ошибка получения данных пользователя:', e);
     }
 
-    const fullText = `ЗДРАВСТВУЙТЕ, ${displayName.toUpperCase()}!`;
-    const words = fullText.split(' ').filter(w => w.length > 0);
+    // Формируем чистый текст без знака в конце, чтобы разбить по пробелам
+    const cleanText = `ЗДРАВСТВУЙТЕ, ${displayName.toUpperCase()}`;
+    let words = cleanText.split(/\s+/).filter(w => w.length > 0);
+    
+    // Добавляем восклицательный знак отдельным элементом в массив
+    words.push('!');
 
-    const wordsHTML = words.map((word, index) => {
-        const delay = (index * 0.25).toFixed(2);
-        return `<span class="welcome-word" style="animation-delay: ${delay}s;">${word}</span>`;
+    const wordsHTML = words.map((token, index) => {
+        const delay = (index * 0.2).toFixed(2);
+        return `<span class="welcome-word" style="animation-delay: ${delay}s;">${token}</span>`;
     }).join('');
 
     const greetingHTML = `
