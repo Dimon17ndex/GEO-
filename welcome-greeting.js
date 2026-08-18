@@ -1,9 +1,17 @@
 // welcome-greeting.js
 
-document.addEventListener('DOMContentLoaded', () => {
-    injectGreetingStyles();
-    initGreetingUI();
-});
+(function() {
+    function startGreeting() {
+        injectGreetingStyles();
+        initGreetingUI();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', startGreeting);
+    } else {
+        startGreeting();
+    }
+})();
 
 // --- СТИЛИ ---
 function injectGreetingStyles() {
@@ -171,11 +179,9 @@ async function initGreetingUI() {
         console.error('Ошибка получения данных пользователя:', e);
     }
 
-    // Текст с восклицательным знаком в конце
     const fullText = `ЗДРАВСТВУЙТЕ, ${displayName.toUpperCase()}!`;
     const words = fullText.split(' ');
 
-    // Оборачиваем каждое слово в тег для пословной анимации
     const wordsHTML = words.map((word, index) => {
         const delay = (index * 0.2).toFixed(2);
         return `<span class="welcome-word" style="animation-delay: ${delay}s;">${word}</span>`;
