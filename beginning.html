@@ -497,7 +497,7 @@ function hideLoader() {
         document.body.classList.remove('is-loading');
     }
     
-    // ИСПРАВЛЕНО: вызываем initGreetingUI вместо showWelcomeGreeting
+    // Запускаем приветствие строго после скрытия лоадера
     if (typeof initGreetingUI === 'function') {
         initGreetingUI();
     }
@@ -518,7 +518,7 @@ async function logoutUser() {
             await client.auth.signOut();
         }
     } catch (err) {
-        console.error('Ошибка выходу из аккаунта:', err);
+        console.error('Ошибка выхода из аккаунта:', err);
     } finally {
         setTimeout(() => {
             window.location.reload();
@@ -626,8 +626,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const hasVisitedSession = sessionStorage.getItem('hasVisitedBeginningSession');
 
     if (!hasVisitedSession) {
+        // Первый вход за сессию: фиксируем сессию, показываем лоадер, а затем скрываем его (что вызовет приветствие)
         sessionStorage.setItem('hasVisitedBeginningSession', 'true');
         showLoader();
+
+        setTimeout(() => {
+            hideLoader();
+        }, 1200);
+    } else {
+        // Повторный вход в рамках сессии: сразу убираем лоадер, приветствие не показываем
+        const loader = document.getElementById('page-loader');
+        if (loader) {
+            loader.style.display = 'none';
+        }
     }
 
     requestAnimationFrame(() => {
@@ -635,19 +646,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     setTimeout(() => { spawnAmbientWave(); }, 1000);
-
-    // Если лоадер показывался — скрываем его через 1.2с (внутри hideLoader вызовется приветствие).
-    // Если лоадер НЕ нужен (уже заходили в сессии), сразу вызываем приветствие.
-    if (!hasVisitedSession) {
-        setTimeout(() => {
-            hideLoader();
-        }, 1200);
-    } else {
-        // ИСПРАВЛЕНО: вызываем initGreetingUI вместо showWelcomeGreeting
-        if (typeof initGreetingUI === 'function') {
-            initGreetingUI();
-        }
-    }
 
     const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
     const sidePanel = document.getElementById('dev-side-panel');
