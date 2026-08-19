@@ -837,19 +837,18 @@ formLogin?.addEventListener('submit', async (e) => {
             // 1. Скрываем окно авторизации
             window.hideAuthModal();
             
-            // 2. ВЫЗЫВАЕМ ПРАВИЛЬНУЮ ФУНКЦИЮ (initGreetingUI вместо showWelcomeGreeting)
-            // Добавим проверку в консоль, чтобы убедиться, что функция найдена
+            // 2. Вызываем функцию приветствия
+            // Убедитесь, что имя функции именно initGreetingUI (согласно welcome-greeting.js)
             if (typeof initGreetingUI === 'function') {
-                console.log("Запуск приветствия...");
                 initGreetingUI();
             } else {
-                console.error("Функция initGreetingUI не найдена! Проверьте подключение welcome-greeting.js");
+                console.error("Функция initGreetingUI не найдена. Проверьте подключение welcome-greeting.js");
             }
 
-            // 3. Задержка перезагрузки
+            // 3. Перезагрузка страницы через 2,2 секунды
             setTimeout(() => {
                 window.location.reload();
-            }, 3000); 
+            }, 2200); 
         }
     } catch (err) {
         console.error(err);
