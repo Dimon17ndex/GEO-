@@ -54,7 +54,7 @@ window.logoutUser = async function(event) {
 
         // Меняем текст на «Выход из аккаунта и загрузка»
         const textContainer = logoutBtn.querySelector('.profile-action-text, span') || logoutBtn;
-        textContainer.textContent = 'Выход из аккаунта и загрузка';
+        textContainer.innerHTML = 'Выход из аккаунта <span class="auth-spinner"></span>';
 
         // 2. Находим родительский контейнер (виджет/панель профиля)
         const parentContainer = logoutBtn.closest('.profile-widget, .profile-dropdown, .side-panel, .user-menu') || logoutBtn.parentElement;
