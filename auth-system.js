@@ -836,10 +836,6 @@ function initAuthEvents() {
                 setButtonLoading(submitBtn, false, 'Войти');
             } else {
                 window.hideAuthModal();
-                
-                // Включаем флаг для показа файла приветствия
-                sessionStorage.setItem('triggerWelcome', 'true');
-                
                 window.location.reload();
             }
         } catch (err) {
