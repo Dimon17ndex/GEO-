@@ -622,19 +622,35 @@ function navigateToPage(targetPage) {
 }
 
 // ЕДИНЫЙ ОБРАБОТЧИК ЗАГРУЗКИ СТРАНИЦЫ
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const hasVisitedSession = sessionStorage.getItem('hasVisitedBeginningSession');
 
     if (!hasVisitedSession) {
-        // Первый вход за сессию: фиксируем сессию, показываем лоадер, а затем скрываем его (что вызовет приветствие)
         sessionStorage.setItem('hasVisitedBeginningSession', 'true');
         showLoader();
 
+        // Проверяем, авторизован ли пользователь
+        let isAuthorized = false;
+        try {
+            const client = window.supabaseClient || window.supabase;
+            if (client && client.auth) {
+                const { data } = await client.auth.getSession();
+                if (data?.session?.user) {
+                    isAuthorized = true;
+                }
+            }
+        } catch (e) {
+            console.error('Ошибка проверки сессии для лоадера:', e);
+        }
+
+        // Если вошел — держим лоадер на 1 секунду дольше (2200 мс вместо 1200 мс)
+        const loadDuration = isAuthorized ? 2200 : 1200;
+
         setTimeout(() => {
             hideLoader();
-        }, 1200);
+        }, loadDuration);
     } else {
-        // Повторный вход в рамках сессии: сразу убираем лоадер, приветствие не показываем
+        // Повторный вход в рамках сессии: сразу убираем лоадер
         const loader = document.getElementById('page-loader');
         if (loader) {
             loader.style.display = 'none';
@@ -646,6 +662,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     setTimeout(() => { spawnAmbientWave(); }, 1000);
+});
 
     const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
     const sidePanel = document.getElementById('dev-side-panel');
