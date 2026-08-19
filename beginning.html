@@ -497,7 +497,7 @@ function hideLoader() {
         document.body.classList.remove('is-loading');
     }
     
-    // Запускаем приветствие строго после скрытия лоадера (оно само внутри проверяет авторизацию)
+    // Запускаем приветствие строго после скрытия лоадера
     if (typeof initGreetingUI === 'function') {
         initGreetingUI();
     }
@@ -512,8 +512,6 @@ async function logoutUser() {
         btn.style.pointerEvents = 'none';
         btn.style.opacity = '0.85';
     }
-
-}
 
     try {
         const client = window.supabaseClient || window.supabase;
@@ -625,33 +623,17 @@ function navigateToPage(targetPage) {
 }
 
 // ЕДИНЫЙ ОБРАБОТЧИК ЗАГРУЗКИ СТРАНИЦЫ
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
     const hasVisitedSession = sessionStorage.getItem('hasVisitedBeginningSession');
 
     if (!hasVisitedSession) {
+        // Первый вход за сессию: фиксируем сессию, показываем лоадер, а затем скрываем его (что вызовет приветствие)
         sessionStorage.setItem('hasVisitedBeginningSession', 'true');
         showLoader();
 
-        // Проверяем, авторизован ли пользователь, чтобы скорректировать время лоадера
-        let isAuthorized = false;
-        try {
-            const client = window.supabaseClient || window.supabase;
-            if (client && client.auth) {
-                const { data } = await client.auth.getSession();
-                if (data?.session?.user) {
-                    isAuthorized = true;
-                }
-            }
-        } catch (e) {
-            console.error('Ошибка проверки сессии для лоадера:', e);
-        }
-
-        // Если авторизован — держим затемнение на 1 секунду дольше (2200мс вместо 1200мс)
-        const loadDuration = isAuthorized ? 2200 : 1200;
-
         setTimeout(() => {
             hideLoader();
-        }, loadDuration);
+        }, 1200);
     } else {
         // Повторный вход в рамках сессии: сразу убираем лоадер, приветствие не показываем
         const loader = document.getElementById('page-loader');
