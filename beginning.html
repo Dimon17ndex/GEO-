@@ -497,7 +497,7 @@ function hideLoader() {
         document.body.classList.remove('is-loading');
     }
     
-    // Запускаем приветствие строго после скрытия лоадера
+    // Запускаем приветствие строго после скрытия лоадера (оно само внутри проверяет авторизацию)
     if (typeof initGreetingUI === 'function') {
         initGreetingUI();
     }
@@ -629,7 +629,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         sessionStorage.setItem('hasVisitedBeginningSession', 'true');
         showLoader();
 
-        // Проверяем, авторизован ли пользователь
+        // Проверяем, авторизован ли пользователь, чтобы скорректировать время лоадера
         let isAuthorized = false;
         try {
             const client = window.supabaseClient || window.supabase;
@@ -643,14 +643,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Ошибка проверки сессии для лоадера:', e);
         }
 
-        // Если вошел — держим лоадер на 1 секунду дольше (2200 мс вместо 1200 мс)
+        // Если авторизован — держим затемнение на 1 секунду дольше (2200мс вместо 1200мс)
         const loadDuration = isAuthorized ? 2200 : 1200;
 
         setTimeout(() => {
             hideLoader();
         }, loadDuration);
     } else {
-        // Повторный вход в рамках сессии: сразу убираем лоадер
+        // Повторный вход в рамках сессии: сразу убираем лоадер, приветствие не показываем
         const loader = document.getElementById('page-loader');
         if (loader) {
             loader.style.display = 'none';
@@ -662,7 +662,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     setTimeout(() => { spawnAmbientWave(); }, 1000);
-});
 
     const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
     const sidePanel = document.getElementById('dev-side-panel');
