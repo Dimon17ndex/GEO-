@@ -817,32 +817,43 @@ function initAuthEvents() {
     tabRegister?.addEventListener('click', () => setAuthMode('register'));
 
     // Форма Входа
-    formLogin?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
+formLogin?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
 
-        const submitBtn = document.getElementById('btn-submit-login');
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
+    const submitBtn = document.getElementById('btn-submit-login');
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
 
-        // Включаем статус загрузки
-        setButtonLoading(submitBtn, true, 'Войти');
+    setButtonLoading(submitBtn, true, 'Войти');
 
-        try {
-            const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
+    try {
+        const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
 
-            if (error) {
-                alert(`Ошибка входа: ${error.message}`);
-                setButtonLoading(submitBtn, false, 'Войти');
-            } else {
-                window.hideAuthModal();
-                window.location.reload();
-            }
-        } catch (err) {
-            console.error(err);
+        if (error) {
+            alert(`Ошибка входа: ${error.message}`);
             setButtonLoading(submitBtn, false, 'Войти');
+        } else {
+            // 1. Скрываем само модальное окно авторизации
+            window.hideAuthModal();
+            
+            // 2. Вызываем функцию приветствия (предполагается, что она называется showWelcomeGreeting)
+            // Убедитесь, что эта функция доступна в глобальной области видимости
+            if (typeof showWelcomeGreeting === 'function') {
+                showWelcomeGreeting();
+            }
+
+            // 3. Перезагружаем страницу с задержкой, чтобы пользователь успел увидеть приветствие
+            // (подберите время в миллисекундах, например, 3000 мс = 3 секунды)
+            setTimeout(() => {
+                window.location.reload();
+            }, 3000); 
         }
-    });
+    } catch (err) {
+        console.error(err);
+        setButtonLoading(submitBtn, false, 'Войти');
+    }
+});
 
     // Форма Регистрации
     formRegister?.addEventListener('submit', async (e) => {
