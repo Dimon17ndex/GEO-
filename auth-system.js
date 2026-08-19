@@ -834,17 +834,19 @@ formLogin?.addEventListener('submit', async (e) => {
             alert(`Ошибка входа: ${error.message}`);
             setButtonLoading(submitBtn, false, 'Войти');
         } else {
-            // 1. Скрываем само модальное окно авторизации
+            // 1. Скрываем окно авторизации
             window.hideAuthModal();
             
-            // 2. Вызываем функцию приветствия (предполагается, что она называется showWelcomeGreeting)
-            // Убедитесь, что эта функция доступна в глобальной области видимости
-            if (typeof showWelcomeGreeting === 'function') {
-                showWelcomeGreeting();
+            // 2. ВЫЗЫВАЕМ ПРАВИЛЬНУЮ ФУНКЦИЮ (initGreetingUI вместо showWelcomeGreeting)
+            // Добавим проверку в консоль, чтобы убедиться, что функция найдена
+            if (typeof initGreetingUI === 'function') {
+                console.log("Запуск приветствия...");
+                initGreetingUI();
+            } else {
+                console.error("Функция initGreetingUI не найдена! Проверьте подключение welcome-greeting.js");
             }
 
-            // 3. Перезагружаем страницу с задержкой, чтобы пользователь успел увидеть приветствие
-            // (подберите время в миллисекундах, например, 3000 мс = 3 секунды)
+            // 3. Задержка перезагрузки
             setTimeout(() => {
                 window.location.reload();
             }, 3000); 
