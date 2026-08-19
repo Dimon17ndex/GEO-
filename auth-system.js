@@ -817,43 +817,43 @@ function initAuthEvents() {
     tabRegister?.addEventListener('click', () => setAuthMode('register'));
 
     // Форма Входа
-formLogin?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
+    formLogin?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
 
-    const submitBtn = document.getElementById('btn-submit-login');
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
+        const submitBtn = document.getElementById('btn-submit-login');
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
 
-    setButtonLoading(submitBtn, true, 'Войти');
+        setButtonLoading(submitBtn, true, 'Войти');
 
-    try {
-        const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
+        try {
+            const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
 
-        if (error) {
-            alert(`Ошибка входа: ${error.message}`);
-            setButtonLoading(submitBtn, false, 'Войти');
-        } else {
-            // 1. Скрываем окно авторизации
-            window.hideAuthModal();
-            
-            // 2. Вызываем функцию приветствия
-            if (typeof initGreetingUI === 'function') {
-                initGreetingUI();
+            if (error) {
+                alert(`Ошибка входа: ${error.message}`);
+                setButtonLoading(submitBtn, false, 'Войти');
             } else {
-                console.error("Функция initGreetingUI не найдена. Проверьте подключение welcome-greeting.js");
-            }
+                // 1. Скрываем окно авторизации
+                window.hideAuthModal();
+                
+                // 2. Вызываем функцию приветствия
+                if (typeof initGreetingUI === 'function') {
+                    initGreetingUI();
+                } else {
+                    console.error("Функция initGreetingUI не найдена. Проверьте подключение welcome-greeting.js");
+                }
 
-            // 3. Перезагрузка страницы через 2,6 секунды (2600 мс)
-            setTimeout(() => {
-                window.location.reload();
-            }, 2600); 
+                // 3. Перезагрузка страницы через 2,6 секунды (2600 мс)
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2600); 
+            }
+        } catch (err) {
+            console.error(err);
+            setButtonLoading(submitBtn, false, 'Войти');
         }
-    } catch (err) {
-        console.error(err);
-        setButtonLoading(submitBtn, false, 'Войти');
-    }
-});
+    });
 
     // Форма Регистрации
     formRegister?.addEventListener('submit', async (e) => {
@@ -893,6 +893,31 @@ formLogin?.addEventListener('submit', async (e) => {
             setButtonLoading(submitBtn, false, 'Зарегистрироваться');
         }
     });
+}
+
+// --- ФУНКЦИЯ ВЫХОДА ИЗ АККАУНТА СО ЗНАЧКОМ ЗАГРУЗКИ ---
+async function logoutUser() {
+    const buttons = document.querySelectorAll('.logout-btn-trigger');
+    
+    // Применяем визуальное оформление загрузки ко всем кнопкам выхода
+    buttons.forEach(btn => {
+        btn.classList.add('is-loading');
+        btn.innerHTML = `Выход из аккаунта <span class="btn-spinner"></span>`;
+    });
+
+    try {
+        const client = window.supabaseClient || window.supabase;
+        if (client && client.auth) {
+            await client.auth.signOut();
+        }
+    } catch (err) {
+        console.error('Ошибка при выходе из аккаунта:', err);
+    } finally {
+        // Небольшая задержка для плавности перед перезагрузкой
+        setTimeout(() => {
+            window.location.reload();
+        }, 500);
+    }
 }
 
 // --- ПРОВЕРКА СЕССИИ И ОБНОВЛЕНИЕ UI ---
