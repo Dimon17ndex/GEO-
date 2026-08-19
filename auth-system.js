@@ -39,7 +39,41 @@ window.hideAuthModal = function() {
 };
 
 // Функция выхода из аккаунта
-window.logoutUser = async function() {
+window.logoutUser = async function(event) {
+    // 1. Находим кнопку, на которую нажали, или ищем её в DOM
+    let logoutBtn = event?.currentTarget || event?.target;
+    
+    if (!logoutBtn || !(logoutBtn instanceof HTMLElement)) {
+        logoutBtn = document.getElementById('user-logout-btn') || 
+                    document.querySelector('.user-logout-btn, .logout-btn, [onclick*="logoutUser"]');
+    }
+
+    if (logoutBtn) {
+        // Отключаем клики по кнопке выхода
+        logoutBtn.style.pointerEvents = 'none';
+
+        // Меняем текст на «Выход из аккаунта и загрузка»
+        const textContainer = logoutBtn.querySelector('.profile-action-text, span') || logoutBtn;
+        textContainer.textContent = 'Выход из аккаунта и загрузка';
+
+        // 2. Находим родительский контейнер (виджет/панель профиля)
+        const parentContainer = logoutBtn.closest('.profile-widget, .profile-dropdown, .side-panel, .user-menu') || logoutBtn.parentElement;
+
+        if (parentContainer) {
+            // Ищем все кнопки и ссылки внутри родителя
+            const allNavElements = Array.from(parentContainer.querySelectorAll('button, a, .btn, .profile-action-btn'));
+            const logoutIndex = allNavElements.indexOf(logoutBtn);
+
+            // Замораживаем все элементы, находящиеся выше кнопки выхода
+            allNavElements.forEach((el, index) => {
+                if (index < logoutIndex || (logoutIndex === -1 && el !== logoutBtn)) {
+                    el.classList.add('btn-frozen');
+                }
+            });
+        }
+    }
+
+    // 3. Выход из аккаунта и перезагрузка
     try {
         if (window.supabaseClient) {
             await window.supabaseClient.auth.signOut();
@@ -150,6 +184,22 @@ function injectAuthStyles() {
     if (document.getElementById('auth-system-styles')) return;
 
     const css = `
+        /* Замораживание вышестоящих кнопок */
+        .btn-frozen,
+        .btn-frozen:hover,
+        .btn-frozen:active,
+        .btn-frozen:focus {
+            pointer-events: none !important;
+            user-select: none !important;
+            cursor: default !important;
+            opacity: 0.65 !important;
+            transform: none !important;
+            transition: none !important;
+            box-shadow: none !important;
+            background: inherit !important;
+            color: inherit !important;
+        }
+
         .auth-modal-overlay {
             position: fixed !important;
             top: 0 !important;
@@ -786,6 +836,10 @@ function initAuthEvents() {
                 setButtonLoading(submitBtn, false, 'Войти');
             } else {
                 window.hideAuthModal();
+                
+                // Включаем флаг для показа файла приветствия
+                sessionStorage.setItem('triggerWelcome', 'true');
+                
                 window.location.reload();
             }
         } catch (err) {
