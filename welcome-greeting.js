@@ -140,30 +140,42 @@ function injectGreetingStyles() {
 async function initGreetingUI() {
     if (document.getElementById('welcome-greeting-overlay')) return;
 
-    injectGreetingStyles();
-
-    let displayName = 'ПОЛЬЗОВАТЕЛЬ';
+    let session = null;
 
     try {
         const client = window.supabaseClient || window.supabase;
         if (client && client.auth) {
-            const { data: { session } } = await client.auth.getSession();
-            if (session && session.user) {
-                const user = session.user;
-                const metaName = user.user_metadata?.full_name || user.user_metadata?.username || user.user_metadata?.name;
-                const email = user.email || '';
-                displayName = metaName || (email ? email.split('@')[0] : 'ПОЛЬЗОВАТЕЛЬ');
-            }
+            const { data } = await client.auth.getSession();
+            session = data?.session;
         }
     } catch (e) {
-        console.error('Ошибка получения данных пользователя:', e);
+        console.error('Ошибка проверки авторизации:', e);
     }
+
+    // Если пользователь не авторизован (нет сессии), прерываем выполнение — приветствие не показываем
+    if (!session || !session.user) {
+        return;
+    }
+
+    injectGreetingStyles();
+
+    const user = session.user;
+    const metaName = user.user_metadata?.full_name || user.user_metadata?.username || user.user_metadata?.name;
+    const email = user.email || '';
+    const displayName = metaName || (email ? email.split('@')[0] : 'ПОЛЬЗОВАТЕЛЬ');
+
+    const fullText = `ЗДРАВСТВУЙТЕ, ${displayName.toUpperCase()}!`;
+    const charsHTML = fullText.split('').map((char, index) => {
+        const safeChar = char === ' ' ? '&nbsp;' : char;
+        const delay = (index * 0.03).toFixed(3);
+        return `<span class="welcome-char" style="animation-delay: ${delay}s">${safeChar}</span>`;
+    }).join('');
 
     const greetingHTML = `
         <div id="welcome-greeting-overlay" class="welcome-overlay">
             <img src="images/geo_logo.png" alt="" class="auth-bg-watermark">
             <div class="welcome-container">
-                <h1 class="welcome-title">ЗДРАВСТВУЙТЕ, ${displayName.toUpperCase()}!</h1>
+                <h1 class="welcome-title">${charsHTML}</h1>
             </div>
         </div>
     `;
@@ -172,18 +184,16 @@ async function initGreetingUI() {
 
     const overlay = document.getElementById('welcome-greeting-overlay');
     
-    // Плавное появление (добавляем класс visible чуть-чуть погодя для срабатывания transition)
     requestAnimationFrame(() => {
         setTimeout(() => {
             overlay.classList.add('visible');
         }, 50);
     });
 
-    // Держим на экране 2 секунды после появления, затем плавно скрываем и удаляем
     setTimeout(() => {
         overlay.classList.add('fade-out');
         setTimeout(() => {
             overlay.remove();
-        }, 800); // Время должно совпадать с transition в CSS (0.8s)
+        }, 800);
     }, 2000); 
 }
