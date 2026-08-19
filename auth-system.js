@@ -838,17 +838,16 @@ formLogin?.addEventListener('submit', async (e) => {
             window.hideAuthModal();
             
             // 2. Вызываем функцию приветствия
-            // Убедитесь, что имя функции именно initGreetingUI (согласно welcome-greeting.js)
             if (typeof initGreetingUI === 'function') {
                 initGreetingUI();
             } else {
                 console.error("Функция initGreetingUI не найдена. Проверьте подключение welcome-greeting.js");
             }
 
-            // 3. Перезагрузка страницы через 2,2 секунды
+            // 3. Перезагрузка страницы через 2,6 секунды (2600 мс)
             setTimeout(() => {
                 window.location.reload();
-            }, 2200); 
+            }, 2600); 
         }
     } catch (err) {
         console.error(err);
