@@ -507,10 +507,13 @@ function hideLoader() {
 async function logoutUser() {
     const btn = document.querySelector('.logout-dropdown-btn');
     if (btn) {
+        // Оставляем только текст и спиннер
         btn.innerHTML = `Выход из аккаунта <span class="btn-spinner"></span>`;
         btn.style.pointerEvents = 'none';
         btn.style.opacity = '0.85';
     }
+
+}
 
     try {
         const client = window.supabaseClient || window.supabase;
