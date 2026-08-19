@@ -503,30 +503,6 @@ function hideLoader() {
     }
 }
 
-// Функция выхода из аккаунта
-async function logoutUser() {
-    const btn = document.querySelector('.logout-dropdown-btn');
-    if (btn) {
-        // Оставляем только текст и спиннер
-        btn.innerHTML = `Выход из аккаунта <span class="btn-spinner"></span>`;
-        btn.style.pointerEvents = 'none';
-        btn.style.opacity = '0.85';
-    }
-
-    try {
-        const client = window.supabaseClient || window.supabase;
-        if (client && client.auth) {
-            await client.auth.signOut();
-        }
-    } catch (err) {
-        console.error('Ошибка выхода из аккаунта:', err);
-    } finally {
-        setTimeout(() => {
-            window.location.reload();
-        }, 600);
-    }
-}
-
 function createBackgroundRipple(x, y, className, duration = 1500) {
     if (!waveContainer) return;
     const ripple = document.createElement('div');
