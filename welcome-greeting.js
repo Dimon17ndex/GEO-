@@ -55,7 +55,7 @@ function injectGreetingStyles() {
             z-index: 1 !important;
         }
 
-        /* Непрерывное движение: без остановки в центре, сразу увеличивается и уходит за экран */
+        /* Старт из центра, непрерывный рост и полет в случайную сторону */
         .tunnel-logo {
             position: absolute !important;
             top: 50% !important;
@@ -64,10 +64,10 @@ function injectGreetingStyles() {
             transform: translate(-50%, -50%) scale(0.001);
             opacity: 0;
             filter: blur(25px);
-            animation: continuousZoomOff 1.8s cubic-bezier(0.15, 0.7, 0.3, 1) forwards;
+            animation: randomDirectionZoomOff 1.8s cubic-bezier(0.15, 0.7, 0.3, 1) forwards;
         }
 
-        @keyframes continuousZoomOff {
+        @keyframes randomDirectionZoomOff {
             0% {
                 transform: translate(-50%, -50%) translate(0px, 0px) scale(0.001);
                 opacity: 0;
@@ -78,8 +78,8 @@ function injectGreetingStyles() {
                 filter: blur(10px);
             }
             100% {
-                /* Без остановок: вырастает до огромного масштаба и улетает вверх за экран */
-                transform: translate(-50%, -50%) translate(0px, -900px) scale(6.5);
+                /* Растет и смещается по динамическим координатам --dx и --dy до вылета за экран */
+                transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(7.0);
                 opacity: 0;
                 filter: blur(0px);
             }
@@ -112,11 +112,21 @@ function injectGreetingStyles() {
     document.head.appendChild(styleElement);
 }
 
-// --- СОЗДАНИЕ ЕДИНСТВЕННОГО ЛОГОТИПА ---
+// --- СОЗДАНИЕ ЛОГОТИПА СО СЛУЧАЙНЫМ НАПРАВЛЕНИЕМ ---
 function createSingleLogo(tunnelContainer) {
     const img = document.createElement('img');
     img.src = 'images/geo_logo.png';
     img.className = 'tunnel-logo';
+
+    // Генерируем случайный угол для вылета в любую сторону экрана
+    const angle = Math.random() * Math.PI * 2;
+    const distance = 1000 + Math.random() * 400; // Достаточная дистанция, чтобы уйти за край
+    
+    const dx = Math.cos(angle) * distance;
+    const dy = Math.sin(angle) * distance;
+
+    img.style.setProperty('--dx', `${dx}px`);
+    img.style.setProperty('--dy', `${dy}px`);
 
     tunnelContainer.appendChild(img);
 
