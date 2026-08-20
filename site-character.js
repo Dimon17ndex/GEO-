@@ -31,7 +31,7 @@ function initSiteCharacter() {
             justify-content: center !important;
         }
 
-        /* Глаза персонажа — пустые круги (контурные кольца) */
+        /* Глаза персонажа — пустые круги с обводкой 2px */
         .char-eye {
             width: 12px !important;
             height: 12px !important;
@@ -42,12 +42,12 @@ function initSiteCharacter() {
             animation: charBlink 4s infinite ease-in-out !important;
         }
 
-        /* Рот персонажа — короткая тонкая белая линия */
+        /* Рот персонажа — линия толщиной 2px, как обводка глаз */
         .char-mouth {
             width: 10px !important;
-            height: 1.5px !important;
+            height: 2px !important;
             background: #ffffff !important;
-            border-radius: 1px !important;
+            border-radius: 0px !important;
             transition: all 0.3s ease !important;
         }
 
@@ -58,7 +58,7 @@ function initSiteCharacter() {
         }
         #site-character-widget.state-loading .char-mouth {
             width: 6px !important;
-            height: 1.5px !important;
+            height: 2px !important;
         }
 
         /* 2. Режим успеха / радости */
