@@ -111,10 +111,10 @@ async function initGreetingUI() {
                     ЗДРАВСТВУЙТЕ, 
                     <span class="welcome-ticker">
                         <span class="welcome-ticker-track" id="welcome-track">
-                            <span class="welcome-ticker-item">${emailPrefix}</span>
-                            <span class="welcome-ticker-item">${fullName}</span>
+                            <span class="welcome-ticker-item">${emailPrefix}!</span>
+                            <span class="welcome-ticker-item">${fullName}!</span>
                         </span>
-                    </span>!
+                    </span>
                 </h1>
             </div>
         </div>
