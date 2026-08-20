@@ -106,7 +106,7 @@ function injectGreetingStyles() {
             white-space: nowrap !important;
         }
 
-        /* Блок статуса "узнаем вас" со значком-слайдером */
+        /* Блок статуса "узнаем вас" с бегающей точкой */
         .welcome-loader-status {
             display: inline-flex !important;
             align-items: center !important;
@@ -123,49 +123,34 @@ function injectGreetingStyles() {
             display: none !important;
         }
 
-        /* Контейнер прилипающего слайдера */
-        .sticky-slider-loader {
+        /* Контейнер линии загрузки */
+        .dot-loader-track {
             position: relative !important;
             width: 44px !important;
-            height: 10px !important;
-            background: rgba(255, 255, 255, 0.15) !important;
-            border-radius: 5px !important;
+            height: 6px !important;
+            background: rgba(255, 255, 255, 0.1) !important;
+            border-radius: 3px !important;
             overflow: hidden !important;
         }
 
-        /* Сам анимирующийся бегунок с эффектом упругости */
-        .sticky-slider-thumb {
+        /* Бегающая белая точка */
+        .dot-loader-ball {
             position: absolute !important;
             top: 0 !important;
             left: 0 !important;
-            width: 16px !important;
-            height: 100% !important;
+            width: 6px !important;
+            height: 6px !important;
             background: #ffffff !important;
-            border-radius: 5px !important;
-            animation: stickySlideBackAndForth 1.1s cubic-bezier(0.77, 0, 0.175, 1) infinite alternate !important;
+            border-radius: 50% !important;
+            animation: moveDotBackAndForth 0.9s ease-in-out infinite alternate !important;
         }
 
-        @keyframes stickySlideBackAndForth {
+        @keyframes moveDotBackAndForth {
             0% {
                 left: 0px;
-                width: 16px;
-                transform: scaleX(1);
-            }
-            30% {
-                transform: scaleX(1.4);
-            }
-            50% {
-                left: 28px;
-                width: 16px;
-                transform: scaleX(1);
-            }
-            70% {
-                transform: scaleX(1.4);
             }
             100% {
-                left: 0px;
-                width: 16px;
-                transform: scaleX(1);
+                left: 38px;
             }
         }
     `;
@@ -204,8 +189,8 @@ async function initGreetingUI() {
                 <h1 id="welcome-title-element" class="welcome-title">
                     <span id="welcome-status-box" class="welcome-loader-status">
                         УЗНАЕМ ВАС
-                        <span class="sticky-slider-loader">
-                            <span class="sticky-slider-thumb"></span>
+                        <span class="dot-loader-track">
+                            <span class="dot-loader-ball"></span>
                         </span>
                     </span>
                     <span id="welcome-main-greeting" style="display: none;">
@@ -234,7 +219,7 @@ async function initGreetingUI() {
         requestAnimationFrame(() => overlay.classList.add('visible'));
     });
 
-    // Ровно через 2 секунды (2000 мс) убираем статус «Узнаем вас» и выдвигаем основной текст
+    // Ровно через 2 секунды убираем статус «Узнаем вас» и выдвигаем основной текст
     setTimeout(() => {
         statusBox.classList.add('hidden');
         statusBox.style.display = 'none';
@@ -250,7 +235,7 @@ async function initGreetingUI() {
         }
     }, 3000);
 
-    // Плавное закрытие всего экрана приветствия на отметке 5 секунд (5000 мс)
+    // Закрытие всего экрана приветствия на отметке 5 секунд
     setTimeout(() => {
         overlay.classList.add('fade-out');
         setTimeout(() => overlay.remove(), 800);
