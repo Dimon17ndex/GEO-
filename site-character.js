@@ -1,38 +1,5 @@
 // site-character.js
 
-// Переменные для отслеживания мыши
-let isTrackingActive = false;
-
-function handleMouseMove(e) {
-    if (!isTrackingActive) return;
-    const widget = document.getElementById('site-character-widget');
-    if (!widget) return;
-
-    const pupils = widget.querySelectorAll('.char-pupil');
-    if (pupils.length === 0) return;
-
-    pupils.forEach(pupil => {
-        const eye = pupil.parentElement;
-        const rect = eye.getBoundingClientRect();
-        
-        const eyeCenterX = rect.left + rect.width / 2;
-        const eyeCenterY = rect.top + rect.height / 2;
-
-        const angle = Math.atan2(e.clientY - eyeCenterY, e.clientX - eyeCenterX);
-        const maxDistance = 10; 
-        const distance = Math.min(maxDistance, Math.hypot(e.clientX - eyeCenterX, e.clientX - eyeCenterX) * 0.2); // исправлено на правильное вычисление гипотенузы
-        const actualDistance = Math.min(maxDistance, Math.hypot(e.clientX - eyeCenterX, e.clientY - eyeCenterY) * 0.2);
-
-        const x = Math.cos(angle) * actualDistance;
-        const y = Math.sin(angle) * actualDistance;
-
-        pupil.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
-    });
-}
-
-// Регистрируем глобальное движение мыши
-document.addEventListener('mousemove', handleMouseMove);
-
 function initSiteCharacter() {
     if (document.getElementById('site-character-widget')) return;
 
@@ -165,11 +132,6 @@ function initSiteCharacter() {
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
 
-        /* Плавность для режима слежения */
-        #site-character-widget.action-track .char-pupil {
-            transition: transform 0.05s linear !important;
-        }
-
         /* Поведение в режиме «Думает» (поднимаются наверх к точкам) */
         #site-character-widget.state-loading .char-pupil {
             top: 18% !important; 
@@ -227,8 +189,8 @@ function initSiteCharacter() {
     function triggerBlink() {
         if (!widget) return;
 
-        // Если выполняется действие или включено слежение, пропускаем обычное моргание
-        if (window._isCharacterActionRunning || isTrackingActive) {
+        // Если выполняется действие, пропускаем обычное моргание
+        if (window._isCharacterActionRunning) {
             const nextBlinkDelay = Math.random() * 3500 + 1500;
             setTimeout(triggerBlink, nextBlinkDelay);
             return;
@@ -239,13 +201,13 @@ function initSiteCharacter() {
 
         // Через 120мс открываем глаза обратно
         setTimeout(() => {
-            if (!widget || window._isCharacterActionRunning || isTrackingActive) return;
+            if (!widget || window._isCharacterActionRunning) return;
             widget.classList.remove('blinking');
 
             // Случайная вероятность (35%) сделать двойное моргание
             if (Math.random() < 0.35) {
                 setTimeout(() => {
-                    if (!widget || window._isCharacterActionRunning || isTrackingActive) return;
+                    if (!widget || window._isCharacterActionRunning) return;
                     widget.classList.add('blinking');
                     setTimeout(() => {
                         if (widget) widget.classList.remove('blinking');
@@ -266,7 +228,7 @@ function initSiteCharacter() {
 // Глобальные методы управления персонажем
 window.siteCharacter = {
     setLoading: function() {
-        if (window._isCharacterActionRunning || isTrackingActive) return;
+        if (window._isCharacterActionRunning) return;
         const widget = document.getElementById('site-character-widget');
         if (widget) {
             const isBlinking = widget.classList.contains('blinking');
@@ -274,7 +236,7 @@ window.siteCharacter = {
         }
     },
     setNeutral: function() {
-        if (window._isCharacterActionRunning || isTrackingActive) return;
+        if (window._isCharacterActionRunning) return;
         const widget = document.getElementById('site-character-widget');
         if (widget) {
             const isBlinking = widget.classList.contains('blinking');
@@ -282,7 +244,7 @@ window.siteCharacter = {
         }
     },
     setHappy: function() {
-        if (window._isCharacterActionRunning || isTrackingActive) return;
+        if (window._isCharacterActionRunning) return;
         const widget = document.getElementById('site-character-widget');
         if (widget) {
             const isBlinking = widget.classList.contains('blinking');
@@ -291,7 +253,7 @@ window.siteCharacter = {
     },
     wink: function() {
         const widget = document.getElementById('site-character-widget');
-        if (!widget || window._isCharacterActionRunning || isTrackingActive) return;
+        if (!widget || window._isCharacterActionRunning) return;
 
         // Блокируем другие действия и рандомное моргание на время анимации
         window._isCharacterActionRunning = true;
@@ -305,36 +267,18 @@ window.siteCharacter = {
         // 2. Шаг 1: Оставляем текущую эмоцию, подмигиваем и делаем рот овальным
         widget.className = currentState + ' action-wink action-wink-oval';
 
-        // 3. Шаг 2: Быстро возвращаем рот в исходную форму эмоции
+        // 3. Шаг 2: Быстро (через 200мс) возвращаем рот в исходную форму эмоции, оставляя подмигивание еще на чуть-чуть
         setTimeout(() => {
             if (!widget) return;
             widget.className = currentState + ' action-wink';
         }, 200);
 
-        // 4. Шаг 3: Полностью завершаем подмигивание и снимаем блокировку
+        // 4. Шаг 3: Полностью завершаем подмигивание (всего за 450мс) и снимаем блокировку
         setTimeout(() => {
             if (!widget) return;
             widget.className = currentState;
             window._isCharacterActionRunning = false;
         }, 450);
-    },
-    toggleTracking: function() {
-        const widget = document.getElementById('site-character-widget');
-        if (!widget || window._isCharacterActionRunning) return;
-
-        isTrackingActive = !isTrackingActive;
-
-        if (isTrackingActive) {
-            widget.classList.add('action-track');
-            widget.classList.remove('blinking');
-        } else {
-            widget.classList.remove('action-track');
-            // Возвращаем зрачки строго по центру
-            const pupils = widget.querySelectorAll('.char-pupil');
-            pupils.forEach(pupil => {
-                pupil.style.transform = 'translate(-50%, -50%)';
-            });
-        }
     },
     hide: function() {
         const widget = document.getElementById('site-character-widget');
