@@ -18,7 +18,7 @@ function injectGreetingStyles() {
             align-items: center !important; 
             justify-content: center !important;
             opacity: 0 !important; 
-            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            transition: opacity 0.8s ease !important;
             overflow: hidden !important;
         }
         .welcome-overlay.visible { opacity: 1 !important; }
@@ -45,7 +45,6 @@ function injectGreetingStyles() {
             text-align: center !important;
         }
 
-        /* Контейнер для динамических логотипов */
         .auth-logo-tunnel {
             position: absolute !important;
             top: 0 !important;
@@ -56,39 +55,34 @@ function injectGreetingStyles() {
             z-index: 1 !important;
         }
 
+        /* Стиль для летящих логотипов */
         .tunnel-logo {
             position: absolute !important;
             top: 50% !important;
             left: 50% !important;
-            width: 120px !important;
-            opacity: 0 !important;
-            filter: blur(12px) brightness(0.9) !important;
-            transform: translate(-50%, -50%) scale(0.01) translate(0, 0);
-            animation-name: flyOut;
-            animation-timing-function: cubic-bezier(0.1, 0.7, 0.3, 1);
-            animation-iteration-count: infinite;
+            width: 100px !important;
+            transform: translate(-50%, -50%) scale(0.05);
+            opacity: 0;
+            filter: blur(10px);
+            animation: zoomAndFly 3s linear infinite;
         }
 
-        @keyframes flyOut {
+        @keyframes zoomAndFly {
             0% {
-                transform: translate(-50%, -50%) scale(0.02) translate(0, 0);
+                transform: translate(-50%, -50%) translate(0px, 0px) scale(0.05);
                 opacity: 0;
-                filter: blur(16px) brightness(0.5);
+                filter: blur(15px);
             }
-            15% {
-                opacity: 0.3; /* Проявляются близко к центру */
-            }
-            75% {
-                opacity: 0.25;
+            20% {
+                opacity: 0.35;
             }
             100% {
-                transform: translate(-50%, -50%) scale(3.5) translate(var(--move-x), var(--move-y));
-                opacity: 0; /* Исчезают улетая за края */
-                filter: blur(2px) brightness(1.2);
+                transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(3.5);
+                opacity: 0;
+                filter: blur(2px);
             }
         }
 
-        /* Контейнер-маска для скролла */
         .welcome-ticker {
             display: inline-block !important;
             height: 1.2em !important;
@@ -116,38 +110,33 @@ function injectGreetingStyles() {
     document.head.appendChild(styleElement);
 }
 
-// --- СОЗДАНИЕ ЛОГОТИПОВ-ЛЕТУНОВ ---
+// --- СОЗДАНИЕ ЛОГОТИПОВ ---
 function createTunnelLogos(tunnelContainer) {
-    const totalLogos = 15;
+    const totalLogos = 12;
 
     for (let i = 0; i < totalLogos; i++) {
         const img = document.createElement('img');
         img.src = 'images/geo_logo.png';
         img.className = 'tunnel-logo';
 
-        // Случайный угол и расстояние для разлета в разные стороны экрана
+        // Случайная точка на экране, куда прилетит логотип
         const angle = Math.random() * Math.PI * 2;
-        const distance = 400 + Math.random() * 600; // дальность разлета
-        
-        const moveX = Math.cos(angle) * distance;
-        const moveY = Math.sin(angle) * distance;
+        const distance = 500 + Math.random() * 400;
+        const dx = Math.cos(angle) * distance;
+        const dy = Math.sin(angle) * distance;
 
-        // Передаем координаты движения через инлайн-стиль
-        img.style.setProperty('--move-x', `${moveX}px`);
-        img.style.setProperty('--move-y', `${moveY}px`);
+        img.style.setProperty('--dx', `${dx}px`);
+        img.style.setProperty('--dy', `${dy}px`);
 
-        // Разная скорость и задержка, чтобы они летели хаотично
-        const duration = 2.2 + Math.random() * 2.0; // от 2.2 до 4.2 секунд
-        const delay = Math.random() * 3; // случайный старт
-
-        img.style.animationDuration = `${duration}s`;
-        img.style.animationDelay = `${delay}s`;
+        // Разные задержки и скорость
+        img.style.animationDuration = (2 + Math.random() * 1.5) + 's';
+        img.style.animationDelay = (Math.random() * 2.5) + 's';
 
         tunnelContainer.appendChild(img);
     }
 }
 
-// --- СОЗДАНИЕ HTML И ПОЛУЧЕНИЕ ИМЕНИ ---
+// --- ОСНОВНАЯ ФУНКЦИЯ ---
 async function initGreetingUI() {
     if (document.getElementById('welcome-greeting-overlay')) return;
 
