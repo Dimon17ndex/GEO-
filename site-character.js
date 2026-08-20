@@ -39,7 +39,12 @@ function initSiteCharacter() {
             border: 2px solid #ffffff !important;
             border-radius: 50% !important;
             box-sizing: border-box !important;
-            animation: charBlink 4s infinite ease-in-out !important;
+            transition: transform 0.1s ease !important; /* Быстрое и плавное смыкание */
+        }
+
+        /* Состояние моргания (сплющивание по вертикали) */
+        #site-character-widget.blinking .char-eye {
+            transform: scaleY(0.1) !important;
         }
 
         /* Рот персонажа — линия толщиной 2px, как обводка глаз */
@@ -53,9 +58,6 @@ function initSiteCharacter() {
 
         /* Эмоции и состояния */
         /* 1. Режим загрузки / думает */
-        #site-character-widget.state-loading .char-eye {
-            animation: charLookAround 1s infinite alternate ease-in-out !important;
-        }
         #site-character-widget.state-loading .char-mouth {
             width: 6px !important;
             height: 2px !important;
@@ -67,13 +69,7 @@ function initSiteCharacter() {
             height: 2px !important;
         }
 
-        /* Анимация моргания */
-        @keyframes charBlink {
-            0%, 90%, 100% { transform: scaleY(1); }
-            95% { transform: scaleY(0.1); }
-        }
-
-        /* Анимация раздумий */
+        /* Анимация раздумий (покачивание) */
         @keyframes charLookAround {
             0% { transform: translateX(-3px); }
             100% { transform: translateX(3px); }
@@ -96,17 +92,57 @@ function initSiteCharacter() {
     `;
 
     document.body.insertAdjacentHTML('beforeend', widgetHTML);
+
+    // --- РАНДОМНОЕ МОРГАНИЕ ЧЕРЕЗ JS ---
+    const widget = document.getElementById('site-character-widget');
+
+    function triggerBlink() {
+        if (!widget) return;
+
+        // Добавляем класс моргания
+        widget.classList.add('blinking');
+
+        // Через 120мс открываем глаза обратно
+        setTimeout(() => {
+            if (!widget) return;
+            widget.classList.remove('blinking');
+
+            // Случайная вероятность (35%) сделать двойное моргание
+            if (Math.random() < 0.35) {
+                setTimeout(() => {
+                    widget.classList.add('blinking');
+                    setTimeout(() => {
+                        if (widget) widget.classList.remove('blinking');
+                    }, 120);
+                }, 180);
+            }
+        }, 120);
+
+        // Планируем следующее моргание в случайном диапазоне от 1.5 до 5 секунд
+        const nextBlinkDelay = Math.random() * 3500 + 1500;
+        setTimeout(triggerBlink, nextBlinkDelay);
+    }
+
+    // Запускаем первый цикл моргания
+    setTimeout(triggerBlink, 2000);
 }
 
 // Глобальные методы управления персонажем
 window.siteCharacter = {
     setLoading: function() {
         const widget = document.getElementById('site-character-widget');
-        if (widget) widget.className = 'state-loading';
+        if (widget) {
+            // Сохраняем класс моргания, если он есть, но меняем состояние
+            const isBlinking = widget.classList.contains('blinking');
+            widget.className = 'state-loading' + (isBlinking ? ' blinking' : '');
+        }
     },
     setHappy: function() {
         const widget = document.getElementById('site-character-widget');
-        if (widget) widget.className = 'state-happy';
+        if (widget) {
+            const isBlinking = widget.classList.contains('blinking');
+            widget.className = 'state-happy' + (isBlinking ? ' blinking' : '');
+        }
     },
     hide: function() {
         const widget = document.getElementById('site-character-widget');
