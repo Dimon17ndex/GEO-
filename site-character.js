@@ -259,26 +259,26 @@ window.siteCharacter = {
         window._isCharacterActionRunning = true;
         widget.classList.remove('blinking');
 
-        // 1. Запоминаем текущие классы состояния (например, state-neutral или state-loading)
+        // 1. Запоминаем текущие классы состояния
         let currentState = 'state-neutral';
         if (widget.classList.contains('state-happy')) currentState = 'state-happy';
         if (widget.classList.contains('state-loading')) currentState = 'state-loading';
 
-        // 2. Шаг 1: Оставляем текущую эмоцию, но добавляем подмигивание правым глазом и овальный рот
+        // 2. Шаг 1: Оставляем текущую эмоцию, подмигиваем и делаем рот овальным
         widget.className = currentState + ' action-wink action-wink-oval';
 
-        // 3. Шаг 2: Через 400мс убираем овальный рот, возвращая рот к стандартному для текущей эмоции, но глаз всё еще подмигивает
+        // 3. Шаг 2: Быстро (через 200мс) возвращаем рот в исходную форму эмоции, оставляя подмигивание еще на чуть-чуть
         setTimeout(() => {
             if (!widget) return;
             widget.className = currentState + ' action-wink';
-        }, 400);
+        }, 200);
 
-        // 4. Шаг 3: Через 900мс полностью убираем действие и возвращаем всё в исходное состояние
+        // 4. Шаг 3: Полностью завершаем подмигивание (всего за 450мс) и снимаем блокировку
         setTimeout(() => {
             if (!widget) return;
             widget.className = currentState;
             window._isCharacterActionRunning = false;
-        }, 900);
+        }, 450);
     },
     hide: function() {
         const widget = document.getElementById('site-character-widget');
