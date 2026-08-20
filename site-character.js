@@ -40,9 +40,9 @@ function initSiteCharacter() {
             animation: charBlink 4s infinite ease-in-out !important;
         }
 
-        /* Рот персонажа — тонкая белая линия */
+        /* Рот персонажа — короткая тонкая белая линия */
         .char-mouth {
-            width: 18px !important;
+            width: 10px !important;
             height: 1.5px !important;
             background: #ffffff !important;
             border-radius: 1px !important;
@@ -55,17 +55,17 @@ function initSiteCharacter() {
             animation: charLookAround 1s infinite alternate ease-in-out !important;
         }
         #site-character-widget.state-loading .char-mouth {
-            width: 8px !important;
+            width: 6px !important;
             height: 1.5px !important;
         }
 
         /* 2. Режим успеха / радости */
         #site-character-widget.state-happy .char-mouth {
-            width: 22px !important;
+            width: 12px !important;
             height: 2px !important;
         }
 
-        /* Анимация моргания (сжимается только по высоте, сохраняя круглую форму в обычном состоянии) */
+        /* Анимация моргания */
         @keyframes charBlink {
             0%, 90%, 100% { transform: scaleY(1); }
             95% { transform: scaleY(0.1); }
