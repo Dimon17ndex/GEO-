@@ -55,7 +55,7 @@ function injectGreetingStyles() {
             z-index: 1 !important;
         }
 
-        /* Старт из центра, непрерывный рост и полет в случайную сторону */
+        /* Медленная и плавная анимация роста и полета */
         .tunnel-logo {
             position: absolute !important;
             top: 50% !important;
@@ -64,22 +64,22 @@ function injectGreetingStyles() {
             transform: translate(-50%, -50%) scale(0.001);
             opacity: 0;
             filter: blur(25px);
-            animation: randomDirectionZoomOff 1.8s cubic-bezier(0.15, 0.7, 0.3, 1) forwards;
+            animation: slowRandomZoomOff 3.8s cubic-bezier(0.2, 0.6, 0.3, 1) forwards;
         }
 
-        @keyframes randomDirectionZoomOff {
+        @keyframes slowRandomZoomOff {
             0% {
                 transform: translate(-50%, -50%) translate(0px, 0px) scale(0.001);
                 opacity: 0;
                 filter: blur(30px);
             }
-            20% {
+            30% {
                 opacity: 1; 
-                filter: blur(10px);
+                filter: blur(8px);
             }
             100% {
-                /* Растет и смещается по динамическим координатам --dx и --dy до вылета за экран */
-                transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(7.0);
+                /* Медленно и плавно увеличивается и уходит в случайную сторону до конца */
+                transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(7.5);
                 opacity: 0;
                 filter: blur(0px);
             }
@@ -118,9 +118,8 @@ function createSingleLogo(tunnelContainer) {
     img.src = 'images/geo_logo.png';
     img.className = 'tunnel-logo';
 
-    // Генерируем случайный угол для вылета в любую сторону экрана
     const angle = Math.random() * Math.PI * 2;
-    const distance = 1000 + Math.random() * 400; // Достаточная дистанция, чтобы уйти за край
+    const distance = 1200 + Math.random() * 400; 
     
     const dx = Math.cos(angle) * distance;
     const dy = Math.sin(angle) * distance;
@@ -193,5 +192,5 @@ async function initGreetingUI() {
     setTimeout(() => {
         overlay.classList.add('fade-out');
         setTimeout(() => overlay.remove(), 800);
-    }, 3200); 
+    }, 4000); // Немного увеличили время показа оверлея под долгую анимацию
 }
