@@ -132,23 +132,21 @@ function hideKeyVisual(code) {
     }, 300);
 }
 
-function updateVisualStatuses(currentSequence, isMatchGlobal, isMatchPage, isError) {
+function updateVisualStatuses(currentSequence, isMatchGlobal, isMatchPageWord, isError) {
     const boxes = Array.from(activeKeyBoxes.values());
     
     boxes.forEach((box) => {
-        // Очищаем старые статусы перед добавлением актуального
         box.classList.remove('status-progress', 'status-success-global', 'status-success-page', 'status-error');
 
         if (isError) {
             box.classList.add('status-error');
-        } else if (isMatchPage) {
-            box.classList.add('status-success-page');
+        } else if (isMatchPageWord) {
+            box.classList.add('status-success-page'); // Голубой при наборе GEO на любой странице
         } else if (isMatchGlobal) {
-            box.classList.add('status-success-global');
+            box.classList.add('status-success-global'); // Зеленый для HEL
         } else if (currentSequence.length >= 2) {
-            box.classList.add('status-progress');
+            box.classList.add('status-progress'); // Оранжевый со 2-й буквы
         }
-        // Если длина меньше 2, классы не добавляются — цвет остается стандартным (белым)
     });
 }
 
@@ -162,11 +160,8 @@ document.addEventListener('keydown', (e) => {
     const key = keyMap[e.code];
     if (!key) return;
 
-    // Сбрасываем таймер старой последовательности при новом нажатии
     clearTimeout(sequenceTimeout);
 
-    // Если прошло больше 1.5 с с прошлого нажатия, полностью обнуляем буфер,
-    // чтобы старый набор не влиял на новые цвета
     if (!window.lastPressTime || Date.now() - window.lastPressTime > 1500) {
         keySequence = [];
     }
@@ -188,15 +183,15 @@ document.addEventListener('keydown', (e) => {
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
 
     const isMatchGlobal = (currentCombination === 'HEL');
-    const isMatchPage = (currentPage === 'pc.html' && currentCombination === 'GEO');
+    const isMatchPageWord = (currentCombination === 'GEO'); // Слово GEO верно само по себе
+    const isMatchPageAction = (currentPage === 'pc.html' && isMatchPageWord); // Действие работает только на pc.html
     
-    // Ошибка фиксируется только при наборе ровно 3 символов, которые неверны
-    const isError = (keySequence.length === 3 && !isMatchGlobal && !isMatchPage);
+    const isError = (keySequence.length === 3 && !isMatchGlobal && !isMatchPageWord);
 
-    updateVisualStatuses(currentCombination, isMatchGlobal, isMatchPage, isError);
+    updateVisualStatuses(currentCombination, isMatchGlobal, isMatchPageWord, isError);
 
-    // Успешные действия
-    if (isMatchPage) {
+    // Переход срабатывает только на нужной странице
+    if (isMatchPageAction) {
         e.preventDefault();
         keySequence = [];
         sessionStorage.setItem('dev_console_authenticated', 'true');
