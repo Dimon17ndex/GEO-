@@ -7,6 +7,13 @@ let shortcutContainer = null;
 // Хранилище активных визуальных блоков по кодам клавиш (например, 'KeyH', 'KeyE')
 const activeKeyBoxes = new Map();
 
+// Карта физических кодов клавиш в латинские буквы (для любой раскладки)
+const keyMap = {
+    'KeyQ': 'Q', 'KeyW': 'W', 'KeyE': 'E', 'KeyR': 'R', 'KeyT': 'T', 'KeyY': 'Y', 'KeyU': 'U', 'KeyI': 'I', 'KeyO': 'O', 'KeyP': 'P',
+    'KeyA': 'A', 'KeyS': 'S', 'KeyD': 'D', 'KeyF': 'F', 'KeyG': 'G', 'KeyH': 'H', 'KeyJ': 'J', 'KeyK': 'K', 'KeyL': 'L',
+    'KeyZ': 'Z', 'KeyX': 'X', 'KeyC': 'C', 'KeyV': 'V', 'KeyB': 'B', 'KeyN': 'N', 'KeyM': 'M'
+};
+
 // --- СОЗДАНИЕ ВИЗУАЛЬНОГО КОНТЕЙНЕРА ---
 function initShortcutVisualizer() {
     if (document.getElementById('shortcut-visualizer')) return;
@@ -70,15 +77,11 @@ function initShortcutVisualizer() {
 function showKeyVisual(code, char) {
     if (!shortcutContainer) initShortcutVisualizer();
 
-    // Если блок для этой клавиши уже отображается, просто обновляем его (не дублируем)
     if (activeKeyBoxes.has(code)) {
         return;
     }
 
-    // Ограничиваем максимальное количество одновременно отображаемых блоков (например, до 5)
-    // чтобы они не уходили за границы экрана, но и не сбрасывали активные клавиши раньше времени
     if (activeKeyBoxes.size >= 5) {
-        // Находим и удаляем самый первый созданный блок, который уже есть в памяти
         const firstKey = activeKeyBoxes.keys().next().value;
         if (firstKey) {
             hideKeyVisual(firstKey);
@@ -90,7 +93,6 @@ function showKeyVisual(code, char) {
     keyBox.textContent = char;
     shortcutContainer.appendChild(keyBox);
 
-    // Сохраняем ссылку в Map вместе со временем создания
     activeKeyBoxes.set(code, keyBox);
 
     requestAnimationFrame(() => {
@@ -121,7 +123,10 @@ document.addEventListener('keydown', (e) => {
     if (e.repeat) return; // Игнорируем автоповтор при зажатии
     if (['Control', 'Shift', 'Alt', 'Meta', 'CapsLock', 'Tab'].includes(e.key)) return;
 
-    const key = e.key.toUpperCase();
+    // Получаем гарантированно английскую букву по коду клавиши
+    const key = keyMap[e.code];
+    if (!key) return; // Если нажата не буквенная клавиша, пропускаем
+
     showKeyVisual(e.code, key);
 
     // Логика шорткатов
@@ -138,8 +143,8 @@ document.addEventListener('keydown', (e) => {
     const currentCombination = keySequence.join('');
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
 
-    // Bypass на pc.html (GEO или ПУЩ)
-    if (currentPage === 'pc.html' && (currentCombination === 'GEO' || currentCombination === 'ПУЩ')) {
+    // Bypass на pc.html (сработает при GEO, даже если набирали в русской раскладке ПУЩ)
+    if (currentPage === 'pc.html' && currentCombination === 'GEO') {
         e.preventDefault();
         keySequence = [];
         sessionStorage.setItem('dev_console_authenticated', 'true');
@@ -148,8 +153,8 @@ document.addEventListener('keydown', (e) => {
         }, 500);
     }
 
-    // Приветствие (HEL или РУД)
-    if (currentCombination === 'HEL' || currentCombination === 'РУД') {
+    // Приветствие (HEL, наберется как HEL даже при русской раскладке РУД)
+    if (currentCombination === 'HEL') {
         e.preventDefault();
         keySequence = [];
 
@@ -161,7 +166,7 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// 2. Отпускание клавиши — теперь визуал растворяется именно здесь
+// 2. Отпускание клавиши — визуал растворяется здесь
 document.addEventListener('keyup', (e) => {
     hideKeyVisual(e.code);
 });
