@@ -66,12 +66,11 @@
             transform: translateY(-2px);
         }
 
-        /* Выпадающий список "Механики" */
-        /* Выпадающий список "Механики" (теперь открывается вниз) */
+        /* Выпадающий список "Механики" (открывается вниз) */
         .mechanics-menu {
             position: absolute;
-            top: calc(100% + 8px); /* Располагаем сразу под кнопкой с отступом */
-            bottom: auto;          /* Отменяем привязку к низу */
+            top: calc(100% + 8px); 
+            bottom: auto;          
             left: 0;
             min-width: 140px;
             background: rgba(15, 15, 20, 0.95);
@@ -84,7 +83,7 @@
             backdrop-filter: blur(15px);
             opacity: 0;
             visibility: hidden;
-            transform: translateY(-6px); /* Легкое смещение вверх для красивого появления вниз */
+            transform: translateY(-6px); 
             transition: all 0.2s ease;
             z-index: 10;
         }
@@ -92,7 +91,7 @@
         .mechanics-menu.active {
             opacity: 1;
             visibility: visible;
-            transform: translateY(0); /* Возвращается на свое место при открытии */
+            transform: translateY(0); 
         }
 
         .mechanics-option {
@@ -127,6 +126,23 @@
             gap: 10px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             flex: 1;
+        }
+
+        /* Стили для переключаемых блоков внутри панели */
+        .panel-content {
+            display: none;
+            width: 100%;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-content.active {
+            display: flex;
+        }
+
+        /* Если блок действий пустой, панель сохраняет высоту */
+        #content-actions:empty {
+            min-height: 41px; 
         }
 
         .char-panel-btn {
@@ -425,21 +441,29 @@
 <div class="center-status-wrapper" id="center-character-container"></div>
 
 <div class="character-controls-container">
-    <!-- Отдельная кнопка "Механики" слева -->
+    <!-- Отдельная кнопка "Механики" слева с выпадающим списком -->
     <div class="mechanics-dropdown-wrapper">
-        <button type="button" class="mechanics-main-btn" id="mechanics-toggle-btn">Механики ▾</button>
+        <button type="button" class="mechanics-main-btn" id="mechanics-toggle-btn">Эмоции ▾</button>
         <div class="mechanics-menu" id="mechanics-menu">
             <button type="button" class="mechanics-option" data-value="Эмоции">Эмоции</button>
             <button type="button" class="mechanics-option" data-value="Действия">Действия</button>
         </div>
     </div>
 
-    <!-- Основная панель с остальными кнопками -->
-    <div class="character-control-panel">
-        <button type="button" class="char-panel-btn" onclick="window.siteCharacter?.setHappy()">Радость 😊</button>
-        <button type="button" class="char-panel-btn" onclick="window.siteCharacter?.setLoading()">Думает ⏳</button>
-        <button type="button" class="char-panel-btn" onclick="window.siteCharacter?.hide()">Скрыть 🙈</button>
-        <button type="button" class="char-panel-btn" onclick="window.siteCharacter?.show()">Показать 👀</button>
+    <!-- Основная панель, которая меняет содержимое -->
+    <div class="character-control-panel" id="character-control-panel">
+        <!-- Блок для ЭМОЦИЙ (по умолчанию активен) -->
+        <div class="panel-content active" id="content-emotions">
+            <button type="button" class="char-panel-btn" onclick="window.siteCharacter?.setHappy()">Радость 😊</button>
+            <button type="button" class="char-panel-btn" onclick="window.siteCharacter?.setLoading()">Думает ⏳</button>
+            <button type="button" class="char-panel-btn" onclick="window.siteCharacter?.hide()">Скрыть 🙈</button>
+            <button type="button" class="char-panel-btn" onclick="window.siteCharacter?.show()">Показать 👀</button>
+        </div>
+
+        <!-- Блок для ДЕЙСТВИЙ (пока пустой) -->
+        <div class="panel-content" id="content-actions">
+            <!-- Здесь позже появятся кнопки действий -->
+        </div>
     </div>
 </div>
 
@@ -697,27 +721,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const mechanicsBtn = document.getElementById('mechanics-toggle-btn');
     const mechanicsMenu = document.getElementById('mechanics-menu');
     const mechanicsOptions = document.querySelectorAll('.mechanics-option');
+    
+    const contentEmotions = document.getElementById('content-emotions');
+    const contentActions = document.getElementById('content-actions');
 
+    // Открытие/закрытие меню "Механики"
     mechanicsBtn?.addEventListener('click', (e) => {
         e.stopPropagation();
         mechanicsMenu.classList.toggle('active');
     });
 
+    // Выбор пункта (Эмоции / Действия)
     mechanicsOptions.forEach(option => {
         option.addEventListener('click', (e) => {
             e.stopPropagation();
             const selectedText = option.getAttribute('data-value');
             
-            // Меняем текст кнопки на выбранный пункт
+            // Меняем текст главной кнопки на выбранный пункт
             mechanicsBtn.innerHTML = `${selectedText} ▾`;
             
-            // Закрываем меню
+            // Закрываем выпадающий список
             mechanicsMenu.classList.remove('active');
             
-            console.log('Выбрана механика:', selectedText);
+            // Переключаем содержимое панели в зависимости от выбора
+            if (selectedText === 'Эмоции') {
+                contentEmotions.classList.add('active');
+                contentActions.classList.remove('active');
+            } else if (selectedText === 'Действия') {
+                contentActions.classList.add('active');
+                contentEmotions.classList.remove('active');
+            }
         });
     });
 
+    // Закрытие меню при клике в пустоту
     document.addEventListener('click', () => {
         mechanicsMenu?.classList.remove('active');
     });
