@@ -45,7 +45,7 @@ function injectGreetingStyles() {
             text-align: center !important;
         }
 
-        /* Контейнер для динамических логотипов (туннель из центра) */
+        /* Контейнер для динамических логотипов */
         .auth-logo-tunnel {
             position: absolute !important;
             top: 0 !important;
@@ -60,29 +60,31 @@ function injectGreetingStyles() {
             position: absolute !important;
             top: 50% !important;
             left: 50% !important;
-            width: 140px !important;
+            width: 120px !important;
             opacity: 0 !important;
-            filter: blur(16px) brightness(0.8) !important;
-            transform: translate(-50%, -50%) scale(0.02);
-            animation: flyAtUs cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+            filter: blur(12px) brightness(0.9) !important;
+            transform: translate(-50%, -50%) scale(0.01) translate(0, 0);
+            animation-name: flyOut;
+            animation-timing-function: cubic-bezier(0.1, 0.7, 0.3, 1);
+            animation-iteration-count: infinite;
         }
 
-        @keyframes flyAtUs {
+        @keyframes flyOut {
             0% {
-                transform: translate(-50%, -50%) translate(var(--start-x), var(--start-y)) scale(0.02);
+                transform: translate(-50%, -50%) scale(0.02) translate(0, 0);
                 opacity: 0;
-                filter: blur(20px) brightness(0.5);
+                filter: blur(16px) brightness(0.5);
             }
-            20% {
-                opacity: 0.28;
+            15% {
+                opacity: 0.3; /* Проявляются близко к центру */
             }
-            80% {
-                opacity: 0.2;
+            75% {
+                opacity: 0.25;
             }
             100% {
-                transform: translate(-50%, -50%) translate(var(--end-x), var(--end-y)) scale(3.2);
-                opacity: 0;
-                filter: blur(4px) brightness(1.1);
+                transform: translate(-50%, -50%) scale(3.5) translate(var(--move-x), var(--move-y));
+                opacity: 0; /* Исчезают улетая за края */
+                filter: blur(2px) brightness(1.2);
             }
         }
 
@@ -116,30 +118,27 @@ function injectGreetingStyles() {
 
 // --- СОЗДАНИЕ ЛОГОТИПОВ-ЛЕТУНОВ ---
 function createTunnelLogos(tunnelContainer) {
-    const totalLogos = 14;
+    const totalLogos = 15;
 
     for (let i = 0; i < totalLogos; i++) {
         const img = document.createElement('img');
         img.src = 'images/geo_logo.png';
         img.className = 'tunnel-logo';
 
-        // Случайный угол разлета
+        // Случайный угол и расстояние для разлета в разные стороны экрана
         const angle = Math.random() * Math.PI * 2;
-        const distance = 700 + Math.random() * 500; 
+        const distance = 400 + Math.random() * 600; // дальность разлета
         
-        const endX = Math.cos(angle) * distance;
-        const endY = Math.sin(angle) * distance;
+        const moveX = Math.cos(angle) * distance;
+        const moveY = Math.sin(angle) * distance;
 
-        const startX = (Math.random() - 0.5) * 30;
-        const startY = (Math.random() - 0.5) * 30;
+        // Передаем координаты движения через инлайн-стиль
+        img.style.setProperty('--move-x', `${moveX}px`);
+        img.style.setProperty('--move-y', `${moveY}px`);
 
-        img.style.setProperty('--start-x', `${startX}px`);
-        img.style.setProperty('--start-y', `${startY}px`);
-        img.style.setProperty('--end-x', `${endX}px`);
-        img.style.setProperty('--end-y', `${endY}px`);
-
-        const duration = 2.0 + Math.random() * 2.2; 
-        const delay = Math.random() * 2.5; 
+        // Разная скорость и задержка, чтобы они летели хаотично
+        const duration = 2.2 + Math.random() * 2.0; // от 2.2 до 4.2 секунд
+        const delay = Math.random() * 3; // случайный старт
 
         img.style.animationDuration = `${duration}s`;
         img.style.animationDelay = `${delay}s`;
