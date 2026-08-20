@@ -55,34 +55,33 @@ function injectGreetingStyles() {
             z-index: 1 !important;
         }
 
-        /* Стиль для летящих логотипов с полным размером */
+        /* Стиль для последовательных логотипов */
         .tunnel-logo {
             position: absolute !important;
             top: 50% !important;
             left: 50% !important;
-            /* Базовый размер делаем большим (как исходное лого) */
             width: 800px !important; 
-            transform: translate(-50%, -50%) scale(0.01);
+            transform: translate(-50%, -50%) scale(0.005);
             opacity: 0;
             filter: blur(16px);
-            animation: zoomAndFlyFull 3s cubic-bezier(0.1, 0.7, 0.3, 1) infinite;
+            animation: sequentialFly 2.2s cubic-bezier(0.1, 0.7, 0.3, 1) forwards;
         }
 
-        @keyframes zoomAndFlyFull {
+        @keyframes sequentialFly {
             0% {
-                transform: translate(-50%, -50%) translate(0px, 0px) scale(0.01);
+                transform: translate(-50%, -50%) translate(0px, 0px) scale(0.005);
                 opacity: 0;
                 filter: blur(20px);
             }
-            15% {
-                opacity: 0.22; /* Плавное проявление из центра */
+            20% {
+                opacity: 0.25;
             }
-            70% {
+            80% {
                 opacity: 0.2;
             }
             100% {
-                /* Вырастают до полноценного крупного размера (scale(1.2)) и улетают в стороны */
-                transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(1.4);
+                /* Вырастают до крупного и улетают за пределы экрана по заданной траектории */
+                transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(1.6);
                 opacity: 0;
                 filter: blur(4px);
             }
@@ -115,30 +114,52 @@ function injectGreetingStyles() {
     document.head.appendChild(styleElement);
 }
 
-// --- СОЗДАНИЕ ЛОГОТИПОВ ---
-function createTunnelLogos(tunnelContainer) {
-    const totalLogos = 8; // Снизили количество, так как они теперь крупные
+// --- ПОСЛЕДОВАТЕЛЬНЫЙ ЗАПУСК ЛОГОТИПОВ ---
+function createSequentialLogos(tunnelContainer) {
+    // Массив точек назначения: по очереди или парами в разные стороны
+    const flights = [
+        { angle: 0.2, dist: 700 },   // Вправо
+        { angle: 3.1, dist: 700 },   // Влево (параллельно с первым или следом)
+        { angle: 1.5, dist: 800 },   // Вверх
+        { angle: 4.7, dist: 800 },   // Вниз
+    ];
 
-    for (let i = 0; i < totalLogos; i++) {
-        const img = document.createElement('img');
-        img.src = 'images/geo_logo.png';
-        img.className = 'tunnel-logo';
+    let index = 0;
 
-        // Траектория разлета в разные стороны
-        const angle = Math.random() * Math.PI * 2;
-        const distance = 300 + Math.random() * 400;
-        const dx = Math.cos(angle) * distance;
-        const dy = Math.sin(angle) * distance;
+    function spawnNext() {
+        if (index >= 6) return; // Ограничимся несколькими красивыми проходами за время приветствия
 
-        img.style.setProperty('--dx', `${dx}px`);
-        img.style.setProperty('--dy', `${dy}px`);
+        // Запускаем по одному или по два логотипа с небольшой задержкой
+        const count = (index === 2) ? 2 : 1; // На третий раз запустим пару в разные стороны
 
-        // Скорость и задержка
-        img.style.animationDuration = (2.5 + Math.random() * 1.5) + 's';
-        img.style.animationDelay = (Math.random() * 2.5) + 's';
+        for (let c = 0; c < count; c++) {
+            const flightData = flights[index % flights.length];
+            const img = document.createElement('img');
+            img.src = 'images/geo_logo.png';
+            img.className = 'tunnel-logo';
 
-        tunnelContainer.appendChild(img);
+            const dx = Math.cos(flightData.angle) * flightData.dist;
+            const dy = Math.sin(flightData.angle) * flightData.dist;
+
+            img.style.setProperty('--dx', `${dx}px`);
+            img.style.setProperty('--dy', `${dy}px`);
+
+            tunnelContainer.appendChild(img);
+
+            // Удаляем DOM-элемент после завершения анимации, чтобы не нагружать память
+            img.addEventListener('animationend', () => {
+                img.remove();
+            });
+
+            index++;
+        }
+
+        // Интервал появления следующего логотипа/пары
+        setTimeout(spawnNext, 700);
     }
+
+    // Старт первой волны чуть после появления оверлея
+    setTimeout(spawnNext, 300);
 }
 
 // --- ОСНОВНАЯ ФУНКЦИЯ ---
@@ -184,7 +205,7 @@ async function initGreetingUI() {
     const track = document.getElementById('welcome-track');
     const tunnelContainer = document.getElementById('logo-tunnel');
     
-    createTunnelLogos(tunnelContainer);
+    createSequentialLogos(tunnelContainer);
 
     requestAnimationFrame(() => {
         requestAnimationFrame(() => overlay.classList.add('visible'));
