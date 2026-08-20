@@ -1,224 +1,250 @@
-// shortcuts-system.js
+// welcome-greeting.js
 
-let keySequence = [];
-let sequenceTimeout = null;
-let shortcutContainer = null;
-
-const activeKeyBoxes = new Map();
-
-const keyMap = {
-    'KeyQ': 'Q', 'KeyW': 'W', 'KeyE': 'E', 'KeyR': 'R', 'KeyT': 'T', 'KeyY': 'Y', 'KeyU': 'U', 'KeyI': 'I', 'KeyO': 'O', 'KeyP': 'P',
-    'KeyA': 'A', 'KeyS': 'S', 'KeyD': 'D', 'KeyF': 'F', 'KeyG': 'G', 'KeyH': 'H', 'KeyJ': 'J', 'KeyK': 'K', 'KeyL': 'L',
-    'KeyZ': 'Z', 'KeyX': 'X', 'KeyC': 'C', 'KeyV': 'V', 'KeyB': 'B', 'KeyN': 'N', 'KeyM': 'M'
-};
-
-function initShortcutVisualizer() {
-    if (document.getElementById('shortcut-visualizer')) return;
+// --- СТИЛИ ---
+function injectGreetingStyles() {
+    if (document.getElementById('welcome-greeting-styles')) return;
 
     const css = `
-        #shortcut-visualizer {
-            position: fixed !important;
-            bottom: 25px !important;
-            left: 25px !important;
-            display: flex !important;
-            gap: 8px !important;
-            z-index: 99999999 !important;
-            pointer-events: none !important;
-        }
-
-        .shortcut-key-box {
-            min-width: 36px !important;
-            height: 36px !important;
-            padding: 0 8px !important;
-            background: rgba(15, 15, 20, 0.75) !important;
-            border: 1px solid rgba(255, 255, 255, 0.4) !important;
-            border-radius: 8px !important;
-            box-shadow: 0 0 12px rgba(255, 255, 255, 0.15) !important;
-            display: flex !important;
-            align-items: center !important;
+        .welcome-overlay {
+            position: fixed !important; 
+            top: 0 !important; 
+            left: 0 !important;
+            width: 100vw !important; 
+            height: 100vh !important;
+            background: rgba(10, 10, 12, 0.94) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            z-index: 9999999 !important;
+            display: flex !important; 
+            align-items: center !important; 
             justify-content: center !important;
-            color: #ffffff !important;
+            opacity: 0 !important; 
+            transition: opacity 0.8s ease !important;
+            overflow: hidden !important;
+        }
+        .welcome-overlay.visible { opacity: 1 !important; }
+        .welcome-overlay.fade-out { opacity: 0 !important; }
+
+        .welcome-container {
+            width: 90% !important; 
+            max-width: 900px !important;
+            display: flex !important; 
+            justify-content: center !important;
+            min-height: 80px !important;
+            position: relative !important;
+            z-index: 10 !important;
+        }
+
+        /* Начальное состояние текста: смещен вниз, полупрозрачный и абсолютно четкий */
+        .welcome-title {
             font-family: 'Montserrat', sans-serif !important;
-            font-size: 14px !important;
-            font-weight: 700 !important;
+            font-size: 28px !important; 
+            font-weight: 900 !important;
+            color: rgba(255, 255, 255, 0.3) !important; 
             text-transform: uppercase !important;
+            letter-spacing: 3px !important; 
+            margin: 0 !important;
+            text-align: center !important;
+            transform: translateY(35px) !important;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), 
+                        color 0.6s ease !important;
+        }
+
+        /* Конечное (активное) состояние текста после анимации */
+        .welcome-title.revealed {
+            color: #ffffff !important;
+            transform: translateY(0) !important;
+        }
+
+        /* Фоновое лого */
+        .welcome-bg-watermark {
+            position: absolute !important;
+            top: 45% !important;
+            right: -15% !important;
+            left: auto !important;
+            width: 1200px !important;
+            height: auto !important;
+            max-width: none !important;
+            pointer-events: none !important;
+            z-index: 1 !important;
+            transform-origin: center right !important;
             
+            opacity: 0.22 !important;
+            filter: blur(12px) brightness(0.9) !important;
+            animation: intenseFloat 6s ease-in-out infinite alternate !important;
+        }
+
+        @keyframes intenseFloat {
+            0% {
+                transform: translateY(-50%) translateX(0px) rotate(0deg) scale(1);
+            }
+            50% {
+                transform: translateY(-58%) translateX(-25px) rotate(-5deg) scale(1.04);
+            }
+            100% {
+                transform: translateY(-42%) translateX(15px) rotate(4deg) scale(0.96);
+            }
+        }
+
+        .welcome-ticker {
+            display: inline-block !important;
+            height: 1.2em !important;
+            overflow: hidden !important;
+            vertical-align: bottom !important;
+            position: relative !important;
+        }
+
+        .welcome-ticker-track {
+            display: flex !important;
+            flex-direction: column !important;
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1) !important;
+        }
+
+        .welcome-ticker-item {
+            height: 1.2em !important;
+            line-height: 1.2em !important;
+            white-space: nowrap !important;
+        }
+
+        /* Блок статуса "узнаем вас" с бегающей точкой */
+        .welcome-loader-status {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            font-size: 18px !important;
+            letter-spacing: 2px !important;
+            color: rgba(255, 255, 255, 0.5) !important;
+            transition: opacity 0.4s ease !important;
+        }
+
+        .welcome-loader-status.hidden {
             opacity: 0 !important;
-            transform: translateY(15px) scale(0.8) !important;
-            transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease !important;
+            pointer-events: none !important;
+            display: none !important;
         }
 
-        .shortcut-key-box.visible {
-            opacity: 1 !important;
-            transform: translateY(0) scale(1) !important;
+        /* Контейнер линии загрузки */
+        .dot-loader-track {
+            position: relative !important;
+            width: 44px !important;
+            height: 6px !important;
+            background: rgba(255, 255, 255, 0.1) !important;
+            border-radius: 3px !important;
+            overflow: hidden !important;
         }
 
-        .shortcut-key-box.fade-out {
-            opacity: 0 !important;
-            transform: translateY(-10px) scale(0.9) !important;
-            transition: opacity 0.3s ease, transform 0.3s ease !important;
+        /* Бегающая белая точка без деформаций и прилипаний */
+        .dot-loader-ball {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 6px !important;
+            height: 6px !important;
+            background: #ffffff !important;
+            border-radius: 50% !important;
+            animation: moveDotClean 0.9s ease-in-out infinite alternate !important;
         }
 
-        /* Цветовые статусы */
-        .shortcut-key-box.status-progress {
-            border-color: #ff9800 !important;
-            box-shadow: 0 0 15px rgba(255, 152, 0, 0.4) !important;
-            color: #ff9800 !important;
-        }
-
-        .shortcut-key-box.status-success-global {
-            border-color: #4caf50 !important;
-            box-shadow: 0 0 15px rgba(76, 175, 80, 0.4) !important;
-            color: #4caf50 !important;
-        }
-
-        .shortcut-key-box.status-success-page {
-            border-color: #00bcd4 !important;
-            box-shadow: 0 0 15px rgba(0, 188, 212, 0.4) !important;
-            color: #00bcd4 !important;
-        }
-
-        .shortcut-key-box.status-error {
-            border-color: #f44336 !important;
-            box-shadow: 0 0 15px rgba(244, 67, 54, 0.4) !important;
-            color: #f44336 !important;
+        @keyframes moveDotClean {
+            0% {
+                left: 0px;
+            }
+            100% {
+                left: 38px;
+            }
         }
     `;
 
-    const styleEl = document.createElement('style');
-    styleEl.id = 'shortcut-visualizer-styles';
-    styleEl.textContent = css;
-    document.head.appendChild(styleEl);
-
-    shortcutContainer = document.createElement('div');
-    shortcutContainer.id = 'shortcut-visualizer';
-    document.body.appendChild(shortcutContainer);
+    const styleElement = document.createElement('style');
+    styleElement.id = 'welcome-greeting-styles';
+    styleElement.textContent = css;
+    document.head.appendChild(styleElement);
 }
 
-function showKeyVisual(code, char) {
-    if (!shortcutContainer) initShortcutVisualizer();
+// --- ОСНОВНАЯ ФУНКЦИЯ ---
+async function initGreetingUI() {
+    if (document.getElementById('welcome-greeting-overlay')) return;
 
-    if (activeKeyBoxes.has(code)) return;
-
-    if (activeKeyBoxes.size >= 5) {
-        const firstKey = activeKeyBoxes.keys().next().value;
-        if (firstKey) hideKeyVisual(firstKey);
+    // Проверяем сначала фейковую сессию от шортката ACT, если ее нет — берем из Supabase
+    let session = window.mockSupabaseSession || null;
+    
+    if (!session) {
+        try {
+            const client = window.supabaseClient || window.supabase;
+            if (client && client.auth) {
+                const { data } = await client.auth.getSession();
+                session = data?.session;
+            }
+        } catch (e) { console.error(e); }
     }
 
-    const keyBox = document.createElement('div');
-    keyBox.className = 'shortcut-key-box';
-    keyBox.textContent = char;
-    shortcutContainer.appendChild(keyBox);
+    if (!session || !session.user) return;
 
-    activeKeyBoxes.set(code, keyBox);
+    injectGreetingStyles();
 
+    const user = session.user;
+    const emailPrefix = (user.email ? user.email.split('@')[0] : 'USER').toUpperCase();
+    const fullName = (user.user_metadata?.full_name || user.user_metadata?.username || 'ПОЛЬЗОВАТЕЛЬ').toUpperCase();
+
+    const greetingHTML = `
+        <div id="welcome-greeting-overlay" class="welcome-overlay">
+            <img src="images/geo_logo.png" alt="" class="welcome-bg-watermark">
+            <div class="welcome-container">
+                <h1 id="welcome-title-element" class="welcome-title">
+                    <span id="welcome-status-box" class="welcome-loader-status">
+                        УЗНАЕМ ВАС
+                        <span class="dot-loader-track">
+                            <span class="dot-loader-ball"></span>
+                        </span>
+                    </span>
+                    <span id="welcome-main-greeting" style="display: none;">
+                        ЗДРАВСТВУЙТЕ, 
+                        <span class="welcome-ticker">
+                            <span class="welcome-ticker-track" id="welcome-track">
+                                <span class="welcome-ticker-item">${emailPrefix}!</span>
+                                <span class="welcome-ticker-item">${fullName}!</span>
+                            </span>
+                        </span>
+                    </span>
+                </h1>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', greetingHTML);
+    const overlay = document.getElementById('welcome-greeting-overlay');
+    const titleElement = document.getElementById('welcome-title-element');
+    const statusBox = document.getElementById('welcome-status-box');
+    const mainGreeting = document.getElementById('welcome-main-greeting');
+    const track = document.getElementById('welcome-track');
+
+    // Показываем оверлей[cite: 3]
     requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            keyBox.classList.add('visible');
-        });
+        requestAnimationFrame(() => overlay.classList.add('visible'));
     });
 
-    return keyBox;
-}
-
-function hideKeyVisual(code) {
-    const keyBox = activeKeyBoxes.get(code);
-    if (!keyBox) return;
-
-    activeKeyBoxes.delete(code);
-    keyBox.classList.add('fade-out');
+    // Ровно через 2 секунды убираем статус «Узнаем вас» и выдвигаем основной текст[cite: 3]
     setTimeout(() => {
-        if (keyBox.parentNode) keyBox.remove();
-    }, 300);
+        statusBox.classList.add('hidden');
+        statusBox.style.display = 'none';
+        
+        mainGreeting.style.display = 'inline';
+        titleElement.classList.add('revealed');
+    }, 2000);
+
+    // Смена почты на имя внутри тикера (спустя 3 секунды от начала)[cite: 3]
+    setTimeout(() => {
+        if (track) {
+            track.style.transform = 'translateY(-1.2em)';
+        }
+    }, 3000);
+
+    // Закрытие всего экрана приветствия на отметке 5 секунд[cite: 3]
+    setTimeout(() => {
+        overlay.classList.add('fade-out');
+        setTimeout(() => overlay.remove(), 800);
+    }, 5000); 
 }
 
-function updateVisualStatuses(currentSequence, isGlobalActive, isPageActiveGreen, isPageActiveBlue, isError) {
-    const boxes = Array.from(activeKeyBoxes.values());
-    
-    boxes.forEach((box) => {
-        box.classList.remove('status-progress', 'status-success-global', 'status-success-page', 'status-error');
-
-        if (isError) {
-            box.classList.add('status-error');
-        } else if (isGlobalActive || isPageActiveGreen) {
-            box.classList.add('status-success-global'); // Зеленый (HEL глобально ИЛИ GEO на pc.html)
-        } else if (isPageActiveBlue) {
-            box.classList.add('status-success-page');   // Голубой (HEL на pc.html или слова на чужих страницах)
-        } else if (currentSequence.length >= 2) {
-            box.classList.add('status-progress');       // Оранжевый в процессе
-        }
-    });
-}
-
-document.addEventListener('DOMContentLoaded', initShortcutVisualizer);
-
-document.addEventListener('keydown', (e) => {
-    if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
-    if (e.repeat) return;
-    if (['Control', 'Shift', 'Alt', 'Meta', 'CapsLock', 'Tab'].includes(e.key)) return;
-
-    const key = keyMap[e.code];
-    if (!key) return;
-
-    clearTimeout(sequenceTimeout);
-
-    if (!window.lastPressTime || Date.now() - window.lastPressTime > 1500) {
-        keySequence = [];
-    }
-    window.lastPressTime = Date.now();
-
-    showKeyVisual(e.code, key);
-
-    sequenceTimeout = setTimeout(() => {
-        keySequence = [];
-        updateVisualStatuses('', false, false, false, false);
-    }, 1500);
-
-    keySequence.push(key);
-    if (keySequence.length > 3) {
-        keySequence.shift();
-    }
-
-    const currentCombination = keySequence.join('');
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-    const isPcPage = (currentPage === 'pc.html');
-
-    const isHelWord = (currentCombination === 'HEL');
-    const isGeoWord = (currentCombination === 'GEO');
-    const isAnyWordExist = isHelWord || isGeoWord;
-
-    // Условия цветов
-    const isGlobalActive = (isHelWord && !isPcPage);       // HEL везде, кроме pc.html -> Зеленый
-    const isPageActiveGreen = (isPcPage && isGeoWord);    // GEO на pc.html -> Зеленый (активный)
-    
-    const isPageActiveBlue = (isPcPage && isHelWord) || (!isPcPage && isGeoWord); // HEL на pc.html ИЛИ GEO не на pc.html -> Голубой
-
-    const isError = (keySequence.length === 3 && !isAnyWordExist);
-
-    updateVisualStatuses(currentCombination, isGlobalActive, isPageActiveGreen, isPageActiveBlue, isError);
-
-    // Действия
-    if (isPageActiveGreen) { // GEO на pc.html
-        e.preventDefault();
-        keySequence = [];
-        sessionStorage.setItem('dev_console_authenticated', 'true');
-        setTimeout(() => { 
-            window.location.href = '/beginning.html'; 
-        }, 300);
-    }
-
-    if (isHelWord) { // HEL работает везде
-        e.preventDefault();
-        keySequence = [];
-
-        if (typeof window.initGreetingUI === 'function') {
-            window.initGreetingUI();
-        } else {
-            console.error('Функция initGreetingUI не найдена.');
-        }
-    }
-});
-
-document.addEventListener('keyup', (e) => {
-    hideKeyVisual(e.code);
-});
+// Делаем функцию доступной глобально для шорткатов
+window.initGreetingUI = initGreetingUI;
