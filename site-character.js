@@ -125,18 +125,23 @@ function initSiteCharacter() {
             transform: translate(-50%, 0) !important;
         }
 
-        /* Лоадер скрыт во всех режимах, кроме loading */
+        /* Лоадер над глазами */
         .char-loader {
-            display: none !important;
+            display: flex !important; /* Всегда в DOM */
             gap: 6px !important;
             align-items: center !important;
             justify-content: center !important;
-            height: 20px !important;
+            height: 20px !important; /* Фиксированная высота */
             margin-bottom: -10px !important;
+            opacity: 0 !important; /* Невидимый по умолчанию */
+            visibility: hidden !important;
+            transition: opacity 0.3s ease !important; /* Плавность */
         }
 
+        /* Появляется только в режиме загрузки */
         #site-character-widget.state-loading .char-loader {
-            display: flex !important;
+            opacity: 1 !important;
+            visibility: visible !important;
         }
     `;
 
