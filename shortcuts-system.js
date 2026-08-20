@@ -136,18 +136,19 @@ function updateVisualStatuses(currentSequence, isMatchGlobal, isMatchPage, isErr
     const boxes = Array.from(activeKeyBoxes.values());
     
     boxes.forEach((box) => {
+        // Очищаем старые статусы перед добавлением актуального
         box.classList.remove('status-progress', 'status-success-global', 'status-success-page', 'status-error');
 
         if (isError) {
             box.classList.add('status-error');
         } else if (isMatchPage) {
-            box.classList.add('status-success-page'); // Голубой для GEO на pc.html
+            box.classList.add('status-success-page');
         } else if (isMatchGlobal) {
-            box.classList.add('status-success-global'); // Зеленый для HEL
+            box.classList.add('status-success-global');
         } else if (currentSequence.length >= 2) {
-            box.classList.add('status-progress'); // Оранжевый со 2-й буквы
+            box.classList.add('status-progress');
         }
-        // Если длина 1 — класс не добавляется, квадрат остается стандартным (белым)
+        // Если длина меньше 2, классы не добавляются — цвет остается стандартным (белым)
     });
 }
 
@@ -161,9 +162,18 @@ document.addEventListener('keydown', (e) => {
     const key = keyMap[e.code];
     if (!key) return;
 
+    // Сбрасываем таймер старой последовательности при новом нажатии
+    clearTimeout(sequenceTimeout);
+
+    // Если прошло больше 1.5 с с прошлого нажатия, полностью обнуляем буфер,
+    // чтобы старый набор не влиял на новые цвета
+    if (!window.lastPressTime || Date.now() - window.lastPressTime > 1500) {
+        keySequence = [];
+    }
+    window.lastPressTime = Date.now();
+
     showKeyVisual(e.code, key);
 
-    clearTimeout(sequenceTimeout);
     sequenceTimeout = setTimeout(() => {
         keySequence = [];
         updateVisualStatuses('', false, false, false);
@@ -180,12 +190,12 @@ document.addEventListener('keydown', (e) => {
     const isMatchGlobal = (currentCombination === 'HEL');
     const isMatchPage = (currentPage === 'pc.html' && currentCombination === 'GEO');
     
-    // Ошибкой считаем только если набрано ровно 3 символа и это неверная комбинация
+    // Ошибка фиксируется только при наборе ровно 3 символов, которые неверны
     const isError = (keySequence.length === 3 && !isMatchGlobal && !isMatchPage);
 
     updateVisualStatuses(currentCombination, isMatchGlobal, isMatchPage, isError);
 
-    // Действия при успешном наборе
+    // Успешные действия
     if (isMatchPage) {
         e.preventDefault();
         keySequence = [];
