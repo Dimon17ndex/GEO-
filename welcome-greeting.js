@@ -35,7 +35,6 @@ function injectGreetingStyles() {
             z-index: 10 !important;
         }
 
-        /* Начальное состояние текста: смещен вниз, полупрозрачный и размытый */
         .welcome-title {
             font-family: 'Montserrat', sans-serif !important;
             font-size: 28px !important; 
@@ -46,17 +45,14 @@ function injectGreetingStyles() {
             margin: 0 !important;
             text-align: center !important;
             transform: translateY(35px) !important;
-            filter: blur(4px) !important;
+            /* Убрали filter: blur(4px), теперь текст сразу резкий */
             transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), 
-                        color 0.6s ease, 
-                        filter 0.6s ease !important;
+                        color 0.6s ease !important;
         }
 
-        /* Конечное (активное) состояние текста после анимации */
         .welcome-title.revealed {
             color: #ffffff !important;
             transform: translateY(0) !important;
-            filter: blur(0px) !important;
         }
 
         /* Фоновое лого */
