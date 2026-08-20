@@ -4,11 +4,13 @@ let keySequence = [];
 let sequenceTimeout = null;
 let shortcutContainer = null;
 
-// --- СОЗДАНИЕ ВИЗУАЛЬНОГО КОНТЕЙНЕРА В НИЖНЕМ ЛЕВОМ УГЛУ ---
+// Хранилище активных визуальных блоков по кодам клавиш (например, 'KeyH', 'KeyE')
+const activeKeyBoxes = new Map();
+
+// --- СОЗДАНИЕ ВИЗУАЛЬНОГО КОНТЕЙНЕРА ---
 function initShortcutVisualizer() {
     if (document.getElementById('shortcut-visualizer')) return;
 
-    // Внедряем стили для плавающих «клавиш»
     const css = `
         #shortcut-visualizer {
             position: fixed !important;
@@ -39,7 +41,7 @@ function initShortcutVisualizer() {
             
             opacity: 0 !important;
             transform: translateY(15px) scale(0.8) !important;
-            transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+            transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
         }
 
         .shortcut-key-box.visible {
@@ -50,7 +52,7 @@ function initShortcutVisualizer() {
         .shortcut-key-box.fade-out {
             opacity: 0 !important;
             transform: translateY(-10px) scale(0.9) !important;
-            transition: opacity 0.4s ease, transform 0.4s ease !important;
+            transition: opacity 0.3s ease, transform 0.3s ease !important;
         }
     `;
 
@@ -59,63 +61,72 @@ function initShortcutVisualizer() {
     styleEl.textContent = css;
     document.head.appendChild(styleEl);
 
-    // Создаем сам контейнер
     shortcutContainer = document.createElement('div');
     shortcutContainer.id = 'shortcut-visualizer';
     document.body.appendChild(shortcutContainer);
 }
 
-// Функция отображения буквы в левом нижнем углу
-function renderKeyVisual(char) {
+// Показываем блок при нажатии клавиши
+function showKeyVisual(code, char) {
     if (!shortcutContainer) initShortcutVisualizer();
 
-    // Создаем элемент квадратной «клавиши»
+    // Если блок для этой клавиши уже отображается (например, при повторе), не плодим новые
+    if (activeKeyBoxes.has(code)) return;
+
     const keyBox = document.createElement('div');
     keyBox.className = 'shortcut-key-box';
     keyBox.textContent = char;
     shortcutContainer.appendChild(keyBox);
 
-    // Даем браузеру отрисовать элемент перед запуском анимации появления
+    // Сохраняем ссылку в Map
+    activeKeyBoxes.set(code, keyBox);
+
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
             keyBox.classList.add('visible');
         });
     });
 
-    // Ограничиваем количество отображаемых клавиш на экране (максимум 3)
+    // Ограничиваем максимальное количество блоков на экране (не больше 3)
     if (shortcutContainer.children.length > 3) {
         const oldestBox = shortcutContainer.children[0];
-        oldestBox.classList.add('fade-out');
-        setTimeout(() => oldestBox.remove(), 400);
-    }
-
-    // Автоматическое растворение и удаление клавиши через 1.5 секунды бездействия
-    setTimeout(() => {
-        if (keyBox.parentNode) {
-            keyBox.classList.add('fade-out');
-            setTimeout(() => keyBox.remove(), 400);
+        // Находим ключ этого старого элемента в Map и удаляем
+        for (let [k, v] of activeKeyBoxes.entries()) {
+            if (v === oldestBox) {
+                activeKeyBoxes.delete(k);
+                break;
+            }
         }
-    }, 1500);
+        oldestBox.classList.add('fade-out');
+        setTimeout(() => oldestBox.remove(), 300);
+    }
 }
 
-// --- ОБРАБОТЧИК НАЖАТИЙ КЛАВИШ ---
+// Скрываем блок при отпускании клавиши
+function hideKeyVisual(code) {
+    const keyBox = activeKeyBoxes.get(code);
+    if (!keyBox) return;
+
+    activeKeyBoxes.delete(code);
+    keyBox.classList.add('fade-out');
+    setTimeout(() => {
+        if (keyBox.parentNode) keyBox.remove();
+    }, 300);
+}
+
+// --- СОБЫТИЯ КЛАВИАТУРЫ ---
 document.addEventListener('DOMContentLoaded', initShortcutVisualizer);
 
+// 1. Нажатие клавиши
 document.addEventListener('keydown', (e) => {
     if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
-
-    // Игнорируем зажатие клавиши (автоповтор при удерживании)
-    if (e.repeat) return;
-
-    // Игнорируем чисто системные клавиши-модификаторы
+    if (e.repeat) return; // Игнорируем автоповтор при зажатии
     if (['Control', 'Shift', 'Alt', 'Meta', 'CapsLock', 'Tab'].includes(e.key)) return;
 
     const key = e.key.toUpperCase();
+    showKeyVisual(e.code, key);
 
-    // Отрисовываем ровно ОДИН визуальный блок (без спама)
-    renderKeyVisual(key);
-
-    // Сброс буфера последовательности шорткатов
+    // Логика шорткатов
     clearTimeout(sequenceTimeout);
     sequenceTimeout = setTimeout(() => {
         keySequence = [];
@@ -129,7 +140,7 @@ document.addEventListener('keydown', (e) => {
     const currentCombination = keySequence.join('');
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
 
-    // 1. Комбинация для bypass на pc.html (GEO или ПУЩ)
+    // Bypass на pc.html (GEO или ПУЩ)
     if (currentPage === 'pc.html' && (currentCombination === 'GEO' || currentCombination === 'ПУЩ')) {
         e.preventDefault();
         keySequence = [];
@@ -139,7 +150,7 @@ document.addEventListener('keydown', (e) => {
         }, 500);
     }
 
-    // 2. Комбинация для вызова приветствия (HEL или РУД) на любой странице
+    // Приветствие (HEL или РУД)
     if (currentCombination === 'HEL' || currentCombination === 'РУД') {
         e.preventDefault();
         keySequence = [];
@@ -150,4 +161,9 @@ document.addEventListener('keydown', (e) => {
             console.error('Функция initGreetingUI не найдена.');
         }
     }
+});
+
+// 2. Отпускание клавиши — теперь визуал растворяется именно здесь
+document.addEventListener('keyup', (e) => {
+    hideKeyVisual(e.code);
 });
