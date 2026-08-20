@@ -48,6 +48,11 @@ function initSiteCharacter() {
             transform: scaleY(0.1) !important;
         }
 
+        /* Действие подмигивания: закрываем только правый глаз */
+        #site-character-widget.action-wink .char-eye:nth-child(2) {
+            transform: scaleY(0.1) !important;
+        }
+
         /* Большой рот персонажа — линия толщиной 6px */
         .char-mouth {
             width: 44px !important;
@@ -76,6 +81,14 @@ function initSiteCharacter() {
             height: 18px !important;
             background: #ffffff !important;
             border-radius: 0 0 50px 50px !important;
+        }
+
+        /* 4. Действие: овальный рот по горизонтали для первой фазы подмигивания */
+        #site-character-widget.action-wink-oval .char-mouth {
+            width: 48px !important;
+            height: 12px !important;
+            background: #ffffff !important;
+            border-radius: 50px !important;
         }
 
         /* Лоадер из точек над персонажем (по умолчанию скрыт) */
@@ -167,23 +180,34 @@ function initSiteCharacter() {
 
     document.body.insertAdjacentHTML('beforeend', widgetHTML);
 
+    // Флаг для блокировки рандомного моргания во время действия
+    window._isCharacterActionRunning = false;
+
     // --- РАНДОМНОЕ МОРГАНИЕ ЧЕРЕЗ JS ---
     const widget = document.getElementById('site-character-widget');
 
     function triggerBlink() {
         if (!widget) return;
 
+        // Если выполняется действие, пропускаем обычное моргание
+        if (window._isCharacterActionRunning) {
+            const nextBlinkDelay = Math.random() * 3500 + 1500;
+            setTimeout(triggerBlink, nextBlinkDelay);
+            return;
+        }
+
         // Добавляем класс моргания
         widget.classList.add('blinking');
 
         // Через 120мс открываем глаза обратно
         setTimeout(() => {
-            if (!widget) return;
+            if (!widget || window._isCharacterActionRunning) return;
             widget.classList.remove('blinking');
 
             // Случайная вероятность (35%) сделать двойное моргание
             if (Math.random() < 0.35) {
                 setTimeout(() => {
+                    if (!widget || window._isCharacterActionRunning) return;
                     widget.classList.add('blinking');
                     setTimeout(() => {
                         if (widget) widget.classList.remove('blinking');
@@ -204,6 +228,7 @@ function initSiteCharacter() {
 // Глобальные методы управления персонажем
 window.siteCharacter = {
     setLoading: function() {
+        if (window._isCharacterActionRunning) return;
         const widget = document.getElementById('site-character-widget');
         if (widget) {
             const isBlinking = widget.classList.contains('blinking');
@@ -211,6 +236,7 @@ window.siteCharacter = {
         }
     },
     setNeutral: function() {
+        if (window._isCharacterActionRunning) return;
         const widget = document.getElementById('site-character-widget');
         if (widget) {
             const isBlinking = widget.classList.contains('blinking');
@@ -218,11 +244,41 @@ window.siteCharacter = {
         }
     },
     setHappy: function() {
+        if (window._isCharacterActionRunning) return;
         const widget = document.getElementById('site-character-widget');
         if (widget) {
             const isBlinking = widget.classList.contains('blinking');
             widget.className = 'state-happy' + (isBlinking ? ' blinking' : '');
         }
+    },
+    wink: function() {
+        const widget = document.getElementById('site-character-widget');
+        if (!widget || window._isCharacterActionRunning) return;
+
+        // Блокируем другие действия и рандомное моргание
+        window._isCharacterActionRunning = true;
+        widget.classList.remove('blinking');
+
+        // Определяем, какая эмоция была до начала действия
+        let previousState = 'state-neutral';
+        if (widget.classList.contains('state-happy')) previousState = 'state-happy';
+        if (widget.classList.contains('state-loading')) previousState = 'state-loading';
+
+        // Шаг 1: Подмигивание (правый глаз закрыт) + овальный рот по горизонтали
+        widget.className = 'action-wink action-wink-oval';
+
+        // Шаг 2: Через 400мс меняем рот на обычную улыбку (как при радости), но правый глаз всё еще подмигивает
+        setTimeout(() => {
+            if (!widget) return;
+            widget.className = 'state-happy action-wink';
+        }, 400);
+
+        // Шаг 3: Через 900мс возвращаем персонажа в исходную эмоцию и снимаем блокировку
+        setTimeout(() => {
+            if (!widget) return;
+            widget.className = previousState;
+            window._isCharacterActionRunning = false;
+        }, 900);
     },
     hide: function() {
         const widget = document.getElementById('site-character-widget');
