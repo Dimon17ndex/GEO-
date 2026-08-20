@@ -59,7 +59,7 @@
             color: #ffffff;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
-        
+
         /* =========================================================
             ОБЩИЙ КОНТЕЙНЕР ДЛЯ ВСЕХ ЭЛЕМЕНТОВ УПРАВЛЕНИЯ
             ========================================================= */
@@ -801,6 +801,19 @@ document.addEventListener('DOMContentLoaded', () => {
         mechanicsMenu?.classList.remove('active');
     });
 });
+
+function updateVisSlider(state) {
+    const showBtn = document.getElementById('btn-show-char');
+    const hideBtn = document.getElementById('btn-hide-char');
+    
+    if (state === 'show') {
+        showBtn?.classList.add('active');
+        hideBtn?.classList.remove('active');
+    } else {
+        hideBtn?.classList.add('active');
+        showBtn?.classList.remove('active');
+    }
+}
 </script>
 
 <script src="site-warning.js" defer></script>
