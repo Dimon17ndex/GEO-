@@ -24,6 +24,7 @@ function initSiteCharacter() {
             pointer-events: none !important;
         }
 
+        /* Контейнер глаз */
         .char-eyes {
             display: flex !important;
             gap: 48px !important;
@@ -31,6 +32,7 @@ function initSiteCharacter() {
             justify-content: center !important;
         }
 
+        /* Большие глаза персонажа — пустые круги с обводкой 6px */
         .char-eye {
             width: 50px !important;
             height: 50px !important;
@@ -38,19 +40,20 @@ function initSiteCharacter() {
             border: 6px solid #ffffff !important;
             border-radius: 50% !important;
             box-sizing: border-box !important;
-            position: relative !important;
-            overflow: hidden !important;
-            transition: transform 0.1s ease !important;
+            transition: transform 0.1s ease !important; /* Быстрое и плавное смыкание */
         }
 
+        /* Состояние моргания (сплющивание по вертикали) */
         #site-character-widget.blinking .char-eye {
             transform: scaleY(0.1) !important;
         }
 
+        /* Действие подмигивания: закрываем только правый глаз */
         #site-character-widget.action-wink .char-eye:nth-child(2) {
             transform: scaleY(0.1) !important;
         }
 
+        /* Большой рот персонажа — линия толщиной 6px */
         .char-mouth {
             width: 44px !important;
             height: 6px !important;
@@ -59,16 +62,20 @@ function initSiteCharacter() {
             transition: all 0.3s ease !important;
         }
 
+        /* Эмоции и состояния */
+        /* 1. Режим загрузки / думает */
         #site-character-widget.state-loading .char-mouth {
             width: 24px !important;
             height: 6px !important;
         }
 
+        /* 2. Режим нейтральный */
         #site-character-widget.state-neutral .char-mouth {
-            width: 56px !important;
+           width: 56px !important;
             height: 6px !important;
         }
 
+        /* 3. Режим успеха / радости */
         #site-character-widget.state-happy .char-mouth {
             width: 52px !important;
             height: 18px !important;
@@ -76,6 +83,7 @@ function initSiteCharacter() {
             border-radius: 0 0 50px 50px !important;
         }
 
+        /* 4. Действие: овальный рот по горизонтали для первой фазы подмигивания */
         #site-character-widget.action-wink-oval .char-mouth {
             width: 48px !important;
             height: 12px !important;
@@ -83,21 +91,14 @@ function initSiteCharacter() {
             border-radius: 50px !important;
         }
 
+        /* Лоадер из точек над персонажем (по умолчанию скрыт) */
         .char-loader {
-            display: flex !important;
+            display: none !important;
             gap: 6px !important;
             align-items: center !important;
             justify-content: center !important;
             height: 20px !important;
             margin-bottom: -10px !important;
-            opacity: 0 !important;
-            visibility: hidden !important;
-            transition: opacity 0.3s ease !important;
-        }
-
-        #site-character-widget.state-loading .char-loader {
-            opacity: 1 !important;
-            visibility: visible !important;
         }
 
         .loader-dot {
@@ -117,20 +118,43 @@ function initSiteCharacter() {
             40% { transform: scale(1.2); opacity: 1; }
         }
 
+        /* Зрачки внутри глаз — по умолчанию видны и находятся по центру */
         .char-pupil {
             width: 12px !important;
             height: 12px !important;
             background: #ffffff !important;
             border-radius: 50% !important;
-            position: absolute !important;
+            position: relative !important;
             top: 50% !important;
             left: 50% !important;
             transform: translate(-50%, -50%) !important;
+            opacity: 1 !important; /* Всегда видны в базовых эмоциях */
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
 
+        /* Поведение в режиме «Думает» (поднимаются наверх к точкам) */
         #site-character-widget.state-loading .char-pupil {
-            top: 20% !important; 
+            top: 18% !important; 
             transform: translate(-50%, 0) !important;
+        }
+
+        /* Лоадер над глазами */
+        .char-loader {
+            display: flex !important; /* Всегда в DOM */
+            gap: 6px !important;
+            align-items: center !important;
+            justify-content: center !important;
+            height: 20px !important; /* Фиксированная высота */
+            margin-bottom: -10px !important;
+            opacity: 0 !important; /* Невидимый по умолчанию */
+            visibility: hidden !important;
+            transition: opacity 0.3s ease !important; /* Плавность */
+        }
+
+        /* Появляется только в режиме загрузки */
+        #site-character-widget.state-loading .char-loader {
+            opacity: 1 !important;
+            visibility: visible !important;
         }
     `;
 
@@ -156,94 +180,119 @@ function initSiteCharacter() {
 
     document.body.insertAdjacentHTML('beforeend', widgetHTML);
 
+    // Флаг для блокировки рандомного моргания во время действия
     window._isCharacterActionRunning = false;
-    let isTrackingActive = true;
+
+    // --- РАНДОМНОЕ МОРГАНИЕ ЧЕРЕЗ JS ---
     const widget = document.getElementById('site-character-widget');
 
-    // Движение глаз за мышкой
-    window.addEventListener('mousemove', (e) => {
-        if (!isTrackingActive || !widget) return;
-        if (widget.classList.contains('state-loading')) return; // Если думает — не двигаем зрачки
-
-        const pupils = widget.querySelectorAll('.char-pupil');
-        pupils.forEach(pupil => {
-            const eye = pupil.parentElement;
-            const rect = eye.getBoundingClientRect();
-            
-            const eyeCenterX = rect.left + rect.width / 2;
-            const eyeCenterY = rect.top + rect.height / 2;
-
-            const radian = Math.atan2(e.clientY - eyeCenterY, e.clientX - eyeCenterX);
-            const maxDistance = 10; // Ограничение радиуса движения зрачка внутри глаза
-            const distance = Math.min(maxDistance, Math.hypot(e.clientX - eyeCenterX, e.clientY - eyeCenterY) * 0.1);
-
-            const x = Math.cos(radian) * distance;
-            const y = Math.sin(radian) * distance;
-
-            pupil.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
-        });
-    });
-
-    // Рандомное моргание
     function triggerBlink() {
         if (!widget) return;
+
+        // Если выполняется действие, пропускаем обычное моргание
         if (window._isCharacterActionRunning) {
-            setTimeout(triggerBlink, 2000);
+            const nextBlinkDelay = Math.random() * 3500 + 1500;
+            setTimeout(triggerBlink, nextBlinkDelay);
             return;
         }
 
+        // Добавляем класс моргания
         widget.classList.add('blinking');
+
+        // Через 120мс открываем глаза обратно
         setTimeout(() => {
-            if (!widget) return;
+            if (!widget || window._isCharacterActionRunning) return;
             widget.classList.remove('blinking');
+
+            // Случайная вероятность (35%) сделать двойное моргание
+            if (Math.random() < 0.35) {
+                setTimeout(() => {
+                    if (!widget || window._isCharacterActionRunning) return;
+                    widget.classList.add('blinking');
+                    setTimeout(() => {
+                        if (widget) widget.classList.remove('blinking');
+                    }, 120);
+                }, 180);
+            }
         }, 120);
 
-        setTimeout(triggerBlink, Math.random() * 3500 + 1500);
+        // Планируем следующее моргание в случайном диапазоне от 1.5 до 5 секунд
+        const nextBlinkDelay = Math.random() * 3500 + 1500;
+        setTimeout(triggerBlink, nextBlinkDelay);
     }
 
+    // Запускаем первый цикл моргания
     setTimeout(triggerBlink, 2000);
-
-    // Экспортируем глобальные методы управления
-    window.siteCharacter = {
-        setLoading: function() {
-            if (window._isCharacterActionRunning) return;
-            if (widget) widget.className = 'state-loading';
-        },
-        setNeutral: function() {
-            if (window._isCharacterActionRunning) return;
-            if (widget) widget.className = 'state-neutral';
-        },
-        setHappy: function() {
-            if (window._isCharacterActionRunning) return;
-            if (widget) widget.className = 'state-happy';
-        },
-        wink: function() {
-            if (!widget || window._isCharacterActionRunning) return;
-
-            window._isCharacterActionRunning = true;
-            let currentState = 'state-neutral';
-            if (widget.classList.contains('state-happy')) currentState = 'state-happy';
-            if (widget.classList.contains('state-loading')) currentState = 'state-loading';
-
-            widget.className = currentState + ' action-wink action-wink-oval';
-            setTimeout(() => {
-                if (widget) widget.className = currentState + ' action-wink';
-            }, 200);
-            setTimeout(() => {
-                if (widget) widget.className = currentState;
-                window._isCharacterActionRunning = false;
-            }, 450);
-        },
-        toggleTracking: function() {
-            isTrackingActive = !isTrackingActive;
-        },
-        hide: function() {
-            if (widget) widget.style.opacity = '0';
-        },
-        show: function() {
-            if (widget) widget.style.opacity = '1';
-        }
-    };
 }
+
+// Глобальные методы управления персонажем
+window.siteCharacter = {
+    setLoading: function() {
+        if (window._isCharacterActionRunning) return;
+        const widget = document.getElementById('site-character-widget');
+        if (widget) {
+            const isBlinking = widget.classList.contains('blinking');
+            widget.className = 'state-loading' + (isBlinking ? ' blinking' : '');
+        }
+    },
+    setNeutral: function() {
+        if (window._isCharacterActionRunning) return;
+        const widget = document.getElementById('site-character-widget');
+        if (widget) {
+            const isBlinking = widget.classList.contains('blinking');
+            widget.className = 'state-neutral' + (isBlinking ? ' blinking' : '');
+        }
+    },
+    setHappy: function() {
+        if (window._isCharacterActionRunning) return;
+        const widget = document.getElementById('site-character-widget');
+        if (widget) {
+            const isBlinking = widget.classList.contains('blinking');
+            widget.className = 'state-happy' + (isBlinking ? ' blinking' : '');
+        }
+    },
+    wink: function() {
+        const widget = document.getElementById('site-character-widget');
+        if (!widget || window._isCharacterActionRunning) return;
+
+        // Блокируем другие действия и рандомное моргание на время анимации
+        window._isCharacterActionRunning = true;
+        widget.classList.remove('blinking');
+
+        // 1. Запоминаем текущие классы состояния
+        let currentState = 'state-neutral';
+        if (widget.classList.contains('state-happy')) currentState = 'state-happy';
+        if (widget.classList.contains('state-loading')) currentState = 'state-loading';
+
+        // 2. Шаг 1: Оставляем текущую эмоцию, подмигиваем и делаем рот овальным
+        widget.className = currentState + ' action-wink action-wink-oval';
+
+        // 3. Шаг 2: Быстро (через 200мс) возвращаем рот в исходную форму эмоции, оставляя подмигивание еще на чуть-чуть
+        setTimeout(() => {
+            if (!widget) return;
+            widget.className = currentState + ' action-wink';
+        }, 200);
+
+        // 4. Шаг 3: Полностью завершаем подмигивание (всего за 450мс) и снимаем блокировку
+        setTimeout(() => {
+            if (!widget) return;
+            widget.className = currentState;
+            window._isCharacterActionRunning = false;
+        }, 450);
+    },
+    hide: function() {
+        const widget = document.getElementById('site-character-widget');
+        if (widget) {
+            widget.style.opacity = '0';
+            widget.style.pointerEvents = 'none';
+        }
+    },
+    show: function() {
+        const widget = document.getElementById('site-character-widget');
+        if (widget) {
+            widget.style.opacity = '1';
+        }
+    }
+};
 
 document.addEventListener('DOMContentLoaded', initSiteCharacter);
