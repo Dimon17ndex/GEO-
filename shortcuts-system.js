@@ -4,17 +4,14 @@ let keySequence = [];
 let sequenceTimeout = null;
 let shortcutContainer = null;
 
-// Хранилище активных визуальных блоков по кодам клавиш (например, 'KeyH', 'KeyE')
 const activeKeyBoxes = new Map();
 
-// Карта физических кодов клавиш в латинские буквы (для любой раскладки)
 const keyMap = {
     'KeyQ': 'Q', 'KeyW': 'W', 'KeyE': 'E', 'KeyR': 'R', 'KeyT': 'T', 'KeyY': 'Y', 'KeyU': 'U', 'KeyI': 'I', 'KeyO': 'O', 'KeyP': 'P',
     'KeyA': 'A', 'KeyS': 'S', 'KeyD': 'D', 'KeyF': 'F', 'KeyG': 'G', 'KeyH': 'H', 'KeyJ': 'J', 'KeyK': 'K', 'KeyL': 'L',
     'KeyZ': 'Z', 'KeyX': 'X', 'KeyC': 'C', 'KeyV': 'V', 'KeyB': 'B', 'KeyN': 'N', 'KeyM': 'M'
 };
 
-// --- СОЗДАНИЕ ВИЗУАЛЬНОГО КОНТЕЙНЕРА ---
 function initShortcutVisualizer() {
     if (document.getElementById('shortcut-visualizer')) return;
 
@@ -48,7 +45,7 @@ function initShortcutVisualizer() {
             
             opacity: 0 !important;
             transform: translateY(15px) scale(0.8) !important;
-            transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+            transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease !important;
         }
 
         .shortcut-key-box.visible {
@@ -60,6 +57,31 @@ function initShortcutVisualizer() {
             opacity: 0 !important;
             transform: translateY(-10px) scale(0.9) !important;
             transition: opacity 0.3s ease, transform 0.3s ease !important;
+        }
+
+        /* Цветовые статусы */
+        .shortcut-key-box.status-progress {
+            border-color: #ff9800 !important;
+            box-shadow: 0 0 15px rgba(255, 152, 0, 0.4) !important;
+            color: #ff9800 !important;
+        }
+
+        .shortcut-key-box.status-success-global {
+            border-color: #4caf50 !important;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.4) !important;
+            color: #4caf50 !important;
+        }
+
+        .shortcut-key-box.status-success-page {
+            border-color: #00bcd4 !important;
+            box-shadow: 0 0 15px rgba(0, 188, 212, 0.4) !important;
+            color: #00bcd4 !important;
+        }
+
+        .shortcut-key-box.status-error {
+            border-color: #f44336 !important;
+            box-shadow: 0 0 15px rgba(244, 67, 54, 0.4) !important;
+            color: #f44336 !important;
         }
     `;
 
@@ -73,19 +95,14 @@ function initShortcutVisualizer() {
     document.body.appendChild(shortcutContainer);
 }
 
-// Показываем блок при нажатии клавиши
 function showKeyVisual(code, char) {
     if (!shortcutContainer) initShortcutVisualizer();
 
-    if (activeKeyBoxes.has(code)) {
-        return;
-    }
+    if (activeKeyBoxes.has(code)) return;
 
     if (activeKeyBoxes.size >= 5) {
         const firstKey = activeKeyBoxes.keys().next().value;
-        if (firstKey) {
-            hideKeyVisual(firstKey);
-        }
+        if (firstKey) hideKeyVisual(firstKey);
     }
 
     const keyBox = document.createElement('div');
@@ -100,9 +117,10 @@ function showKeyVisual(code, char) {
             keyBox.classList.add('visible');
         });
     });
+
+    return keyBox;
 }
 
-// Скрываем блок при отпускании клавиши
 function hideKeyVisual(code) {
     const keyBox = activeKeyBoxes.get(code);
     if (!keyBox) return;
@@ -114,25 +132,43 @@ function hideKeyVisual(code) {
     }, 300);
 }
 
-// --- СОБЫТИЯ КЛАВИАТУРЫ ---
+// Функция обновления цветов всех активных блоков в зависимости от текущего набора
+function updateVisualStatuses(currentSequence, isMatchGlobal, isMatchPage, isError) {
+    const boxes = Array.from(activeKeyBoxes.values());
+    
+    // Проходим по последним введенным блокам и подкрашиваем их
+    boxes.forEach((box, index) => {
+        // Убираем старые статусы
+        box.classList.remove('status-progress', 'status-success-global', 'status-success-page', 'status-error');
+
+        if (isError) {
+            box.classList.add('status-error');
+        } else if (isMatchPage) {
+            box.classList.add('status-success-page'); // Голубой для страниц (GEO)
+        } else if (isMatchGlobal) {
+            box.classList.add('status-success-global'); // Зеленый для глобальных (HEL)
+        } else if (currentSequence.length > 0) {
+            box.classList.add('status-progress'); // Оранжевый в процессе (например, GE)
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', initShortcutVisualizer);
 
-// 1. Нажатие клавиши
 document.addEventListener('keydown', (e) => {
     if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
-    if (e.repeat) return; // Игнорируем автоповтор при зажатии
+    if (e.repeat) return;
     if (['Control', 'Shift', 'Alt', 'Meta', 'CapsLock', 'Tab'].includes(e.key)) return;
 
-    // Получаем гарантированно английскую букву по коду клавиши
     const key = keyMap[e.code];
-    if (!key) return; // Если нажата не буквенная клавиша, пропускаем
+    if (!key) return;
 
     showKeyVisual(e.code, key);
 
-    // Логика шорткатов
     clearTimeout(sequenceTimeout);
     sequenceTimeout = setTimeout(() => {
         keySequence = [];
+        updateVisualStatuses('', false, false, true); // Если таймаут вышел — подсветим ошибкой/сбросом
     }, 1500);
 
     keySequence.push(key);
@@ -143,8 +179,21 @@ document.addEventListener('keydown', (e) => {
     const currentCombination = keySequence.join('');
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
 
-    // Bypass на pc.html (сработает при GEO, даже если набирали в русской раскладке ПУЩ)
-    if (currentPage === 'pc.html' && currentCombination === 'GEO') {
+    // Проверяем префиксы (подкрадывание)
+    const isGlobalPrefix = 'HEL'.startsWith(currentCombination);
+    const isPagePrefix = (currentPage === 'pc.html' && 'GEO'.startsWith(currentCombination));
+    
+    const isMatchGlobal = (currentCombination === 'HEL');
+    const isMatchPage = (currentPage === 'pc.html' && currentCombination === 'GEO');
+    
+    // Если набрано 3 символа и это не совпало ни с чем — это ошибка
+    const isError = (keySequence.length === 3 && !isMatchGlobal && !isMatchPage);
+
+    // Обновляем цвета на экране
+    updateVisualStatuses(currentCombination, isMatchGlobal, isMatchPage, isError);
+
+    // Выполнение действий при полном совпадении
+    if (isMatchPage) {
         e.preventDefault();
         keySequence = [];
         sessionStorage.setItem('dev_console_authenticated', 'true');
@@ -153,8 +202,7 @@ document.addEventListener('keydown', (e) => {
         }, 500);
     }
 
-    // Приветствие (HEL, наберется как HEL даже при русской раскладке РУД)
-    if (currentCombination === 'HEL') {
+    if (isMatchGlobal) {
         e.preventDefault();
         keySequence = [];
 
@@ -166,7 +214,6 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// 2. Отпускание клавиши — визуал растворяется здесь
 document.addEventListener('keyup', (e) => {
     hideKeyVisual(e.code);
 });
