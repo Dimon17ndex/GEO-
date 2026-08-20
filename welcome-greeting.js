@@ -35,18 +35,31 @@ function injectGreetingStyles() {
             z-index: 10 !important;
         }
 
+        /* Начальное состояние текста: смещен вниз, полупрозрачный и размытый */
         .welcome-title {
             font-family: 'Montserrat', sans-serif !important;
             font-size: 28px !important; 
             font-weight: 900 !important;
-            color: #ffffff !important; 
+            color: rgba(255, 255, 255, 0.3) !important; 
             text-transform: uppercase !important;
             letter-spacing: 3px !important; 
             margin: 0 !important;
             text-align: center !important;
+            transform: translateY(35px) !important;
+            filter: blur(4px) !important;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), 
+                        color 0.6s ease, 
+                        filter 0.6s ease !important;
         }
 
-        /* Точно такое же фоновое лого, как в auth-system.js */
+        /* Конечное (активное) состояние текста после анимации */
+        .welcome-title.revealed {
+            color: #ffffff !important;
+            transform: translateY(0) !important;
+            filter: blur(0px) !important;
+        }
+
+        /* Фоновое лого */
         .welcome-bg-watermark {
             position: absolute !important;
             top: 45% !important;
@@ -95,6 +108,69 @@ function injectGreetingStyles() {
             line-height: 1.2em !important;
             white-space: nowrap !important;
         }
+
+        /* Блок статуса "узнаем вас" со значком-слайдером */
+        .welcome-loader-status {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            font-size: 18px !important;
+            letter-spacing: 2px !important;
+            color: rgba(255, 255, 255, 0.5) !important;
+            transition: opacity 0.4s ease !important;
+        }
+
+        .welcome-loader-status.hidden {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            display: none !important;
+        }
+
+        /* Контейнер прилипающего слайдера */
+        .sticky-slider-loader {
+            position: relative !important;
+            width: 44px !important;
+            height: 10px !important;
+            background: rgba(255, 255, 255, 0.15) !important;
+            border-radius: 5px !important;
+            overflow: hidden !important;
+        }
+
+        /* Сам анимирующийся бегунок с эффектом упругости */
+        .sticky-slider-thumb {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 16px !important;
+            height: 100% !important;
+            background: #ffffff !important;
+            border-radius: 5px !important;
+            animation: stickySlideBackAndForth 1.1s cubic-bezier(0.77, 0, 0.175, 1) infinite alternate !important;
+        }
+
+        @keyframes stickySlideBackAndForth {
+            0% {
+                left: 0px;
+                width: 16px;
+                transform: scaleX(1);
+            }
+            30% {
+                transform: scaleX(1.4); /* Эффект прилипания/растягивания при разгоне */
+            }
+            50% {
+                left: 28px;
+                width: 16px;
+                transform: scaleX(1);
+            }
+            70% {
+                transform: scaleX(1.4); /* Эффект прилипания в обратную сторону */
+            }
+            100% {
+                left: 0px;
+                width: 16px;
+                transform: scaleX(1);
+            }
+        }
     `;
 
     const styleElement = document.createElement('style');
@@ -128,12 +204,20 @@ async function initGreetingUI() {
         <div id="welcome-greeting-overlay" class="welcome-overlay">
             <img src="images/geo_logo.png" alt="" class="welcome-bg-watermark">
             <div class="welcome-container">
-                <h1 class="welcome-title">
-                    ЗДРАВСТВУЙТЕ, 
-                    <span class="welcome-ticker">
-                        <span class="welcome-ticker-track" id="welcome-track">
-                            <span class="welcome-ticker-item">${emailPrefix}!</span>
-                            <span class="welcome-ticker-item">${fullName}!</span>
+                <h1 id="welcome-title-element" class="welcome-title">
+                    <span id="welcome-status-box" class="welcome-loader-status">
+                        УЗНАЕМ ВАС
+                        <span class="sticky-slider-loader">
+                            <span class="sticky-slider-thumb"></span>
+                        </span>
+                    </span>
+                    <span id="welcome-main-greeting" style="display: none;">
+                        ЗДРАВСТВУЙТЕ, 
+                        <span class="welcome-ticker">
+                            <span class="welcome-ticker-track" id="welcome-track">
+                                <span class="welcome-ticker-item">${emailPrefix}!</span>
+                                <span class="welcome-ticker-item">${fullName}!</span>
+                            </span>
                         </span>
                     </span>
                 </h1>
@@ -143,18 +227,35 @@ async function initGreetingUI() {
 
     document.body.insertAdjacentHTML('beforeend', greetingHTML);
     const overlay = document.getElementById('welcome-greeting-overlay');
+    const titleElement = document.getElementById('welcome-title-element');
+    const statusBox = document.getElementById('welcome-status-box');
+    const mainGreeting = document.getElementById('welcome-main-greeting');
     const track = document.getElementById('welcome-track');
 
+    // Показываем оверлей
     requestAnimationFrame(() => {
         requestAnimationFrame(() => overlay.classList.add('visible'));
     });
 
+    // Через 0.5 секунд (500 мс) убираем статус «Узнаем вас», выдвигаем основной текст и активируем его
     setTimeout(() => {
-        track.style.transform = 'translateY(-1.2em)';
-    }, 1000);
+        statusBox.classList.add('hidden');
+        statusBox.style.display = 'none';
+        
+        mainGreeting.style.display = 'inline';
+        titleElement.classList.add('revealed');
+    }, 500);
 
+    // Смена почты на имя внутри тикера (спустя 1.5 секунды от начала)
+    setTimeout(() => {
+        if (track) {
+            track.style.transform = 'translateY(-1.2em)';
+        }
+    }, 1500);
+
+    // Плавное закрытие оверлея
     setTimeout(() => {
         overlay.classList.add('fade-out');
         setTimeout(() => overlay.remove(), 800);
-    }, 3200); 
+    }, 3700); 
 }
