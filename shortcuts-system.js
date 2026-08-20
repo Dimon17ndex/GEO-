@@ -141,11 +141,11 @@ function updateVisualStatuses(currentSequence, isGlobalActive, isPageActiveGreen
         if (isError) {
             box.classList.add('status-error');
         } else if (isGlobalActive || isPageActiveGreen) {
-            box.classList.add('status-success-global'); 
+            box.classList.add('status-success-global'); // Зеленый (HEL глобально ИЛИ GEO на pc.html)
         } else if (isPageActiveBlue) {
-            box.classList.add('status-success-page');   
+            box.classList.add('status-success-page');   // Голубой (HEL на pc.html или слова на чужих страницах)
         } else if (currentSequence.length >= 2) {
-            box.classList.add('status-progress');       
+            box.classList.add('status-progress');       // Оранжевый в процессе
         }
     });
 }
@@ -182,55 +182,29 @@ document.addEventListener('keydown', (e) => {
     const currentCombination = keySequence.join('');
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     const isPcPage = (currentPage === 'pc.html');
-    const isBeginningPage = (currentPage === 'beginning.html');
 
     const isHelWord = (currentCombination === 'HEL');
     const isGeoWord = (currentCombination === 'GEO');
-    const isActWord = (currentCombination === 'ACT');
-    
-    const isAnyWordExist = isHelWord || isGeoWord || (isBeginningPage && isActWord);
+    const isAnyWordExist = isHelWord || isGeoWord;
 
-    // Условия цветов подсветки шорткатов
-    const isGlobalActive = (isHelWord && !isPcPage);       
-    const isPageActiveGreen = (isPcPage && isGeoWord) || (isBeginningPage && isActWord);    
-    const isPageActiveBlue = (isPcPage && isHelWord) || (!isPcPage && isGeoWord); 
+    // Условия цветов
+    const isGlobalActive = (isHelWord && !isPcPage);       // HEL везде, кроме pc.html -> Зеленый
+    const isPageActiveGreen = (isPcPage && isGeoWord);    // GEO на pc.html -> Зеленый (активный)
+    
+    const isPageActiveBlue = (isPcPage && isHelWord) || (!isPcPage && isGeoWord); // HEL на pc.html ИЛИ GEO не на pc.html -> Голубой
 
     const isError = (keySequence.length === 3 && !isAnyWordExist);
 
     updateVisualStatuses(currentCombination, isGlobalActive, isPageActiveGreen, isPageActiveBlue, isError);
 
-    // Действия шорткатов
-    if (isPageActiveGreen && isPcPage) { // GEO на pc.html
+    // Действия
+    if (isPageActiveGreen) { // GEO на pc.html
         e.preventDefault();
         keySequence = [];
         sessionStorage.setItem('dev_console_authenticated', 'true');
         setTimeout(() => { 
             window.location.href = '/beginning.html'; 
         }, 300);
-    }
-
-    if (isBeginningPage && isActWord) { // ACT на beginning.html
-        e.preventDefault();
-        keySequence = [];
-
-        // Устанавливаем фейковые данные сессии в sessionStorage (только в коде, без Supabase)
-        const mockUser = {
-            email: 'test.user@custom.domain',
-            user_metadata: {
-                full_name: 'АЛЕКСАНДР СТЕПАНОВ',
-                username: 'ALEX_TEST'
-            }
-        };
-        
-        // Сохраняем во временный объект сессии, который подхватит приветствие
-        window.mockSupabaseSession = { user: mockUser };
-
-        // Если функция приветствия уже объявлена, сразу вызываем её для проверки
-        if (typeof window.initGreetingUI === 'function') {
-            window.initGreetingUI();
-        } else {
-            console.log('ACT активирован: фейковая сессия создана для текущей страницы.');
-        }
     }
 
     if (isHelWord) { // HEL работает везде
