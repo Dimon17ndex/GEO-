@@ -1,39 +1,5 @@
 // site-character.js
 
-let isTrackingActive = true; // Слежение включено по умолчанию
-
-function handleMouseMove(e) {
-    if (!isTrackingActive) return;
-    const widget = document.getElementById('site-character-widget');
-    if (!widget) return;
-
-    const pupils = widget.querySelectorAll('.char-pupil');
-    if (pupils.length === 0) return;
-
-    pupils.forEach(pupil => {
-        const eye = pupil.parentElement;
-        const rect = eye.getBoundingClientRect();
-        
-        // Центр глаза
-        const eyeX = rect.left + rect.width / 2;
-        const eyeY = rect.top + rect.height / 2;
-
-        // Угол между глазом и курсором
-        const radian = Math.atan2(e.clientX - eyeX, e.clientY - eyeY);
-        
-        // Максимальное расстояние, на которое может сместиться зрачок внутри глаза (в пикселях)
-        const maxRadius = 12; 
-        const distance = Math.min(maxRadius, Math.hypot(e.clientX - eyeX, e.clientY - eyeY) * 0.1);
-
-        const x = Math.sin(radian) * distance;
-        const y = Math.cos(radian) * distance;
-
-        pupil.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
-    });
-}
-
-document.addEventListener('mousemove', handleMouseMove);
-
 function initSiteCharacter() {
     if (document.getElementById('site-character-widget')) return;
 
@@ -55,6 +21,7 @@ function initSiteCharacter() {
             gap: 36px !important;
             z-index: 999998 !important;
             transition: opacity 0.3s ease !important;
+            pointer-events: none !important;
         }
 
         .char-eyes {
@@ -190,11 +157,37 @@ function initSiteCharacter() {
     document.body.insertAdjacentHTML('beforeend', widgetHTML);
 
     window._isCharacterActionRunning = false;
+    let isTrackingActive = true;
     const widget = document.getElementById('site-character-widget');
 
+    // Движение глаз за мышкой
+    window.addEventListener('mousemove', (e) => {
+        if (!isTrackingActive || !widget) return;
+        if (widget.classList.contains('state-loading')) return; // Если думает — не двигаем зрачки
+
+        const pupils = widget.querySelectorAll('.char-pupil');
+        pupils.forEach(pupil => {
+            const eye = pupil.parentElement;
+            const rect = eye.getBoundingClientRect();
+            
+            const eyeCenterX = rect.left + rect.width / 2;
+            const eyeCenterY = rect.top + rect.height / 2;
+
+            const radian = Math.atan2(e.clientY - eyeCenterY, e.clientX - eyeCenterX);
+            const maxDistance = 10; // Ограничение радиуса движения зрачка внутри глаза
+            const distance = Math.min(maxDistance, Math.hypot(e.clientX - eyeCenterX, e.clientY - eyeCenterY) * 0.1);
+
+            const x = Math.cos(radian) * distance;
+            const y = Math.sin(radian) * distance;
+
+            pupil.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+        });
+    });
+
+    // Рандомное моргание
     function triggerBlink() {
         if (!widget) return;
-        if (window._isCharacterActionRunning || isTrackingActive) {
+        if (window._isCharacterActionRunning) {
             setTimeout(triggerBlink, 2000);
             return;
         }
@@ -209,51 +202,48 @@ function initSiteCharacter() {
     }
 
     setTimeout(triggerBlink, 2000);
+
+    // Экспортируем глобальные методы управления
+    window.siteCharacter = {
+        setLoading: function() {
+            if (window._isCharacterActionRunning) return;
+            if (widget) widget.className = 'state-loading';
+        },
+        setNeutral: function() {
+            if (window._isCharacterActionRunning) return;
+            if (widget) widget.className = 'state-neutral';
+        },
+        setHappy: function() {
+            if (window._isCharacterActionRunning) return;
+            if (widget) widget.className = 'state-happy';
+        },
+        wink: function() {
+            if (!widget || window._isCharacterActionRunning) return;
+
+            window._isCharacterActionRunning = true;
+            let currentState = 'state-neutral';
+            if (widget.classList.contains('state-happy')) currentState = 'state-happy';
+            if (widget.classList.contains('state-loading')) currentState = 'state-loading';
+
+            widget.className = currentState + ' action-wink action-wink-oval';
+            setTimeout(() => {
+                if (widget) widget.className = currentState + ' action-wink';
+            }, 200);
+            setTimeout(() => {
+                if (widget) widget.className = currentState;
+                window._isCharacterActionRunning = false;
+            }, 450);
+        },
+        toggleTracking: function() {
+            isTrackingActive = !isTrackingActive;
+        },
+        hide: function() {
+            if (widget) widget.style.opacity = '0';
+        },
+        show: function() {
+            if (widget) widget.style.opacity = '1';
+        }
+    };
 }
-
-window.siteCharacter = {
-    setLoading: function() {
-        if (window._isCharacterActionRunning) return;
-        const widget = document.getElementById('site-character-widget');
-        if (widget) widget.className = 'state-loading';
-    },
-    setNeutral: function() {
-        if (window._isCharacterActionRunning) return;
-        const widget = document.getElementById('site-character-widget');
-        if (widget) widget.className = 'state-neutral';
-    },
-    setHappy: function() {
-        if (window._isCharacterActionRunning) return;
-        const widget = document.getElementById('site-character-widget');
-        if (widget) widget.className = 'state-happy';
-    },
-    wink: function() {
-        const widget = document.getElementById('site-character-widget');
-        if (!widget || window._isCharacterActionRunning) return;
-
-        window._isCharacterActionRunning = true;
-        let currentState = widget.className.split(' ')[0] || 'state-neutral';
-
-        widget.className = currentState + ' action-wink action-wink-oval';
-        setTimeout(() => {
-            if (widget) widget.className = currentState + ' action-wink';
-        }, 200);
-        setTimeout(() => {
-            if (widget) widget.className = currentState;
-            window._isCharacterActionRunning = false;
-        }, 450);
-    },
-    toggleTracking: function() {
-        isTrackingActive = !isTrackingActive;
-    },
-    hide: function() {
-        const widget = document.getElementById('site-character-widget');
-        if (widget) widget.style.opacity = '0';
-    },
-    show: function() {
-        const widget = document.getElementById('site-character-widget');
-        if (widget) widget.style.opacity = '1';
-    }
-};
 
 document.addEventListener('DOMContentLoaded', initSiteCharacter);
