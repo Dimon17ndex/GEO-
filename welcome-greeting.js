@@ -55,35 +55,37 @@ function injectGreetingStyles() {
             z-index: 1 !important;
         }
 
-        /* Стиль для последовательных логотипов */
+        /* Стиль для глубокого пролета с уменьшением блюра */
         .tunnel-logo {
             position: absolute !important;
             top: 50% !important;
             left: 50% !important;
-            width: 800px !important; 
-            transform: translate(-50%, -50%) scale(0.005);
+            width: 600px !important; 
+            transform: translate(-50%, -50%) scale(0.002);
             opacity: 0;
-            filter: blur(16px);
-            animation: sequentialFly 2.2s cubic-bezier(0.1, 0.7, 0.3, 1) forwards;
+            filter: blur(25px);
+            animation: deepZoomFly 2.4s cubic-bezier(0.15, 0.6, 0.25, 1) forwards;
         }
 
-        @keyframes sequentialFly {
+        @keyframes deepZoomFly {
             0% {
-                transform: translate(-50%, -50%) translate(0px, 0px) scale(0.005);
+                transform: translate(-50%, -50%) translate(0px, 0px) scale(0.002);
                 opacity: 0;
-                filter: blur(20px);
+                filter: blur(30px); /* Сильный блюр в самом начале в точке точки */
             }
             20% {
-                opacity: 0.25;
+                opacity: 0.28;
+                filter: blur(15px);
             }
-            80% {
-                opacity: 0.2;
+            60% {
+                opacity: 0.25;
+                filter: blur(4px); /* Блюр спадает, логотип становится резким, приближаясь */
             }
             100% {
-                /* Вырастают до крупного и улетают за пределы экрана по заданной траектории */
-                transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(1.6);
+                /* Огромный масштаб (4.5), логотип улетает за пределы экрана */
+                transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(4.5);
                 opacity: 0;
-                filter: blur(4px);
+                filter: blur(0px); /* Полностью резкий в момент пролета мимо камеры */
             }
         }
 
@@ -116,21 +118,21 @@ function injectGreetingStyles() {
 
 // --- ПОСЛЕДОВАТЕЛЬНЫЙ ЗАПУСК ЛОГОТИПОВ ---
 function createSequentialLogos(tunnelContainer) {
-    // Массив точек назначения: по очереди или парами в разные стороны
+    // Направления разлета по углам и сторонам экрана
     const flights = [
-        { angle: 0.2, dist: 700 },   // Вправо
-        { angle: 3.1, dist: 700 },   // Влево (параллельно с первым или следом)
-        { angle: 1.5, dist: 800 },   // Вверх
-        { angle: 4.7, dist: 800 },   // Вниз
+        { angle: 0.0, dist: 900 },   // Вправо
+        { angle: 3.14, dist: 900 },  // Влево
+        { angle: 1.57, dist: 900 },  // Вниз
+        { angle: -1.57, dist: 900 }, // Вверх
     ];
 
     let index = 0;
 
     function spawnNext() {
-        if (index >= 6) return; // Ограничимся несколькими красивыми проходами за время приветствия
+        if (index >= 5) return;
 
-        // Запускаем по одному или по два логотипа с небольшой задержкой
-        const count = (index === 2) ? 2 : 1; // На третий раз запустим пару в разные стороны
+        // Запуск по одному или парами
+        const count = (index === 2) ? 2 : 1;
 
         for (let c = 0; c < count; c++) {
             const flightData = flights[index % flights.length];
@@ -146,7 +148,6 @@ function createSequentialLogos(tunnelContainer) {
 
             tunnelContainer.appendChild(img);
 
-            // Удаляем DOM-элемент после завершения анимации, чтобы не нагружать память
             img.addEventListener('animationend', () => {
                 img.remove();
             });
@@ -154,12 +155,10 @@ function createSequentialLogos(tunnelContainer) {
             index++;
         }
 
-        // Интервал появления следующего логотипа/пары
-        setTimeout(spawnNext, 700);
+        setTimeout(spawnNext, 750);
     }
 
-    // Старт первой волны чуть после появления оверлея
-    setTimeout(spawnNext, 300);
+    setTimeout(spawnNext, 200);
 }
 
 // --- ОСНОВНАЯ ФУНКЦИЯ ---
