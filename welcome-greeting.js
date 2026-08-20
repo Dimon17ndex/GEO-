@@ -55,7 +55,7 @@ function injectGreetingStyles() {
             z-index: 1 !important;
         }
 
-        /* Единственный логотип: увеличивается и плавно уходит вверх за экран */
+        /* Непрерывное движение: без остановки в центре, сразу увеличивается и уходит за экран */
         .tunnel-logo {
             position: absolute !important;
             top: 50% !important;
@@ -64,10 +64,10 @@ function injectGreetingStyles() {
             transform: translate(-50%, -50%) scale(0.001);
             opacity: 0;
             filter: blur(25px);
-            animation: singleZoomAndSlide 2.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            animation: continuousZoomOff 1.8s cubic-bezier(0.15, 0.7, 0.3, 1) forwards;
         }
 
-        @keyframes singleZoomAndSlide {
+        @keyframes continuousZoomOff {
             0% {
                 transform: translate(-50%, -50%) translate(0px, 0px) scale(0.001);
                 opacity: 0;
@@ -75,17 +75,11 @@ function injectGreetingStyles() {
             }
             20% {
                 opacity: 1; 
-                filter: blur(5px);
+                filter: blur(10px);
             }
-            /* К середине анимации логотип полностью приблизился */
-            55% {
-                transform: translate(-50%, -50%) translate(0px, 0px) scale(4.5);
-                opacity: 1;
-                filter: blur(0px);
-            }
-            /* В финале плавно уходит вверх за границу экрана и тухнет */
             100% {
-                transform: translate(-50%, -50%) translate(0px, -800px) scale(5.0);
+                /* Без остановок: вырастает до огромного масштаба и улетает вверх за экран */
+                transform: translate(-50%, -50%) translate(0px, -900px) scale(6.5);
                 opacity: 0;
                 filter: blur(0px);
             }
@@ -174,7 +168,6 @@ async function initGreetingUI() {
     const track = document.getElementById('welcome-track');
     const tunnelContainer = document.getElementById('logo-tunnel');
     
-    // Запускаем ровно один логотип
     setTimeout(() => {
         createSingleLogo(tunnelContainer);
     }, 200);
