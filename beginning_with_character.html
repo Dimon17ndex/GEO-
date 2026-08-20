@@ -68,6 +68,27 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            align-items: flex-start;
+            gap: 4px;
+            will-change: transform;
+            animation: floatingText 4.5s ease-in-out infinite alternate !important;
+        }
+
+        /* Подзаголовок "РЕЖИМ ADMIN" под заголовком */
+        .admin-mode-badge {
+            display: inline-block;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.15);
+            border: 1px solid rgba(231, 76, 60, 0.4);
+            padding: 3px 8px;
+            border-radius: 6px;
+            margin-top: 2px;
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.2);
         }
 
         .top-left-brand .db-main-title {
@@ -372,23 +393,6 @@
         .app-banners-container.banner-active {
             display: block !important; 
         }
-
-        /* Стиль для плашки ADMIN под логотипом */
-.admin-badge {
-    display: inline-block;
-    margin-top: 6px;
-    padding: 2px 8px;
-    background: rgba(231, 76, 60, 0.2);
-    border: 1px solid rgba(231, 76, 60, 0.4);
-    border-radius: 6px;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    color: #e74c3c;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    width: fit-content;
-}
     </style>
 </head>
 <body>
@@ -418,7 +422,7 @@
         <img src="images/geo_logo.png" alt="Geo Logo" class="db-logo-icon">
         <div class="db-text-right">
             <h1 class="db-main-title">GEOГРАФИЯ</h1>
-            <div class="admin-badge">ADMIN</div>
+            <span class="admin-mode-badge">РЕЖИМ ADMIN</span>
         </div>
     </div>
 </div>
