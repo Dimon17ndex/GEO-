@@ -55,7 +55,7 @@ function injectGreetingStyles() {
             z-index: 1 !important;
         }
 
-        /* Логотипы летят насквозь к ближайшему краю */
+        /* Логотип увеличивается, а в конце плавно уходит вверх/вниз за экран */
         .tunnel-logo {
             position: absolute !important;
             top: 50% !important;
@@ -64,25 +64,28 @@ function injectGreetingStyles() {
             transform: translate(-50%, -50%) scale(0.001);
             opacity: 0;
             filter: blur(25px);
-            animation: directionalFly 1.8s linear forwards;
+            animation: zoomAndSlideOff 2.0s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
 
-        @keyframes directionalFly {
+        @keyframes zoomAndSlideOff {
             0% {
                 transform: translate(-50%, -50%) translate(0px, 0px) scale(0.001);
                 opacity: 0;
                 filter: blur(30px);
             }
-            15% {
+            20% {
                 opacity: 1; 
+                filter: blur(5px);
             }
-            88% {
+            /* К середине анимации логотип полностью приблизился и четкий */
+            55% {
+                transform: translate(-50%, -50%) translate(0px, 0px) scale(4.5);
                 opacity: 1;
                 filter: blur(0px);
             }
+            /* В финале плавно смещается за верх или низ экрана и затухает */
             100% {
-                /* Улетают точно в сторону выбранного края до полного исчезновения */
-                transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(7.5);
+                transform: translate(-50%, -50%) translate(0px, var(--slide-y)) scale(5.0);
                 opacity: 0;
                 filter: blur(0px);
             }
@@ -115,28 +118,22 @@ function injectGreetingStyles() {
     document.head.appendChild(styleElement);
 }
 
-// --- ПОСЛЕДОВАТЕЛЬНЫЙ ЗАПУСК К БЛИЖАЙШИМ КРАЯМ ---
+// --- ПОСЛЕДОВАТЕЛЬНЫЙ ЗАПУСК С УХОДОМ ВВЕРХ/ВНИЗ ---
 function createSequentialLogos(tunnelContainer) {
-    // Четыре основных направления: Вправо, Влево, Вниз, Вверх
-    const directions = [
-        { dx: 1600, dy: 0 },    // Вправо
-        { dx: -1600, dy: 0 },   // Влево
-        { dx: 0, dy: 1400 },    // Вниз
-        { dx: 0, dy: -1400 }    // Вверх
-    ];
+    // Чередуем: один уходит вверх, другой вниз, следующий снова вверх и т.д.
+    const slideDirections = [-700, 700, -700, 700]; // отрицательное — вверх, положительное — вниз
 
     let index = 0;
 
     function spawnNext() {
-        if (index >= directions.length) return;
+        if (index >= slideDirections.length) return;
 
-        const dir = directions[index];
+        const slideY = slideDirections[index];
         const img = document.createElement('img');
         img.src = 'images/geo_logo.png';
         img.className = 'tunnel-logo';
 
-        img.style.setProperty('--dx', `${dir.dx}px`);
-        img.style.setProperty('--dy', `${dir.dy}px`);
+        img.style.setProperty('--slide-y', `${slideY}px`);
 
         tunnelContainer.appendChild(img);
 
@@ -146,8 +143,8 @@ function createSequentialLogos(tunnelContainer) {
 
         index++;
 
-        if (index < directions.length) {
-            setTimeout(spawnNext, 550); // Интервал между одиночными логотипами
+        if (index < slideDirections.length) {
+            setTimeout(spawnNext, 600); // Интервал между логотипами
         }
     }
 
