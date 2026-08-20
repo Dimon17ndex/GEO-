@@ -55,31 +55,36 @@ function injectGreetingStyles() {
             z-index: 1 !important;
         }
 
-        /* Стиль для летящих логотипов */
+        /* Стиль для летящих логотипов с полным размером */
         .tunnel-logo {
             position: absolute !important;
             top: 50% !important;
             left: 50% !important;
-            width: 100px !important;
-            transform: translate(-50%, -50%) scale(0.05);
+            /* Базовый размер делаем большим (как исходное лого) */
+            width: 800px !important; 
+            transform: translate(-50%, -50%) scale(0.01);
             opacity: 0;
-            filter: blur(10px);
-            animation: zoomAndFly 3s linear infinite;
+            filter: blur(16px);
+            animation: zoomAndFlyFull 3s cubic-bezier(0.1, 0.7, 0.3, 1) infinite;
         }
 
-        @keyframes zoomAndFly {
+        @keyframes zoomAndFlyFull {
             0% {
-                transform: translate(-50%, -50%) translate(0px, 0px) scale(0.05);
+                transform: translate(-50%, -50%) translate(0px, 0px) scale(0.01);
                 opacity: 0;
-                filter: blur(15px);
+                filter: blur(20px);
             }
-            20% {
-                opacity: 0.35;
+            15% {
+                opacity: 0.22; /* Плавное проявление из центра */
+            }
+            70% {
+                opacity: 0.2;
             }
             100% {
-                transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(3.5);
+                /* Вырастают до полноценного крупного размера (scale(1.2)) и улетают в стороны */
+                transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(1.4);
                 opacity: 0;
-                filter: blur(2px);
+                filter: blur(4px);
             }
         }
 
@@ -112,24 +117,24 @@ function injectGreetingStyles() {
 
 // --- СОЗДАНИЕ ЛОГОТИПОВ ---
 function createTunnelLogos(tunnelContainer) {
-    const totalLogos = 12;
+    const totalLogos = 8; // Снизили количество, так как они теперь крупные
 
     for (let i = 0; i < totalLogos; i++) {
         const img = document.createElement('img');
         img.src = 'images/geo_logo.png';
         img.className = 'tunnel-logo';
 
-        // Случайная точка на экране, куда прилетит логотип
+        // Траектория разлета в разные стороны
         const angle = Math.random() * Math.PI * 2;
-        const distance = 500 + Math.random() * 400;
+        const distance = 300 + Math.random() * 400;
         const dx = Math.cos(angle) * distance;
         const dy = Math.sin(angle) * distance;
 
         img.style.setProperty('--dx', `${dx}px`);
         img.style.setProperty('--dy', `${dy}px`);
 
-        // Разные задержки и скорость
-        img.style.animationDuration = (2 + Math.random() * 1.5) + 's';
+        // Скорость и задержка
+        img.style.animationDuration = (2.5 + Math.random() * 1.5) + 's';
         img.style.animationDelay = (Math.random() * 2.5) + 's';
 
         tunnelContainer.appendChild(img);
