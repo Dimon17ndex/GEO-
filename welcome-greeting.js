@@ -50,6 +50,29 @@ function injectGreetingStyles() {
             0% { transform: translateY(-50%) translateX(0px); }
             100% { transform: translateY(-50%) translateX(20px); }
         }
+
+        /* Контейнер-маска для скролла */
+.welcome-ticker {
+    display: inline-block !important;
+    height: 1.2em !important;
+    overflow: hidden !important;
+    vertical-align: bottom !important;
+    position: relative !important;
+}
+
+/* Трек, который будет двигаться */
+.welcome-ticker-track {
+    display: flex !important;
+    flex-direction: column !important;
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+
+/* Каждая строчка (почта и имя) */
+.welcome-ticker-item {
+    height: 1.2em !important;
+    line-height: 1.2em !important;
+    white-space: nowrap !important;
+}
     `;
 
     const styleElement = document.createElement('style');
@@ -79,13 +102,19 @@ async function initGreetingUI() {
     const emailPrefix = (user.email ? user.email.split('@')[0] : 'USER').toUpperCase();
     const fullName = (user.user_metadata?.full_name || user.user_metadata?.username || 'ПОЛЬЗОВАТЕЛЬ').toUpperCase();
 
-    // Разделяем на статический текст и меняющуюся часть
+    // Создаем разметку с треком для вертикального скролла
     const greetingHTML = `
         <div id="welcome-greeting-overlay" class="welcome-overlay">
             <img src="images/geo_logo.png" alt="" class="auth-bg-watermark">
             <div class="welcome-container">
                 <h1 class="welcome-title">
-                    ЗДРАВСТВУЙТЕ, <span id="welcome-dynamic-name">${emailPrefix}</span>!
+                    ЗДРАВСТВУЙТЕ, 
+                    <span class="welcome-ticker">
+                        <span class="welcome-ticker-track" id="welcome-track">
+                            <span class="welcome-ticker-item">${emailPrefix}</span>
+                            <span class="welcome-ticker-item">${fullName}</span>
+                        </span>
+                    </span>!
                 </h1>
             </div>
         </div>
@@ -93,36 +122,21 @@ async function initGreetingUI() {
 
     document.body.insertAdjacentHTML('beforeend', greetingHTML);
     const overlay = document.getElementById('welcome-greeting-overlay');
-    const nameNode = document.getElementById('welcome-dynamic-name');
+    const track = document.getElementById('welcome-track');
     
-    // Появление оверлея
+    // Плавное появление оверлея
     requestAnimationFrame(() => {
         requestAnimationFrame(() => overlay.classList.add('visible'));
     });
 
-    // Через 0.8 секунд меняем только имя
+    // Через 1 секунду запускаем скролл сверху вниз (сдвигаем трек на одну строку вверх)
     setTimeout(() => {
-        // Уходим вниз
-        nameNode.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
-        nameNode.style.transform = 'translateY(15px)';
-        nameNode.style.opacity = '0';
+        track.style.transform = 'translateY(-1.2em)';
+    }, 1000);
 
-        setTimeout(() => {
-            // Подменяем текст
-            nameNode.textContent = fullName;
-            // Возвращаем из положения вверх
-            nameNode.style.transform = 'translateY(-15px)';
-            
-            requestAnimationFrame(() => {
-                nameNode.style.transform = 'translateY(0)';
-                nameNode.style.opacity = '1';
-            });
-        }, 400);
-    }, 800);
-
-    // Удаление оверлея
+    // Удаление оверлея в конце
     setTimeout(() => {
         overlay.classList.add('fade-out');
         setTimeout(() => overlay.remove(), 800);
-    }, 3000); 
+    }, 3200); 
 }
