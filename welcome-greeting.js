@@ -6,14 +6,15 @@ function injectGreetingStyles() {
 
     const css = `
         .welcome-overlay {
-            position: fixed !important; top: 0 !important; left: 0 !important;
-            width: 100vw !important; height: 100vh !important;
-            background: rgba(10, 10, 12, 0.94) !important;
-            backdrop-filter: blur(12px) !important;
-            z-index: 9999999 !important;
-            display: flex !important; align-items: center !important; justify-content: center !important;
-            opacity: 0 !important; transition: opacity 0.6s ease !important;
-        }
+    position: fixed !important; top: 0 !important; left: 0 !important;
+    width: 100vw !important; height: 100vh !important;
+    background: rgba(10, 10, 12, 0.94) !important;
+    backdrop-filter: blur(12px) !important;
+    z-index: 9999999 !important;
+    display: flex !important; align-items: center !important; justify-content: center !important;
+    opacity: 0 !important; 
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1) !important; /* Сделали появление очень мягким */
+}
         .welcome-overlay.visible { opacity: 1 !important; }
         .welcome-overlay.fade-out { opacity: 0 !important; }
 
@@ -72,13 +73,11 @@ async function initGreetingUI() {
 
     if (!session || !session.user) return;
 
-    injectGreetingStyles(); // Оставляем один вызов здесь
+    injectGreetingStyles();
 
     const user = session.user;
     const emailPrefix = user.email ? user.email.split('@')[0].toUpperCase() : 'USER';
     const fullName = (user.user_metadata?.full_name || user.user_metadata?.username || 'ПОЛЬЗОВАТЕЛЬ').toUpperCase();
-
-    // Вторую строку injectGreetingStyles(); УДАЛИЛИ отсюда
 
     const greetingHTML = `
         <div id="welcome-greeting-overlay" class="welcome-overlay">
@@ -93,29 +92,32 @@ async function initGreetingUI() {
     const overlay = document.getElementById('welcome-greeting-overlay');
     const textNode = document.getElementById('welcome-text-node');
     
-    // Показываем оверлей
-    requestAnimationFrame(() => overlay.classList.add('visible'));
+    // Мягкое появление: даем браузеру передохнуть один кадр перед добавлением класса видимости
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            overlay.classList.add('visible');
+        });
+    });
 
-    // Через 0.8 секунд меняем текст на полное имя
+    // Через 0.8 секунд меняем текст на полное имя (плавный сдвиг)
     setTimeout(() => {
-        textNode.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
-        textNode.style.transform = 'translateY(20px)';
+        textNode.style.transform = 'translateY(15px)';
         textNode.style.opacity = '0';
 
         setTimeout(() => {
             textNode.textContent = `ЗДРАВСТВУЙТЕ, ${fullName}!`;
-            textNode.style.transform = 'translateY(-20px)';
+            textNode.style.transform = 'translateY(-15px)';
             
             requestAnimationFrame(() => {
                 textNode.style.transform = 'translateY(0)';
                 textNode.style.opacity = '1';
             });
-        }, 400);
-    }, 800);
+        }, 300);
+    }, 900);
 
-    // Удаление оверлея
+    // Плавное удаление оверлея в конце
     setTimeout(() => {
         overlay.classList.add('fade-out');
-        setTimeout(() => overlay.remove(), 800);
-    }, 2800); 
+        setTimeout(() => overlay.remove(), 800); // Время должно совпадать с transition: opacity в CSS
+    }, 3000); 
 }
