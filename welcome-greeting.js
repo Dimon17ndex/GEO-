@@ -55,37 +55,37 @@ function injectGreetingStyles() {
             z-index: 1 !important;
         }
 
-        /* Стиль для глубокого пролета с уменьшением блюра */
+        /* Поток одиночных логотипов без замедления (linear) */
         .tunnel-logo {
             position: absolute !important;
             top: 50% !important;
             left: 50% !important;
-            width: 600px !important; 
-            transform: translate(-50%, -50%) scale(0.002);
+            width: 500px !important; 
+            transform: translate(-50%, -50%) scale(0.001);
             opacity: 0;
-            filter: blur(25px);
-            animation: deepZoomFly 2.4s cubic-bezier(0.15, 0.6, 0.25, 1) forwards;
+            filter: blur(30px);
+            /* Используем linear, чтобы логотипы не тормозили и не замедлялись перед глазами */
+            animation: fastFlyThrough 1.8s linear forwards;
         }
 
-        @keyframes deepZoomFly {
+        @keyframes fastFlyThrough {
             0% {
-                transform: translate(-50%, -50%) translate(0px, 0px) scale(0.002);
+                transform: translate(-50%, -50%) translate(0px, 0px) scale(0.001);
                 opacity: 0;
-                filter: blur(30px); /* Сильный блюр в самом начале в точке точки */
+                filter: blur(35px);
             }
-            20% {
-                opacity: 0.28;
-                filter: blur(15px);
+            15% {
+                opacity: 0.3;
             }
-            60% {
+            50% {
                 opacity: 0.25;
-                filter: blur(4px); /* Блюр спадает, логотип становится резким, приближаясь */
+                filter: blur(10px);
             }
             100% {
-                /* Огромный масштаб (4.5), логотип улетает за пределы экрана */
-                transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(4.5);
+                /* Пролетают насквозь, вырастая до огромного масштаба (5.5) и улетая за экран */
+                transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(5.5);
                 opacity: 0;
-                filter: blur(0px); /* Полностью резкий в момент пролета мимо камеры */
+                filter: blur(0px);
             }
         }
 
@@ -116,48 +116,48 @@ function injectGreetingStyles() {
     document.head.appendChild(styleElement);
 }
 
-// --- ПОСЛЕДОВАТЕЛЬНЫЙ ЗАПУСК ЛОГОТИПОВ ---
+// --- СТРОГАЯ ОЧЕРЕДЬ ПО ОДНОМУ ---
 function createSequentialLogos(tunnelContainer) {
-    // Направления разлета по углам и сторонам экрана
+    // Направления движения (по очереди в разные стороны)
     const flights = [
-        { angle: 0.0, dist: 900 },   // Вправо
-        { angle: 3.14, dist: 900 },  // Влево
-        { angle: 1.57, dist: 900 },  // Вниз
-        { angle: -1.57, dist: 900 }, // Вверх
+        { angle: 0.2, dist: 1000 },   // Вправо-вверх
+        { angle: 3.0, dist: 1000 },   // Влево-вверх
+        { angle: 1.5, dist: 1000 },   // Вниз
+        { angle: 4.8, dist: 1000 },   // Вправо-вниз
+        { angle: 3.8, dist: 1000 },   // Влево-вниз
     ];
 
     let index = 0;
 
     function spawnNext() {
-        if (index >= 5) return;
+        if (index >= flights.length) return;
 
-        // Запуск по одному или парами
-        const count = (index === 2) ? 2 : 1;
+        const flightData = flights[index];
+        const img = document.createElement('img');
+        img.src = 'images/geo_logo.png';
+        img.className = 'tunnel-logo';
 
-        for (let c = 0; c < count; c++) {
-            const flightData = flights[index % flights.length];
-            const img = document.createElement('img');
-            img.src = 'images/geo_logo.png';
-            img.className = 'tunnel-logo';
+        const dx = Math.cos(flightData.angle) * flightData.dist;
+        const dy = Math.sin(flightData.angle) * flightData.dist;
 
-            const dx = Math.cos(flightData.angle) * flightData.dist;
-            const dy = Math.sin(flightData.angle) * flightData.dist;
+        img.style.setProperty('--dx', `${dx}px`);
+        img.style.setProperty('--dy', `${dy}px`);
 
-            img.style.setProperty('--dx', `${dx}px`);
-            img.style.setProperty('--dy', `${dy}px`);
+        tunnelContainer.appendChild(img);
 
-            tunnelContainer.appendChild(img);
+        img.addEventListener('animationend', () => {
+            img.remove();
+        });
 
-            img.addEventListener('animationend', () => {
-                img.remove();
-            });
+        index++;
 
-            index++;
+        // Интервал появления следующего (строго друг за другом, без свалки)
+        if (index < flights.length) {
+            setTimeout(spawnNext, 600);
         }
-
-        setTimeout(spawnNext, 750);
     }
 
+    // Запускаем первый логотип сразу после появления оверлея
     setTimeout(spawnNext, 200);
 }
 
