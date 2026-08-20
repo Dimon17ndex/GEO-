@@ -20,7 +20,7 @@ function initSiteCharacter() {
             justify-content: center !important;
             gap: 36px !important;
             z-index: 999998 !important;
-            transition: transform 0.3s ease !important;
+            transition: opacity 0.3s ease !important;
             pointer-events: none !important;
         }
 
