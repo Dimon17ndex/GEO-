@@ -71,7 +71,7 @@
             align-items: flex-start;
             gap: 4px;
             will-change: transform;
-            /* Анимация левитации теперь двигает весь блок (и текст, и плашку) целиком */
+            /* Анимация левитации двигает весь блок (и текст, и плашку) целиком */
             animation: floatingText 4.5s ease-in-out infinite alternate !important;
         }
 
@@ -100,7 +100,6 @@
             letter-spacing: -0.5px;
             line-height: 1;
             color: #ffffff;
-            /* Анимацию убрали, так как контейнер выше двигает весь блок */
         }
 
         /* Анимация левитации */
@@ -181,37 +180,31 @@
         /* 2. Контейнер выпадающего меню */
         .profile-dropdown-menu {
             position: absolute;
-            top: 100%;     /* Зацепка ровно за нижний край карточки */
+            top: 100%;
             left: 0;
             right: 0;
-            padding-top: 8px;      /* Заменяем внешние зазоры внутренними */
+            padding-top: 8px;
             display: flex;
             flex-direction: column;
-            gap: 6px;      /* Расстояние между кнопками */
-
-            /* Визуальное скрытие */
+            gap: 6px;
             opacity: 0;
             visibility: hidden;
             transform: translateY(-4px);
             transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
-            
-            /* Отключаем клики в скрытом состоянии */
             pointer-events: none;
         }
 
-        /* 3. НЕВИДИМАЯ ПОДУШКА-СОЕДИНИТЕЛЬ (Убирает все провалы) */
         .profile-dropdown-menu::before {
             content: '';
             position: absolute;
             top: 0;
-            left: -10px;            /* Немного расширяем зону по бокам */
+            left: -10px;
             right: -10px;
-            bottom: -10px;          /* И снизу, чтобы мышь не соскакивала */
+            bottom: -10px;
             z-index: -1;
             background: transparent;
         }
 
-        /* 4. Открытие и удержание при наведении на ЛЮБОЙ элемент этой зоны */
         .profile-card:hover .profile-dropdown-menu,
         .profile-dropdown-menu:hover {
             opacity: 1 !important;
@@ -220,117 +213,28 @@
             pointer-events: auto !important;
         }
 
-        /* 5. Кнопки внутри меню */
-        .profile-settings-btn,
-        .logout-dropdown-btn {
-            width: 100%;
-            border: none;
-            border-radius: 8px;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 700;
-            cursor: pointer;
-            box-sizing: border-box;
-            position: relative;
-            z-index: 2;            /* Кнопки поверх невидимой подушки */
-        }
-
-        /* Синяя кнопка */
-        .profile-settings-btn {
-            padding: 10px 8px;
-            background: #3498db;
-            color: #ffffff;
-            font-size: 12px;
-            transition: background 0.2s ease;
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
-            text-align: center;
-        }
-
-        .profile-settings-btn:hover {
-            background: #2980b9;
-        }
-
-        /* Красная кнопка */
-        .logout-dropdown-btn {
-            padding: 10px 12px;
-            background: #e74c3c;
-            color: #ffffff;
-            font-size: 13px;
-            transition: background 0.2s ease, opacity 0.2s ease;
-            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .logout-dropdown-btn:hover {
-            background: #c0392b;
-        }
-
-        /* Крутящийся лоадер загрузки в кнопке */
-        .btn-spinner {
-            width: 14px;
-            height: 14px;
-            border: 2px solid rgba(255, 255, 255, 0.35);
-            border-top-color: #ffffff;
-            border-radius: 50%;
-            animation: btnSpinnerRotate 0.8s linear infinite;
-            display: inline-block;
-            box-sizing: border-box;
-            flex-shrink: 0;
-        }
-
-        @keyframes btnSpinnerRotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Контейнер для размещения статуса строго по центру экрана */
+        /* =========================================================
+            ЦЕНТРАЛЬНЫЙ КОНТЕЙНЕР (ПЕРСОНАЖ)
+            ========================================================= */
         .center-status-wrapper {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 5;
-            pointer-events: none;
-            text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            justify-content: center;
         }
 
-        /* Разрешаем клики по элементам управления внутри центрального контейнера */
-        .auth-trigger-btn,
-        .reset-open-link {
-            pointer-events: auto;
-        }
-
-        /* Серый статус "ЗДЕСЬ ПОКА ПУСТО" */
-        .empty-status-message {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 13px;
-            font-weight: 700;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.4);
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
-        }
-
-        /* Ссылка восстановления пароля */
-        .reset-open-link {
-            background: transparent;
-            border: none;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 13px;
-            font-family: 'Montserrat', sans-serif;
-            cursor: pointer;
-            text-decoration: underline;
-            transition: color 0.2s ease;
-        }
-
-        .reset-open-link:hover {
-            color: #ffffff;
+        /* Стили для увеличенного персонажа по центру */
+        .center-status-wrapper .site-character,
+        .center-status-wrapper img,
+        .center-status-wrapper svg {
+            width: 280px !important;
+            height: auto !important;
+            max-width: none !important;
         }
 
         /* =========================================================
@@ -340,7 +244,7 @@
             position: fixed;
             top: 50%;
             right: 0;
-            transform: translate(100%, -50%); /* Спрятано за правым краем */
+            transform: translate(100%, -50%);
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -356,7 +260,7 @@
         }
 
         .dev-side-panel.visible {
-            transform: translate(0, -50%); /* Показывается */
+            transform: translate(0, -50%);
         }
 
         .dev-panel-btn {
@@ -389,7 +293,6 @@
             display: none; 
         }
 
-        /* Когда плашка должна работать — добавляем этот класс */
         .app-banners-container.banner-active {
             display: block !important; 
         }
@@ -397,7 +300,7 @@
 </head>
 <body>
 
-<!-- Подключаем скрипт персонажа в правом нижнем углу -->
+<!-- Подключаем скрипт персонажа -->
 <script src="site-character.js"></script>
 
 <script src="shortcuts-system.js" defer></script>
@@ -427,16 +330,9 @@
     </div>
 </div>
 
-<div class="center-status-wrapper">
-    <button type="button" id="open-auth-btn" class="auth-trigger-btn" onclick="showAuthModal()">
-        Войти / Зарегистрироваться
-    </button>
-
-    <button type="button" class="reset-open-link" onclick="showResetModal('request')">
-        Забыли пароль?
-    </button>
-
-    <div class="empty-status-message">ЗДЕСЬ ПОКА ПУСТО</div>
+<!-- Центральный контейнер теперь содержит увеличенного персонажа -->
+<div class="center-status-wrapper" id="center-character-container">
+    <!-- Сюда скрипт site-character.js внедрит персонажа, а CSS выше автоматически увеличит его размер -->
 </div>
 
 <div class="settings-trigger-zone" id="settings-btn" style="opacity: 1; pointer-events: auto;">
@@ -477,12 +373,7 @@
     <div class="profile-card">
         <span class="profile-username" id="profile-email-text">Профиль</span>
         <div class="profile-dropdown-menu">
-            <button type="button" class="profile-settings-btn" onclick="navigateToPage('profile_settings.html')">
-                Характеристики профиля
-            </button>
-            <button type="button" class="logout-dropdown-btn" onclick="logoutUser()">
-                Выйти
-            </button>
+            <!-- Кнопки профиля и выхода убраны по вашему запросу -->
         </div>
     </div>
 </div>
@@ -499,7 +390,6 @@
 <script src="welcome-greeting.js" defer></script>
 
 <script>
-// Переменные состояния
 const waveContainer = document.getElementById('bg-wave-container');
 const volumeStatusLabel = document.getElementById('volume-status-label');
 const intensitySlider = document.getElementById('wave-intensity-slider');
@@ -508,7 +398,6 @@ const intensityValueLabel = document.getElementById('intensity-value');
 let intensityPercent = 20;
 let ambientTimeoutId = null;
 
-// === ФУНКЦИИ ЛОАДЕРА И БЛОКИРОВКИ КНОПОК ===
 function showLoader() {
     const loader = document.getElementById('page-loader');
     if (loader) {
@@ -524,7 +413,6 @@ function hideLoader() {
         document.body.classList.remove('is-loading');
     }
     
-    // Запускаем приветствие строго после скрытия лоадера
     if (typeof initGreetingUI === 'function') {
         initGreetingUI();
     }
@@ -625,7 +513,6 @@ function navigateToPage(targetPage) {
     }, 500);
 }
 
-// ЕДИНЫЙ ОБРАБОТЧИК ЗАГРУЗКИ СТРАНИЦЫ
 document.addEventListener('DOMContentLoaded', () => {
     const hasVisitedSession = sessionStorage.getItem('hasVisitedBeginningSession');
 
