@@ -76,8 +76,14 @@ async function initGreetingUI() {
     injectGreetingStyles();
 
     const user = session.user;
-    const emailPrefix = user.email ? user.email.split('@')[0].toUpperCase() : 'USER';
-    const fullName = (user.user_metadata?.full_name || user.user_metadata?.username || 'ПОЛЬЗОВАТЕЛЬ').toUpperCase();
+    // Логика как в auth-system.js:
+    const userEmail = user.email || '';
+    const customName = user.user_metadata?.full_name || user.user_metadata?.username;
+    
+    // Первый этап: имя до @ (как в виджете)
+    const emailPrefix = userEmail.split('@')[0].toUpperCase();
+    // Второй этап: Полное имя (или имя из метаданных)
+    const fullName = (customName || emailPrefix).toUpperCase();
 
     const greetingHTML = `
         <div id="welcome-greeting-overlay" class="welcome-overlay">
@@ -92,32 +98,31 @@ async function initGreetingUI() {
     const overlay = document.getElementById('welcome-greeting-overlay');
     const textNode = document.getElementById('welcome-text-node');
     
-    // Мягкое появление: даем браузеру передохнуть один кадр перед добавлением класса видимости
+    // Мягкое появление оверлея
     requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            overlay.classList.add('visible');
-        });
+        requestAnimationFrame(() => overlay.classList.add('visible'));
     });
 
-    // Через 0.8 секунд меняем текст на полное имя (плавный сдвиг)
+    // Через 0.8 секунд меняем на полное имя
     setTimeout(() => {
-        textNode.style.transform = 'translateY(15px)';
+        textNode.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+        textNode.style.transform = 'translateY(20px)';
         textNode.style.opacity = '0';
 
         setTimeout(() => {
             textNode.textContent = `ЗДРАВСТВУЙТЕ, ${fullName}!`;
-            textNode.style.transform = 'translateY(-15px)';
+            textNode.style.transform = 'translateY(-20px)';
             
             requestAnimationFrame(() => {
                 textNode.style.transform = 'translateY(0)';
                 textNode.style.opacity = '1';
             });
-        }, 300);
-    }, 900);
+        }, 400);
+    }, 800);
 
-    // Плавное удаление оверлея в конце
+    // Удаление оверлея через 3 секунды
     setTimeout(() => {
         overlay.classList.add('fade-out');
-        setTimeout(() => overlay.remove(), 800); // Время должно совпадать с transition: opacity в CSS
+        setTimeout(() => overlay.remove(), 800);
     }, 3000); 
 }
