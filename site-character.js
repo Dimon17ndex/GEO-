@@ -31,12 +31,14 @@ function initSiteCharacter() {
             justify-content: center !important;
         }
 
-        /* Глаза персонажа — идеальные круги */
+        /* Глаза персонажа — пустые круги (контурные кольца) */
         .char-eye {
             width: 12px !important;
             height: 12px !important;
-            background: #ffffff !important;
+            background: transparent !important;
+            border: 2px solid #ffffff !important;
             border-radius: 50% !important;
+            box-sizing: border-box !important;
             animation: charBlink 4s infinite ease-in-out !important;
         }
 
