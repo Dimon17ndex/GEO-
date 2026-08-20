@@ -132,24 +132,22 @@ function hideKeyVisual(code) {
     }, 300);
 }
 
-// Функция обновления цветов всех активных блоков в зависимости от текущего набора
 function updateVisualStatuses(currentSequence, isMatchGlobal, isMatchPage, isError) {
     const boxes = Array.from(activeKeyBoxes.values());
     
-    // Проходим по последним введенным блокам и подкрашиваем их
-    boxes.forEach((box, index) => {
-        // Убираем старые статусы
+    boxes.forEach((box) => {
         box.classList.remove('status-progress', 'status-success-global', 'status-success-page', 'status-error');
 
         if (isError) {
             box.classList.add('status-error');
         } else if (isMatchPage) {
-            box.classList.add('status-success-page'); // Голубой для страниц (GEO)
+            box.classList.add('status-success-page'); // Голубой для GEO на pc.html
         } else if (isMatchGlobal) {
-            box.classList.add('status-success-global'); // Зеленый для глобальных (HEL)
-        } else if (currentSequence.length > 0) {
-            box.classList.add('status-progress'); // Оранжевый в процессе (например, GE)
+            box.classList.add('status-success-global'); // Зеленый для HEL
+        } else if (currentSequence.length >= 2) {
+            box.classList.add('status-progress'); // Оранжевый со 2-й буквы
         }
+        // Если длина 1 — класс не добавляется, квадрат остается стандартным (белым)
     });
 }
 
@@ -168,7 +166,7 @@ document.addEventListener('keydown', (e) => {
     clearTimeout(sequenceTimeout);
     sequenceTimeout = setTimeout(() => {
         keySequence = [];
-        updateVisualStatuses('', false, false, true); // Если таймаут вышел — подсветим ошибкой/сбросом
+        updateVisualStatuses('', false, false, false);
     }, 1500);
 
     keySequence.push(key);
@@ -179,27 +177,22 @@ document.addEventListener('keydown', (e) => {
     const currentCombination = keySequence.join('');
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
 
-    // Проверяем префиксы (подкрадывание)
-    const isGlobalPrefix = 'HEL'.startsWith(currentCombination);
-    const isPagePrefix = (currentPage === 'pc.html' && 'GEO'.startsWith(currentCombination));
-    
     const isMatchGlobal = (currentCombination === 'HEL');
     const isMatchPage = (currentPage === 'pc.html' && currentCombination === 'GEO');
     
-    // Если набрано 3 символа и это не совпало ни с чем — это ошибка
+    // Ошибкой считаем только если набрано ровно 3 символа и это неверная комбинация
     const isError = (keySequence.length === 3 && !isMatchGlobal && !isMatchPage);
 
-    // Обновляем цвета на экране
     updateVisualStatuses(currentCombination, isMatchGlobal, isMatchPage, isError);
 
-    // Выполнение действий при полном совпадении
+    // Действия при успешном наборе
     if (isMatchPage) {
         e.preventDefault();
         keySequence = [];
         sessionStorage.setItem('dev_console_authenticated', 'true');
         setTimeout(() => { 
             window.location.href = '/beginning.html'; 
-        }, 500);
+        }, 300);
     }
 
     if (isMatchGlobal) {
