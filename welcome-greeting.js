@@ -157,14 +157,14 @@ async function initGreetingUI() {
 
     if (!session || !session.user) return;
 
-    injectGreetingStyles();
+    injectGreetingStyles(); // Оставляем один вызов здесь
 
     const user = session.user;
     const emailPrefix = user.email ? user.email.split('@')[0].toUpperCase() : 'USER';
     const fullName = (user.user_metadata?.full_name || user.user_metadata?.username || 'ПОЛЬЗОВАТЕЛЬ').toUpperCase();
 
-    // Создаем структуру с контейнером для текста, который будет меняться
-    injectGreetingStyles();
+    // Вторую строку injectGreetingStyles(); УДАЛИЛИ отсюда
+
     const greetingHTML = `
         <div id="welcome-greeting-overlay" class="welcome-overlay">
             <img src="images/geo_logo.png" alt="" class="auth-bg-watermark">
