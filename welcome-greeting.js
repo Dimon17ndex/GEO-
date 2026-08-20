@@ -53,36 +53,17 @@ function injectGreetingStyles() {
             height: 100% !important;
             pointer-events: none !important;
             z-index: 1 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
         }
 
-        /* Медленная и плавная анимация роста и полета */
+        /* Статичный логотип на фоне по центру */
         .tunnel-logo {
-            position: absolute !important;
-            top: 50% !important;
-            left: 50% !important;
             width: 500px !important; 
-            transform: translate(-50%, -50%) scale(0.001);
-            opacity: 0;
-            filter: blur(25px);
-            animation: slowRandomZoomOff 3.8s cubic-bezier(0.2, 0.6, 0.3, 1) forwards;
-        }
-
-        @keyframes slowRandomZoomOff {
-            0% {
-                transform: translate(-50%, -50%) translate(0px, 0px) scale(0.001);
-                opacity: 0;
-                filter: blur(30px);
-            }
-            30% {
-                opacity: 1; 
-                filter: blur(8px);
-            }
-            100% {
-                /* Медленно и плавно увеличивается и уходит в случайную сторону до конца */
-                transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(7.5);
-                opacity: 0;
-                filter: blur(0px);
-            }
+            opacity: 0.15 !important;
+            filter: blur(2px) !important;
+            transform: scale(1) !important;
         }
 
         .welcome-ticker {
@@ -112,26 +93,12 @@ function injectGreetingStyles() {
     document.head.appendChild(styleElement);
 }
 
-// --- СОЗДАНИЕ ЛОГОТИПА СО СЛУЧАЙНЫМ НАПРАВЛЕНИЕМ ---
-function createSingleLogo(tunnelContainer) {
+// --- СОЗДАНИЕ СТАТИЧНОГО ФОНОВОГО ЛОГОТИПА ---
+function createStaticLogo(tunnelContainer) {
     const img = document.createElement('img');
     img.src = 'images/geo_logo.png';
     img.className = 'tunnel-logo';
-
-    const angle = Math.random() * Math.PI * 2;
-    const distance = 1200 + Math.random() * 400; 
-    
-    const dx = Math.cos(angle) * distance;
-    const dy = Math.sin(angle) * distance;
-
-    img.style.setProperty('--dx', `${dx}px`);
-    img.style.setProperty('--dy', `${dy}px`);
-
     tunnelContainer.appendChild(img);
-
-    img.addEventListener('animationend', () => {
-        img.remove();
-    });
 }
 
 // --- ОСНОВНАЯ ФУНКЦИЯ ---
@@ -177,9 +144,7 @@ async function initGreetingUI() {
     const track = document.getElementById('welcome-track');
     const tunnelContainer = document.getElementById('logo-tunnel');
     
-    setTimeout(() => {
-        createSingleLogo(tunnelContainer);
-    }, 200);
+    createStaticLogo(tunnelContainer);
 
     requestAnimationFrame(() => {
         requestAnimationFrame(() => overlay.classList.add('visible'));
@@ -192,5 +157,5 @@ async function initGreetingUI() {
     setTimeout(() => {
         overlay.classList.add('fade-out');
         setTimeout(() => overlay.remove(), 800);
-    }, 4000); // Немного увеличили время показа оверлея под долгую анимацию
+    }, 3200); 
 }
