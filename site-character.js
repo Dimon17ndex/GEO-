@@ -9,8 +9,8 @@ function initSiteCharacter() {
             top: 50% !important;
             left: 50% !important;
             transform: translate(-50%, -50%) !important;
-            width: 180px !important;
-            height: 180px !important;
+            width: 260px !important;
+            height: 260px !important;
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
@@ -18,7 +18,7 @@ function initSiteCharacter() {
             flex-direction: column !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 24px !important;
+            gap: 36px !important;
             z-index: 999998 !important;
             transition: transform 0.3s ease !important;
             pointer-events: none !important;
@@ -27,17 +27,17 @@ function initSiteCharacter() {
         /* Контейнер глаз */
         .char-eyes {
             display: flex !important;
-            gap: 30px !important;
+            gap: 48px !important;
             align-items: center !important;
             justify-content: center !important;
         }
 
-        /* Увеличенные глаза персонажа — пустые круги с обводкой 4px */
+        /* Большие глаза персонажа — пустые круги с обводкой 6px */
         .char-eye {
-            width: 32px !important;
-            height: 32px !important;
+            width: 50px !important;
+            height: 50px !important;
             background: transparent !important;
-            border: 4px solid #ffffff !important;
+            border: 6px solid #ffffff !important;
             border-radius: 50% !important;
             box-sizing: border-box !important;
             transition: transform 0.1s ease !important; /* Быстрое и плавное смыкание */
@@ -48,26 +48,26 @@ function initSiteCharacter() {
             transform: scaleY(0.1) !important;
         }
 
-        /* Увеличенный рот персонажа — линия толщиной 4px */
+        /* Большой рот персонажа — линия толщиной 6px */
         .char-mouth {
-            width: 28px !important;
-            height: 4px !important;
+            width: 44px !important;
+            height: 6px !important;
             background: #ffffff !important;
-            border-radius: 2px !important;
+            border-radius: 3px !important;
             transition: all 0.3s ease !important;
         }
 
         /* Эмоции и состояния */
         /* 1. Режим загрузки / думает */
         #site-character-widget.state-loading .char-mouth {
-            width: 16px !important;
-            height: 4px !important;
+            width: 24px !important;
+            height: 6px !important;
         }
 
         /* 2. Режим успеха / радости */
         #site-character-widget.state-happy .char-mouth {
-            width: 36px !important;
-            height: 4px !important;
+            width: 56px !important;
+            height: 6px !important;
         }
     `;
 
