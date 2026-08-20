@@ -132,7 +132,7 @@ function hideKeyVisual(code) {
     }, 300);
 }
 
-function updateVisualStatuses(currentSequence, isMatchGlobal, isMatchPageActive, isMatchPageWord, isError) {
+function updateVisualStatuses(currentSequence, isGlobalActive, isPageActive, isWordExist, isError) {
     const boxes = Array.from(activeKeyBoxes.values());
     
     boxes.forEach((box) => {
@@ -140,12 +140,14 @@ function updateVisualStatuses(currentSequence, isMatchGlobal, isMatchPageActive,
 
         if (isError) {
             box.classList.add('status-error');
-        } else if (isMatchPageActive || isMatchGlobal) {
-            box.classList.add('status-success-global'); // Зеленый, если комбинация активна на этой странице ИЛИ это HEL
-        } else if (isMatchPageWord) {
-            box.classList.add('status-success-page'); // Голубой, если слово верное, но на другой странице
+        } else if (isGlobalActive) {
+            box.classList.add('status-success-global'); // Зеленый для глобального успеха (например HEL на обычных страницах)
+        } else if (isPageActive) {
+            box.classList.add('status-success-page');   // Голубой для страниц (GEO на pc.html ИЛИ HEL на pc.html)
+        } else if (isWordExist) {
+            box.classList.add('status-success-page');   // Голубой, если слово существует, но на другой странице
         } else if (currentSequence.length >= 2) {
-            box.classList.add('status-progress'); // Оранжевый в процессе набора
+            box.classList.add('status-progress');       // Оранжевый в процессе набора
         }
     });
 }
@@ -182,16 +184,30 @@ document.addEventListener('keydown', (e) => {
     const currentCombination = keySequence.join('');
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
 
-    const isMatchGlobal = (currentCombination === 'HEL');
-    const isMatchPageWord = (currentCombination === 'GEO'); // Набрано слово GEO в принципе
-    const isMatchPageActive = (currentPage === 'pc.html' && isMatchPageWord); // GEO активно именно на этой странице
+    const isHelWord = (currentCombination === 'HEL');
+    const isGeoWord = (currentCombination === 'GEO');
+    const isAnyWordExist = isHelWord || isGeoWord;
+
+    // Настраиваем правила для цветов и действий на конкретных страницах
+    const isPcPage = (currentPage === 'pc.html');
+
+    // HEL активен как глобальный (зеленый) только НЕ на pc.html. На pc.html он станет голубым.
+    const isGlobalActive = (isHelWord && !isPcPage);
     
-    const isError = (keySequence.length === 3 && !isMatchGlobal && !isMatchPageWord);
+    // Страничные успешные комбинации (голубые): GEO на pc.html ИЛИ HEL на pc.html
+    const isPageActiveGeo = (isPcPage && isGeoWord);
+    const isPageActiveHel = (isPcPage && isHelWord);
+    const isPageActive = isPageActiveGeo || isPageActiveHel;
 
-    updateVisualStatuses(currentCombination, isMatchGlobal, isMatchPageActive, isMatchPageWord, isError);
+    // Если слово введено верно, но мы на чужой странице (например, GEO на index.html)
+    const isWordExist = (isAnyWordExist && !isGlobalActive && !isPageActive);
 
-    // Действие перенаправления работает только когда комбинация активна
-    if (isMatchPageActive) {
+    const isError = (keySequence.length === 3 && !isAnyWordExist);
+
+    updateVisualStatuses(currentCombination, isGlobalActive, isPageActive, isWordExist, isError);
+
+    // Действия при совпадении
+    if (isPageActiveGeo) {
         e.preventDefault();
         keySequence = [];
         sessionStorage.setItem('dev_console_authenticated', 'true');
@@ -200,7 +216,7 @@ document.addEventListener('keydown', (e) => {
         }, 300);
     }
 
-    if (isMatchGlobal) {
+    if (isHelWord) {
         e.preventDefault();
         keySequence = [];
 
