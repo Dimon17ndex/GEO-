@@ -104,12 +104,15 @@ document.addEventListener('DOMContentLoaded', initShortcutVisualizer);
 document.addEventListener('keydown', (e) => {
     if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
 
-    // Игнорируем чисто системные клавиши-модификаторы сами по себе
+    // Игнорируем зажатие клавиши (автоповтор при удерживании)
+    if (e.repeat) return;
+
+    // Игнорируем чисто системные клавиши-модификаторы
     if (['Control', 'Shift', 'Alt', 'Meta', 'CapsLock', 'Tab'].includes(e.key)) return;
 
     const key = e.key.toUpperCase();
 
-    // Отрисовываем визуализацию нажатой клавиши в левом нижнем углу
+    // Отрисовываем ровно ОДИН визуальный блок (без спама)
     renderKeyVisual(key);
 
     // Сброс буфера последовательности шорткатов
