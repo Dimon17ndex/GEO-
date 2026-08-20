@@ -31,12 +31,12 @@ function initSiteCharacter() {
             justify-content: center !important;
         }
 
-        /* Глаза персонажа */
+        /* Глаза персонажа — кружки */
         .char-eye {
-            width: 8px !important;
-            height: 12px !important;
+            width: 10px !important;
+            height: 10px !important;
             background: #ffffff !important;
-            border-radius: 4px !important;
+            border-radius: 50% !important;
             transition: transform 0.2s ease, height 0.2s ease !important;
             animation: charBlink 4s infinite ease-in-out !important;
         }
@@ -54,8 +54,6 @@ function initSiteCharacter() {
         /* 1. Режим загрузки / думает */
         #site-character-widget.state-loading .char-eye {
             animation: charLookAround 1s infinite alternate ease-in-out !important;
-            height: 8px !important;
-            border-radius: 50% !important;
         }
         #site-character-widget.state-loading .char-mouth {
             width: 8px !important;
