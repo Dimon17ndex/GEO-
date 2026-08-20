@@ -55,7 +55,7 @@ function injectGreetingStyles() {
             z-index: 1 !important;
         }
 
-        /* Логотип увеличивается, а в конце плавно уходит вверх/вниз за экран */
+        /* Единственный логотип: увеличивается и плавно уходит вверх за экран */
         .tunnel-logo {
             position: absolute !important;
             top: 50% !important;
@@ -64,10 +64,10 @@ function injectGreetingStyles() {
             transform: translate(-50%, -50%) scale(0.001);
             opacity: 0;
             filter: blur(25px);
-            animation: zoomAndSlideOff 2.0s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            animation: singleZoomAndSlide 2.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
 
-        @keyframes zoomAndSlideOff {
+        @keyframes singleZoomAndSlide {
             0% {
                 transform: translate(-50%, -50%) translate(0px, 0px) scale(0.001);
                 opacity: 0;
@@ -77,15 +77,15 @@ function injectGreetingStyles() {
                 opacity: 1; 
                 filter: blur(5px);
             }
-            /* К середине анимации логотип полностью приблизился и четкий */
+            /* К середине анимации логотип полностью приблизился */
             55% {
                 transform: translate(-50%, -50%) translate(0px, 0px) scale(4.5);
                 opacity: 1;
                 filter: blur(0px);
             }
-            /* В финале плавно смещается за верх или низ экрана и затухает */
+            /* В финале плавно уходит вверх за границу экрана и тухнет */
             100% {
-                transform: translate(-50%, -50%) translate(0px, var(--slide-y)) scale(5.0);
+                transform: translate(-50%, -50%) translate(0px, -800px) scale(5.0);
                 opacity: 0;
                 filter: blur(0px);
             }
@@ -118,37 +118,17 @@ function injectGreetingStyles() {
     document.head.appendChild(styleElement);
 }
 
-// --- ПОСЛЕДОВАТЕЛЬНЫЙ ЗАПУСК С УХОДОМ ВВЕРХ/ВНИЗ ---
-function createSequentialLogos(tunnelContainer) {
-    // Чередуем: один уходит вверх, другой вниз, следующий снова вверх и т.д.
-    const slideDirections = [-700, 700, -700, 700]; // отрицательное — вверх, положительное — вниз
+// --- СОЗДАНИЕ ЕДИНСТВЕННОГО ЛОГОТИПА ---
+function createSingleLogo(tunnelContainer) {
+    const img = document.createElement('img');
+    img.src = 'images/geo_logo.png';
+    img.className = 'tunnel-logo';
 
-    let index = 0;
+    tunnelContainer.appendChild(img);
 
-    function spawnNext() {
-        if (index >= slideDirections.length) return;
-
-        const slideY = slideDirections[index];
-        const img = document.createElement('img');
-        img.src = 'images/geo_logo.png';
-        img.className = 'tunnel-logo';
-
-        img.style.setProperty('--slide-y', `${slideY}px`);
-
-        tunnelContainer.appendChild(img);
-
-        img.addEventListener('animationend', () => {
-            img.remove();
-        });
-
-        index++;
-
-        if (index < slideDirections.length) {
-            setTimeout(spawnNext, 600); // Интервал между логотипами
-        }
-    }
-
-    setTimeout(spawnNext, 200);
+    img.addEventListener('animationend', () => {
+        img.remove();
+    });
 }
 
 // --- ОСНОВНАЯ ФУНКЦИЯ ---
@@ -194,7 +174,10 @@ async function initGreetingUI() {
     const track = document.getElementById('welcome-track');
     const tunnelContainer = document.getElementById('logo-tunnel');
     
-    createSequentialLogos(tunnelContainer);
+    // Запускаем ровно один логотип
+    setTimeout(() => {
+        createSingleLogo(tunnelContainer);
+    }, 200);
 
     requestAnimationFrame(() => {
         requestAnimationFrame(() => overlay.classList.add('visible'));
