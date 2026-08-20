@@ -66,13 +66,13 @@ function initSiteCharacter() {
 
         /* 2. Режим нейтральный */
         #site-character-widget.state-neutral .char-mouth {
-            width: 34px !important;
+           width: 56px !important;
             height: 6px !important;
         }
 
         /* 3. Режим успеха / радости */
         #site-character-widget.state-happy .char-mouth {
-            width: 56px !important;
+            width: 34px !important;
             height: 6px !important;
         }
     `;
@@ -83,7 +83,7 @@ function initSiteCharacter() {
     document.head.appendChild(styleEl);
 
     const widgetHTML = `
-        <div id="site-character-widget" class="state-happy">
+        <div id="site-character-widget" class="state-neutral">
             <div class="char-eyes">
                 <div class="char-eye"></div>
                 <div class="char-eye"></div>
