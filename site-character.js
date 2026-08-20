@@ -72,8 +72,11 @@ function initSiteCharacter() {
 
         /* 3. Режим успеха / радости */
         #site-character-widget.state-happy .char-mouth {
-            width: 34px !important;
-            height: 6px !important;
+            width: 52px !important;
+            height: 14px !important;
+            background: transparent !important;
+            border-bottom: 6px solid #ffffff !important;
+            border-radius: 0 0 28px 28px !important;
         }
     `;
 
