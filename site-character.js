@@ -55,7 +55,6 @@ function initSiteCharacter() {
             background: #ffffff !important;
             border-radius: 3px !important;
             transition: all 0.3s ease !important;
-            flex-shrink: 0 !important; /* Защита от сжатия/деформации */
         }
 
         /* Эмоции и состояния */
@@ -126,36 +125,18 @@ function initSiteCharacter() {
             transform: translate(-50%, 0) !important;
         }
 
-        /* Лоадер над глазами */
+        /* Лоадер скрыт во всех режимах, кроме loading */
         .char-loader {
-            display: flex !important; /* Всегда в DOM */
+            display: none !important;
             gap: 6px !important;
             align-items: center !important;
             justify-content: center !important;
-            height: 20px !important; /* Фиксированная высота */
+            height: 20px !important;
             margin-bottom: -10px !important;
-            opacity: 0 !important; /* Невидимый по умолчанию */
-            visibility: hidden !important;
-            transition: opacity 0.3s ease !important; /* Плавность */
         }
 
-        /* Появляется только в режиме загрузки */
         #site-character-widget.state-loading .char-loader {
-            opacity: 1 !important;
-            visibility: visible !important;
-        }
-
-        /* Подмигивание правым глазом (складываем только правый глаз по вертикали) */
-        #site-character-widget.action-wink .char-eye:nth-child(2) {
-            transform: scaleY(0.1) !important;
-        }
-
-        /* Овальный рот по горизонтали для действия */
-        #site-character-widget.action-wink .char-mouth {
-            width: 48px !important;
-            height: 12px !important;
-            background: #ffffff !important;
-            border-radius: 50px !important;
+            display: flex !important;
         }
     `;
 
@@ -250,32 +231,6 @@ window.siteCharacter = {
         if (widget) {
             widget.style.opacity = '1';
         }
-    }
-    wink: function() {
-        const widget = document.getElementById('site-character-widget');
-        if (!widget) return;
-
-        // 1. Запоминаем текущий класс эмоции (например, state-neutral или state-happy)
-        let previousState = 'state-neutral';
-        if (widget.classList.contains('state-happy')) previousState = 'state-happy';
-        if (widget.classList.contains('state-loading')) previousState = 'state-loading';
-
-        // 2. Отключаем обычное рандомное моргание на время действия
-        widget.classList.remove('blinking');
-        
-        // 3. Запускаем анимацию: переводим в радость с овальным ртом и подмигиванием
-        widget.className = 'state-happy action-wink';
-
-        // 4. Через время меняем рот на обычную улыбку (если нужно по сценарию)
-        setTimeout(() => {
-            // Убираем класс действия, оставляя просто радость
-            widget.className = 'state-happy';
-        }, 600); // Длительность первой фазы (овальный рот + подмигивание)
-
-        // 5. Возвращаем персонажа в предыдущую эмоцию после завершения действия
-        setTimeout(() => {
-            widget.className = previousState;
-        }, 1200); // Общая длительность анимации подмигивания
     }
 };
 
