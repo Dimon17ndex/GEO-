@@ -55,7 +55,7 @@ function injectGreetingStyles() {
             z-index: 1 !important;
         }
 
-        /* Логотипы летят насквозь без растворения по центру и уходят в стороны за экран */
+        /* Логотипы пролетают насквозь и убегают далеко за края экрана */
         .tunnel-logo {
             position: absolute !important;
             top: 50% !important;
@@ -64,28 +64,27 @@ function injectGreetingStyles() {
             transform: translate(-50%, -50%) scale(0.001);
             opacity: 0;
             filter: blur(25px);
-            animation: solidFlyThrough 1.8s linear forwards;
+            animation: slideOffScreen 1.8s linear forwards;
         }
 
-        @keyframes solidFlyThrough {
+        @keyframes slideOffScreen {
             0% {
                 transform: translate(-50%, -50%) translate(0px, 0px) scale(0.001);
                 opacity: 0;
                 filter: blur(30px);
             }
             15% {
-                /* Быстро проявляются и дальше остаются полностью яркими и видимыми */
                 opacity: 1; 
             }
-            85% {
-                /* До самого конца полета логотип полностью виден */
+            88% {
+                /* До самого вылета за рамки экрана логотип яркий и четкий */
                 opacity: 1;
                 filter: blur(0px);
             }
             100% {
-                /* Улетают далеко за границы экрана в стороны */
-                transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(6.0);
-                opacity: 0; /* Растворение происходит только когда логотип уже ушел за экран */
+                /* Огромный масштаб и улет далеко за пределы видимости */
+                transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(7.5);
+                opacity: 0; /* Гаснут уже в самом конце, когда они полностью за экраном */
                 filter: blur(0px);
             }
         }
@@ -119,11 +118,12 @@ function injectGreetingStyles() {
 
 // --- ОЧЕРЕДЬ ПО ОДНОМУ ---
 function createSequentialLogos(tunnelContainer) {
+    // Увеличили дистанцию (dist), чтобы они улетали глубоко за границы экрана
     const flights = [
-        { angle: 0.2, dist: 1200 },   // Вправо
-        { angle: 3.1, dist: 1200 },   // Влево
-        { angle: 1.5, dist: 1200 },   // Вниз
-        { angle: 4.7, dist: 1200 },   // Вверх
+        { angle: 0.2, dist: 1600 },   // Вправо за экран
+        { angle: 3.1, dist: 1600 },   // Влево за экран
+        { angle: 1.5, dist: 1600 },   // Вниз за экран
+        { angle: 4.7, dist: 1600 },   // Вверх за экран
     ];
 
     let index = 0;
@@ -151,7 +151,7 @@ function createSequentialLogos(tunnelContainer) {
         index++;
 
         if (index < flights.length) {
-            setTimeout(spawnNext, 550); // Интервал между появлением одиночных логотипов
+            setTimeout(spawnNext, 550);
         }
     }
 
