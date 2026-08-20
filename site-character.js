@@ -31,13 +31,12 @@ function initSiteCharacter() {
             justify-content: center !important;
         }
 
-        /* Глаза персонажа — кружки */
+        /* Глаза персонажа — идеальные круги */
         .char-eye {
-            width: 10px !important;
-            height: 10px !important;
+            width: 12px !important;
+            height: 12px !important;
             background: #ffffff !important;
             border-radius: 50% !important;
-            transition: transform 0.2s ease, height 0.2s ease !important;
             animation: charBlink 4s infinite ease-in-out !important;
         }
 
@@ -61,15 +60,12 @@ function initSiteCharacter() {
         }
 
         /* 2. Режим успеха / радости */
-        #site-character-widget.state-happy .char-eye {
-            transform: scaleY(0.4) !important;
-        }
         #site-character-widget.state-happy .char-mouth {
             width: 22px !important;
             height: 2px !important;
         }
 
-        /* Анимация моргания */
+        /* Анимация моргания (сжимается только по высоте, сохраняя круглую форму в обычном состоянии) */
         @keyframes charBlink {
             0%, 90%, 100% { transform: scaleY(1); }
             95% { transform: scaleY(0.1); }
