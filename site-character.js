@@ -6,10 +6,11 @@ function initSiteCharacter() {
     const css = `
         #site-character-widget {
             position: fixed !important;
-            bottom: 30px !important;
-            right: 30px !important;
-            width: 70px !important;
-            height: 70px !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            width: 180px !important;
+            height: 180px !important;
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
@@ -17,7 +18,7 @@ function initSiteCharacter() {
             flex-direction: column !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 10px !important;
+            gap: 24px !important;
             z-index: 999998 !important;
             transition: transform 0.3s ease !important;
             pointer-events: none !important;
@@ -26,17 +27,17 @@ function initSiteCharacter() {
         /* Контейнер глаз */
         .char-eyes {
             display: flex !important;
-            gap: 12px !important;
+            gap: 30px !important;
             align-items: center !important;
             justify-content: center !important;
         }
 
-        /* Глаза персонажа — пустые круги с обводкой 2px */
+        /* Увеличенные глаза персонажа — пустые круги с обводкой 4px */
         .char-eye {
-            width: 12px !important;
-            height: 12px !important;
+            width: 32px !important;
+            height: 32px !important;
             background: transparent !important;
-            border: 2px solid #ffffff !important;
+            border: 4px solid #ffffff !important;
             border-radius: 50% !important;
             box-sizing: border-box !important;
             transition: transform 0.1s ease !important; /* Быстрое и плавное смыкание */
@@ -47,32 +48,26 @@ function initSiteCharacter() {
             transform: scaleY(0.1) !important;
         }
 
-        /* Рот персонажа — линия толщиной 2px, как обводка глаз */
+        /* Увеличенный рот персонажа — линия толщиной 4px */
         .char-mouth {
-            width: 10px !important;
-            height: 2px !important;
+            width: 28px !important;
+            height: 4px !important;
             background: #ffffff !important;
-            border-radius: 0px !important;
+            border-radius: 2px !important;
             transition: all 0.3s ease !important;
         }
 
         /* Эмоции и состояния */
         /* 1. Режим загрузки / думает */
         #site-character-widget.state-loading .char-mouth {
-            width: 6px !important;
-            height: 2px !important;
+            width: 16px !important;
+            height: 4px !important;
         }
 
         /* 2. Режим успеха / радости */
         #site-character-widget.state-happy .char-mouth {
-            width: 12px !important;
-            height: 2px !important;
-        }
-
-        /* Анимация раздумий (покачивание) */
-        @keyframes charLookAround {
-            0% { transform: translateX(-3px); }
-            100% { transform: translateX(3px); }
+            width: 36px !important;
+            height: 4px !important;
         }
     `;
 
@@ -132,7 +127,6 @@ window.siteCharacter = {
     setLoading: function() {
         const widget = document.getElementById('site-character-widget');
         if (widget) {
-            // Сохраняем класс моргания, если он есть, но меняем состояние
             const isBlinking = widget.classList.contains('blinking');
             widget.className = 'state-loading' + (isBlinking ? ' blinking' : '');
         }
