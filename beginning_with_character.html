@@ -21,12 +21,139 @@
     <link rel="stylesheet" href="beginning.css">
 
     <style>
-        /* Когда пользователь вошел — гарантированно скрываем центральную кнопку */
+        /* =========================================================
+            ОБЩИЙ КОНТЕЙНЕР ДЛЯ ВСЕХ ЭЛЕМЕНТОВ УПРАВЛЕНИЯ
+            ========================================================= */
+        .character-controls-container {
+            position: fixed;
+            top: calc(50% + 190px); /* Отступ вниз от центра экрана */
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 6;
+            width: 90%;
+            max-width: 720px;
+            justify-content: center;
+        }
+
+        /* =========================================================
+            ОТДЕЛЬНАЯ КНОПКА "МЕХАНИКИ" СЛЕВА
+            ========================================================= */
+        .mechanics-dropdown-wrapper {
+            position: relative;
+        }
+
+        .mechanics-main-btn {
+            padding: 10px 18px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            border-radius: 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            backdrop-filter: blur(15px);
+            transition: all 0.25s ease;
+        }
+
+        .mechanics-main-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Выпадающий список "Механики" */
+        .mechanics-menu {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 0;
+            min-width: 140px;
+            background: rgba(15, 15, 20, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            backdrop-filter: blur(15px);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(6px);
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .mechanics-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .mechanics-option {
+            padding: 8px 12px;
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: left;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .mechanics-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* =========================================================
+            ПРОТЯЖЕННАЯ ПАНЕЛЬ С КНОПКАМИ ПЕРСОНАЖА
+            ========================================================= */
+        .character-control-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border-radius: 16px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            flex: 1;
+        }
+
+        .char-panel-btn {
+            flex: 1;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            border-radius: 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            white-space: nowrap;
+            transition: all 0.25s ease;
+        }
+
+        .char-panel-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Остальные ваши стили (без изменений) */
         body.user-logged-in #open-auth-btn {
             display: none !important;
         }
 
-        /* Плавное проявление и затухание страницы */
         body {
             opacity: 0;
             transition: opacity 0.5s ease;
@@ -36,12 +163,10 @@
             opacity: 1;
         }
 
-        /* Класс для плавного угасания перед переходом */
         body.page-hidden {
             opacity: 0 !important;
         }
 
-        /* Позиционирование бренд-блока в верхнем левом углу */
         .top-left-brand {
             position: fixed;
             top: 40px;
@@ -74,7 +199,6 @@
             animation: floatingText 4.5s ease-in-out infinite alternate !important;
         }
 
-        /* Подзаголовок "РЕЖИМ ADMIN" под заголовком */
         .admin-mode-badge {
             display: inline-block;
             font-family: 'Montserrat', sans-serif;
@@ -101,7 +225,6 @@
             color: #ffffff;
         }
 
-        /* Анимация левитации */
         @keyframes floatingLogo {
             0% { transform: translateY(0px) rotate(0deg); }
             50% { transform: translateY(-8px) rotate(-1.5deg); }
@@ -114,9 +237,6 @@
             100% { transform: translateY(4px); }
         }
 
-        /* =========================================================
-            ВИДЖЕТ ПРОФИЛЯ
-            ========================================================= */
         .top-right-profile {
             position: fixed;
             top: 40px;
@@ -198,9 +318,6 @@
             pointer-events: auto !important;
         }
 
-        /* =========================================================
-            ЦЕНТРАЛЬНЫЙ КОНТЕЙНЕР (ПЕРСОНАЖ)
-            ========================================================= */
         .center-status-wrapper {
             position: fixed;
             top: 44%;
@@ -213,106 +330,6 @@
             justify-content: center;
         }
 
-        /* =========================================================
-            ПРОТЯЖЕННАЯ ПАНЕЛЬ ПОД ПЕРСОНАЖЕМ С КНОПКАМИ
-            ========================================================= */
-        .character-control-panel {
-            position: fixed;
-            top: calc(50% + 190px); /* Отступ вниз от центра экрана */
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 650px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(15px);
-            border-radius: 16px;
-            padding: 16px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            z-index: 6;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Контейнер для выпадающего меню "Механики" */
-        .mechanics-dropdown-wrapper {
-            position: relative;
-            flex: 1;
-        }
-
-        .char-panel-btn {
-            width: 100%;
-            flex: 1;
-            padding: 10px 14px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #ffffff;
-            border-radius: 10px;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            text-align: center;
-            white-space: nowrap;
-            transition: all 0.25s ease;
-        }
-
-        .char-panel-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.4);
-            transform: translateY(-2px);
-        }
-
-        /* Выпадающий список "Механики" */
-        .mechanics-menu {
-            position: absolute;
-            bottom: calc(100% + 8px);
-            left: 0;
-            right: 0;
-            background: rgba(15, 15, 20, 0.95);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            padding: 6px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            backdrop-filter: blur(15px);
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(6px);
-            transition: all 0.2s ease;
-            z-index: 10;
-        }
-
-        .mechanics-menu.active {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .mechanics-option {
-            padding: 8px 12px;
-            background: transparent;
-            border: none;
-            color: #ffffff;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 13px;
-            font-weight: 600;
-            text-align: left;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
-
-        .mechanics-option:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        /* =========================================================
-            ВЫДВИЖНАЯ СЕКРЕТНАЯ ПАНЕЛЬ АДМИНИСТРАТОРА
-            ========================================================= */
         .dev-side-panel {
             position: fixed;
             top: 50%;
@@ -405,22 +422,23 @@
 <!-- Центральный контейнер персонажа -->
 <div class="center-status-wrapper" id="center-character-container"></div>
 
-<!-- Протянутая панель с кнопками под персонажем -->
-<!-- Протянутая панель с кнопками под персонажем -->
-<div class="character-control-panel">
-    <!-- Кнопка "Механики" с выпадающим списком -->
+<div class="character-controls-container">
+    <!-- Отдельная кнопка "Механики" слева -->
     <div class="mechanics-dropdown-wrapper">
-        <button type="button" class="char-panel-btn" id="mechanics-toggle-btn">Механики ▾</button>
+        <button type="button" class="mechanics-main-btn" id="mechanics-toggle-btn">Механики ▾</button>
         <div class="mechanics-menu" id="mechanics-menu">
             <button type="button" class="mechanics-option" data-value="Эмоции">Эмоции</button>
             <button type="button" class="mechanics-option" data-value="Действия">Действия</button>
         </div>
     </div>
 
-    <button type="button" class="char-panel-btn" onclick="window.siteCharacter?.setHappy()">Радость 😊</button>
-    <button type="button" class="char-panel-btn" onclick="window.siteCharacter?.setLoading()">Думает ⏳</button>
-    <button type="button" class="char-panel-btn" onclick="window.siteCharacter?.hide()">Скрыть 🙈</button>
-    <button type="button" class="char-panel-btn" onclick="window.siteCharacter?.show()">Показать 👀</button>
+    <!-- Основная панель с остальными кнопками -->
+    <div class="character-control-panel">
+        <button type="button" class="char-panel-btn" onclick="window.siteCharacter?.setHappy()">Радость 😊</button>
+        <button type="button" class="char-panel-btn" onclick="window.siteCharacter?.setLoading()">Думает ⏳</button>
+        <button type="button" class="char-panel-btn" onclick="window.siteCharacter?.hide()">Скрыть 🙈</button>
+        <button type="button" class="char-panel-btn" onclick="window.siteCharacter?.show()">Показать 👀</button>
+    </div>
 </div>
 
 <div class="settings-trigger-zone" id="settings-btn" style="opacity: 1; pointer-events: auto;">
@@ -678,31 +696,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const mechanicsMenu = document.getElementById('mechanics-menu');
     const mechanicsOptions = document.querySelectorAll('.mechanics-option');
 
-    // Открытие/закрытие меню по клику на "Механики"
     mechanicsBtn?.addEventListener('click', (e) => {
         e.stopPropagation();
         mechanicsMenu.classList.toggle('active');
     });
 
-    // Выбор пункта из меню
     mechanicsOptions.forEach(option => {
         option.addEventListener('click', (e) => {
             e.stopPropagation();
             const selectedText = option.getAttribute('data-value');
             
-            // Меняем текст кнопки на выбранный пункт (сохраняя стрелочку вниз)
+            // Меняем текст кнопки на выбранный пункт
             mechanicsBtn.innerHTML = `${selectedText} ▾`;
             
             // Закрываем меню
             mechanicsMenu.classList.remove('active');
             
-            // Здесь вы можете добавить логику, что именно должно происходить 
-            // при выборе "Эмоций" или "Действий"
-            console.لاج('Выбрана механика:', selectedText);
+            console.log('Выбрана механика:', selectedText);
         });
     });
 
-    // Закрытие меню при клике в любое другое место страницы
     document.addEventListener('click', () => {
         mechanicsMenu?.classList.remove('active');
     });
