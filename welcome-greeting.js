@@ -133,7 +133,7 @@ function injectGreetingStyles() {
             overflow: hidden !important;
         }
 
-        /* Бегающая белая точка */
+        /* Бегающая белая точка без деформаций и прилипаний */
         .dot-loader-ball {
             position: absolute !important;
             top: 0 !important;
@@ -142,10 +142,10 @@ function injectGreetingStyles() {
             height: 6px !important;
             background: #ffffff !important;
             border-radius: 50% !important;
-            animation: moveDotBackAndForth 0.9s ease-in-out infinite alternate !important;
+            animation: moveDotClean 0.9s ease-in-out infinite alternate !important;
         }
 
-        @keyframes moveDotBackAndForth {
+        @keyframes moveDotClean {
             0% {
                 left: 0px;
             }
@@ -165,14 +165,18 @@ function injectGreetingStyles() {
 async function initGreetingUI() {
     if (document.getElementById('welcome-greeting-overlay')) return;
 
-    let session = null;
-    try {
-        const client = window.supabaseClient || window.supabase;
-        if (client && client.auth) {
-            const { data } = await client.auth.getSession();
-            session = data?.session;
-        }
-    } catch (e) { console.error(e); }
+    // Проверяем сначала фейковую сессию от шортката ACT, если ее нет — берем из Supabase
+    let session = window.mockSupabaseSession || null;
+    
+    if (!session) {
+        try {
+            const client = window.supabaseClient || window.supabase;
+            if (client && client.auth) {
+                const { data } = await client.auth.getSession();
+                session = data?.session;
+            }
+        } catch (e) { console.error(e); }
+    }
 
     if (!session || !session.user) return;
 
@@ -214,12 +218,12 @@ async function initGreetingUI() {
     const mainGreeting = document.getElementById('welcome-main-greeting');
     const track = document.getElementById('welcome-track');
 
-    // Показываем оверлей
+    // Показываем оверлей[cite: 3]
     requestAnimationFrame(() => {
         requestAnimationFrame(() => overlay.classList.add('visible'));
     });
 
-    // Ровно через 2 секунды убираем статус «Узнаем вас» и выдвигаем основной текст
+    // Ровно через 2 секунды убираем статус «Узнаем вас» и выдвигаем основной текст[cite: 3]
     setTimeout(() => {
         statusBox.classList.add('hidden');
         statusBox.style.display = 'none';
@@ -228,16 +232,19 @@ async function initGreetingUI() {
         titleElement.classList.add('revealed');
     }, 2000);
 
-    // Смена почты на имя внутри тикера (спустя 3 секунды от начала)
+    // Смена почты на имя внутри тикера (спустя 3 секунды от начала)[cite: 3]
     setTimeout(() => {
         if (track) {
             track.style.transform = 'translateY(-1.2em)';
         }
     }, 3000);
 
-    // Закрытие всего экрана приветствия на отметке 5 секунд
+    // Закрытие всего экрана приветствия на отметке 5 секунд[cite: 3]
     setTimeout(() => {
         overlay.classList.add('fade-out');
         setTimeout(() => overlay.remove(), 800);
     }, 5000); 
 }
+
+// Делаем функцию доступной глобально для шорткатов
+window.initGreetingUI = initGreetingUI;
