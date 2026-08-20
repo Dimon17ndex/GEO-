@@ -70,15 +70,27 @@ function initShortcutVisualizer() {
 function showKeyVisual(code, char) {
     if (!shortcutContainer) initShortcutVisualizer();
 
-    // Если блок для этой клавиши уже отображается (например, при повторе), не плодим новые
-    if (activeKeyBoxes.has(code)) return;
+    // Если блок для этой клавиши уже отображается, просто обновляем его (не дублируем)
+    if (activeKeyBoxes.has(code)) {
+        return;
+    }
+
+    // Ограничиваем максимальное количество одновременно отображаемых блоков (например, до 5)
+    // чтобы они не уходили за границы экрана, но и не сбрасывали активные клавиши раньше времени
+    if (activeKeyBoxes.size >= 5) {
+        // Находим и удаляем самый первый созданный блок, который уже есть в памяти
+        const firstKey = activeKeyBoxes.keys().next().value;
+        if (firstKey) {
+            hideKeyVisual(firstKey);
+        }
+    }
 
     const keyBox = document.createElement('div');
     keyBox.className = 'shortcut-key-box';
     keyBox.textContent = char;
     shortcutContainer.appendChild(keyBox);
 
-    // Сохраняем ссылку в Map
+    // Сохраняем ссылку в Map вместе со временем создания
     activeKeyBoxes.set(code, keyBox);
 
     requestAnimationFrame(() => {
@@ -86,20 +98,6 @@ function showKeyVisual(code, char) {
             keyBox.classList.add('visible');
         });
     });
-
-    // Ограничиваем максимальное количество блоков на экране (не больше 3)
-    if (shortcutContainer.children.length > 3) {
-        const oldestBox = shortcutContainer.children[0];
-        // Находим ключ этого старого элемента в Map и удаляем
-        for (let [k, v] of activeKeyBoxes.entries()) {
-            if (v === oldestBox) {
-                activeKeyBoxes.delete(k);
-                break;
-            }
-        }
-        oldestBox.classList.add('fade-out');
-        setTimeout(() => oldestBox.remove(), 300);
-    }
 }
 
 // Скрываем блок при отпускании клавиши
