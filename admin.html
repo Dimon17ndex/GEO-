@@ -101,8 +101,8 @@
         /* Плашка "АВТОРИЗОВАННЫЕ GEOUSERS" */
         .admin-sub-badge {
             position: fixed;
-            top: 165px;  /* Смещена ниже */
-            left: 160px; /* Смещена правее */
+            top: 165px;
+            left: 160px;
             z-index: 10;
             display: inline-flex;
             align-items: center;
@@ -130,23 +130,22 @@
         }
 
         /* =========================================================
-           СПИСОК ПЛАШЕК ДЛЯ GEOUSERS (ПОД ПЛАШКОЙ "АВТОРИЗОВАННЫЕ...")
+           СПИСОК ПЛАШЕК ДЛЯ GEOUSERS
            ========================================================= */
         .geousers-list-container {
             position: fixed;
-            top: 220px;          /* Чуть ниже плашки admin-sub-badge */
-            left: 160px;         /* По левому краю верхнего бейджа */
-            width: 600px;        /* Длинная фиксированная ширина */
-            max-height: calc(100vh - 250px); /* Добавлен скролл, если пользователей много */
+            top: 220px;
+            left: 160px;
+            width: 600px;
+            max-height: calc(100vh - 250px);
             overflow-y: auto;
             padding-right: 6px;
             display: flex;
             flex-direction: column;
-            gap: 12px;           /* Расстояние между плашками */
+            gap: 12px;
             z-index: 10;
         }
 
-        /* Кастомный красивый скроллбар */
         .geousers-list-container::-webkit-scrollbar {
             width: 6px;
         }
@@ -157,12 +156,11 @@
 
         .geouser-row-item {
             display: flex;
-            align-items: center;  /* Вертикальное центрирование содержимого */
-            gap: 16px;           /* Отступ между цифрой и плашкой */
+            align-items: center;
+            gap: 16px;
             width: 100%;
         }
 
-        /* Цифра слева без контейнера */
         .geouser-number {
             font-family: 'Montserrat', sans-serif;
             font-size: 14px;
@@ -177,7 +175,6 @@
             gap: 6px;
         }
 
-        /* Лейбл "ВЫ" перед номером пользователя */
         .geouser-you-badge {
             font-family: 'Montserrat', sans-serif;
             font-size: 10px;
@@ -191,12 +188,11 @@
             text-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
         }
 
-        /* Сама длинная плашка */
         .geouser-card-box {
             flex: 1;
             display: flex;
-            align-items: center;  /* Вертикальное центрирование текста внутри */
-            gap: 12px;           /* Отступ между иконкой и текстом */
+            align-items: center;
+            gap: 12px;
             min-height: 48px;
             padding: 10px 20px;
             background: rgba(255, 255, 255, 0.04);
@@ -211,7 +207,6 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
-        /* Усиленная белая обводка для карточки ТЕКУЩЕГО пользователя (без подсветки фона и свечения) */
         .geouser-card-box.currentUserCard {
             border: 1px solid rgba(255, 255, 255, 0.85) !important;
         }
@@ -222,7 +217,6 @@
             transform: translateX(4px);
         }
 
-        /* Стили для SVG иконки профиля */
         .geouser-avatar-icon {
             width: 18px;
             height: 18px;
@@ -235,7 +229,6 @@
             stroke: #3498db;
         }
 
-        /* Анимация левитации логотипа и текста */
         @keyframes floatingLogo {
             0% { transform: translateY(0px) rotate(0deg); }
             50% { transform: translateY(-8px) rotate(-1.5deg); }
@@ -249,12 +242,12 @@
         }
 
         /* =========================================================
-           ВИДЖЕТ ПРОФИЛЯ В ВЕРХНЕМ ПРАВОМ УГЛУ
+           ВИДЖЕТ ПРОФИЛЯ С ВЫПАДАЮЩИМ МЕНЮ (НАВЕДЕНИЕ)
            ========================================================= */
         .top-right-profile {
             position: fixed;
-            top: 40px;          /* На одном уровне с логотипом */
-            right: 140px;       /* Безопасное расстояние от шестерёнки */
+            top: 40px;
+            right: 140px;
             z-index: 10;
         }
 
@@ -266,7 +259,13 @@
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 12px;
             backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
+            cursor: pointer;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        .profile-card:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.3);
         }
 
         .profile-username {
@@ -277,9 +276,83 @@
             white-space: nowrap;
             display: flex;
             align-items: center;
+            gap: 8px;
         }
 
-        /* Контейнер по центру для новых элементов админки */
+        .profile-username::after {
+            content: '▾';
+            font-size: 10px;
+            opacity: 0.6;
+            transition: transform 0.2s ease;
+        }
+
+        .profile-card:hover .profile-username::after {
+            transform: rotate(180deg);
+        }
+
+        /* Выпадающее меню профиля */
+        .profile-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            padding-top: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-4px);
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+            pointer-events: none;
+        }
+
+        /* Невидимая подушка для предотвращения соскакивания мыши */
+        .profile-dropdown-menu::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            z-index: -1;
+            background: transparent;
+        }
+
+        .profile-card:hover .profile-dropdown-menu,
+        .profile-dropdown-menu:hover {
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: translateY(0) !important;
+            pointer-events: auto !important;
+        }
+
+        /* Кнопки внутри выпадающего меню */
+        .profile-action-btn {
+            width: 100%;
+            padding: 10px 12px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 2;
+            transition: background 0.2s ease;
+            text-align: center;
+            color: #ffffff;
+            background: #3498db;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            white-space: nowrap;
+        }
+
+        .profile-action-btn:hover {
+            background: #2980b9;
+        }
+
+        /* Контейнер по центру */
         .center-status-wrapper {
             position: fixed;
             top: 50%;
@@ -300,9 +373,7 @@
             pointer-events: auto;
         }
 
-        /* =========================================================
-           ВЫДВИЖНАЯ СЕКРЕТНАЯ ПАНЕЛЬ АДМИНИСТРАТОРА
-           ========================================================= */
+        /* Выдвижная секретная панель администратора */
         .dev-side-panel {
             position: fixed;
             top: 50%;
@@ -352,29 +423,27 @@
         }
 
         .reset-open-link {
-    background: transparent;
-    border: none;
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 13px;
-    font-family: 'Montserrat', sans-serif;
-    cursor: pointer;
-    text-decoration: underline;
-    transition: color 0.2s ease;
-}
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+            text-decoration: underline;
+            transition: color 0.2s ease;
+        }
 
-.reset-open-link:hover {
-    color: #ffffff;
-}
+        .reset-open-link:hover {
+            color: #ffffff;
+        }
 
-/* Базовое состояние — контейнер скрыт */
-.app-banners-container {
-    display: none; 
-}
+        .app-banners-container {
+            display: none; 
+        }
 
-/* Когда плашка должна работать — добавляем этот класс */
-.app-banners-container.banner-active {
-    display: block !important; /* или flex, в зависимости от вашей верстки */
-}
+        .app-banners-container.banner-active {
+            display: block !important; 
+        }
     </style>
 </head>
 <body>
@@ -457,9 +526,15 @@
         </div>
     </div>
 
+    <!-- Виджет профиля в правом верхнем углу с выпадающим меню -->
     <div id="user-profile-widget" class="top-right-profile" style="display: none;">
         <div class="profile-card">
             <span class="profile-username" id="profile-email-text">Профиль</span>
+            <div class="profile-dropdown-menu">
+                <button type="button" class="profile-action-btn" onclick="navigateToPage('beginning_with_character.html')">
+                    Покликать персонажа
+                </button>
+            </div>
         </div>
     </div>
 
@@ -579,23 +654,18 @@
         }, 500);
     }
 
-    // Вспомогательная функция безопасного получения Supabase клиента
     function getSupabaseClient() {
         if (window.supabaseClient) return window.supabaseClient;
         if (window.supabase && typeof window.supabase.from === 'function') return window.supabase;
         return null;
     }
 
-    // Функция отрисовки списка пользователей из базы Supabase
     async function fetchAndRenderUsers() {
         const container = document.getElementById('geousers-list-container');
         if (!container) return;
 
         const client = getSupabaseClient();
-        if (!client) {
-            console.warn('Supabase клиент не найден. Загрузите или инициализируйте Supabase.');
-            return;
-        }
+        if (!client) return;
 
         const userIconSVG = `
             <svg class="geouser-avatar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -605,7 +675,6 @@
         `;
 
         try {
-            // 1. Проверяем ID текущего авторизованного пользователя и факт подтверждения его email
             let currentUserId = null;
             if (client.auth) {
                 const { data: { session } } = await client.auth.getSession();
@@ -614,14 +683,12 @@
                 }
             }
 
-            // 2. Запрос к публичной таблице profiles
             const { data: rawUsers, error } = await client
                 .from('profiles')
                 .select('*');
 
             if (error) throw error;
 
-            // 3. Фильтруем только подтверждённых пользователей
             const users = (rawUsers || []).filter(u => {
                 if ('email_confirmed_at' in u) {
                     return u.email_confirmed_at !== null;
@@ -644,7 +711,6 @@
                 return;
             }
 
-            // 4. Если текущий пользователь авторизован и его профиль в списке — поднимаем на 1-е место
             if (currentUserId) {
                 const myIndex = users.findIndex(u => u.id === currentUserId);
                 if (myIndex !== -1) {
@@ -653,7 +719,6 @@
                 }
             }
 
-            // 5. Рендерим пользователей
             container.innerHTML = users.map((u, index) => {
                 const isSelf = currentUserId && u.id === currentUserId;
                 const hasUsername = u.username && u.username.trim() !== '' && u.username !== '—';
@@ -783,7 +848,7 @@
     </script>
 
     <script src="reset-password.js"></script>
-<script src="site-warning.js" defer></script>
+    <script src="site-warning.js" defer></script>
 
 </body>
 </html>
