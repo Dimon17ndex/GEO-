@@ -156,6 +156,11 @@ function initSiteCharacter() {
             opacity: 1 !important;
             visibility: visible !important;
         }
+
+        /* Режим слежения за курсором */
+        #site-character-widget.action-track .char-pupil {
+            transition: transform 0.05s linear !important; /* Быстрое слежение за мышкой */
+        }
     `;
 
     const styleEl = document.createElement('style');
@@ -293,6 +298,68 @@ window.siteCharacter = {
             widget.style.opacity = '1';
         }
     }
+    toggleTracking: function() {
+        const widget = document.getElementById('site-character-widget');
+        if (!widget || window._isCharacterActionRunning) return;
+
+        isTrackingActive = !isTrackingActive;
+
+        if (isTrackingActive) {
+            widget.classList.add('action-track');
+            // Временно блокируем рандомное моргание, чтобы зрачки не сбивались
+            window._isCharacterActionRunning = true;
+            widget.classList.remove('blinking');
+        } else {
+            widget.classList.remove('action-track');
+            window._isCharacterActionRunning = false;
+            
+            // Возвращаем зрачки в исходное строго центральное положение
+            const pupils = widget.querySelectorAll('.char-pupil');
+            pupils.forEach(pupil => {
+                pupil.style.transform = 'translate(-50%, -50%)';
+            });
+        }
+    },
 };
+
+// Переменные для отслеживания мыши
+let isTrackingActive = false;
+
+function handleMouseMove(e) {
+    if (!isTrackingActive) return;
+    const widget = document.getElementById('site-character-widget');
+    if (!widget) return;
+
+    // Находим оба зрачка
+    const pupils = widget.querySelectorAll('.char-pupil');
+    if (pupils.length === 0) return;
+
+    // Проходим по каждому глазу и двигаем зрачок за курсором
+    pupils.forEach(pupil => {
+        const eye = pupil.parentElement;
+        const rect = eye.getBoundingClientRect();
+        
+        // Центр конкретного глаза
+        const eyeCenterX = rect.left + rect.width / 2;
+        const eyeCenterY = rect.top + rect.height / 2;
+
+        // Угол между центром глаза и курсором
+        const angle = Math.atan2(e.clientY - eyeCenterY, e.clientX - eyeCenterX);
+        
+        // Максимальное расстояние, на которое зрачок может отойти от центра (ограничиваем радиусом глаза)
+        const maxDistance = 10; 
+        const distance = Math.min(maxDistance, Math.hypot(e.clientX - eyeCenterX, e.clientY - eyeCenterY) * 0.2);
+
+        // Вычисляем смещение
+        const x = Math.cos(angle) * distance;
+        const y = Math.sin(angle) * distance;
+
+        // Применяем смещение для обоих зрачков одинаково
+        pupil.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+    });
+}
+
+// Регистрируем движение мыши глобально
+document.addEventListener('mousemove', handleMouseMove);
 
 document.addEventListener('DOMContentLoaded', initSiteCharacter);
