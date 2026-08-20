@@ -74,10 +74,9 @@ function initSiteCharacter() {
         /* 3. Режим успеха / радости */
         #site-character-widget.state-happy .char-mouth {
             width: 52px !important;
-            height: 14px !important; /* Чуть уменьшим высоту, чтобы не двигать сетку */
-            background: transparent !important;
-            border-bottom: 6px solid #ffffff !important;
-            border-radius: 0 0 28px 28px !important;
+            height: 18px !important;
+            background: #ffffff !important;
+            border-radius: 0 0 50px 50px !important;
         }
 
         /* Лоадер из точек над персонажем (по умолчанию скрыт) */
