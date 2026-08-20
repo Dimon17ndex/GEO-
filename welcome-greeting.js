@@ -76,51 +76,51 @@ async function initGreetingUI() {
     injectGreetingStyles();
 
     const user = session.user;
-    // Логика как в auth-system.js:
-    const userEmail = user.email || '';
-    const customName = user.user_metadata?.full_name || user.user_metadata?.username;
-    
-    // Первый этап: имя до @ (как в виджете)
-    const emailPrefix = userEmail.split('@')[0].toUpperCase();
-    // Второй этап: Полное имя (или имя из метаданных)
-    const fullName = (customName || emailPrefix).toUpperCase();
+    const emailPrefix = (user.email ? user.email.split('@')[0] : 'USER').toUpperCase();
+    const fullName = (user.user_metadata?.full_name || user.user_metadata?.username || 'ПОЛЬЗОВАТЕЛЬ').toUpperCase();
 
+    // Разделяем на статический текст и меняющуюся часть
     const greetingHTML = `
         <div id="welcome-greeting-overlay" class="welcome-overlay">
             <img src="images/geo_logo.png" alt="" class="auth-bg-watermark">
             <div class="welcome-container">
-                <h1 class="welcome-title" id="welcome-text-node">ЗДРАВСТВУЙТЕ, ${emailPrefix}!</h1>
+                <h1 class="welcome-title">
+                    ЗДРАВСТВУЙТЕ, <span id="welcome-dynamic-name">${emailPrefix}</span>!
+                </h1>
             </div>
         </div>
     `;
 
     document.body.insertAdjacentHTML('beforeend', greetingHTML);
     const overlay = document.getElementById('welcome-greeting-overlay');
-    const textNode = document.getElementById('welcome-text-node');
+    const nameNode = document.getElementById('welcome-dynamic-name');
     
-    // Мягкое появление оверлея
+    // Появление оверлея
     requestAnimationFrame(() => {
         requestAnimationFrame(() => overlay.classList.add('visible'));
     });
 
-    // Через 0.8 секунд меняем на полное имя
+    // Через 0.8 секунд меняем только имя
     setTimeout(() => {
-        textNode.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
-        textNode.style.transform = 'translateY(20px)';
-        textNode.style.opacity = '0';
+        // Уходим вниз
+        nameNode.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+        nameNode.style.transform = 'translateY(15px)';
+        nameNode.style.opacity = '0';
 
         setTimeout(() => {
-            textNode.textContent = `ЗДРАВСТВУЙТЕ, ${fullName}!`;
-            textNode.style.transform = 'translateY(-20px)';
+            // Подменяем текст
+            nameNode.textContent = fullName;
+            // Возвращаем из положения вверх
+            nameNode.style.transform = 'translateY(-15px)';
             
             requestAnimationFrame(() => {
-                textNode.style.transform = 'translateY(0)';
-                textNode.style.opacity = '1';
+                nameNode.style.transform = 'translateY(0)';
+                nameNode.style.opacity = '1';
             });
         }, 400);
     }, 800);
 
-    // Удаление оверлея через 3 секунды
+    // Удаление оверлея
     setTimeout(() => {
         overlay.classList.add('fade-out');
         setTimeout(() => overlay.remove(), 800);
