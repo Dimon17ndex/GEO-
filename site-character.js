@@ -105,7 +105,7 @@ function initSiteCharacter() {
             40% { transform: scale(1.2); opacity: 1; }
         }
 
-        /* Зрачки внутри глаз */
+        /* Зрачки внутри глаз — по умолчанию видны и находятся по центру */
         .char-pupil {
             width: 12px !important;
             height: 12px !important;
@@ -115,25 +115,33 @@ function initSiteCharacter() {
             top: 50% !important;
             left: 50% !important;
             transform: translate(-50%, -50%) !important;
-            opacity: 0 !important;
+            opacity: 1 !important; /* Всегда видны в базовых эмоциях */
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
 
-        /* Поведение в режиме «Думает» */
-        #site-character-widget.state-loading .char-loader {
-            display: flex !important;
-        }
-
+        /* Поведение в режиме «Думает» (поднимаются наверх к точкам) */
         #site-character-widget.state-loading .char-pupil {
-            opacity: 1 !important;
-            /* Плавный подъем зрачков из центра к верхним границам глаз изнутри */
             top: 18% !important; 
             transform: translate(-50%, 0) !important;
         }
 
-        #site-character-widget.state-loading .char-mouth {
-            width: 24px !important;
-            height: 6px !important;
+        /* Лоадер над глазами */
+        .char-loader {
+            display: flex !important; /* Всегда в DOM */
+            gap: 6px !important;
+            align-items: center !important;
+            justify-content: center !important;
+            height: 20px !important; /* Фиксированная высота */
+            margin-bottom: -10px !important;
+            opacity: 0 !important; /* Невидимый по умолчанию */
+            visibility: hidden !important;
+            transition: opacity 0.3s ease !important; /* Плавность */
+        }
+
+        /* Появляется только в режиме загрузки */
+        #site-character-widget.state-loading .char-loader {
+            opacity: 1 !important;
+            visibility: visible !important;
         }
     `;
 
