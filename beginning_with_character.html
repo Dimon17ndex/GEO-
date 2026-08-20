@@ -67,9 +67,11 @@
         }
 
         /* Выпадающий список "Механики" */
+        /* Выпадающий список "Механики" (теперь открывается вниз) */
         .mechanics-menu {
             position: absolute;
-            bottom: calc(100% + 8px);
+            top: calc(100% + 8px); /* Располагаем сразу под кнопкой с отступом */
+            bottom: auto;          /* Отменяем привязку к низу */
             left: 0;
             min-width: 140px;
             background: rgba(15, 15, 20, 0.95);
@@ -82,7 +84,7 @@
             backdrop-filter: blur(15px);
             opacity: 0;
             visibility: hidden;
-            transform: translateY(6px);
+            transform: translateY(-6px); /* Легкое смещение вверх для красивого появления вниз */
             transition: all 0.2s ease;
             z-index: 10;
         }
@@ -90,7 +92,7 @@
         .mechanics-menu.active {
             opacity: 1;
             visibility: visible;
-            transform: translateY(0);
+            transform: translateY(0); /* Возвращается на свое место при открытии */
         }
 
         .mechanics-option {
