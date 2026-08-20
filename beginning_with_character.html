@@ -216,14 +216,13 @@
         /* =========================================================
             ПРОТЯЖЕННАЯ ПАНЕЛЬ ПОД ПЕРСОНАЖЕМ С КНОПКАМИ
             ========================================================= */
-        /* Протянутая панель с кнопками под персонажем (опущена ниже) */
         .character-control-panel {
             position: fixed;
-            top: calc(50% + 190px); /* Увеличили отступ вниз от центра экрана */
+            top: calc(50% + 190px); /* Отступ вниз от центра экрана */
             left: 50%;
             transform: translateX(-50%);
             width: 90%;
-            max-width: 600px;
+            max-width: 650px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(15px);
@@ -237,7 +236,14 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
+        /* Контейнер для выпадающего меню "Механики" */
+        .mechanics-dropdown-wrapper {
+            position: relative;
+            flex: 1;
+        }
+
         .char-panel-btn {
+            width: 100%;
             flex: 1;
             padding: 10px 14px;
             background: rgba(255, 255, 255, 0.08);
@@ -257,6 +263,51 @@
             background: rgba(255, 255, 255, 0.2);
             border-color: rgba(255, 255, 255, 0.4);
             transform: translateY(-2px);
+        }
+
+        /* Выпадающий список "Механики" */
+        .mechanics-menu {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: rgba(15, 15, 20, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            backdrop-filter: blur(15px);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(6px);
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .mechanics-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .mechanics-option {
+            padding: 8px 12px;
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: left;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .mechanics-option:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
 
         /* =========================================================
@@ -355,7 +406,17 @@
 <div class="center-status-wrapper" id="center-character-container"></div>
 
 <!-- Протянутая панель с кнопками под персонажем -->
+<!-- Протянутая панель с кнопками под персонажем -->
 <div class="character-control-panel">
+    <!-- Кнопка "Механики" с выпадающим списком -->
+    <div class="mechanics-dropdown-wrapper">
+        <button type="button" class="char-panel-btn" id="mechanics-toggle-btn">Механики ▾</button>
+        <div class="mechanics-menu" id="mechanics-menu">
+            <button type="button" class="mechanics-option" data-value="Эмоции">Эмоции</button>
+            <button type="button" class="mechanics-option" data-value="Действия">Действия</button>
+        </div>
+    </div>
+
     <button type="button" class="char-panel-btn" onclick="window.siteCharacter?.setHappy()">Радость 😊</button>
     <button type="button" class="char-panel-btn" onclick="window.siteCharacter?.setLoading()">Думает ⏳</button>
     <button type="button" class="char-panel-btn" onclick="window.siteCharacter?.hide()">Скрыть 🙈</button>
@@ -610,6 +671,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     initDevPanel();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const mechanicsBtn = document.getElementById('mechanics-toggle-btn');
+    const mechanicsMenu = document.getElementById('mechanics-menu');
+    const mechanicsOptions = document.querySelectorAll('.mechanics-option');
+
+    // Открытие/закрытие меню по клику на "Механики"
+    mechanicsBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        mechanicsMenu.classList.toggle('active');
+    });
+
+    // Выбор пункта из меню
+    mechanicsOptions.forEach(option => {
+        option.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const selectedText = option.getAttribute('data-value');
+            
+            // Меняем текст кнопки на выбранный пункт (сохраняя стрелочку вниз)
+            mechanicsBtn.innerHTML = `${selectedText} ▾`;
+            
+            // Закрываем меню
+            mechanicsMenu.classList.remove('active');
+            
+            // Здесь вы можете добавить логику, что именно должно происходить 
+            // при выборе "Эмоций" или "Действий"
+            console.لاج('Выбрана механика:', selectedText);
+        });
+    });
+
+    // Закрытие меню при клике в любое другое место страницы
+    document.addEventListener('click', () => {
+        mechanicsMenu?.classList.remove('active');
+    });
 });
 </script>
 
