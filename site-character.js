@@ -255,28 +255,28 @@ window.siteCharacter = {
         const widget = document.getElementById('site-character-widget');
         if (!widget || window._isCharacterActionRunning) return;
 
-        // Блокируем другие действия и рандомное моргание
+        // Блокируем другие действия и рандомное моргание на время анимации
         window._isCharacterActionRunning = true;
         widget.classList.remove('blinking');
 
-        // Определяем, какая эмоция была до начала действия
-        let previousState = 'state-neutral';
-        if (widget.classList.contains('state-happy')) previousState = 'state-happy';
-        if (widget.classList.contains('state-loading')) previousState = 'state-loading';
+        // 1. Запоминаем текущие классы состояния (например, state-neutral или state-loading)
+        let currentState = 'state-neutral';
+        if (widget.classList.contains('state-happy')) currentState = 'state-happy';
+        if (widget.classList.contains('state-loading')) currentState = 'state-loading';
 
-        // Шаг 1: Подмигивание (правый глаз закрыт) + овальный рот по горизонтали
-        widget.className = 'action-wink action-wink-oval';
+        // 2. Шаг 1: Оставляем текущую эмоцию, но добавляем подмигивание правым глазом и овальный рот
+        widget.className = currentState + ' action-wink action-wink-oval';
 
-        // Шаг 2: Через 400мс меняем рот на обычную улыбку (как при радости), но правый глаз всё еще подмигивает
+        // 3. Шаг 2: Через 400мс убираем овальный рот, возвращая рот к стандартному для текущей эмоции, но глаз всё еще подмигивает
         setTimeout(() => {
             if (!widget) return;
-            widget.className = 'state-happy action-wink';
+            widget.className = currentState + ' action-wink';
         }, 400);
 
-        // Шаг 3: Через 900мс возвращаем персонажа в исходную эмоцию и снимаем блокировку
+        // 4. Шаг 3: Через 900мс полностью убираем действие и возвращаем всё в исходное состояние
         setTimeout(() => {
             if (!widget) return;
-            widget.className = previousState;
+            widget.className = currentState;
             window._isCharacterActionRunning = false;
         }, 900);
     },
