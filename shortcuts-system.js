@@ -1,31 +1,49 @@
 // shortcuts-system.js
 
+let keySequence = [];
+let sequenceTimeout = null;
+
 document.addEventListener('keydown', (e) => {
-    // Получаем текущий путь страницы (например, '/beginning.html' или просто имя файла)
+    // Проверяем, что мы находимся именно на странице pc.html
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    if (currentPage !== 'pc.html') return;
 
-    // Пример 1: Комбинация Ctrl + Shift + L (или Cmd + Shift + L на Mac) для открытия авторизации на любой странице
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.code === 'KeyL') {
-        e.preventDefault();
-        if (typeof window.showAuthModal === 'function') {
-            window.showAuthModal();
-        }
+    // Не перехватываем горячие клавиши, если пользователь печатает в поле ввода (input/textarea)
+    if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+
+    // Приводим нажатую клавишу к верхнему регистру (поддерживаем латиницу и кириллицу)
+    const key = e.key.toUpperCase();
+
+    // Сбрасываем таймер последовательности, если прошло больше 1.5 секунд между нажатиями
+    clearTimeout(sequenceTimeout);
+    sequenceTimeout = setTimeout(() => {
+        keySequence = [];
+    }, 1500);
+
+    // Добавляем нажатую клавишу в буфер
+    keySequence.push(key);
+
+    // Оставляем в памяти только последние 3 символа
+    if (keySequence.length > 3) {
+        keySequence.shift();
     }
 
-    // Пример 2: Горячие клавиши для конкретной страницы, например, 'beginning.html'
-    if (currentPage === 'beginning.html') {
-        // Нажатие клавиши 'Escape' или 'KeyQ' для какого-то действия
-        if (e.code === 'KeyQ') {
-            console.log('Нажата клавиша Q на странице beginning.html');
-            // Здесь можно вызвать вашу кастомную функцию
-        }
-    }
-
-    // Пример 3: Быстрый выход из аккаунта по комбинации Ctrl + Alt + X
-    if ((e.ctrlKey || e.metaKey) && e.altKey && e.code === 'KeyX') {
+    // Проверяем комбинации из 3 символов: GEO (латиница) или ПУЩ (кириллица)
+    const currentCombination = keySequence.join('');
+    
+    if (currentCombination === 'GEO' || currentCombination === 'ПУЩ') {
         e.preventDefault();
-        if (typeof window.logoutUser === 'function') {
-            window.logoutUser();
-        }
+        keySequence = []; // Сбрасываем буфер
+
+        console.log('Секретная комбинация активирована! Выполняется bypass...');
+
+        // То же самое действие, что и у команды bypass из вашей консоли:
+        // 1. Устанавливаем статус авторизации в sessionStorage (если нужно для консоли)
+        sessionStorage.setItem('dev_console_authenticated', 'true');
+        
+        // 2. Переходим на страницу beginning.html с небольшой задержкой
+        setTimeout(() => { 
+            window.location.href = '/beginning.html'; 
+        }, 500);
     }
 });
