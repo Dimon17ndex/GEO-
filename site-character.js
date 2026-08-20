@@ -144,6 +144,19 @@ function initSiteCharacter() {
             opacity: 1 !important;
             visibility: visible !important;
         }
+
+        /* Подмигивание правым глазом (складываем только правый глаз по вертикали) */
+        #site-character-widget.action-wink .char-eye:nth-child(2) {
+            transform: scaleY(0.1) !important;
+        }
+
+        /* Овальный рот по горизонтали для действия */
+        #site-character-widget.action-wink .char-mouth {
+            width: 48px !important;
+            height: 12px !important;
+            background: #ffffff !important;
+            border-radius: 50px !important;
+        }
     `;
 
     const styleEl = document.createElement('style');
@@ -237,6 +250,32 @@ window.siteCharacter = {
         if (widget) {
             widget.style.opacity = '1';
         }
+    }
+    wink: function() {
+        const widget = document.getElementById('site-character-widget');
+        if (!widget) return;
+
+        // 1. Запоминаем текущий класс эмоции (например, state-neutral или state-happy)
+        let previousState = 'state-neutral';
+        if (widget.classList.contains('state-happy')) previousState = 'state-happy';
+        if (widget.classList.contains('state-loading')) previousState = 'state-loading';
+
+        // 2. Отключаем обычное рандомное моргание на время действия
+        widget.classList.remove('blinking');
+        
+        // 3. Запускаем анимацию: переводим в радость с овальным ртом и подмигиванием
+        widget.className = 'state-happy action-wink';
+
+        // 4. Через время меняем рот на обычную улыбку (если нужно по сценарию)
+        setTimeout(() => {
+            // Убираем класс действия, оставляя просто радость
+            widget.className = 'state-happy';
+        }, 600); // Длительность первой фазы (овальный рот + подмигивание)
+
+        // 5. Возвращаем персонажа в предыдущую эмоцию после завершения действия
+        setTimeout(() => {
+            widget.className = previousState;
+        }, 1200); // Общая длительность анимации подмигивания
     }
 };
 
