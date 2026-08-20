@@ -13,6 +13,7 @@ function injectGreetingStyles() {
             height: 100vh !important;
             background: rgba(10, 10, 12, 0.94) !important;
             backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
             z-index: 9999999 !important;
             display: flex !important; 
             align-items: center !important; 
@@ -45,25 +46,34 @@ function injectGreetingStyles() {
             text-align: center !important;
         }
 
-        .auth-logo-tunnel {
+        /* Точно такое же фоновое лого, как в auth-system.js */
+        .welcome-bg-watermark {
             position: absolute !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
+            top: 45% !important;
+            right: -15% !important;
+            left: auto !important;
+            width: 1200px !important;
+            height: auto !important;
+            max-width: none !important;
             pointer-events: none !important;
             z-index: 1 !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
+            transform-origin: center right !important;
+            
+            opacity: 0.22 !important;
+            filter: blur(12px) brightness(0.9) !important;
+            animation: intenseFloat 6s ease-in-out infinite alternate !important;
         }
 
-        /* Статичный логотип на фоне по центру */
-        .tunnel-logo {
-            width: 500px !important; 
-            opacity: 0.15 !important;
-            filter: blur(2px) !important;
-            transform: scale(1) !important;
+        @keyframes intenseFloat {
+            0% {
+                transform: translateY(-50%) translateX(0px) rotate(0deg) scale(1);
+            }
+            50% {
+                transform: translateY(-58%) translateX(-25px) rotate(-5deg) scale(1.04);
+            }
+            100% {
+                transform: translateY(-42%) translateX(15px) rotate(4deg) scale(0.96);
+            }
         }
 
         .welcome-ticker {
@@ -93,14 +103,6 @@ function injectGreetingStyles() {
     document.head.appendChild(styleElement);
 }
 
-// --- СОЗДАНИЕ СТАТИЧНОГО ФОНОВОГО ЛОГОТИПА ---
-function createStaticLogo(tunnelContainer) {
-    const img = document.createElement('img');
-    img.src = 'images/geo_logo.png';
-    img.className = 'tunnel-logo';
-    tunnelContainer.appendChild(img);
-}
-
 // --- ОСНОВНАЯ ФУНКЦИЯ ---
 async function initGreetingUI() {
     if (document.getElementById('welcome-greeting-overlay')) return;
@@ -124,7 +126,7 @@ async function initGreetingUI() {
 
     const greetingHTML = `
         <div id="welcome-greeting-overlay" class="welcome-overlay">
-            <div class="auth-logo-tunnel" id="logo-tunnel"></div>
+            <img src="images/geo_logo.png" alt="" class="welcome-bg-watermark">
             <div class="welcome-container">
                 <h1 class="welcome-title">
                     ЗДРАВСТВУЙТЕ, 
@@ -142,9 +144,6 @@ async function initGreetingUI() {
     document.body.insertAdjacentHTML('beforeend', greetingHTML);
     const overlay = document.getElementById('welcome-greeting-overlay');
     const track = document.getElementById('welcome-track');
-    const tunnelContainer = document.getElementById('logo-tunnel');
-    
-    createStaticLogo(tunnelContainer);
 
     requestAnimationFrame(() => {
         requestAnimationFrame(() => overlay.classList.add('visible'));
