@@ -55,7 +55,7 @@ function injectGreetingStyles() {
             z-index: 1 !important;
         }
 
-        /* Поток одиночных логотипов без замедления (linear) */
+        /* Логотипы летят насквозь без растворения по центру и уходят в стороны за экран */
         .tunnel-logo {
             position: absolute !important;
             top: 50% !important;
@@ -63,28 +63,29 @@ function injectGreetingStyles() {
             width: 500px !important; 
             transform: translate(-50%, -50%) scale(0.001);
             opacity: 0;
-            filter: blur(30px);
-            /* Используем linear, чтобы логотипы не тормозили и не замедлялись перед глазами */
-            animation: fastFlyThrough 1.8s linear forwards;
+            filter: blur(25px);
+            animation: solidFlyThrough 1.8s linear forwards;
         }
 
-        @keyframes fastFlyThrough {
+        @keyframes solidFlyThrough {
             0% {
                 transform: translate(-50%, -50%) translate(0px, 0px) scale(0.001);
                 opacity: 0;
-                filter: blur(35px);
+                filter: blur(30px);
             }
             15% {
-                opacity: 0.3;
+                /* Быстро проявляются и дальше остаются полностью яркими и видимыми */
+                opacity: 1; 
             }
-            50% {
-                opacity: 0.25;
-                filter: blur(10px);
+            85% {
+                /* До самого конца полета логотип полностью виден */
+                opacity: 1;
+                filter: blur(0px);
             }
             100% {
-                /* Пролетают насквозь, вырастая до огромного масштаба (5.5) и улетая за экран */
-                transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(5.5);
-                opacity: 0;
+                /* Улетают далеко за границы экрана в стороны */
+                transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(6.0);
+                opacity: 0; /* Растворение происходит только когда логотип уже ушел за экран */
                 filter: blur(0px);
             }
         }
@@ -116,15 +117,13 @@ function injectGreetingStyles() {
     document.head.appendChild(styleElement);
 }
 
-// --- СТРОГАЯ ОЧЕРЕДЬ ПО ОДНОМУ ---
+// --- ОЧЕРЕДЬ ПО ОДНОМУ ---
 function createSequentialLogos(tunnelContainer) {
-    // Направления движения (по очереди в разные стороны)
     const flights = [
-        { angle: 0.2, dist: 1000 },   // Вправо-вверх
-        { angle: 3.0, dist: 1000 },   // Влево-вверх
-        { angle: 1.5, dist: 1000 },   // Вниз
-        { angle: 4.8, dist: 1000 },   // Вправо-вниз
-        { angle: 3.8, dist: 1000 },   // Влево-вниз
+        { angle: 0.2, dist: 1200 },   // Вправо
+        { angle: 3.1, dist: 1200 },   // Влево
+        { angle: 1.5, dist: 1200 },   // Вниз
+        { angle: 4.7, dist: 1200 },   // Вверх
     ];
 
     let index = 0;
@@ -151,13 +150,11 @@ function createSequentialLogos(tunnelContainer) {
 
         index++;
 
-        // Интервал появления следующего (строго друг за другом, без свалки)
         if (index < flights.length) {
-            setTimeout(spawnNext, 600);
+            setTimeout(spawnNext, 550); // Интервал между появлением одиночных логотипов
         }
     }
 
-    // Запускаем первый логотип сразу после появления оверлея
     setTimeout(spawnNext, 200);
 }
 
