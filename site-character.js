@@ -64,7 +64,13 @@ function initSiteCharacter() {
             height: 6px !important;
         }
 
-        /* 2. Режим успеха / радости */
+        /* 2. Режим нейтральный */
+        #site-character-widget.state-neutral .char-mouth {
+            width: 34px !important;
+            height: 6px !important;
+        }
+
+        /* 3. Режим успеха / радости */
         #site-character-widget.state-happy .char-mouth {
             width: 56px !important;
             height: 6px !important;
@@ -129,6 +135,13 @@ window.siteCharacter = {
         if (widget) {
             const isBlinking = widget.classList.contains('blinking');
             widget.className = 'state-loading' + (isBlinking ? ' blinking' : '');
+        }
+    },
+    setNeutral: function() {
+        const widget = document.getElementById('site-character-widget');
+        if (widget) {
+            const isBlinking = widget.classList.contains('blinking');
+            widget.className = 'state-neutral' + (isBlinking ? ' blinking' : '');
         }
     },
     setHappy: function() {
