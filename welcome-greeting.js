@@ -133,7 +133,7 @@ function injectGreetingStyles() {
             overflow: hidden !important;
         }
 
-        /* Бегающая белая точка без деформаций и прилипаний */
+        /* Бегающая белая точка через transform для 100% надежности */
         .dot-loader-ball {
             position: absolute !important;
             top: 0 !important;
@@ -142,15 +142,16 @@ function injectGreetingStyles() {
             height: 6px !important;
             background: #ffffff !important;
             border-radius: 50% !important;
-            animation: moveDotClean 0.9s ease-in-out infinite alternate !important;
+            will-change: transform !important;
+            animation: moveDotClean 0.8s ease-in-out infinite alternate !important;
         }
 
         @keyframes moveDotClean {
             0% {
-                left: 0px;
+                transform: translateX(0px);
             }
             100% {
-                left: 38px;
+                transform: translateX(38px);
             }
         }
     `;
