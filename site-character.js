@@ -10,25 +10,23 @@ function initSiteCharacter() {
             right: 30px !important;
             width: 70px !important;
             height: 70px !important;
-            background: rgba(15, 15, 20, 0.85) !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
-            border-radius: 50% !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 8px !important;
+            gap: 10px !important;
             z-index: 999998 !important;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5) !important;
-            backdrop-filter: blur(8px) !important;
-            transition: transform 0.3s ease, border-color 0.3s ease !important;
+            transition: transform 0.3s ease !important;
             pointer-events: none !important;
         }
 
         /* Контейнер глаз */
         .char-eyes {
             display: flex !important;
-            gap: 10px !important;
+            gap: 12px !important;
             align-items: center !important;
             justify-content: center !important;
         }
@@ -43,39 +41,34 @@ function initSiteCharacter() {
             animation: charBlink 4s infinite ease-in-out !important;
         }
 
-        /* Рот персонажа (линия/улыбка) */
+        /* Рот персонажа — простая прямая линия */
         .char-mouth {
-            width: 16px !important;
-            height: 4px !important;
-            background: rgba(255, 255, 255, 0.7) !important;
-            border-radius: 2px !important;
+            width: 18px !important;
+            height: 3px !important;
+            background: rgba(255, 255, 255, 0.8) !important;
+            border-radius: 1.5px !important;
             transition: all 0.3s ease !important;
         }
 
         /* Эмоции и состояния */
-        /* 1. Режим загрузки / думает (глаза бегают, рот превращается в точку/овал) */
+        /* 1. Режим загрузки / думает */
         #site-character-widget.state-loading .char-eye {
             animation: charLookAround 1s infinite alternate ease-in-out !important;
             height: 8px !important;
             border-radius: 50% !important;
         }
         #site-character-widget.state-loading .char-mouth {
-            width: 6px !important;
-            height: 6px !important;
-            border-radius: 50% !important;
+            width: 8px !important;
+            height: 3px !important;
         }
 
-        /* 2. Режим успеха / радости (глаза-дуги или прищурены, рот-улыбка) */
+        /* 2. Режим успеха / радости */
         #site-character-widget.state-happy .char-eye {
             transform: scaleY(0.4) !important;
         }
         #site-character-widget.state-happy .char-mouth {
-            width: 20px !important;
-            height: 8px !important;
-            border-bottom-left-radius: 10px !important;
-            border-bottom-right-radius: 10px !important;
-            border-top-left-radius: 0 !important;
-            border-top-right-radius: 0 !important;
+            width: 22px !important;
+            height: 4px !important;
         }
 
         /* Анимация моргания */
@@ -84,7 +77,7 @@ function initSiteCharacter() {
             95% { transform: scaleY(0.1); }
         }
 
-        /* Анимация раздумий (покачивание глаз) */
+        /* Анимация раздумий */
         @keyframes charLookAround {
             0% { transform: translateX(-3px); }
             100% { transform: translateX(3px); }
@@ -109,19 +102,15 @@ function initSiteCharacter() {
     document.body.insertAdjacentHTML('beforeend', widgetHTML);
 }
 
-// Глобальные методы управления персонажем из любого другого скрипта
+// Глобальные методы управления персонажем
 window.siteCharacter = {
     setLoading: function() {
         const widget = document.getElementById('site-character-widget');
-        if (widget) {
-            widget.className = 'state-loading';
-        }
+        if (widget) widget.className = 'state-loading';
     },
     setHappy: function() {
         const widget = document.getElementById('site-character-widget');
-        if (widget) {
-            widget.className = 'state-happy';
-        }
+        if (widget) widget.className = 'state-happy';
     },
     hide: function() {
         const widget = document.getElementById('site-character-widget');
@@ -133,5 +122,4 @@ window.siteCharacter = {
     }
 };
 
-// Автоматический запуск при загрузке страницы
 document.addEventListener('DOMContentLoaded', initSiteCharacter);
