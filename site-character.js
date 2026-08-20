@@ -77,6 +77,64 @@ function initSiteCharacter() {
             background: #ffffff !important;
             border-radius: 0 0 50px 50px !important;
         }
+
+        /* Лоадер из точек над персонажем (по умолчанию скрыт) */
+        .char-loader {
+            display: none !important;
+            gap: 6px !important;
+            align-items: center !important;
+            justify-content: center !important;
+            height: 20px !important;
+            margin-bottom: -10px !important;
+        }
+
+        .loader-dot {
+            width: 6px !important;
+            height: 6px !important;
+            background: #ffffff !important;
+            border-radius: 50% !important;
+            opacity: 0.4 !important;
+            animation: pulse-dot 1.4s infinite ease-in-out both !important;
+        }
+
+        .loader-dot:nth-child(1) { animation-delay: -0.32s !important; }
+        .loader-dot:nth-child(2) { animation-delay: -0.16s !important; }
+
+        @keyframes pulse-dot {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1.2); opacity: 1; }
+        }
+
+        /* Зрачки внутри глаз */
+        .char-pupil {
+            width: 12px !important;
+            height: 12px !important;
+            background: #ffffff !important;
+            border-radius: 50% !important;
+            position: relative !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            opacity: 0 !important;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        /* Поведение в режиме «Думает» */
+        #site-character-widget.state-loading .char-loader {
+            display: flex !important;
+        }
+
+        #site-character-widget.state-loading .char-pupil {
+            opacity: 1 !important;
+            /* Плавный подъем зрачков из центра к верхним границам глаз изнутри */
+            top: 18% !important; 
+            transform: translate(-50%, 0) !important;
+        }
+
+        #site-character-widget.state-loading .char-mouth {
+            width: 24px !important;
+            height: 6px !important;
+        }
     `;
 
     const styleEl = document.createElement('style');
@@ -86,9 +144,14 @@ function initSiteCharacter() {
 
     const widgetHTML = `
         <div id="site-character-widget" class="state-neutral">
+            <div class="char-loader">
+                <div class="loader-dot"></div>
+                <div class="loader-dot"></div>
+                <div class="loader-dot"></div>
+            </div>
             <div class="char-eyes">
-                <div class="char-eye"></div>
-                <div class="char-eye"></div>
+                <div class="char-eye"><div class="char-pupil"></div></div>
+                <div class="char-eye"><div class="char-pupil"></div></div>
             </div>
             <div class="char-mouth"></div>
         </div>
