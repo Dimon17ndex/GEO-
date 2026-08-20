@@ -140,11 +140,16 @@ window.siteCharacter = {
     },
     hide: function() {
         const widget = document.getElementById('site-character-widget');
-        if (widget) widget.style.display = 'none';
+        if (widget) {
+            widget.style.opacity = '0';
+            widget.style.pointerEvents = 'none';
+        }
     },
     show: function() {
         const widget = document.getElementById('site-character-widget');
-        if (widget) widget.style.display = 'flex';
+        if (widget) {
+            widget.style.opacity = '1';
+        }
     }
 };
 
