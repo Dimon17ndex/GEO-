@@ -35,6 +35,7 @@ function injectGreetingStyles() {
             z-index: 10 !important;
         }
 
+        /* Начальное состояние текста: смещен вниз, полупрозрачный и абсолютно четкий */
         .welcome-title {
             font-family: 'Montserrat', sans-serif !important;
             font-size: 28px !important; 
@@ -45,11 +46,11 @@ function injectGreetingStyles() {
             margin: 0 !important;
             text-align: center !important;
             transform: translateY(35px) !important;
-            /* Убрали filter: blur(4px), теперь текст сразу резкий */
             transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), 
                         color 0.6s ease !important;
         }
 
+        /* Конечное (активное) состояние текста после анимации */
         .welcome-title.revealed {
             color: #ffffff !important;
             transform: translateY(0) !important;
@@ -151,7 +152,7 @@ function injectGreetingStyles() {
                 transform: scaleX(1);
             }
             30% {
-                transform: scaleX(1.4); /* Эффект прилипания/растягивания при разгоне */
+                transform: scaleX(1.4);
             }
             50% {
                 left: 28px;
@@ -159,7 +160,7 @@ function injectGreetingStyles() {
                 transform: scaleX(1);
             }
             70% {
-                transform: scaleX(1.4); /* Эффект прилипания в обратную сторону */
+                transform: scaleX(1.4);
             }
             100% {
                 left: 0px;
@@ -233,25 +234,25 @@ async function initGreetingUI() {
         requestAnimationFrame(() => overlay.classList.add('visible'));
     });
 
-    // Через 0.5 секунд (500 мс) убираем статус «Узнаем вас», выдвигаем основной текст и активируем его
+    // Ровно через 2 секунды (2000 мс) убираем статус «Узнаем вас» и выдвигаем основной текст
     setTimeout(() => {
         statusBox.classList.add('hidden');
         statusBox.style.display = 'none';
         
         mainGreeting.style.display = 'inline';
         titleElement.classList.add('revealed');
-    }, 500);
+    }, 2000);
 
-    // Смена почты на имя внутри тикера (спустя 1.5 секунды от начала)
+    // Смена почты на имя внутри тикера (спустя 3 секунды от начала)
     setTimeout(() => {
         if (track) {
             track.style.transform = 'translateY(-1.2em)';
         }
-    }, 1500);
+    }, 3000);
 
-    // Плавное закрытие оверлея
+    // Плавное закрытие всего экрана приветствия на отметке 5 секунд (5000 мс)
     setTimeout(() => {
         overlay.classList.add('fade-out');
         setTimeout(() => overlay.remove(), 800);
-    }, 3700); 
+    }, 5000); 
 }
