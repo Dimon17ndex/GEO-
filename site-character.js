@@ -1,6 +1,6 @@
 // site-character.js
 
-let isTrackingActive = true; // Сразу включим по умолчанию для проверки
+let isTrackingActive = true; // Слежение включено по умолчанию
 
 function handleMouseMove(e) {
     if (!isTrackingActive) return;
@@ -14,14 +14,19 @@ function handleMouseMove(e) {
         const eye = pupil.parentElement;
         const rect = eye.getBoundingClientRect();
         
-        const eyeCenterX = rect.left + rect.width / 2;
-        const eyeCenterY = rect.top + rect.height / 2;
+        // Центр глаза
+        const eyeX = rect.left + rect.width / 2;
+        const eyeY = rect.top + rect.height / 2;
 
-        const angle = Math.atan2(e.clientY - eyeCenterY, e.clientX - eyeCenterX);
-        const distance = Math.min(10, Math.hypot(e.clientX - eyeCenterX, e.clientY - eyeCenterY) * 0.15);
+        // Угол между глазом и курсором
+        const radian = Math.atan2(e.clientX - eyeX, e.clientY - eyeY);
+        
+        // Максимальное расстояние, на которое может сместиться зрачок внутри глаза (в пикселях)
+        const maxRadius = 12; 
+        const distance = Math.min(maxRadius, Math.hypot(e.clientX - eyeX, e.clientY - eyeY) * 0.1);
 
-        const x = Math.cos(angle) * distance;
-        const y = Math.sin(angle) * distance;
+        const x = Math.sin(radian) * distance;
+        const y = Math.cos(radian) * distance;
 
         pupil.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
     });
@@ -50,7 +55,6 @@ function initSiteCharacter() {
             gap: 36px !important;
             z-index: 999998 !important;
             transition: opacity 0.3s ease !important;
-            /* Убрали pointer-events: none, чтобы блок не был «прозрачным» для мыши */
         }
 
         .char-eyes {
