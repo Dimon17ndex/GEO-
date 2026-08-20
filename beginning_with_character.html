@@ -71,7 +71,6 @@
             align-items: flex-start;
             gap: 4px;
             will-change: transform;
-            /* Анимация левитации двигает весь блок (и текст, и плашку) целиком */
             animation: floatingText 4.5s ease-in-out infinite alternate !important;
         }
 
@@ -104,31 +103,19 @@
 
         /* Анимация левитации */
         @keyframes floatingLogo {
-            0% {
-                transform: translateY(0px) rotate(0deg);
-            }
-            50% {
-                transform: translateY(-8px) rotate(-1.5deg);
-            }
-            100% {
-                transform: translateY(5px) rotate(1.5deg);
-            }
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(-1.5deg); }
+            100% { transform: translateY(5px) rotate(1.5deg); }
         }
 
         @keyframes floatingText {
-            0% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-6px);
-            }
-            100% {
-                transform: translateY(4px);
-            }
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+            100% { transform: translateY(4px); }
         }
 
         /* =========================================================
-            ВИДЖЕТ ПРОФИЛЯ — ПОЛНАЯ ЗАЩИТА ОТ СРЫВА HOVER
+            ВИДЖЕТ ПРОФИЛЯ
             ========================================================= */
         .top-right-profile {
             position: fixed;
@@ -137,7 +124,6 @@
             z-index: 10;
         }
 
-        /* 1. Карточка профиля */
         .profile-card {
             position: relative;
             display: inline-block;
@@ -177,7 +163,6 @@
             transform: rotate(180deg);
         }
 
-        /* 2. Контейнер выпадающего меню */
         .profile-dropdown-menu {
             position: absolute;
             top: 100%;
@@ -218,7 +203,7 @@
             ========================================================= */
         .center-status-wrapper {
             position: fixed;
-            top: 50%;
+            top: 44%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 5;
@@ -228,13 +213,49 @@
             justify-content: center;
         }
 
-        /* Стили для увеличенного персонажа по центру */
-        .center-status-wrapper .site-character,
-        .center-status-wrapper img,
-        .center-status-wrapper svg {
-            width: 280px !important;
-            height: auto !important;
-            max-width: none !important;
+        /* =========================================================
+            ПРОТЯЖЕННАЯ ПАНЕЛЬ ПОД ПЕРСОНАЖЕМ С КНОПКАМИ
+            ========================================================= */
+        .character-control-panel {
+            position: fixed;
+            top: calc(50% + 110px);
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border-radius: 16px;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            z-index: 6;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .char-panel-btn {
+            flex: 1;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            border-radius: 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            white-space: nowrap;
+            transition: all 0.25s ease;
+        }
+
+        .char-panel-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
         }
 
         /* =========================================================
@@ -288,7 +309,6 @@
             background: rgba(52, 152, 219, 0.2);
         }
 
-        /* Базовое состояние — контейнер скрыт */
         .app-banners-container {
             display: none; 
         }
@@ -330,9 +350,15 @@
     </div>
 </div>
 
-<!-- Центральный контейнер теперь содержит увеличенного персонажа -->
-<div class="center-status-wrapper" id="center-character-container">
-    <!-- Сюда скрипт site-character.js внедрит персонажа, а CSS выше автоматически увеличит его размер -->
+<!-- Центральный контейнер персонажа -->
+<div class="center-status-wrapper" id="center-character-container"></div>
+
+<!-- Протянутая панель с кнопками под персонажем -->
+<div class="character-control-panel">
+    <button type="button" class="char-panel-btn" onclick="window.siteCharacter?.setHappy()">Радость 😊</button>
+    <button type="button" class="char-panel-btn" onclick="window.siteCharacter?.setLoading()">Думает ⏳</button>
+    <button type="button" class="char-panel-btn" onclick="window.siteCharacter?.hide()">Скрыть 🙈</button>
+    <button type="button" class="char-panel-btn" onclick="window.siteCharacter?.show()">Показать 👀</button>
 </div>
 
 <div class="settings-trigger-zone" id="settings-btn" style="opacity: 1; pointer-events: auto;">
@@ -372,9 +398,7 @@
 <div id="user-profile-widget" class="top-right-profile" style="display: none;">
     <div class="profile-card">
         <span class="profile-username" id="profile-email-text">Профиль</span>
-        <div class="profile-dropdown-menu">
-            <!-- Кнопки профиля и выхода убраны по вашему запросу -->
-        </div>
+        <div class="profile-dropdown-menu"></div>
     </div>
 </div>
 
