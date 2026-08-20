@@ -128,6 +128,12 @@ function injectGreetingStyles() {
             50% { transform: translateY(-58%) translateX(-25px) rotate(-5deg) scale(1.04); }
             100% { transform: translateY(-42%) translateX(15px) rotate(4deg) scale(0.96); }
         }
+
+        /* Добавьте это в строку css в welcome-greeting.js */
+#welcome-text-node {
+    transition: transform 0.4s ease, opacity 0.4s ease !important;
+    display: inline-block !important;
+}
     `;
 
     const styleElement = document.createElement('style');
@@ -141,59 +147,60 @@ async function initGreetingUI() {
     if (document.getElementById('welcome-greeting-overlay')) return;
 
     let session = null;
-
     try {
         const client = window.supabaseClient || window.supabase;
         if (client && client.auth) {
             const { data } = await client.auth.getSession();
             session = data?.session;
         }
-    } catch (e) {
-        console.error('Ошибка проверки авторизации:', e);
-    }
+    } catch (e) { console.error(e); }
 
-    // Если пользователь не авторизован (нет сессии), прерываем выполнение — приветствие не показываем
-    if (!session || !session.user) {
-        return;
-    }
+    if (!session || !session.user) return;
 
     injectGreetingStyles();
 
     const user = session.user;
-    const metaName = user.user_metadata?.full_name || user.user_metadata?.username || user.user_metadata?.name;
-    const email = user.email || '';
-    const displayName = metaName || (email ? email.split('@')[0] : 'ПОЛЬЗОВАТЕЛЬ');
+    const emailPrefix = user.email ? user.email.split('@')[0].toUpperCase() : 'USER';
+    const fullName = (user.user_metadata?.full_name || user.user_metadata?.username || 'ПОЛЬЗОВАТЕЛЬ').toUpperCase();
 
-    const fullText = `ЗДРАВСТВУЙТЕ, ${displayName.toUpperCase()}!`;
-    const charsHTML = fullText.split('').map((char, index) => {
-        const safeChar = char === ' ' ? '&nbsp;' : char;
-        const delay = (index * 0.03).toFixed(3);
-        return `<span class="welcome-char" style="animation-delay: ${delay}s">${safeChar}</span>`;
-    }).join('');
-
+    // Создаем структуру с контейнером для текста, который будет меняться
+    injectGreetingStyles();
     const greetingHTML = `
         <div id="welcome-greeting-overlay" class="welcome-overlay">
             <img src="images/geo_logo.png" alt="" class="auth-bg-watermark">
             <div class="welcome-container">
-                <h1 class="welcome-title">${charsHTML}</h1>
+                <h1 class="welcome-title" id="welcome-text-node">ЗДРАВСТВУЙТЕ, ${emailPrefix}!</h1>
             </div>
         </div>
     `;
 
     document.body.insertAdjacentHTML('beforeend', greetingHTML);
-
     const overlay = document.getElementById('welcome-greeting-overlay');
+    const textNode = document.getElementById('welcome-text-node');
     
-    requestAnimationFrame(() => {
-        setTimeout(() => {
-            overlay.classList.add('visible');
-        }, 50);
-    });
+    // Показываем оверлей
+    requestAnimationFrame(() => overlay.classList.add('visible'));
 
+    // Через 0.8 секунд меняем текст на полное имя
+    setTimeout(() => {
+        textNode.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+        textNode.style.transform = 'translateY(20px)';
+        textNode.style.opacity = '0';
+
+        setTimeout(() => {
+            textNode.textContent = `ЗДРАВСТВУЙТЕ, ${fullName}!`;
+            textNode.style.transform = 'translateY(-20px)';
+            
+            requestAnimationFrame(() => {
+                textNode.style.transform = 'translateY(0)';
+                textNode.style.opacity = '1';
+            });
+        }, 400);
+    }, 800);
+
+    // Удаление оверлея
     setTimeout(() => {
         overlay.classList.add('fade-out');
-        setTimeout(() => {
-            overlay.remove();
-        }, 800);
-    }, 2000); 
+        setTimeout(() => overlay.remove(), 800);
+    }, 2800); 
 }
