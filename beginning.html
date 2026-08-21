@@ -26,15 +26,18 @@
             display: none !important;
         }
 
-        /* Плавное проявление и затухание страницы */
-        body {
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
+        /* Изначально тело прозрачное или черное */
+body {
+    background-color: #000000;
+    opacity: 0;
+    transition: opacity 1s ease; /* Плавное появление контента */
+}
 
-        body.page-loaded {
-            opacity: 1;
-        }
+/* Класс, который снимает черноту и делает страницу видимой */
+body.page-loaded {
+    opacity: 1;
+    background-color: transparent; /* Возвращаем основной фон */
+}
 
         /* Класс для плавного угасания перед переходом */
         body.page-hidden {
@@ -503,28 +506,27 @@ function navigateToPage(targetPage) {
 
 // ЕДИНЫЙ И ПРАВИЛЬНЫЙ DOMContentLoaded
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // 1. Плавное проявление страницы
-    requestAnimationFrame(() => {
-        document.body.classList.add('page-loaded');
-    });
 
-    // 2. Приветствие запускается ТОЛЬКО если мы зашли впервые за сессию
+    // 1. Инициализация приветствия при первом входе за сессию
     if (!sessionStorage.getItem('greetingShown')) {
-        requestAnimationFrame(() => {
-            if (typeof initGreetingUI === 'function') {
-                initGreetingUI(() => {
-                    // Ставим флаг после завершения анимации приветствия
-                    sessionStorage.setItem('greetingShown', 'true');
-                });
-            }
-        });
+        // Страница остается прозрачной (opacity 0) благодаря CSS до вызова page-loaded
+        if (typeof initGreetingUI === 'function') {
+            initGreetingUI(() => {
+                // Ставим флаг после завершения анимации
+                sessionStorage.setItem('greetingShown', 'true');
+                // Плавно проявляем страницу
+                document.body.classList.add('page-loaded');
+            });
+        }
+    } else {
+        // Если уже были на сайте — показываем сразу
+        document.body.classList.add('page-loaded');
     }
 
-    // 3. Запуск фоновых волн...
+    // 2. Запуск фоновых волн (запускаем сразу, но они видны только после появления страницы)
     setTimeout(() => { spawnAmbientWave(); }, 1000);
 
-    // 4. Панель разработчика и подсветка активной страницы
+    // 3. Панель разработчика и подсветка активной страницы
     const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
     const sidePanel = document.getElementById('dev-side-panel');
     let hideTimeout = null;
@@ -575,10 +577,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initDevPanel();
     
-    // 5. Инициализация сессии
-if (window.supabaseClient) {
-    checkUserSession();
-}
+    // 4. Инициализация сессии
+    if (window.supabaseClient) {
+        checkUserSession();
+    }
 });
 </script>
 
