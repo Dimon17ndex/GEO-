@@ -507,21 +507,28 @@ function navigateToPage(targetPage) {
 // ЕДИНЫЙ И ПРАВИЛЬНЫЙ DOMContentLoaded
 document.addEventListener('DOMContentLoaded', () => {
 
-    // 1. Инициализация приветствия при первом входе за сессию
-    if (!sessionStorage.getItem('greetingShown')) {
-        // Страница остается прозрачной (opacity 0) благодаря CSS до вызова page-loaded
-        if (typeof initGreetingUI === 'function') {
-            initGreetingUI(() => {
-                // Ставим флаг после завершения анимации
-                sessionStorage.setItem('greetingShown', 'true');
-                // Плавно проявляем страницу
+    // 1. Инициализация приветствия
+    const runGreeting = () => {
+        if (!sessionStorage.getItem('greetingShown')) {
+            if (typeof initGreetingUI === 'function') {
+                // Добавляем небольшую задержку, чтобы DOM успел прогрузиться
+                setTimeout(() => {
+                    initGreetingUI(() => {
+                        sessionStorage.setItem('greetingShown', 'true');
+                        document.body.classList.add('page-loaded');
+                    });
+                }, 100);
+            } else {
+                console.error("Функция initGreetingUI не найдена");
                 document.body.classList.add('page-loaded');
-            });
+            }
+        } else {
+            // Если сессия уже была — просто проявляем
+            document.body.classList.add('page-loaded');
         }
-    } else {
-        // Если уже были на сайте — показываем сразу
-        document.body.classList.add('page-loaded');
-    }
+    };
+
+    runGreeting();
 
     // 2. Запуск фоновых волн (запускаем сразу, но они видны только после появления страницы)
     setTimeout(() => { spawnAmbientWave(); }, 1000);
