@@ -26,16 +26,15 @@
             display: none !important;
         }
 
-        /* Плавное проявление и затухание страницы */
         body {
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
+    background: #0a0a0c;
+}
 
-        /* Класс для плавного угасания перед переходом */
-        body.page-hidden {
-            opacity: 0 !important;
-        }
+/* Класс для плавного угасания перед переходом */
+body.page-hidden {
+    opacity: 0 !important;
+    transition: opacity 0.5s ease;
+}
 
         /* Позиционирование бренд-блока в верхнем левом углу */
         .top-left-brand {
