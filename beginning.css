@@ -970,3 +970,191 @@ body.is-loading a.btn {
     cursor: not-allowed;
 }
 
+.profile-circle-placeholder {
+            position: fixed !important;
+            top: -25% !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            width: 160px;
+            height: 160px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            backdrop-filter: blur(12px);
+            
+            /* Добавляем мягкое свечение вокруг круга */
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.08), inset 0 0 15px rgba(255, 255, 255, 0.05);
+            
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.3);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            z-index: 5;
+            transition: all 0.3s ease;
+        }
+
+        /* При наведении делаем свечение ярче и чуть больше */
+        .profile-circle-placeholder:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(-50%) scale(1.05);
+            color: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 0 35px rgba(255, 255, 255, 0.2), inset 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        /* 2. Контейнер для трех квадратов внизу */
+        .content-cards-container {
+            position: fixed;
+            top: 55%; /* Опускаем квадраты ниже, отдельно от кружка */
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            gap: 25px; /* Увеличили отступ между блоками */
+            z-index: 5;
+            pointer-events: auto;
+        }
+
+        /* Ряд квадратов */
+        .row-cards {
+            display: flex;
+            gap: 25px; /* Увеличили отступ */
+        }
+
+        /* Стиль каждого блока: увеличили ширину по горизонтали */
+        .feature-card-placeholder {
+            width: 190px; /* Было 140px, теперь блокишире по горизонтали */
+            height: 140px; /* Высоту оставили прежней, можете скорректировать под себя */
+            background: rgba(255, 255, 255, 0.04);
+            border: none !important;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.3);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            /* Добавляем настройки для переноса текста */
+            text-align: center;
+            padding: 0 15px; /* Добавляем внутренние отступы, чтобы текст не прижимался к краям */
+            white-space: normal; /* Разрешаем перенос строк */
+            word-break: break-word; /* Переносим длинные слова */
+            color: rgba(255, 255, 255, 0.3);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 11px; /* Чуть уменьшил размер, чтобы длинный текст аккуратно поместился в две строки */
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .feature-card-placeholder:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border: none !important;
+            transform: translateY(-5px);
+            color: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .super-high-photo {
+            position: fixed !important;
+            top: 10px !important; /* Прямо у самого верхнего края экрана! Можете поставить 20px, 40px и т.д. */
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            width: 160px;
+            height: 160px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.3);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            z-index: 5;
+            transition: all 0.3s ease;
+        }
+
+        .super-high-photo:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(-50%) scale(1.05) !important;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Контейнер для группы (фото + имя), чтобы они центрировались вместе */
+/* Контейнер для группы (фото + имя) */
+.profile-wrapper {
+    position: fixed;
+    top: 14%; 
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column; 
+    align-items: center;   
+    z-index: 5;
+}
+
+.profile-name-container {
+    margin-top: 150px; /* Добавит отступ сверху для блока с именем */
+}
+
+/* Настраиваем имя */
+.profile-name {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    white-space: nowrap;
+}
+
+/* Теперь убираем position: fixed и top/left из самого кружка, 
+   так как ими теперь управляет .profile-wrapper */
+.profile-circle-placeholder {
+    /* position: fixed !important;  <- УБРАТЬ ЭТО */
+    /* top: 14% !important;         <- УБРАТЬ ЭТО */
+    /* left: 50% !important;        <- УБРАТЬ ЭТО */
+    /* transform: translateX(-50%) !important; <- УБРАТЬ ЭТО */
+    
+    /* Остальные параметры (width, height, background и т.д.) оставить */
+}
+
+#user-display-name {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+
+    /* Увеличьте ширину или удалите эти строки: */
+    max-width: 400px; 
+    /* overflow: hidden; */
+    /* text-overflow: ellipsis; */
+    /* white-space: nowrap; */
+    display: block;
+}
+
+/* Стили только для профиля */
+.profile-wrapper #user-display-name {
+    font-size: 24px;
+    max-width: 400px;
+}
+
+/* Стили для всех остальных мест (включая настройки) */
+#user-display-name {
+    font-size: 15px; /* Оставляем как было для настроек */
+}
