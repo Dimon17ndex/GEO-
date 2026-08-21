@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEOГРАФИЯ — Авторизация</title>
+    
+    <!-- Подключаем те же скрипты авторизации -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="auth-system.js?v=3" defer></script>
+
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Используем тот же файл стилей, чтобы сохранить дизайн -->
+    <link rel="stylesheet" href="beginning.css">
+
+    <style>
+        body { margin: 0; padding: 0; background-color: #000; overflow: hidden; }
+        
+        /* Центрируем блок авторизации */
+        .auth-page-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .auth-title {
+            font-family: 'Unbounded', sans-serif;
+            color: #fff;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        /* Кнопка входа */
+        .auth-trigger-btn {
+            padding: 15px 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-radius: 12px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .auth-trigger-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="bg-wave-container"></div>
+
+    <div class="auth-page-container">
+        <h1 class="auth-title">Вход в GEOГРАФИЮ</h1>
+        <button type="button" id="open-auth-btn" class="auth-trigger-btn" onclick="if(typeof showAuthModal === 'function') { showAuthModal(); }">
+            Войти / Зарегистрироваться
+        </button>
+    </div>
+
+    <script>
+        // Защита от возврата: если пользователь УЖЕ авторизован, отправляем его на главный экран
+        const client = window.supabaseClient || window.supabase;
+        
+        async function checkAuthAndRedirect() {
+            if (!client) return;
+            const { data: { session } } = await client.auth.getSession();
+            if (session) {
+                window.location.href = 'beginning.html';
+            }
+        }
+        checkAuthAndRedirect();
+    </script>
+</body>
+</html>
