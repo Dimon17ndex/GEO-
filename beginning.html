@@ -378,10 +378,6 @@
 
 <script src="shortcuts-system.js" defer></script>
 
-    <div id="page-loader">
-    <div class="spinner"></div>
-</div>
-
     <div class="app-banners-container">
         <div class="app-banner banner-warning">
             <span class="banner-icon">🛠</span>
@@ -498,21 +494,7 @@ let intensityPercent = 20;
 let ambientTimeoutId = null;
 
 // === ФУНКЦИИ ЛОАДЕРА И БЛОКИРОВКИ КНОПОК ===
-function showLoader() {
-    const loader = document.getElementById('page-loader');
-    if (loader) {
-        loader.classList.add('active');
-        document.body.classList.add('is-loading');
-    }
-}
-
 function hideLoader() {
-    const loader = document.getElementById('page-loader');
-    if (loader) {
-        loader.classList.remove('active');
-        document.body.classList.remove('is-loading');
-    }
-    
     // Запускаем приветствие строго после скрытия лоадера
     if (typeof initGreetingUI === 'function') {
         initGreetingUI();
@@ -621,19 +603,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!hasVisitedSession) {
         // Первый вход за сессию: фиксируем сессию, показываем лоадер, а затем скрываем его (что вызовет приветствие)
         sessionStorage.setItem('hasVisitedBeginningSession', 'true');
-        showLoader();
-
-        setTimeout(() => {
-            hideLoader();
-        }, 1200);
+        
     } else {
-        // Повторный вход в рамках сессии: сразу убираем лоадер, приветствие не показываем
-        const loader = document.getElementById('page-loader');
-        if (loader) {
-            loader.style.display = 'none';
-        }
-    }
-
+        
     requestAnimationFrame(() => {
         document.body.classList.add('page-loaded');
     });
