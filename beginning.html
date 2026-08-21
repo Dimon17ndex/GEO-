@@ -32,14 +32,6 @@
             transition: opacity 0.5s ease;
         }
 
-        body {
-    opacity: 0;
-    transition: opacity 0.6s ease;
-}
-body.page-loaded {
-    opacity: 1;
-}
-
         /* Класс для плавного угасания перед переходом */
         body.page-hidden {
             opacity: 0 !important;
@@ -404,12 +396,6 @@ const intensityValueLabel = document.getElementById('intensity-value');
 let intensityPercent = 20;
 let ambientTimeoutId = null;
 
-function hideLoader() {
-    if (typeof initGreetingUI === 'function') {
-        initGreetingUI();
-    }
-}
-
 function createBackgroundRipple(x, y, className, duration = 1500) {
     if (!waveContainer) return;
     const ripple = document.createElement('div');
@@ -505,28 +491,31 @@ function navigateToPage(targetPage) {
     }, 500);
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Инициализация сессии (делаем это сразу, чтобы UI был готов к показу)
-    if (window.supabaseClient) {
-        await checkUserSession(); // Используем await, чтобы дождаться ответа Supabase
-    }
+// Функция для плавного показа всей страницы (вызывается после приветствия)
+const revealPage = () => {
+    document.body.classList.add('page-loaded');
+    spawnAmbientWave(); 
+};
 
-    // Функция для плавного показа всей страницы
-    const revealPage = () => {
-        document.body.classList.add('page-loaded');
-        spawnAmbientWave(); // Запускаем волны только при появлении страницы
-    };
-
-    // 2. Логика приветствия
-    // Если функция приветствия доступна — запускаем её всегда при входе на страницу
+// МОМЕНТАЛЬНЫЙ ЗАПУСК ПРИВЕТСТВИЯ (не ждем DOMContentLoaded)
+function tryStartGreeting() {
     if (typeof initGreetingUI === 'function') {
         initGreetingUI(revealPage);
     } else {
-        // Запасной вариант на случай, если скрипт приветствия не загрузился
-        revealPage();
+        // Если скрипт welcome-greeting.js еще грузится, проверяем снова через 50мс
+        setTimeout(tryStartGreeting, 50);
+    }
+}
+tryStartGreeting();
+
+// Основная логика после полной загрузки DOM
+document.addEventListener('DOMContentLoaded', async () => {
+    // 1. Инициализация сессии
+    if (window.supabaseClient) {
+        await checkUserSession(); 
     }
 
-    // 3. Панель разработчика (остается без изменений)
+    // 2. Панель разработчика
     const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
     const sidePanel = document.getElementById('dev-side-panel');
     let hideTimeout = null;
