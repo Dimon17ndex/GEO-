@@ -948,19 +948,3 @@ function updateUIForUser(user) {
     }
 }
 
-window.logoutUser = async function(event) {
-    // Логика блокировки кнопок и анимации выхода...
-    try {
-        if (window.supabaseClient) {
-            await window.supabaseClient.auth.signOut();
-        }
-    } catch (error) {
-        console.error('Ошибка при выходе из аккаунта:', error);
-    } finally {
-        document.body.classList.add('page-hidden');
-        setTimeout(() => {
-            // Здесь можно перенаправить на страницу логина/начала:
-            window.location.href = 'Login.html'; 
-        }, 500);
-    }
-};
