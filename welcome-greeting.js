@@ -309,7 +309,7 @@ function injectGreetingStyles() {
 }
 
 // --- ОСНОВНАЯ ФУНКЦИЯ ---
-async function initGreetingUI() {
+async function initGreetingUI(onComplete) {
     if (document.getElementById('welcome-greeting-overlay')) return;
 
     let session = window.mockSupabaseSession || null;
@@ -324,7 +324,11 @@ async function initGreetingUI() {
         } catch (e) { console.error(e); }
     }
 
-    if (!session || !session.user) return;
+    // Если нет сессии, сразу вызываем onComplete, чтобы страница показалась
+    if (!session || !session.user) {
+        if (typeof onComplete === 'function') onComplete();
+        return;
+    }
 
     injectGreetingStyles();
 
@@ -332,7 +336,6 @@ async function initGreetingUI() {
     const emailPrefix = (user.email ? user.email.split('@')[0] : 'USER').toUpperCase();
     const fullName = (user.user_metadata?.full_name || user.user_metadata?.username || 'ПОЛЬЗОВАТЕЛЬ').toUpperCase();
 
-    // Добавляем персонажа с блоком лоадера внутрь оверлея
     const greetingHTML = `
         <div id="welcome-greeting-overlay" class="welcome-overlay">
             <img src="images/geo_logo.png" alt="" class="welcome-bg-watermark">
@@ -380,7 +383,7 @@ async function initGreetingUI() {
     const track = document.getElementById('welcome-track');
     const character = document.getElementById('welcome-character');
 
-    // Отслеживание мыши зрачками персонажа внутри оверлея
+    // Логика мыши, моргания (оставляем как было)...
     window.addEventListener('mousemove', (e) => {
         if (!character) return;
         const pupils = character.querySelectorAll('.char-pupil');
@@ -389,70 +392,46 @@ async function initGreetingUI() {
             const rect = eye.getBoundingClientRect();
             const eyeCenterX = rect.left + rect.width / 2;
             const eyeCenterY = rect.top + rect.height / 2;
-
             const radian = Math.atan2(e.clientY - eyeCenterY, e.clientX - eyeCenterX);
-            const maxDistance = 10;
-            const distance = Math.min(maxDistance, Math.hypot(e.clientX - eyeCenterX, e.clientY - eyeCenterY) * 0.1);
-
-            const x = Math.cos(radian) * distance;
-            const y = Math.sin(radian) * distance;
-
-            pupil.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+            const distance = Math.min(10, Math.hypot(e.clientX - eyeCenterX, e.clientY - eyeCenterY) * 0.1);
+            pupil.style.transform = `translate(calc(-50% + ${Math.cos(radian) * distance}px), calc(-50% + ${Math.sin(radian) * distance}px))`;
         });
     });
 
-    // Рандомное моргание персонажа
     function triggerBlink() {
         if (!character || !document.contains(character)) return;
         character.classList.add('blinking');
-        setTimeout(() => {
-            if (character) character.classList.remove('blinking');
-        }, 120);
+        setTimeout(() => { if (character) character.classList.remove('blinking'); }, 120);
         setTimeout(triggerBlink, Math.random() * 2500 + 1000);
     }
     setTimeout(triggerBlink, 1500);
 
-    // Показываем оверлей
     requestAnimationFrame(() => {
         requestAnimationFrame(() => overlay.classList.add('visible'));
     });
 
-    // Через 2 секунды меняем статус на "Здравствуйте" и переключаем эмоцию персонажа на радостную
     setTimeout(() => {
         statusBox.classList.add('hidden');
         statusBox.style.display = 'none';
-        
         mainGreeting.style.display = 'inline';
         titleElement.classList.add('revealed');
-
-        if (character) {
-            character.className = 'welcome-character-container state-happy revealed';
-        }
+        if (character) character.className = 'welcome-character-container state-happy revealed';
     }, 2000);
 
-    // Смена почты на имя внутри тикера (спустя 3 секунды)
     setTimeout(() => {
-        if (track) {
-            track.style.transform = 'translateY(-1.2em)';
-        }
+        if (track) track.style.transform = 'translateY(-1.2em)';
     }, 3000);
 
-    // Закрытие экрана приветствия на отметке 4.5 секунд
+    // Финальное закрытие
     setTimeout(() => {
-        // 1. Запускаем сжатие персонажа
-        if (character) {
-            character.classList.add('scale-down');
-        }
-
-        // 2. Сразу же запускаем вспышку оверлея
-        // Вспышка начинается плавно, пока персонаж "схлопывается"
+        if (character) character.classList.add('scale-down');
         overlay.classList.add('flash-closing');
 
-        // 3. Удаляем оверлей из DOM после того, как все анимации завершены
         setTimeout(() => {
             overlay.remove();
+            // ВЫЗЫВАЕМ КОЛЛБЭК, ЧТОБЫ ПОКАЗАТЬ СТРАНИЦУ
+            if (typeof onComplete === 'function') onComplete();
         }, 800);
-
     }, 4500);
 }
 
