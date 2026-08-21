@@ -836,7 +836,7 @@ function initAuthEvents() {
             } else {
                 // Успешный вход: скрываем модалку и перенаправляем
                 window.hideAuthModal();
-                window.location.href = '/beginning';
+                window.location.href = 'beginning.html';
             }
         } catch (err) {
             console.error(err);
