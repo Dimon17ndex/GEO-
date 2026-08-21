@@ -817,43 +817,32 @@ function initAuthEvents() {
     tabRegister?.addEventListener('click', () => setAuthMode('register'));
 
     // Форма Входа
-formLogin?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
+    formLogin?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
 
-    const submitBtn = document.getElementById('btn-submit-login');
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
+        const submitBtn = document.getElementById('btn-submit-login');
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
 
-    setButtonLoading(submitBtn, true, 'Войти');
+        setButtonLoading(submitBtn, true, 'Войти');
 
-    try {
-        const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
+        try {
+            const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
 
-        if (error) {
-            alert(`Ошибка входа: ${error.message}`);
-            setButtonLoading(submitBtn, false, 'Войти');
-        } else {
-            // 1. Скрываем окно авторизации
-            window.hideAuthModal();
-            
-            // 2. Вызываем функцию приветствия
-            if (typeof initGreetingUI === 'function') {
-                initGreetingUI();
+            if (error) {
+                alert(`Ошибка входа: ${error.message}`);
+                setButtonLoading(submitBtn, false, 'Войти');
             } else {
-                console.error("Функция initGreetingUI не найдена. Проверьте подключение welcome-greeting.js");
+                // Успешный вход: скрываем модалку и перенаправляем
+                window.hideAuthModal();
+                window.location.href = '/beginning';
             }
-
-            // 3. Перезагрузка страницы через 2,6 секунды (2600 мс)
-            setTimeout(() => {
-                window.location.reload();
-            }, 2600); 
+        } catch (err) {
+            console.error(err);
+            setButtonLoading(submitBtn, false, 'Войти');
         }
-    } catch (err) {
-        console.error(err);
-        setButtonLoading(submitBtn, false, 'Войти');
-    }
-});
+    });
 
     // Форма Регистрации
     formRegister?.addEventListener('submit', async (e) => {
