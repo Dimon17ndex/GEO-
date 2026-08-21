@@ -918,12 +918,6 @@
         </div>
     </div>
 
-    <div class="center-status-wrapper">
-        <button type="button" id="open-auth-btn" class="auth-trigger-btn" onclick="showAuthModal()">
-            Войти / Зарегистрироваться
-        </button>
-    </div>
-
     <div id="dev-side-panel" class="dev-side-panel">
         <button type="button" class="dev-panel-btn" id="btn-main-profile" onclick="navigateToPage('beginning.html')">
             Основной профиль
@@ -1024,7 +1018,7 @@ async function handleLogout() {
         console.error('Ошибка при выходе из аккаунта:', err);
     } finally {
         setTimeout(() => {
-            navigateToPage('beginning.html');
+            navigateToPage('login.html');
         }, 600);
     }
 }
