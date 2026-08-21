@@ -509,15 +509,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.add('page-loaded');
     });
 
-    // 2. Приветствие запускается плавно, если пришли со страницы логина
-    const cameFromLogin = document.referrer && document.referrer.includes('login.html');
-    if (cameFromLogin) {
-        setTimeout(() => {
-            if (typeof initGreetingUI === 'function') {
-                initGreetingUI();
-            }
-        }, 1200); // 1.2 сек — страница успевает плавно появиться
-    }
+    // 2. Приветствие запускается сразу после проявления страницы
+    requestAnimationFrame(() => {
+        if (typeof initGreetingUI === 'function') {
+            initGreetingUI();
+        }
+    });
 
     // 3. Запуск фоновых волн
     setTimeout(() => { spawnAmbientWave(); }, 1000);
