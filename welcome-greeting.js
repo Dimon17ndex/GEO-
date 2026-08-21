@@ -312,29 +312,8 @@ function injectGreetingStyles() {
 async function initGreetingUI(onComplete) {
     if (document.getElementById('welcome-greeting-overlay')) return;
 
-    let session = window.mockSupabaseSession || null;
-    
-    if (!session) {
-        try {
-            const client = window.supabaseClient || window.supabase;
-            if (client && client.auth) {
-                const { data } = await client.auth.getSession();
-                session = data?.session;
-            }
-        } catch (e) { console.error(e); }
-    }
-
-    // Если нет сессии, сразу вызываем onComplete, чтобы страница показалась
-    if (!session || !session.user) {
-        if (typeof onComplete === 'function') onComplete();
-        return;
-    }
-
+    // СРАЗУ внедряем стили и рисуем оверлей, НЕ дожидаясь Supabase!
     injectGreetingStyles();
-
-    const user = session.user;
-    const emailPrefix = (user.email ? user.email.split('@')[0] : 'USER').toUpperCase();
-    const fullName = (user.user_metadata?.full_name || user.user_metadata?.username || 'ПОЛЬЗОВАТЕЛЬ').toUpperCase();
 
     const greetingHTML = `
         <div id="welcome-greeting-overlay" class="welcome-overlay">
@@ -365,8 +344,8 @@ async function initGreetingUI(onComplete) {
                         ЗДРАВСТВУЙТЕ, 
                         <span class="welcome-ticker">
                             <span class="welcome-ticker-track" id="welcome-track">
-                                <span class="welcome-ticker-item">${emailPrefix}!</span>
-                                <span class="welcome-ticker-item">${fullName}!</span>
+                                <span class="welcome-ticker-item" id="greeting-prefix">ПОЛЬЗОВАТЕЛЬ!</span>
+                                <span class="welcome-ticker-item" id="greeting-fullname">ПОЛЬЗОВАТЕЛЬ!</span>
                             </span>
                         </span>
                     </span>
@@ -377,13 +356,44 @@ async function initGreetingUI(onComplete) {
 
     document.body.insertAdjacentHTML('beforeend', greetingHTML);
     const overlay = document.getElementById('welcome-greeting-overlay');
+    
+    // Мгновенно делаем оверлей видимым
+    requestAnimationFrame(() => {
+        overlay.classList.add('visible');
+    });
+
+    // Пока оверлей уже крутится и анимируется, за кулисами запрашиваем сессию
+    let session = window.mockSupabaseSession || null;
+    try {
+        const client = window.supabaseClient || window.supabase;
+        if (client && client.auth) {
+            const { data } = await client.auth.getSession();
+            session = data?.session;
+        }
+    } catch (e) { console.error(e); }
+
+    // Если пользователь не вошел — сразу убираем оверлей и пускаем дальше
+    if (!session || !session.user) {
+        overlay.remove();
+        if (typeof onComplete === 'function') onComplete();
+        return;
+    }
+
+    // Если вошел — подставляем его имя на лету
+    const user = session.user;
+    const emailPrefix = (user.email ? user.email.split('@')[0] : 'USER').toUpperCase();
+    const fullName = (user.user_metadata?.full_name || user.user_metadata?.username || emailPrefix).toUpperCase();
+    
+    document.getElementById('greeting-prefix').textContent = `${emailPrefix}!`;
+    document.getElementById('greeting-fullname').textContent = `${fullName}!`;
+
     const titleElement = document.getElementById('welcome-title-element');
     const statusBox = document.getElementById('welcome-status-box');
     const mainGreeting = document.getElementById('welcome-main-greeting');
     const track = document.getElementById('welcome-track');
     const character = document.getElementById('welcome-character');
 
-    // Логика мыши, моргания (оставляем как было)...
+    // Логика движения глаз
     window.addEventListener('mousemove', (e) => {
         if (!character) return;
         const pupils = character.querySelectorAll('.char-pupil');
@@ -398,19 +408,9 @@ async function initGreetingUI(onComplete) {
         });
     });
 
-    function triggerBlink() {
-        if (!character || !document.contains(character)) return;
-        character.classList.add('blinking');
-        setTimeout(() => { if (character) character.classList.remove('blinking'); }, 120);
-        setTimeout(triggerBlink, Math.random() * 2500 + 1000);
-    }
-    setTimeout(triggerBlink, 1500);
-
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => overlay.classList.add('visible'));
-    });
-
+    // Переключение текстов и эмоций персонажа
     setTimeout(() => {
+        if (!statusBox || !mainGreeting) return;
         statusBox.classList.add('hidden');
         statusBox.style.display = 'none';
         mainGreeting.style.display = 'inline';
@@ -422,14 +422,13 @@ async function initGreetingUI(onComplete) {
         if (track) track.style.transform = 'translateY(-1.2em)';
     }, 3000);
 
-    // Финальное закрытие
+    // Финальное закрытие и вызов показа сайта
     setTimeout(() => {
         if (character) character.classList.add('scale-down');
         overlay.classList.add('flash-closing');
 
         setTimeout(() => {
             overlay.remove();
-            // ВЫЗЫВАЕМ КОЛЛБЭК, ЧТОБЫ ПОКАЗАТЬ СТРАНИЦУ
             if (typeof onComplete === 'function') onComplete();
         }, 800);
     }, 4500);
