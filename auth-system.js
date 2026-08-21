@@ -83,7 +83,7 @@ window.logoutUser = async function(event) {
     } finally {
         document.body.classList.add('page-hidden');
         setTimeout(() => {
-            window.location.reload();
+            window.location.href = 'login.html'; // Переход на страницу логина
         }, 500);
     }
 };
