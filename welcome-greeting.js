@@ -42,6 +42,41 @@ function injectGreetingStyles() {
             transform: translateY(0) !important;
         }
 
+        /* Точки-лоадер над персонажем */
+        .char-loader {
+            display: flex !important;
+            gap: 6px !important;
+            align-items: center !important;
+            justify-content: center !important;
+            height: 20px !important;
+            margin-bottom: -10px !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            transition: opacity 0.3s ease !important;
+        }
+
+        .welcome-character-container.state-loading .char-loader {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        .loader-dot {
+            width: 6px !important;
+            height: 6px !important;
+            background: #ffffff !important;
+            border-radius: 50% !important;
+            opacity: 0.4 !important;
+            animation: pulse-dot 1.4s infinite ease-in-out both !important;
+        }
+
+        .loader-dot:nth-child(1) { animation-delay: -0.32s !important; }
+        .loader-dot:nth-child(2) { animation-delay: -0.16s !important; }
+
+        @keyframes pulse-dot {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1.2); opacity: 1; }
+        }
+
         /* Глаза персонажа */
         .char-eyes {
             display: flex !important;
@@ -252,12 +287,17 @@ async function initGreetingUI() {
     const emailPrefix = (user.email ? user.email.split('@')[0] : 'USER').toUpperCase();
     const fullName = (user.user_metadata?.full_name || user.user_metadata?.username || 'ПОЛЬЗОВАТЕЛЬ').toUpperCase();
 
-    // Добавляем персонажа прямо над текстом приветствия в оверлей
+    // Добавляем персонажа с блоком лоадера внутрь оверлея
     const greetingHTML = `
         <div id="welcome-greeting-overlay" class="welcome-overlay">
             <img src="images/geo_logo.png" alt="" class="welcome-bg-watermark">
             
             <div id="welcome-character" class="welcome-character-container state-loading revealed">
+                <div class="char-loader">
+                    <div class="loader-dot"></div>
+                    <div class="loader-dot"></div>
+                    <div class="loader-dot"></div>
+                </div>
                 <div class="char-eyes">
                     <div class="char-eye"><div class="char-pupil"></div></div>
                     <div class="char-eye"><div class="char-pupil"></div></div>
