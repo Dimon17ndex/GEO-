@@ -890,9 +890,19 @@ async function checkUserSession() {
 
     // 1. Проверка сессии при загрузке
     const { data: { session } } = await window.supabaseClient.auth.getSession();
+    
+    // ДОБАВЬТЕ ЭТОТ БЛОК:
+    if (session && session.user) {
+        // Если мы на странице логина и пользователь уже зашел — перенаправляем
+        if (window.location.pathname.includes('login.html')) {
+            window.location.href = 'beginning.html';
+            return;
+        }
+    }
+
     updateUIForUser(session ? session.user : null);
 
-    // 2. Отслеживание изменения состояния авторизации в режиме реального времени
+    // 2. Отслеживание изменения состояния авторизации
     window.supabaseClient.auth.onAuthStateChange((event, session) => {
         const user = session ? session.user : null;
         updateUIForUser(user);
