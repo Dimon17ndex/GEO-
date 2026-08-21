@@ -6,11 +6,11 @@
     <title>GEOГРАФИЯ — Сессия</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="script.js" defer></script>
-    <script src="console.js" defer></script>
-    <script src="auth-system.js?v=3" defer></script>
-    <script src="reset-password.js" defer></script>
-    <script src="app.js" defer></script>
+<script src="auth-system.js?v=3" defer></script>
+<script src="script.js" defer></script>
+<script src="console.js" defer></script>
+<script src="reset-password.js" defer></script>
+<script src="app.js" defer></script>
 
     <link rel="icon" type="image/png" href="images/favicon.png">
 
@@ -403,15 +403,29 @@
     </div>
 
     <div class="center-status-wrapper">
-        <button type="button" id="open-auth-btn" class="auth-trigger-btn" onclick="showAuthModal()">
+        <button type="button" id="open-auth-btn" class="auth-trigger-btn" onclick="if(typeof showAuthModal === 'function') { showAuthModal(); } else { console.log('Система авторизации еще загружается...'); }">
             Войти / Зарегистрироваться
         </button>
+        
+        <div class="empty-status-message" style="display: none;">ЗДЕСЬ ПОКА ПУСТО</div>
+    </div>
 
-        <button type="button" class="reset-open-link" onclick="showResetModal('request')">
-            Забыли пароль?
-        </button>
+    <div class="profile-wrapper">
+    <div class="profile-circle-placeholder">ФОТО</div>
+    <div class="profile-name-container">
+    <span id="user-display-name"></span> <!-- Пустой контейнер -->
+</div>
+</div>
+    
+    <div class="content-cards-container">
+        <div class="row-cards">
+            <div class="feature-card-placeholder" onclick="console.log('Клик по квадрату 1')">БЛОК 1</div>
+            <div class="feature-card-placeholder" onclick="console.log('Клик по квадрату 2')">ОБРАЗОВАТЕЛЬНАЯ КАРТОТЕКА</div>
+            <div class="feature-card-placeholder" onclick="console.log('Клик по квадрату 3')">GEOГРАФИЧЕСКИЕ ИГРЫ</div>
+        </div>
+    </div>
 
-        <div class="empty-status-message">ЗДЕСЬ ПОКА ПУСТО</div>
+        <div class="empty-status-message" style="display: none;">ЗДЕСЬ ПОКА ПУСТО</div>
     </div>
 
     <div class="settings-trigger-zone" id="settings-btn" style="opacity: 1; pointer-events: auto;">
@@ -675,6 +689,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     initDevPanel();
+});
+
+// Добавьте этот фрагмент в ваш основной скрипт после того, как определен supabaseClient
+async function loadUserProfile() {
+    const client = window.supabaseClient || window.supabase;
+    if (!client) return;
+
+    try {
+        const { data: { session } } = await client.auth.getSession();
+        const wrapper = document.querySelector('.profile-name-container'); // весь блок
+        const userNameElement = document.getElementById('user-display-name');
+        
+        if (session && userNameElement) {
+            const name = session.user.user_metadata.full_name || session.user.email.split('@')[0];
+            userNameElement.innerText = name;
+            wrapper.style.display = 'block'; // Показываем блок, если имя есть
+        } else {
+            // Если пользователь не вошел, просто прячем этот контейнер
+            if (wrapper) wrapper.style.display = 'none';
+        }
+    } catch (err) {
+        console.error('Ошибка загрузки профиля:', err);
+    }
+}
+
+// Вызываем функцию при загрузке страницы
+document.addEventListener('DOMContentLoaded', () => {
+    loadUserProfile();
 });
 </script>
 
