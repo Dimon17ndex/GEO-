@@ -518,14 +518,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // 2. Логика приветствия
-    const cameFromLogin = document.referrer && document.referrer.includes('login.html');
-    
-    if (cameFromLogin && typeof initGreetingUI === 'function') {
-        // Запускаем приветствие и передаем функцию revealPage как callback
-        // initGreetingUI должен вызвать переданную функцию в самом конце своей анимации
+    // Если функция приветствия доступна — запускаем её всегда при входе на страницу
+    if (typeof initGreetingUI === 'function') {
         initGreetingUI(revealPage);
     } else {
-        // Если это обычный вход, показываем страницу сразу
+        // Запасной вариант на случай, если скрипт приветствия не загрузился
         revealPage();
     }
 
