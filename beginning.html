@@ -596,20 +596,31 @@ function navigateToPage(targetPage) {
     }, 500);
 }
 
-// ЕДИНЫЙ ОБРАБОТЧИК ЗАГРУЗКИ СТРАНИЦЫ
 document.addEventListener('DOMContentLoaded', () => {
-    const hasVisitedSession = sessionStorage.getItem('hasVisitedBeginningSession');
+    
+    // Безопасная проверка: есть ли referrer и содержит ли он login.html
+    const cameFromLogin = document.referrer && document.referrer.includes('login.html');
 
-    // 1. Логика первого входа
-    if (!hasVisitedSession) {
-        sessionStorage.setItem('hasVisitedBeginningSession', 'true');
-        // Запускаем приветствие с небольшой задержкой для красоты
+    // Если пришли с логина — показываем приветствие
+    if (cameFromLogin) {
         setTimeout(() => {
             if (typeof initGreetingUI === 'function') {
                 initGreetingUI();
             }
         }, 800);
     }
+
+    // ВЕСЬ ОСТАЛЬНОЙ КОД (без проверок на hasVisitedSession)
+    requestAnimationFrame(() => {
+        document.body.classList.add('page-loaded');
+    });
+
+    setTimeout(() => { spawnAmbientWave(); }, 1000);
+    
+    // ... ваш остальной код (initDevPanel, loadUserProfile и т.д.)
+    initDevPanel();
+    loadUserProfile();
+});
 
     // 2. Базовые функции (работают всегда)
     requestAnimationFrame(() => {
@@ -671,7 +682,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 4. Загрузка данных профиля
     loadUserProfile();
-});
 
 // Функция загрузки профиля (вынесена отдельно)
 async function loadUserProfile() {
