@@ -203,7 +203,7 @@ document.addEventListener('keydown', (e) => {
         keySequence = [];
         sessionStorage.setItem('dev_console_authenticated', 'true');
         setTimeout(() => { 
-            window.location.href = '/beginning.html'; 
+            window.location.href = '/login.html'; 
         }, 300);
     }
 
