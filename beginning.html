@@ -504,19 +504,24 @@ function navigateToPage(targetPage) {
 // ЕДИНЫЙ И ПРАВИЛЬНЫЙ DOMContentLoaded
 document.addEventListener('DOMContentLoaded', () => {
     
-    // 1. Плавное проявление страницы всегда
+    // 1. Плавное проявление страницы
     requestAnimationFrame(() => {
         document.body.classList.add('page-loaded');
     });
 
-    // 2. Приветствие запускается сразу после проявления страницы
-    requestAnimationFrame(() => {
-        if (typeof initGreetingUI === 'function') {
-            initGreetingUI();
-        }
-    });
+    // 2. Приветствие запускается ТОЛЬКО если мы зашли впервые за сессию
+    if (!sessionStorage.getItem('greetingShown')) {
+        requestAnimationFrame(() => {
+            if (typeof initGreetingUI === 'function') {
+                initGreetingUI(() => {
+                    // Ставим флаг после завершения анимации приветствия
+                    sessionStorage.setItem('greetingShown', 'true');
+                });
+            }
+        });
+    }
 
-    // 3. Запуск фоновых волн
+    // 3. Запуск фоновых волн...
     setTimeout(() => { spawnAmbientWave(); }, 1000);
 
     // 4. Панель разработчика и подсветка активной страницы
