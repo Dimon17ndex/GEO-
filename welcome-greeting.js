@@ -255,6 +255,51 @@ function injectGreetingStyles() {
             0% { transform: translateX(0px); }
             100% { transform: translateX(38px); }
         }
+
+        /* Эффект вспышки белого круга */
+.flash-circle {
+    position: absolute !important;
+    background: #ffffff !important;
+    border-radius: 50% !important;
+    z-index: 100 !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
+    /* Убираем начальный scale, будем задавать его через JS */
+    transform: translate(-50%, -50%) scale(0) !important;
+}
+
+@keyframes flashEffect {
+    0% { transform: translate(-50%, -50%) scale(0.3); opacity: 1; }
+    50% { transform: translate(-50%, -50%) scale(25); opacity: 0.9; }
+    100% { transform: translate(-50%, -50%) scale(40); opacity: 0; }
+}
+
+        /* Класс для вспышки и закрытия оверлея */
+        .welcome-overlay.flash-closing {
+            background-color: #ffffff !important;
+            transform: scale(1.05) !important;
+            opacity: 0 !important;
+            transition: background-color 0.4s ease, transform 0.4s ease, opacity 0.4s ease !important;
+        }
+
+        /* Эффект сжатия персонажа перед исчезновением */
+        .welcome-character-container.shrinking {
+            transform: scale(0) !important;
+            opacity: 0 !important;
+            transition: transform 0.3s cubic-bezier(0.5, 0, 1, 1), opacity 0.3s ease !important;
+        }
+
+        /* Специальный класс для принудительного схлопывания элементов лица */
+.collapse-elements {
+    transform: scale(0) !important;
+    transition: transform 0.3s cubic-bezier(0.5, 0, 1, 1) !important;
+}
+
+        .welcome-character-container.scale-down {
+    transform: scale(0) !important;
+    opacity: 0 !important;
+    transition: transform 0.4s cubic-bezier(0.6, 0, 0.4, 1), opacity 0.3s ease !important;
+}
     `;
 
     const styleElement = document.createElement('style');
@@ -392,11 +437,23 @@ async function initGreetingUI() {
         }
     }, 3000);
 
-    // Закрытие экрана приветствия на отметке 5 секунд
+    // Закрытие экрана приветствия на отметке 4.5 секунд
     setTimeout(() => {
-        overlay.classList.add('fade-out');
-        setTimeout(() => overlay.remove(), 800);
-    }, 5000); 
+        // 1. Запускаем сжатие персонажа
+        if (character) {
+            character.classList.add('scale-down');
+        }
+
+        // 2. Сразу же запускаем вспышку оверлея
+        // Вспышка начинается плавно, пока персонаж "схлопывается"
+        overlay.classList.add('flash-closing');
+
+        // 3. Удаляем оверлей из DOM после того, как все анимации завершены
+        setTimeout(() => {
+            overlay.remove();
+        }, 800);
+
+    }, 4500);
 }
 
 window.initGreetingUI = initGreetingUI;
