@@ -26,18 +26,15 @@
             display: none !important;
         }
 
-        /* Изначально тело прозрачное или черное */
-body {
-    background-color: #000000;
-    opacity: 0;
-    transition: opacity 1s ease; /* Плавное появление контента */
-}
+        /* Плавное проявление и затухание страницы */
+        body {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
 
-/* Класс, который снимает черноту и делает страницу видимой */
-body.page-loaded {
-    opacity: 1;
-    background-color: transparent; /* Возвращаем основной фон */
-}
+        body.page-loaded {
+            opacity: 1;
+        }
 
         /* Класс для плавного угасания перед переходом */
         body.page-hidden {
@@ -506,34 +503,26 @@ function navigateToPage(targetPage) {
 
 // ЕДИНЫЙ И ПРАВИЛЬНЫЙ DOMContentLoaded
 document.addEventListener('DOMContentLoaded', () => {
+    
+    // 1. Плавное проявление страницы всегда
+    requestAnimationFrame(() => {
+        document.body.classList.add('page-loaded');
+    });
 
-    // 1. Инициализация приветствия
-    const runGreeting = () => {
-        if (!sessionStorage.getItem('greetingShown')) {
+    // 2. Приветствие запускается плавно, если пришли со страницы логина
+    const cameFromLogin = document.referrer && document.referrer.includes('login.html');
+    if (cameFromLogin) {
+        setTimeout(() => {
             if (typeof initGreetingUI === 'function') {
-                // Добавляем небольшую задержку, чтобы DOM успел прогрузиться
-                setTimeout(() => {
-                    initGreetingUI(() => {
-                        sessionStorage.setItem('greetingShown', 'true');
-                        document.body.classList.add('page-loaded');
-                    });
-                }, 100);
-            } else {
-                console.error("Функция initGreetingUI не найдена");
-                document.body.classList.add('page-loaded');
+                initGreetingUI();
             }
-        } else {
-            // Если сессия уже была — просто проявляем
-            document.body.classList.add('page-loaded');
-        }
-    };
+        }, 1200); // 1.2 сек — страница успевает плавно появиться
+    }
 
-    runGreeting();
-
-    // 2. Запуск фоновых волн (запускаем сразу, но они видны только после появления страницы)
+    // 3. Запуск фоновых волн
     setTimeout(() => { spawnAmbientWave(); }, 1000);
 
-    // 3. Панель разработчика и подсветка активной страницы
+    // 4. Панель разработчика и подсветка активной страницы
     const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
     const sidePanel = document.getElementById('dev-side-panel');
     let hideTimeout = null;
@@ -584,10 +573,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initDevPanel();
     
-    // 4. Инициализация сессии
-    if (window.supabaseClient) {
-        checkUserSession();
-    }
+    // 5. Инициализация сессии
+if (window.supabaseClient) {
+    checkUserSession();
+}
 });
 </script>
 
