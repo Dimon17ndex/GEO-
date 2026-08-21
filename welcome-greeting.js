@@ -312,9 +312,9 @@ function injectGreetingStyles() {
 async function initGreetingUI(onComplete) {
     if (document.getElementById('welcome-greeting-overlay')) return;
 
-    // СРАЗУ внедряем стили и рисуем оверлей, НЕ дожидаясь Supabase!
     injectGreetingStyles();
 
+    // 1. СРАЗУ рисуем оверлей и показываем заглушку, чтобы он появился мгновенно
     const greetingHTML = `
         <div id="welcome-greeting-overlay" class="welcome-overlay">
             <img src="images/geo_logo.png" alt="" class="welcome-bg-watermark">
@@ -357,12 +357,11 @@ async function initGreetingUI(onComplete) {
     document.body.insertAdjacentHTML('beforeend', greetingHTML);
     const overlay = document.getElementById('welcome-greeting-overlay');
     
-    // Мгновенно делаем оверлей видимым
     requestAnimationFrame(() => {
         overlay.classList.add('visible');
     });
 
-    // Пока оверлей уже крутится и анимируется, за кулисами запрашиваем сессию
+    // 2. Параллельно запрашиваем сессию у Supabase
     let session = window.mockSupabaseSession || null;
     try {
         const client = window.supabaseClient || window.supabase;
@@ -372,20 +371,22 @@ async function initGreetingUI(onComplete) {
         }
     } catch (e) { console.error(e); }
 
-    // Если пользователь не вошел — сразу убираем оверлей и пускаем дальше
+    // ВАЖНО: Если пользователь НЕ вошел в систему, мы не показываем приветствие, а сразу убираем оверлей
     if (!session || !session.user) {
         overlay.remove();
         if (typeof onComplete === 'function') onComplete();
         return;
     }
 
-    // Если вошел — подставляем его имя на лету
+    // Если пользователь вошел — подставляем его имя
     const user = session.user;
     const emailPrefix = (user.email ? user.email.split('@')[0] : 'USER').toUpperCase();
     const fullName = (user.user_metadata?.full_name || user.user_metadata?.username || emailPrefix).toUpperCase();
     
-    document.getElementById('greeting-prefix').textContent = `${emailPrefix}!`;
-    document.getElementById('greeting-fullname').textContent = `${fullName}!`;
+    const prefixEl = document.getElementById('greeting-prefix');
+    const fullEl = document.getElementById('greeting-fullname');
+    if (prefixEl) prefixEl.textContent = `${emailPrefix}!`;
+    if (fullEl) fullEl.textContent = `${fullName}!`;
 
     const titleElement = document.getElementById('welcome-title-element');
     const statusBox = document.getElementById('welcome-status-box');
@@ -408,13 +409,22 @@ async function initGreetingUI(onComplete) {
         });
     });
 
-    // Переключение текстов и эмоций персонажа
+    // Анимация моргания
+    function triggerBlink() {
+        if (!character || !document.contains(character)) return;
+        character.classList.add('blinking');
+        setTimeout(() => { if (character) character.classList.remove('blinking'); }, 120);
+        setTimeout(triggerBlink, Math.random() * 2500 + 1000);
+    }
+    setTimeout(triggerBlink, 1500);
+
+    // Переключение на приветствие по имени
     setTimeout(() => {
         if (!statusBox || !mainGreeting) return;
         statusBox.classList.add('hidden');
         statusBox.style.display = 'none';
         mainGreeting.style.display = 'inline';
-        titleElement.classList.add('revealed');
+        if (titleElement) titleElement.classList.add('revealed');
         if (character) character.className = 'welcome-character-container state-happy revealed';
     }, 2000);
 
@@ -422,7 +432,7 @@ async function initGreetingUI(onComplete) {
         if (track) track.style.transform = 'translateY(-1.2em)';
     }, 3000);
 
-    // Финальное закрытие и вызов показа сайта
+    // Завершение анимации и открытие сайта
     setTimeout(() => {
         if (character) character.classList.add('scale-down');
         overlay.classList.add('flash-closing');
