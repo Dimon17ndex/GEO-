@@ -32,9 +32,13 @@
             transition: opacity 0.5s ease;
         }
 
-        body.page-loaded {
-            opacity: 1;
-        }
+        body {
+    opacity: 0;
+    transition: opacity 0.6s ease;
+}
+body.page-loaded {
+    opacity: 1;
+}
 
         /* Класс для плавного угасания перед переходом */
         body.page-hidden {
@@ -501,28 +505,31 @@ function navigateToPage(targetPage) {
     }, 500);
 }
 
-// ЕДИНЫЙ И ПРАВИЛЬНЫЙ DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
-    
-    // 1. Плавное проявление страницы всегда
-    requestAnimationFrame(() => {
-        document.body.classList.add('page-loaded');
-    });
-
-    // 2. Приветствие запускается плавно, если пришли со страницы логина
-    const cameFromLogin = document.referrer && document.referrer.includes('login.html');
-    if (cameFromLogin) {
-        setTimeout(() => {
-            if (typeof initGreetingUI === 'function') {
-                initGreetingUI();
-            }
-        }, 1200); // 1.2 сек — страница успевает плавно появиться
+document.addEventListener('DOMContentLoaded', async () => {
+    // 1. Инициализация сессии (делаем это сразу, чтобы UI был готов к показу)
+    if (window.supabaseClient) {
+        await checkUserSession(); // Используем await, чтобы дождаться ответа Supabase
     }
 
-    // 3. Запуск фоновых волн
-    setTimeout(() => { spawnAmbientWave(); }, 1000);
+    // Функция для плавного показа всей страницы
+    const revealPage = () => {
+        document.body.classList.add('page-loaded');
+        spawnAmbientWave(); // Запускаем волны только при появлении страницы
+    };
 
-    // 4. Панель разработчика и подсветка активной страницы
+    // 2. Логика приветствия
+    const cameFromLogin = document.referrer && document.referrer.includes('login.html');
+    
+    if (cameFromLogin && typeof initGreetingUI === 'function') {
+        // Запускаем приветствие и передаем функцию revealPage как callback
+        // initGreetingUI должен вызвать переданную функцию в самом конце своей анимации
+        initGreetingUI(revealPage);
+    } else {
+        // Если это обычный вход, показываем страницу сразу
+        revealPage();
+    }
+
+    // 3. Панель разработчика (остается без изменений)
     const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
     const sidePanel = document.getElementById('dev-side-panel');
     let hideTimeout = null;
@@ -550,7 +557,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setupHoverDetection() {
         if (!sidePanel) return;
-
         document.addEventListener('mousemove', (e) => {
             const distanceFromRight = window.innerWidth - e.clientX;
             if (distanceFromRight <= 60) {
@@ -558,25 +564,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 sidePanel.classList.add('visible');
             }
         });
-
         sidePanel.addEventListener('mouseenter', () => {
             clearTimeout(hideTimeout);
             sidePanel.classList.add('visible');
         });
-
         sidePanel.addEventListener('mouseleave', () => {
-            hideTimeout = setTimeout(() => {
-                sidePanel.classList.remove('visible');
-            }, 2000);
+            hideTimeout = setTimeout(() => { sidePanel.classList.remove('visible'); }, 2000);
         });
     }
 
     initDevPanel();
-    
-    // 5. Инициализация сессии
-if (window.supabaseClient) {
-    checkUserSession();
-}
 });
 </script>
 
