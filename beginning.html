@@ -495,9 +495,12 @@ let ambientTimeoutId = null;
 
 // === ФУНКЦИИ ЛОАДЕРА И БЛОКИРОВКИ КНОПОК ===
 function hideLoader() {
-    // Запускаем приветствие строго после скрытия лоадера
-    if (typeof initGreetingUI === 'function') {
-        initGreetingUI();
+    // Запускаем приветствие только если его еще не было в этой сессии
+    if (!sessionStorage.getItem('hasVisitedBeginningSession')) {
+        sessionStorage.setItem('hasVisitedBeginningSession', 'true');
+        if (typeof initGreetingUI === 'function') {
+            initGreetingUI();
+        }
     }
 }
 
@@ -602,22 +605,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const hasVisited = sessionStorage.getItem('hasVisitedBeginningSession');
 
     if (!hasVisited) {
-        // Если зашел ВПЕРВЫЕ за сессию — записываем флаг
+        // Если зашел ВПЕРВЫЕ за сессию — записываем флаг и запускаем приветствие
         sessionStorage.setItem('hasVisitedBeginningSession', 'true');
         
-        // Ожидаем загрузку скрипта приветствия и запускаем его
         const checkGreetingInterval = setInterval(() => {
             if (typeof initGreetingUI === 'function') {
                 clearInterval(checkGreetingInterval);
-                initGreetingUI(); // Показываем приветствие
+                initGreetingUI(); 
             }
         }, 50);
 
         setTimeout(() => clearInterval(checkGreetingInterval), 2000);
     } else {
-        // Если пользователь уже был на странице в этой сессии, 
-        // скрываем элемент приветствия принудительно (если он вдруг пытается отрисоваться)
-        const greetingElement = document.getElementById('welcome-greeting-container'); // или ваш селектор приветствия
+        // Если уже был в этой сессии — глушим функцию приветствия на уровне объекта window, 
+        // чтобы сторонние скрипты не смогли её вызвать
+        window.initGreetingUI = function() {};
+
+        const greetingElement = document.getElementById('welcome-greeting-container');
         if (greetingElement) {
             greetingElement.style.display = 'none';
         }
