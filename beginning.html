@@ -400,9 +400,23 @@ const intensityValueLabel = document.getElementById('intensity-value');
 let intensityPercent = 20;
 let ambientTimeoutId = null;
 
-function hideLoader() {
-    if (typeof initGreetingUI === 'function') {
-        initGreetingUI();
+// Функция для плавного показа всей страницы и старта волн
+const revealPage = () => {
+    document.body.classList.add('page-loaded');
+    spawnAmbientWave();
+};
+
+// МОМЕНТАЛЬНЫЙ ЗАПУСК ПРИВЕТСТВИЯ БЕЗ ЗАДЕРЖЕК
+if (typeof initGreetingUI === 'function') {
+    initGreetingUI(revealPage);
+} else {
+    const greetingScript = document.querySelector('script[src="welcome-greeting.js"]');
+    if (greetingScript) {
+        greetingScript.onload = () => {
+            if (typeof initGreetingUI === 'function') {
+                initGreetingUI(revealPage);
+            }
+        };
     }
 }
 
@@ -501,30 +515,9 @@ function navigateToPage(targetPage) {
     }, 500);
 }
 
-// ЕДИНЫЙ И ПРАВИЛЬНЫЙ DOMContentLoaded
+// DOMContentLoaded для сессии и панели разработчика
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // 1. Плавное проявление страницы
-    requestAnimationFrame(() => {
-        document.body.classList.add('page-loaded');
-    });
-
-    // 2. Приветствие запускается ТОЛЬКО если мы зашли впервые за сессию
-    if (!sessionStorage.getItem('greetingShown')) {
-        requestAnimationFrame(() => {
-            if (typeof initGreetingUI === 'function') {
-                initGreetingUI(() => {
-                    // Ставим флаг после завершения анимации приветствия
-                    sessionStorage.setItem('greetingShown', 'true');
-                });
-            }
-        });
-    }
-
-    // 3. Запуск фоновых волн...
-    setTimeout(() => { spawnAmbientWave(); }, 1000);
-
-    // 4. Панель разработчика и подсветка активной страницы
+    // Панель разработчика и подсветка активной страницы
     const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
     const sidePanel = document.getElementById('dev-side-panel');
     let hideTimeout = null;
@@ -575,10 +568,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initDevPanel();
     
-    // 5. Инициализация сессии
-if (window.supabaseClient) {
-    checkUserSession();
-}
+    // Инициализация сессии (подгружает имя пользователя в элементы профиля)
+    if (window.supabaseClient) {
+        checkUserSession();
+    }
 });
 </script>
 
