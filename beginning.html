@@ -598,20 +598,29 @@ function navigateToPage(targetPage) {
 
 // ЕДИНЫЙ ОБРАБОТЧИК ЗАГРУЗКИ СТРАНИЦЫ
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Гарантированный запуск приветствия 1 раз за сессию с ожиданием загрузки скрипта
-    if (!sessionStorage.getItem('hasVisitedBeginningSession')) {
+    // 1. Проверяем, заходил ли пользователь на страницу в ЭТОЙ сессии
+    const hasVisited = sessionStorage.getItem('hasVisitedBeginningSession');
+
+    if (!hasVisited) {
+        // Если зашел ВПЕРВЫЕ за сессию — записываем флаг
         sessionStorage.setItem('hasVisitedBeginningSession', 'true');
         
-        // Функция проверяет появление initGreetingUI, если скрипт еще грузится
+        // Ожидаем загрузку скрипта приветствия и запускаем его
         const checkGreetingInterval = setInterval(() => {
             if (typeof initGreetingUI === 'function') {
                 clearInterval(checkGreetingInterval);
-                initGreetingUI();
+                initGreetingUI(); // Показываем приветствие
             }
         }, 50);
 
-        // Страховка на случай, если скрипт не загрузился за 2 секунды
         setTimeout(() => clearInterval(checkGreetingInterval), 2000);
+    } else {
+        // Если пользователь уже был на странице в этой сессии, 
+        // скрываем элемент приветствия принудительно (если он вдруг пытается отрисоваться)
+        const greetingElement = document.getElementById('welcome-greeting-container'); // или ваш селектор приветствия
+        if (greetingElement) {
+            greetingElement.style.display = 'none';
+        }
     }
 
     // 2. Базовые функции (работают всегда)
