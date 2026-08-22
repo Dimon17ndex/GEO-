@@ -605,12 +605,10 @@ document.addEventListener('DOMContentLoaded', () => {
         sessionStorage.setItem('hasVisitedBeginningSession', 'true');
     }
 
-    // Запускаем анимацию приветствия в любом случае при загрузке DOM
-    setTimeout(() => {
-        if (typeof initGreetingUI === 'function') {
-            initGreetingUI();
-        }
-    }, 600);
+    // Сразу запускаем анимацию приветствия без задержки
+    if (typeof initGreetingUI === 'function') {
+        initGreetingUI();
+    }
 
     // 2. Базовые функции (работают всегда)
     requestAnimationFrame(() => {
