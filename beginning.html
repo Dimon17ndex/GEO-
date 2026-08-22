@@ -598,16 +598,20 @@ function navigateToPage(targetPage) {
 
 // ЕДИНЫЙ ОБРАБОТЧИК ЗАГРУЗКИ СТРАНИЦЫ
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Проверяем, заходил ли пользователь на эту страницу за текущую сессию
-    const hasVisitedSession = sessionStorage.getItem('hasVisitedBeginningSession');
-    
-    if (!hasVisitedSession) {
-        // Если зашел впервые за сессию — ставим флаг и сразу запускаем приветствие
+    // 1. Гарантированный запуск приветствия 1 раз за сессию с ожиданием загрузки скрипта
+    if (!sessionStorage.getItem('hasVisitedBeginningSession')) {
         sessionStorage.setItem('hasVisitedBeginningSession', 'true');
         
-        if (typeof initGreetingUI === 'function') {
-            initGreetingUI();
-        }
+        // Функция проверяет появление initGreetingUI, если скрипт еще грузится
+        const checkGreetingInterval = setInterval(() => {
+            if (typeof initGreetingUI === 'function') {
+                clearInterval(checkGreetingInterval);
+                initGreetingUI();
+            }
+        }, 50);
+
+        // Страховка на случай, если скрипт не загрузился за 2 секунды
+        setTimeout(() => clearInterval(checkGreetingInterval), 2000);
     }
 
     // 2. Базовые функции (работают всегда)
