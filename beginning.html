@@ -484,7 +484,17 @@
 <script src="welcome-greeting.js" defer></script>
 
 <script>
-// Переменные состояния
+// Глобальный флаг сессии
+const SESSION_KEY = 'hasVisitedBeginningSession';
+
+// Перехватываем функцию ДО загрузки скрипта, чтобы она вообще ничего не делала, если уже были
+if (sessionStorage.getItem(SESSION_KEY)) {
+    window.initGreetingUI = function(cb) {
+        if (typeof cb === 'function') cb();
+    };
+}
+
+// Переменные состояния страницы
 const waveContainer = document.getElementById('bg-wave-container');
 const volumeStatusLabel = document.getElementById('volume-status-label');
 const intensitySlider = document.getElementById('wave-intensity-slider');
@@ -493,13 +503,12 @@ const intensityValueLabel = document.getElementById('intensity-value');
 let intensityPercent = 20;
 let ambientTimeoutId = null;
 
-// === ФУНКЦИИ ЛОАДЕРА И БЛОКИРОВКИ КНОПОК ===
+// Функция вызова лоадера / приветствия
 function hideLoader() {
-    // Запускаем приветствие только если его еще не было в этой сессии
-    if (!sessionStorage.getItem('hasVisitedBeginningSession')) {
-        sessionStorage.setItem('hasVisitedBeginningSession', 'true');
-        if (typeof initGreetingUI === 'function') {
-            initGreetingUI();
+    if (!sessionStorage.getItem(SESSION_KEY)) {
+        sessionStorage.setItem(SESSION_KEY, 'true');
+        if (typeof window.initGreetingUI === 'function') {
+            window.initGreetingUI();
         }
     }
 }
@@ -516,7 +525,6 @@ function createBackgroundRipple(x, y, className, duration = 1500) {
 
 function spawnAmbientWave() {
     clearTimeout(ambientTimeoutId);
-
     if (intensityPercent === 0) { 
         ambientTimeoutId = setTimeout(spawnAmbientWave, 1000); 
         return; 
@@ -601,40 +609,33 @@ function navigateToPage(targetPage) {
 
 // ЕДИНЫЙ ОБРАБОТЧИК ЗАГРУЗКИ СТРАНИЦЫ
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Проверяем, заходил ли пользователь на страницу в ЭТОЙ сессии
-    const hasVisited = sessionStorage.getItem('hasVisitedBeginningSession');
-
-    if (!hasVisited) {
-        // Если зашел ВПЕРВЫЕ за сессию — записываем флаг и запускаем приветствие
-        sessionStorage.setItem('hasVisitedBeginningSession', 'true');
+    // Проверка сессии для приветствия
+    if (!sessionStorage.getItem(SESSION_KEY)) {
+        sessionStorage.setItem(SESSION_KEY, 'true');
         
-        const checkGreetingInterval = setInterval(() => {
-            if (typeof initGreetingUI === 'function') {
-                clearInterval(checkGreetingInterval);
-                initGreetingUI(); 
+        // Ждем пока подгрузится welcome-greeting.js и вызываем
+        const checkGreeting = setInterval(() => {
+            if (typeof window.initGreetingUI === 'function') {
+                clearInterval(checkGreeting);
+                window.initGreetingUI();
             }
         }, 50);
 
-        setTimeout(() => clearInterval(checkGreetingInterval), 2000);
+        setTimeout(() => clearInterval(checkGreeting), 2500);
     } else {
-        // Если уже был в этой сессии — глушим функцию приветствия на уровне объекта window, 
-        // чтобы сторонние скрипты не смогли её вызвать
-        window.initGreetingUI = function() {};
-
-        const greetingElement = document.getElementById('welcome-greeting-container');
-        if (greetingElement) {
-            greetingElement.style.display = 'none';
-        }
+        // На всякий случай гасим, если оверлей вдруг попал в верстку
+        const overlay = document.getElementById('welcome-greeting-overlay');
+        if (overlay) overlay.remove();
     }
 
-    // 2. Базовые функции (работают всегда)
+    // Базовые анимации
     requestAnimationFrame(() => {
         document.body.classList.add('page-loaded');
     });
 
     setTimeout(() => { spawnAmbientWave(); }, 1000);
 
-    // 3. Инициализация панели разработчика
+    // Панель разработчика
     const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
     const sidePanel = document.getElementById('dev-side-panel');
     let hideTimeout = null;
@@ -684,12 +685,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     initDevPanel();
-    
-    // 4. Загрузка данных профиля
     loadUserProfile();
 });
 
-// Функция загрузки профиля (вынесена отдельно)
 async function loadUserProfile() {
     const client = window.supabaseClient || window.supabase;
     if (!client) return;
