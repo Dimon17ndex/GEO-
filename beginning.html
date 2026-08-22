@@ -598,18 +598,19 @@ function navigateToPage(targetPage) {
 
 // ЕДИНЫЙ ОБРАБОТЧИК ЗАГРУЗКИ СТРАНИЦЫ
 document.addEventListener('DOMContentLoaded', () => {
+    // Гарантированный запуск приветствия при входе или обновлении страницы
     const hasVisitedSession = sessionStorage.getItem('hasVisitedBeginningSession');
-
-    // 1. Логика первого входа
+    
     if (!hasVisitedSession) {
         sessionStorage.setItem('hasVisitedBeginningSession', 'true');
-        // Запускаем приветствие с небольшой задержкой для красоты
-        setTimeout(() => {
-            if (typeof initGreetingUI === 'function') {
-                initGreetingUI();
-            }
-        }, 800);
     }
+
+    // Запускаем анимацию приветствия в любом случае при загрузке DOM
+    setTimeout(() => {
+        if (typeof initGreetingUI === 'function') {
+            initGreetingUI();
+        }
+    }, 600);
 
     // 2. Базовые функции (работают всегда)
     requestAnimationFrame(() => {
