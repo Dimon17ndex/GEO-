@@ -554,29 +554,39 @@ function navigateToPage(targetPage) {
 
 // ЕДИНЫЙ ОБРАБОТЧИК ЗАГРУЗКИ СТРАНИЦЫ
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Управление логикой приветствия за сессию
-    const hasVisited = sessionStorage.getItem('hasVisitedBeginningSession');
-
-    if (!hasVisited) {
+    // 1. Проверяем сессию: если в этой сессии мы ЕЩЕ НЕ показывали приветствие
+    if (!sessionStorage.getItem('hasVisitedBeginningSession')) {
+        // Сразу ставим флаг, чтобы при любых обновлениях/переходах внутри сессии оно больше не всплывало
         sessionStorage.setItem('hasVisitedBeginningSession', 'true');
-        
-        const checkGreetingInterval = setInterval(() => {
+
+        // Пытаемся запустить приветствие с небольшими интервалами (на случай если скрипт defer грузится дольше)
+        let attempts = 0;
+        const greetingInterval = setInterval(() => {
+            attempts++;
             if (typeof initGreetingUI === 'function') {
-                clearInterval(checkGreetingInterval);
-                initGreetingUI(); 
+                clearInterval(greetingInterval);
+                try {
+                    initGreetingUI();
+                } catch (e) {
+                    console.error('Ошибка внутри initGreetingUI:', e);
+                }
+            } else if (window.initGreetingUI && typeof window.initGreetingUI === 'function') {
+                clearInterval(greetingInterval);
+                window.initGreetingUI();
+            } else if (attempts > 40) { // Сдаемся через 2 секунды (40 * 50мс)
+                clearInterval(greetingInterval);
+                console.warn('Функция initGreetingUI не найдена в welcome-greeting.js');
             }
         }, 50);
-
-        setTimeout(() => clearInterval(checkGreetingInterval), 2000);
     } else {
-        // Убираем контейнер приветствия, если он уже был показан в этой сессии
+        // Если уже показывали в этой сессии — принудительно прячем контейнер, если он есть
         const greetingElement = document.getElementById('welcome-greeting-container');
         if (greetingElement) {
             greetingElement.style.display = 'none';
         }
     }
 
-    // 2. Базовые функции
+    // 2. Базовые функции страницы
     requestAnimationFrame(() => {
         document.body.classList.add('page-loaded');
     });
@@ -621,6 +631,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         sidePanel.addEventListener('mouseenter', () => {
+            clearTimeout(hideProgrammaticHide = true);
             clearTimeout(hideTimeout);
             sidePanel.classList.add('visible');
         });
@@ -633,8 +644,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     initDevPanel();
-    
-    // 4. Загрузка данных профиля
     loadUserProfile();
 });
 
