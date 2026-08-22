@@ -310,6 +310,15 @@ function injectGreetingStyles() {
 
 // --- ОСНОВНАЯ ФУНКЦИЯ ---
 async function initGreetingUI(onComplete) {
+    // Еслы мы уже показывали приветствие в этой сессии — сразу выходим
+    if (sessionStorage.getItem('hasVisitedBeginningSession')) {
+        if (typeof onComplete === 'function') onComplete();
+        return;
+    }
+
+    // Сразу ставим флаг, что в этой сессии приветствие уже было
+    sessionStorage.setItem('hasVisitedBeginningSession', 'true');
+
     if (document.getElementById('welcome-greeting-overlay')) return;
 
     injectGreetingStyles();
