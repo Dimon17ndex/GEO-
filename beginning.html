@@ -6,11 +6,11 @@
     <title>GEOГРАФИЯ — Сессия</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="auth-system.js?v=3" defer></script>
-<script src="script.js" defer></script>
-<script src="console.js" defer></script>
-<script src="reset-password.js" defer></script>
-<script src="app.js" defer></script>
+    <script src="auth-system.js?v=3" defer></script>
+    <script src="script.js" defer></script>
+    <script src="console.js" defer></script>
+    <script src="reset-password.js" defer></script>
+    <script src="app.js" defer></script>
 
     <link rel="icon" type="image/png" href="images/favicon.png">
 
@@ -364,14 +364,14 @@
         }
 
         /* Базовое состояние — контейнер скрыт */
-.app-banners-container {
-    display: none; 
-}
+        .app-banners-container {
+            display: none; 
+        }
 
-/* Когда плашка должна работать — добавляем этот класс */
-.app-banners-container.banner-active {
-    display: block !important; /* или flex, в зависимости от вашей верстки */
-}
+        /* Когда плашка должна работать — добавляем этот класс */
+        .app-banners-container.banner-active {
+            display: block !important;
+        }
     </style>
 </head>
 <body>
@@ -407,11 +407,11 @@
     </div>
 
     <div class="profile-wrapper">
-    <div class="profile-circle-placeholder">ФОТО</div>
-    <div class="profile-name-container">
-    <span id="user-display-name"></span> <!-- Пустой контейнер -->
-</div>
-</div>
+        <div class="profile-circle-placeholder">ФОТО</div>
+        <div class="profile-name-container">
+            <span id="user-display-name"></span>
+        </div>
+    </div>
     
     <div class="content-cards-container">
         <div class="row-cards">
@@ -419,9 +419,6 @@
             <div class="feature-card-placeholder" onclick="console.log('Клик по квадрату 2')">ОБРАЗОВАТЕЛЬНАЯ КАРТОТЕКА</div>
             <div class="feature-card-placeholder" onclick="console.log('Клик по квадрату 3')">GEOГРАФИЧЕСКИЕ ИГРЫ</div>
         </div>
-    </div>
-
-        <div class="empty-status-message" style="display: none;">ЗДЕСЬ ПОКА ПУСТО</div>
     </div>
 
     <div class="settings-trigger-zone" id="settings-btn" style="opacity: 1; pointer-events: auto;">
@@ -487,13 +484,6 @@
 // Глобальный флаг сессии
 const SESSION_KEY = 'hasVisitedBeginningSession';
 
-// Перехватываем функцию ДО загрузки скрипта, чтобы она вообще ничего не делала, если уже были
-if (sessionStorage.getItem(SESSION_KEY)) {
-    window.initGreetingUI = function(cb) {
-        if (typeof cb === 'function') cb();
-    };
-}
-
 // Переменные состояния страницы
 const waveContainer = document.getElementById('bg-wave-container');
 const volumeStatusLabel = document.getElementById('volume-status-label');
@@ -502,16 +492,6 @@ const intensityValueLabel = document.getElementById('intensity-value');
 
 let intensityPercent = 20;
 let ambientTimeoutId = null;
-
-// Функция вызова лоадера / приветствия
-function hideLoader() {
-    if (!sessionStorage.getItem(SESSION_KEY)) {
-        sessionStorage.setItem(SESSION_KEY, 'true');
-        if (typeof window.initGreetingUI === 'function') {
-            window.initGreetingUI();
-        }
-    }
-}
 
 function createBackgroundRipple(x, y, className, duration = 1500) {
     if (!waveContainer) return;
@@ -566,7 +546,150 @@ document.body.addEventListener('mousedown', (e) => {
     playMusic();
     createBackgroundRipple(e.clientX, e.clientY, 'bg-click-ripple');
 });
+
+const volumeBtn = document.getElementById('volume-toggle-btn');
+const volumeIcon = document.getElementById('volume-icon');
+let isMuted = false;
+
+volumeBtn?.addEventListener('click', (e) => {
+    e.stopPropagation(); 
+    isMuted = !isMuted;
+    bgMusic.muted = isMuted;
+    
+    if (isMuted) {
+        volumeStatusLabel?.classList.add('muted-mode');
+        volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15" stroke="currentColor" stroke-width="1.5"></line><line x1="17" y1="9" x2="23" y2="15" stroke="currentColor" stroke-width="1.5"></line>`;
+    } else {
+        volumeStatusLabel?.classList.remove('muted-mode');
+        volumeIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path class="volume-wave-1" d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path class="volume-wave-2" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>`;
+        playMusic();
+    }
+});
+
+intensitySlider?.addEventListener('mousedown', (e) => { e.stopPropagation(); });
+intensitySlider?.addEventListener('input', (e) => {
+    intensityPercent = parseInt(e.target.value);
+    if (intensityValueLabel) intensityValueLabel.innerText = `${intensityPercent}%`;
+});
+
+history.pushState(null, null, location.href);
+window.addEventListener('popstate', function () {
+    navigateToPage('index.html');
+});
+
+function navigateToPage(targetPage) {
+    const currentPage = window.location.pathname.split('/').pop() || 'beginning.html';
+    if (currentPage === targetPage) return;
+
+    document.body.classList.add('page-hidden');
+    setTimeout(() => {
+        window.location.href = targetPage;
+    }, 500);
+}
+
+// ЕДИНЫЙ ОБРАБОТЧИК ЗАГРУЗКИ СТРАНИЦЫ
+document.addEventListener('DOMContentLoaded', () => {
+    // Проверка сессии для приветствия
+    if (!sessionStorage.getItem(SESSION_KEY)) {
+        sessionStorage.setItem(SESSION_KEY, 'true');
+        
+        // Ожидаем подгрузку функции инициализации приветствия из welcome-greeting.js
+        const checkGreeting = setInterval(() => {
+            if (typeof window.initGreetingUI === 'function') {
+                clearInterval(checkGreeting);
+                window.initGreetingUI();
+            }
+        }, 50);
+
+        setTimeout(() => clearInterval(checkGreeting), 2500);
+    } else {
+        const overlay = document.getElementById('welcome-greeting-overlay');
+        if (overlay) overlay.remove();
+    }
+
+    // Базовые анимации
+    requestAnimationFrame(() => {
+        document.body.classList.add('page-loaded');
+    });
+
+    setTimeout(() => { spawnAmbientWave(); }, 1000);
+
+    // Панель разработчика
+    const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
+    const sidePanel = document.getElementById('dev-side-panel');
+    let hideTimeout = null;
+
+    const currentPage = window.location.pathname.split('/').pop() || 'beginning.html';
+    if (currentPage === 'beginning.html') {
+        document.getElementById('btn-main-profile')?.classList.add('active-page');
+    } else if (currentPage === 'admin.html') {
+        document.getElementById('btn-admin-profile')?.classList.add('active-page');
+    }
+
+    async function initDevPanel() {
+        const client = window.supabaseClient || window.supabase;
+        if (!client) return;
+
+        try {
+            const { data: { session } } = await client.auth.getSession();
+            if (session?.user?.email === DEV_EMAIL) {
+                setupHoverDetection();
+            }
+        } catch (err) {
+            console.error('Ошибка проверки прав разработчика:', err);
+        }
+    }
+
+    function setupHoverDetection() {
+        if (!sidePanel) return;
+
+        document.addEventListener('mousemove', (e) => {
+            const distanceFromRight = window.innerWidth - e.clientX;
+            if (distanceFromRight <= 60) {
+                clearTimeout(hideTimeout);
+                sidePanel.classList.add('visible');
+            }
+        });
+
+        sidePanel.addEventListener('mouseenter', () => {
+            clearTimeout(hideTimeout);
+            sidePanel.classList.add('visible');
+        });
+
+        sidePanel.addEventListener('mouseleave', () => {
+            hideTimeout = setTimeout(() => {
+                sidePanel.classList.remove('visible');
+            }, 2000);
+        });
+    }
+
+    initDevPanel();
+    loadUserProfile();
+});
+
+async function loadUserProfile() {
+    const client = window.supabaseClient || window.supabase;
+    if (!client) return;
+
+    try {
+        const { data: { session } } = await client.auth.getSession();
+        const wrapper = document.querySelector('.profile-name-container');
+        const userNameElement = document.getElementById('user-display-name');
+        
+        if (session && userNameElement) {
+            const name = session.user.user_metadata.full_name || session.user.email.split('@')[0];
+            userNameElement.innerText = name;
+            if (wrapper) wrapper.style.display = 'block';
+        } else {
+            if (wrapper) wrapper.style.display = 'none';
+        }
+    } catch (err) {
+        console.error('Ошибка загрузки профиля:', err);
+    }
+}
 </script>
+
+<script src="site-warning.js" defer></script>
 
 </body>
 </html>
