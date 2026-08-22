@@ -6,11 +6,11 @@
     <title>GEOГРАФИЯ — Сессия</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="auth-system.js?v=3" defer></script>
-<script src="script.js" defer></script>
-<script src="console.js" defer></script>
-<script src="reset-password.js" defer></script>
-<script src="app.js" defer></script>
+    <script src="auth-system.js?v=3" defer></script>
+    <script src="script.js" defer></script>
+    <script src="console.js" defer></script>
+    <script src="reset-password.js" defer></script>
+    <script src="app.js" defer></script>
 
     <link rel="icon" type="image/png" href="images/favicon.png">
 
@@ -84,27 +84,15 @@
 
         /* Анимация левитации */
         @keyframes floatingLogo {
-            0% {
-                transform: translateY(0px) rotate(0deg);
-            }
-            50% {
-                transform: translateY(-8px) rotate(-1.5deg);
-            }
-            100% {
-                transform: translateY(5px) rotate(1.5deg);
-            }
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(-1.5deg); }
+            100% { transform: translateY(5px) rotate(1.5deg); }
         }
 
         @keyframes floatingText {
-            0% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-6px);
-            }
-            100% {
-                transform: translateY(4px);
-            }
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+            100% { transform: translateY(4px); }
         }
 
         /* =========================================================
@@ -117,7 +105,6 @@
             z-index: 10;
         }
 
-        /* 1. Карточка профиля */
         .profile-card {
             position: relative;
             display: inline-block;
@@ -157,40 +144,33 @@
             transform: rotate(180deg);
         }
 
-        /* 2. Контейнер выпадающего меню */
         .profile-dropdown-menu {
             position: absolute;
-            top: 100%;             /* Зацепка ровно за нижний край карточки */
+            top: 100%;
             left: 0;
             right: 0;
-            padding-top: 8px;      /* Заменяем внешние зазоры внутренними */
+            padding-top: 8px;
             display: flex;
             flex-direction: column;
-            gap: 6px;              /* Расстояние между кнопками */
-
-            /* Визуальное скрытие */
+            gap: 6px;
             opacity: 0;
             visibility: hidden;
             transform: translateY(-4px);
             transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
-            
-            /* Отключаем клики в скрытом состоянии */
             pointer-events: none;
         }
 
-        /* 3. НЕВИДИМАЯ ПОДУШКА-СОЕДИНИТЕЛЬ (Убирает все провалы) */
         .profile-dropdown-menu::before {
             content: '';
             position: absolute;
             top: 0;
-            left: -10px;            /* Немного расширяем зону по бокам */
+            left: -10px;
             right: -10px;
-            bottom: -10px;          /* И снизу, чтобы мышь не соскакивала */
+            bottom: -10px;
             z-index: -1;
             background: transparent;
         }
 
-        /* 4. Открытие и удержание при наведении на ЛЮБОЙ элемент этой зоны */
         .profile-card:hover .profile-dropdown-menu,
         .profile-dropdown-menu:hover {
             opacity: 1 !important;
@@ -199,7 +179,6 @@
             pointer-events: auto !important;
         }
 
-        /* 5. Кнопки внутри меню */
         .profile-settings-btn,
         .logout-dropdown-btn {
             width: 100%;
@@ -210,10 +189,9 @@
             cursor: pointer;
             box-sizing: border-box;
             position: relative;
-            z-index: 2;            /* Кнопки поверх невидимой подушки */
+            z-index: 2;
         }
 
-        /* Синяя кнопка */
         .profile-settings-btn {
             padding: 10px 8px;
             background: #3498db;
@@ -228,7 +206,6 @@
             background: #2980b9;
         }
 
-        /* Красная кнопка */
         .logout-dropdown-btn {
             padding: 10px 12px;
             background: #e74c3c;
@@ -246,7 +223,6 @@
             background: #c0392b;
         }
 
-        /* Крутящийся лоадер загрузки в кнопке */
         .btn-spinner {
             width: 14px;
             height: 14px;
@@ -264,7 +240,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Контейнер для размещения статуса строго по центру экрана */
         .center-status-wrapper {
             position: fixed;
             top: 50%;
@@ -279,13 +254,11 @@
             gap: 12px;
         }
 
-        /* Разрешаем клики по элементам управления внутри центрального контейнера */
         .auth-trigger-btn,
         .reset-open-link {
             pointer-events: auto;
         }
 
-        /* Серый статус "ЗДЕСЬ ПОКА ПУСТО" */
         .empty-status-message {
             font-family: 'Montserrat', sans-serif;
             font-size: 13px;
@@ -296,7 +269,6 @@
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
         }
 
-        /* Ссылка восстановления пароля */
         .reset-open-link {
             background: transparent;
             border: none;
@@ -312,14 +284,11 @@
             color: #ffffff;
         }
 
-        /* =========================================================
-           ВЫДВИЖНАЯ СЕКРЕТНАЯ ПАНЕЛЬ АДМИНИСТРАТОРА
-           ========================================================= */
         .dev-side-panel {
             position: fixed;
             top: 50%;
             right: 0;
-            transform: translate(100%, -50%); /* Спрятано за правым краем */
+            transform: translate(100%, -50%);
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -335,7 +304,7 @@
         }
 
         .dev-side-panel.visible {
-            transform: translate(0, -50%); /* Показывается */
+            transform: translate(0, -50%);
         }
 
         .dev-panel-btn {
@@ -363,15 +332,13 @@
             background: rgba(52, 152, 219, 0.2);
         }
 
-        /* Базовое состояние — контейнер скрыт */
-.app-banners-container {
-    display: none; 
-}
+        .app-banners-container {
+            display: none; 
+        }
 
-/* Когда плашка должна работать — добавляем этот класс */
-.app-banners-container.banner-active {
-    display: block !important; /* или flex, в зависимости от вашей верстки */
-}
+        .app-banners-container.banner-active {
+            display: block !important;
+        }
     </style>
 </head>
 <body>
@@ -407,11 +374,11 @@
     </div>
 
     <div class="profile-wrapper">
-    <div class="profile-circle-placeholder">ФОТО</div>
-    <div class="profile-name-container">
-    <span id="user-display-name"></span> <!-- Пустой контейнер -->
-</div>
-</div>
+        <div class="profile-circle-placeholder">ФОТО</div>
+        <div class="profile-name-container">
+            <span id="user-display-name"></span>
+        </div>
+    </div>
     
     <div class="content-cards-container">
         <div class="row-cards">
@@ -419,9 +386,6 @@
             <div class="feature-card-placeholder" onclick="console.log('Клик по квадрату 2')">ОБРАЗОВАТЕЛЬНАЯ КАРТОТЕКА</div>
             <div class="feature-card-placeholder" onclick="console.log('Клик по квадрату 3')">GEOГРАФИЧЕСКИЕ ИГРЫ</div>
         </div>
-    </div>
-
-        <div class="empty-status-message" style="display: none;">ЗДЕСЬ ПОКА ПУСТО</div>
     </div>
 
     <div class="settings-trigger-zone" id="settings-btn" style="opacity: 1; pointer-events: auto;">
@@ -492,17 +456,6 @@ const intensityValueLabel = document.getElementById('intensity-value');
 
 let intensityPercent = 20;
 let ambientTimeoutId = null;
-
-// === ФУНКЦИИ ЛОАДЕРА И БЛОКИРОВКИ КНОПОК ===
-function hideLoader() {
-    // Запускаем приветствие только если его еще не было в этой сессии
-    if (!sessionStorage.getItem('hasVisitedBeginningSession')) {
-        sessionStorage.setItem('hasVisitedBeginningSession', 'true');
-        if (typeof initGreetingUI === 'function') {
-            initGreetingUI();
-        }
-    }
-}
 
 function createBackgroundRipple(x, y, className, duration = 1500) {
     if (!waveContainer) return;
@@ -601,11 +554,10 @@ function navigateToPage(targetPage) {
 
 // ЕДИНЫЙ ОБРАБОТЧИК ЗАГРУЗКИ СТРАНИЦЫ
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Проверяем, заходил ли пользователь на страницу в ЭТОЙ сессии
+    // 1. Управление логикой приветствия за сессию
     const hasVisited = sessionStorage.getItem('hasVisitedBeginningSession');
 
     if (!hasVisited) {
-        // Если зашел ВПЕРВЫЕ за сессию — записываем флаг и запускаем приветствие
         sessionStorage.setItem('hasVisitedBeginningSession', 'true');
         
         const checkGreetingInterval = setInterval(() => {
@@ -617,17 +569,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setTimeout(() => clearInterval(checkGreetingInterval), 2000);
     } else {
-        // Если уже был в этой сессии — глушим функцию приветствия на уровне объекта window, 
-        // чтобы сторонние скрипты не смогли её вызвать
-        window.initGreetingUI = function() {};
-
+        // Убираем контейнер приветствия, если он уже был показан в этой сессии
         const greetingElement = document.getElementById('welcome-greeting-container');
         if (greetingElement) {
             greetingElement.style.display = 'none';
         }
     }
 
-    // 2. Базовые функции (работают всегда)
+    // 2. Базовые функции
     requestAnimationFrame(() => {
         document.body.classList.add('page-loaded');
     });
@@ -689,7 +638,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadUserProfile();
 });
 
-// Функция загрузки профиля (вынесена отдельно)
+// Функция загрузки профиля
 async function loadUserProfile() {
     const client = window.supabaseClient || window.supabase;
     if (!client) return;
