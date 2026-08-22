@@ -554,21 +554,20 @@ function navigateToPage(targetPage) {
 // ЕДИНЫЙ ОБРАБОТЧИК ЗАГРУЗКИ СТРАНИЦЫ
 // Ждем полной загрузки страницы и всех скриптов
 window.addEventListener('load', () => {
+    // Проверяем сессию
     if (!sessionStorage.getItem('hasVisitedBeginningSession')) {
         sessionStorage.setItem('hasVisitedBeginningSession', 'true');
 
-        // К этому моменту все скрипты точно загружены, функция должна быть доступна
-        if (typeof initGreetingUI === 'function') {
-            try {
+        // Даем небольшую паузу на полную инициализацию стилей и Supabase, затем запускаем приветствие
+        setTimeout(() => {
+            if (typeof initGreetingUI === 'function') {
                 initGreetingUI();
-            } catch (e) {
-                console.error('Ошибка внутри initGreetingUI:', e);
+            } else if (window.initGreetingUI && typeof window.initGreetingUI === 'function') {
+                window.initGreetingUI();
+            } else {
+                console.warn('Функция initGreetingUI не найдена в welcome-greeting.js');
             }
-        } else if (window.initGreetingUI && typeof window.initGreetingUI === 'function') {
-            window.initGreetingUI();
-        } else {
-            console.warn('Функция initGreetingUI не найдена в welcome-greeting.js');
-        }
+        }, 200); // задержка в 200мс гарантирует, что всё готово
     } else {
         const greetingElement = document.getElementById('welcome-greeting-container');
         if (greetingElement) {
