@@ -836,7 +836,7 @@ function initAuthEvents() {
             } else {
                 // Успешный вход: скрываем модалку и перенаправляем
                 window.hideAuthModal();
-                window.location.href = 'beginning.html';
+                window.location.href = 'welcome.html';
             }
         } catch (err) {
             console.error(err);
@@ -895,7 +895,7 @@ async function checkUserSession() {
     if (session && session.user) {
         // Если мы на странице логина и пользователь уже зашел — перенаправляем
         if (window.location.pathname.includes('login.html')) {
-            window.location.href = 'beginning.html';
+            window.location.href = 'welcome.html';
             return;
         }
     }
