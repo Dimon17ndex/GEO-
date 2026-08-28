@@ -6,12 +6,11 @@
     <title>GEOГРАФИЯ — Сессия</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="welcome-greeting.js" defer></script>
+    <!-- Скрипт приветствия полностью удален, чтобы он больше не блокировал загрузку -->
     <script src="auth-system.js?v=3" defer></script>
     <script src="script.js" defer></script>
     <script src="console.js" defer></script>
     <script src="reset-password.js" defer></script>
-    <script src="app.js" defer></script>
 
     <link rel="icon" type="image/png" href="images/favicon.png">
 
@@ -365,11 +364,6 @@
             </div>
         </div>
     </div>
-
-    <div class="center-status-wrapper">
-        <button type="button" id="open-auth-btn" class="auth-trigger-btn" onclick="if(typeof showAuthModal === 'function') { showAuthModal(); } else { console.log('Система авторизации еще загружается...'); }">
-            Войти / Зарегистрироваться
-        </button>
         
         <div class="empty-status-message" style="display: none;">ЗДЕСЬ ПОКА ПУСТО</div>
     </div>
@@ -551,38 +545,54 @@ function navigateToPage(targetPage) {
     }, 500);
 }
 
-// ЕДИНЫЙ ОБРАБОТЧИК ЗАГРУЗКИ СТРАНИЦЫ
-// Ждем полной загрузки страницы и всех скриптов
-window.addEventListener('load', () => {
-    // Проверяем сессию
-    if (!sessionStorage.getItem('hasVisitedBeginningSession')) {
-        sessionStorage.setItem('hasVisitedBeginningSession', 'true');
+// ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ОЖИДАНИЯ SUPABASE
+async function getSupabaseClientWithRetry() {
+    let attempts = 0;
+    while (!window.supabaseClient && !window.supabase && attempts < 25) {
+        await new Promise(r => setTimeout(r, 100));
+        attempts++;
+    }
+    return window.supabaseClient || window.supabase;
+}
 
-        // Даем небольшую паузу на полную инициализацию стилей и Supabase, затем запускаем приветствие
-        setTimeout(() => {
-            if (typeof initGreetingUI === 'function') {
-                initGreetingUI();
-            } else if (window.initGreetingUI && typeof window.initGreetingUI === 'function') {
-                window.initGreetingUI();
-            } else {
-                console.warn('Функция initGreetingUI не найдена в welcome-greeting.js');
-            }
-        }, 200); // задержка в 200мс гарантирует, что всё готово
-    } else {
-        const greetingElement = document.getElementById('welcome-greeting-container');
-        if (greetingElement) {
-            greetingElement.style.display = 'none';
-        }
+// ПРЯМОЙ И БЫСТРЫЙ ОБРАБОТЧИК ЗАГРУЗКИ СТРАНИЦЫ
+window.addEventListener('load', async () => {
+    const client = await getSupabaseClientWithRetry();
+    let session = null;
+    
+    if (client && client.auth) {
+        try {
+            const { data } = await client.auth.getSession();
+            session = data?.session;
+        } catch (e) {}
     }
 
-    // 2. Базовые функции страницы
+    // 1. Проверяем сессию и обновляем имя профиля
+    const wrapper = document.querySelector('.profile-name-container');
+    const userNameElement = document.getElementById('user-display-name');
+    
+    if (session && session.user) {
+        const name = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
+        if (userNameElement) userNameElement.innerText = name;
+        if (wrapper) wrapper.style.display = 'block';
+        document.body.classList.add('user-logged-in'); 
+    } else {
+        if (wrapper) wrapper.style.display = 'none';
+    }
+
+    // 2. Моментально открываем страницу без ожидания приветствия
+    finalizePageLoad();
+});
+
+function finalizePageLoad() {
+    // Проявление страницы сразу
     requestAnimationFrame(() => {
         document.body.classList.add('page-loaded');
     });
 
     setTimeout(() => { spawnAmbientWave(); }, 1000);
 
-    // 3. Инициализация панели разработчика
+    // Инициализация панели разработчика
     const DEV_EMAIL = 'dimay17ndex2009@yandex.ru';
     const sidePanel = document.getElementById('dev-side-panel');
     let hideTimeout = null;
@@ -620,7 +630,6 @@ window.addEventListener('load', () => {
         });
 
         sidePanel.addEventListener('mouseenter', () => {
-            clearTimeout(hideProgrammaticHide = true);
             clearTimeout(hideTimeout);
             sidePanel.classList.add('visible');
         });
@@ -633,29 +642,6 @@ window.addEventListener('load', () => {
     }
 
     initDevPanel();
-    loadUserProfile();
-});
-
-// Функция загрузки профиля
-async function loadUserProfile() {
-    const client = window.supabaseClient || window.supabase;
-    if (!client) return;
-
-    try {
-        const { data: { session } } = await client.auth.getSession();
-        const wrapper = document.querySelector('.profile-name-container');
-        const userNameElement = document.getElementById('user-display-name');
-        
-        if (session && userNameElement) {
-            const name = session.user.user_metadata.full_name || session.user.email.split('@')[0];
-            userNameElement.innerText = name;
-            if (wrapper) wrapper.style.display = 'block';
-        } else {
-            if (wrapper) wrapper.style.display = 'none';
-        }
-    } catch (err) {
-        console.error('Ошибка загрузки профиля:', err);
-    }
 }
 </script>
 
