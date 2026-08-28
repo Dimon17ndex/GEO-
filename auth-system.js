@@ -15,8 +15,13 @@ if (!window.supabaseClient && window.supabase) {
     }
 }
 
-let currentAuthMode = null; // Изначально ни один режим не выбран
+let currentAuthMode = null; 
 let overlayClickTimeout = null;
+
+// Таймеры и состояния для поэтапной регистрации
+let regStepTimeout = null;
+let regNameTypedValid = false;
+let regUsernameTypedValid = false;
 
 // --- ГЛОБАЛЬНЫЕ ФУНКЦИИ ---
 window.showAuthModal = function() {
@@ -26,7 +31,7 @@ window.showAuthModal = function() {
     
     const modal = document.getElementById('auth-modal-overlay');
     hideConfirmToast(true);
-    resetAuthToInitialState(); // Сбрасываем в исходное состояние
+    resetAuthToInitialState();
 
     if (modal) {
         modal.classList.add('active');
@@ -41,7 +46,6 @@ window.hideAuthModal = function() {
     }
 };
 
-// Функция выхода из аккаунта
 window.logoutUser = async function(event) {
     let logoutBtn = event?.currentTarget || event?.target;
     
@@ -117,9 +121,11 @@ function hideConfirmToast(immediate = false) {
     }
 }
 
-// Сброс в начальное состояние (обе кнопки яркие, формы скрыты)
 function resetAuthToInitialState() {
     currentAuthMode = null;
+    if (regStepTimeout) clearTimeout(regStepTimeout);
+    regNameTypedValid = false;
+    regUsernameTypedValid = false;
 
     const btnLogin = document.getElementById('tab-login-btn');
     const btnRegister = document.getElementById('tab-register-btn');
@@ -137,6 +143,20 @@ function resetAuthToInitialState() {
 
     formLogin.classList.remove('visible');
     formRegister.classList.remove('visible');
+
+    // Сброс шагов регистрации
+    const rowUsername = document.getElementById('reg-username-row');
+    const rowPassword = document.getElementById('reg-password-row');
+    if (rowUsername) rowUsername.classList.remove('visible-row');
+    if (rowPassword) rowPassword.classList.remove('visible-row');
+
+    // Очистка полей
+    const regName = document.getElementById('reg-name');
+    const regUser = document.getElementById('reg-username');
+    const regPass = document.getElementById('reg-password');
+    if (regName) regName.value = '';
+    if (regUser) regUser.value = '';
+    if (regPass) regPass.value = '';
 }
 
 function setAuthMode(mode) {
@@ -151,13 +171,14 @@ function setAuthMode(mode) {
     if (!btnLogin || !btnRegister || !formLogin || !formRegister) return;
 
     if (mode === 'login') {
+        if (regStepTimeout) clearTimeout(regStepTimeout);
         btnLogin.classList.add('active-mode');
         btnLogin.classList.remove('dimmed');
         btnLogin.style.pointerEvents = 'auto';
 
         btnRegister.classList.add('dimmed');
         btnRegister.classList.remove('active-mode');
-        btnRegister.style.pointerEvents = 'auto'; // Оставляем кликабельной, чтобы можно было переключиться обратно
+        btnRegister.style.pointerEvents = 'auto';
 
         formRegister.classList.remove('visible');
         formLogin.classList.add('visible');
@@ -250,13 +271,11 @@ function injectAuthStyles() {
         .auth-title-track span { height: 55px !important; line-height: 55px !important; font-family: 'Unbounded', sans-serif !important; font-size: 32px !important; font-weight: 900 !important; color: #ffffff !important; text-transform: uppercase !important; white-space: nowrap !important; display: flex !important; align-items: center !important; }
         @keyframes titleVerticalScroll { 0%, 20% { transform: translateY(0); } 25%, 45% { transform: translateY(-55px); } 50%, 70% { transform: translateY(-55px); } 75%, 100% { transform: translateY(0); } }
         
-        /* Стили кнопок Вход / Регистрация */
         .auth-actions-group { display: flex !important; gap: 12px !important; width: 100% !important; margin-bottom: 30px !important; box-sizing: border-box !important; }
         
         .auth-action-btn { flex: 1 !important; background: transparent !important; border: 1px solid rgba(255, 255, 255, 0.3) !important; border-radius: 24px !important; padding: 11px 15px !important; color: #ffffff !important; font-size: 13px !important; font-weight: 500 !important; cursor: pointer !important; text-align: center !important; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important; box-sizing: border-box !important; }
         .auth-action-btn:hover { background: #ffffff !important; color: #000000 !important; border-color: #ffffff !important; }
 
-        /* Плавное приглушение (серый цвет) для неактивной кнопки */
         .auth-action-btn.dimmed { opacity: 0.35 !important; border-color: rgba(255, 255, 255, 0.1) !important; color: rgba(255, 255, 255, 0.4) !important; }
         .auth-action-btn.dimmed:hover { background: transparent !important; color: rgba(255, 255, 255, 0.7) !important; border-color: rgba(255, 255, 255, 0.2) !important; }
 
@@ -268,6 +287,60 @@ function injectAuthStyles() {
         .auth-input { background: transparent !important; border: none !important; border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important; padding: 4px 0 8px 0 !important; color: #ffffff !important; font-size: 13px !important; text-align: center !important; outline: none !important; width: 100% !important; box-sizing: border-box !important; transition: border-color 0.25s !important; }
         .auth-input::placeholder { color: rgba(255, 255, 255, 0.35) !important; text-align: center !important; }
         .auth-input:focus { border-bottom-color: #ffffff !important; }
+
+        /* Стили для поэтапного появления строк в регистрации */
+        .reg-step-row {
+            opacity: 0 !important;
+            max-height: 0 !important;
+            overflow: hidden !important;
+            margin-top: 0 !important;
+            transition: opacity 0.4s ease, max-height 0.4s ease, margin 0.4s ease !important;
+            pointer-events: none !important;
+        }
+        .reg-step-row.visible-row {
+            opacity: 1 !important;
+            max-height: 100px !important;
+            margin-top: 25px !important;
+            pointer-events: auto !important;
+        }
+
+        /* Кастомное поле логина с неудаляемым белым суффиксом справа */
+        .reg-login-container {
+            display: flex !important;
+            align-items: center !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
+            padding: 4px 0 8px 0 !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            transition: border-color 0.25s !important;
+        }
+        .reg-login-container:focus-within {
+            border-bottom-color: #ffffff !important;
+        }
+        .reg-login-input {
+            background: transparent !important;
+            border: none !important;
+            outline: none !important;
+            color: #ffffff !important;
+            font-size: 13px !important;
+            text-align: right !important;
+            flex: 1 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            min-width: 0 !important;
+        }
+        .reg-login-input::placeholder {
+            color: rgba(255, 255, 255, 0.35) !important;
+            text-align: right !important;
+        }
+        .reg-login-suffix {
+            color: #ffffff !important;
+            font-size: 13px !important;
+            font-weight: 500 !important;
+            white-space: nowrap !important;
+            user-select: none !important;
+            text-align: left !important;
+        }
         
         .auth-submit-btn { position: relative !important; display: flex !important; align-items: center !important; justify-content: center !important; background: transparent !important; color: #ffffff !important; border: 1px solid #ffffff !important; border-radius: 24px !important; padding: 10px 20px !important; font-size: 14px !important; font-weight: 500 !important; cursor: pointer !important; width: 100% !important; margin-top: 15px !important; transition: all 0.25s ease !important; min-height: 42px !important; box-sizing: border-box !important; }
         .auth-submit-btn:hover:not(:disabled) { background: #ffffff !important; color: #000000 !important; }
@@ -326,7 +399,6 @@ function initAuthModalUI() {
                     </div>
                 </div>
                 
-                <!-- Две кнопки выбора режима -->
                 <div class="auth-actions-group" id="auth-actions-group">
                     <button type="button" class="auth-action-btn" id="tab-login-btn">Вход</button>
                     <button type="button" class="auth-action-btn" id="tab-register-btn">Регистрация</button>
@@ -344,15 +416,24 @@ function initAuthModalUI() {
                     </form>
 
                     <form id="auth-form-register" class="auth-form">
+                        <!-- Шаг 1: Ваш никнейм -->
                         <div class="auth-input-group">
-                            <input type="text" id="reg-name" placeholder="Ваше имя / Никнейм..." required class="auth-input" autocomplete="name">
+                            <input type="text" id="reg-name" placeholder="Ваш никнейм..." required class="auth-input" autocomplete="name">
                         </div>
-                        <div class="auth-input-group">
-                            <input type="text" id="reg-username" placeholder="Придумайте логин..." required class="auth-input" autocomplete="username">
+                        
+                        <!-- Шаг 2: Кастомный логин с суффиксом @geo.geo -->
+                        <div class="auth-input-group reg-step-row" id="reg-username-row">
+                            <div class="reg-login-container">
+                                <input type="text" id="reg-username" placeholder="придумайте логин" class="reg-login-input" autocomplete="username">
+                                <span class="reg-login-suffix">@geo.geo</span>
+                            </div>
                         </div>
-                        <div class="auth-input-group">
-                            <input type="password" id="reg-password" placeholder="Пароль (мин. 6 символов)..." required class="auth-input" autocomplete="new-password">
+
+                        <!-- Шаг 3: Пароль -->
+                        <div class="auth-input-group reg-step-row" id="reg-password-row">
+                            <input type="password" id="reg-password" placeholder="Пароль..." required class="auth-input" autocomplete="new-password">
                         </div>
+
                         <button type="submit" id="btn-submit-register" class="auth-submit-btn">Зарегистрироваться</button>
                     </form>
                 </div>
@@ -381,6 +462,13 @@ function initAuthEvents() {
     
     const formLogin = document.getElementById('auth-form-login');
     const formRegister = document.getElementById('auth-form-register');
+
+    const regNameInput = document.getElementById('reg-name');
+    const regUsernameInput = document.getElementById('reg-username');
+    const regPasswordInput = document.getElementById('reg-password');
+
+    const rowUsername = document.getElementById('reg-username-row');
+    const rowPassword = document.getElementById('reg-password-row');
 
     const btnConfirmYes = document.getElementById('auth-confirm-close-btn');
     const btnConfirmNo = document.getElementById('auth-cancel-close-btn');
@@ -421,6 +509,86 @@ function initAuthEvents() {
     tabLogin?.addEventListener('click', () => setAuthMode('login'));
     tabRegister?.addEventListener('click', () => setAuthMode('register'));
 
+    // --- ЛОГИКА ПОЭТАПНОЙ РЕГИСТРАЦИИ (1.5 сек затишья) ---
+
+    // 1. Ввод в «Ваш никнейм»
+    regNameInput?.addEventListener('input', () => {
+        const val = regNameInput.value.trim();
+        
+        // Если поле пустое, скрываем последующие ряды
+        if (!val) {
+            rowUsername?.classList.remove('visible-row');
+            rowPassword?.classList.remove('visible-row');
+            if (regUsernameInput) regUsernameInput.value = '';
+            if (regPasswordInput) regPasswordInput.value = '';
+            regNameTypedValid = false;
+            regUsernameTypedValid = false;
+            return;
+        }
+
+        // Если пользователь снова печатает, а пароль еще не введен окончательно — скрываем строку пароля
+        if (!regPasswordInput.value) {
+            rowPassword?.classList.remove('visible-row');
+            regUsernameTypedValid = false;
+        }
+
+        // Если пароль уже введен, правило 1.5 сек отключено (по условию)
+        if (regPasswordInput.value.length > 0) return;
+
+        // Перезапускаем таймер на 1.5 секунды для появления поля логина
+        if (regStepTimeout) clearTimeout(regStepTimeout);
+        
+        regStepTimeout = setTimeout(() => {
+            if (regNameInput.value.trim().length > 0) {
+                rowUsername?.classList.add('visible-row');
+                regNameTypedValid = true;
+            }
+        }, 1500);
+    });
+
+    // 2. Ввод в «Придумайте логин»
+    regUsernameInput?.addEventListener('input', () => {
+        const val = regUsernameInput.value.trim();
+        
+        if (!val) {
+            rowPassword?.classList.remove('visible-row');
+            if (regPasswordInput) regPasswordInput.value = '';
+            regUsernameTypedValid = false;
+            return;
+        }
+
+        // Если пароль уже введен, правило отключено
+        if (regPasswordInput.value.length > 0) return;
+
+        // Перезапускаем таймер на 1.5 секунды для появления поля пароля
+        if (regStepTimeout) clearTimeout(regStepTimeout);
+
+        regStepTimeout = setTimeout(() => {
+            if (regUsernameInput.value.trim().length > 0) {
+                rowPassword?.classList.add('visible-row');
+                regUsernameTypedValid = true;
+            }
+        }, 1500);
+    });
+
+    // 3. Ввод в «Пароль...» (как только введен текст — выключаем правило 1.5 сек, оставляя поля на месте)
+    regPasswordInput?.addEventListener('input', () => {
+        const val = regPasswordInput.value;
+        if (val.length > 0) {
+            // Очищаем любые активные таймеры, чтобы они больше ничего не скрывали
+            if (regStepTimeout) clearTimeout(regStepTimeout);
+            // Гарантируем, что все строки открыты
+            rowUsername?.classList.add('visible-row');
+            rowPassword?.classList.add('visible-row');
+        } else {
+            // Если пароль стерли полностью, можно вернуть зависимость
+            if (!regUsernameInput.value.trim()) {
+                rowPassword?.classList.remove('visible-row');
+            }
+        }
+    });
+
+
     // --- ОБРАБОТКА ВХОДА ---
     formLogin?.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -456,9 +624,9 @@ function initAuthEvents() {
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
 
         const submitBtn = document.getElementById('btn-submit-register');
-        const name = document.getElementById('reg-name').value.trim();
-        const userInput = document.getElementById('reg-username').value.trim().toLowerCase();
-        const password = document.getElementById('reg-password').value;
+        const name = regNameInput.value.trim();
+        const userInput = regUsernameInput.value.trim().toLowerCase();
+        const password = regPasswordInput.value;
 
         const email = userInput + INTERNAL_DOMAIN;
 
