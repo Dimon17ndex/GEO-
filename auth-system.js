@@ -26,7 +26,7 @@ window.showAuthModal = function() {
     
     const modal = document.getElementById('auth-modal-overlay');
     hideConfirmToast(true);
-    resetAuthToInitialState(); // Сбрасываем в состояние «только лого и кнопки»
+    resetAuthToInitialState(); // Сбрасываем в состояние «только лого и две кнопки»
 
     if (modal) {
         modal.classList.add('active');
@@ -117,25 +117,26 @@ function hideConfirmToast(immediate = false) {
     }
 }
 
-// Сброс в начальное состояние (видны только кнопки выбора, формы скрыты)
+// Сброс в начальное состояние (видны обе отдельные кнопки, формы скрыты)
 function resetAuthToInitialState() {
     currentAuthMode = null;
 
-    const authTabs = document.getElementById('auth-tabs');
-    const tabLogin = document.getElementById('tab-login-btn');
-    const tabRegister = document.getElementById('tab-register-btn');
+    const btnLogin = document.getElementById('tab-login-btn');
+    const btnRegister = document.getElementById('tab-register-btn');
     
     const formLogin = document.getElementById('auth-form-login');
     const formRegister = document.getElementById('auth-form-register');
 
-    if (!authTabs || !tabLogin || !tabRegister || !formLogin || !formRegister) return;
+    if (!btnLogin || !btnRegister || !formLogin || !formRegister) return;
 
-    // Возвращаем кнопки в исходное положение (видимые и на своих местах)
-    authTabs.classList.remove('register-mode', 'login-selected', 'register-selected');
-    tabLogin.style.opacity = '1';
-    tabLogin.style.pointerEvents = 'auto';
-    tabRegister.style.opacity = '1';
-    tabRegister.style.pointerEvents = 'auto';
+    // Возвращаем обе кнопки в исходное видимое положение
+    btnLogin.style.opacity = '1';
+    btnLogin.style.pointerEvents = 'auto';
+    btnLogin.style.transform = 'translateY(0) scale(1)';
+    
+    btnRegister.style.opacity = '1';
+    btnRegister.style.pointerEvents = 'auto';
+    btnRegister.style.transform = 'translateY(0) scale(1)';
 
     formLogin.classList.remove('visible');
     formRegister.classList.remove('visible');
@@ -144,35 +145,33 @@ function resetAuthToInitialState() {
 function setAuthMode(mode) {
     currentAuthMode = mode;
 
-    const authTabs = document.getElementById('auth-tabs');
-    const tabLogin = document.getElementById('tab-login-btn');
-    const tabRegister = document.getElementById('tab-register-btn');
+    const btnLogin = document.getElementById('tab-login-btn');
+    const btnRegister = document.getElementById('tab-register-btn');
     
     const formLogin = document.getElementById('auth-form-login');
     const formRegister = document.getElementById('auth-form-register');
 
-    if (!authTabs || !tabLogin || !tabRegister || !formLogin || !formRegister) return;
+    if (!btnLogin || !btnRegister || !formLogin || !formRegister) return;
 
     if (mode === 'login') {
-        authTabs.classList.add('login-selected');
-        authTabs.classList.remove('register-mode');
+        // Выбран «Вход»: показываем форму входа, плавно скрываем кнопку «Регистрация»
+        btnLogin.style.opacity = '1';
+        btnLogin.style.pointerEvents = 'auto';
         
-        // Плавное скрытие неиспользуемой кнопки
-        tabRegister.style.opacity = '0';
-        tabRegister.style.pointerEvents = 'none';
-        tabLogin.style.opacity = '1';
-        tabLogin.style.pointerEvents = 'auto';
+        btnRegister.style.opacity = '0';
+        btnRegister.style.pointerEvents = 'none';
+        btnRegister.style.transform = 'scale(0.9)';
 
         formRegister.classList.remove('visible');
         formLogin.classList.add('visible');
     } else {
-        authTabs.classList.add('register-selected', 'register-mode');
+        // Выбрана «Регистрация»: показываем форму регистрации, плавно скрываем кнопку «Вход»
+        btnRegister.style.opacity = '1';
+        btnRegister.style.pointerEvents = 'auto';
         
-        // Плавное скрытие неиспользуемой кнопки
-        tabLogin.style.opacity = '0';
-        tabLogin.style.pointerEvents = 'none';
-        tabRegister.style.opacity = '1';
-        tabRegister.style.pointerEvents = 'auto';
+        btnLogin.style.opacity = '0';
+        btnLogin.style.pointerEvents = 'none';
+        btnLogin.style.transform = 'scale(0.9)';
 
         formLogin.classList.remove('visible');
         formRegister.classList.add('visible');
@@ -254,17 +253,11 @@ function injectAuthStyles() {
         .auth-title-track span { height: 55px !important; line-height: 55px !important; font-family: 'Unbounded', sans-serif !important; font-size: 32px !important; font-weight: 900 !important; color: #ffffff !important; text-transform: uppercase !important; white-space: nowrap !important; display: flex !important; align-items: center !important; }
         @keyframes titleVerticalScroll { 0%, 20% { transform: translateY(0); } 25%, 45% { transform: translateY(-55px); } 50%, 70% { transform: translateY(-55px); } 75%, 100% { transform: translateY(0); } }
         
-        .auth-tabs { position: relative !important; display: flex !important; background: rgba(255, 255, 255, 0.04) !important; border: 1px solid rgba(255, 255, 255, 0.15) !important; border-radius: 24px !important; padding: 3px !important; width: 100% !important; margin-bottom: 30px !important; box-sizing: border-box !important; }
-        .auth-tab-pill { position: absolute !important; top: 3px !important; left: 3px !important; width: calc(50% - 3px) !important; height: calc(100% - 6px) !important; background: #ffffff !important; border-radius: 20px !important; z-index: 1 !important; opacity: 0; transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.25s ease !important; pointer-events: none !important; }
+        /* Стили для контейнера двух отдельных кнопок */
+        .auth-actions-group { display: flex !important; gap: 12px !important; width: 100% !important; margin-bottom: 30px !important; box-sizing: border-box !important; }
         
-        /* Показываем белый фон-таблетку только при выборе одного из режимов */
-        .auth-tabs.login-selected .auth-tab-pill,
-        .auth-tabs.register-selected .auth-tab-pill { opacity: 1 !important; }
-
-        .auth-tabs.register-mode .auth-tab-pill { transform: translateX(100%) !important; }
-        
-        .auth-tab-btn { position: relative !important; z-index: 2 !important; flex: 1 !important; padding: 7px 14px !important; background: transparent !important; border: none !important; color: rgba(255, 255, 255, 0.7) !important; font-size: 13px !important; font-weight: 500 !important; cursor: pointer !important; transition: color 0.3s ease, opacity 0.35s ease !important; text-align: center !important; }
-        .auth-tab-btn.active { color: #000000 !important; font-weight: 600 !important; }
+        .auth-action-btn { flex: 1 !important; background: transparent !important; border: 1px solid rgba(255, 255, 255, 0.3) !important; border-radius: 24px !important; padding: 11px 15px !important; color: #ffffff !important; font-size: 13px !important; font-weight: 500 !important; cursor: pointer !important; text-align: center !important; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; box-sizing: border-box !important; }
+        .auth-action-btn:hover { background: #ffffff !important; color: #000000 !important; border-color: #ffffff !important; }
 
         .auth-forms-wrapper { position: relative !important; width: 100% !important; min-height: 220px !important; }
         .auth-form { position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; display: flex !important; flex-direction: column !important; gap: 25px !important; opacity: 0 !important; filter: blur(8px) !important; pointer-events: none !important; transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), filter 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important; }
@@ -332,10 +325,10 @@ function initAuthModalUI() {
                     </div>
                 </div>
                 
-                <div class="auth-tabs" id="auth-tabs">
-                    <div class="auth-tab-pill"></div>
-                    <button type="button" class="auth-tab-btn" id="tab-login-btn">Вход</button>
-                    <button type="button" class="auth-tab-btn" id="tab-register-btn">Регистрация</button>
+                <!-- Две отдельные независимые кнопки -->
+                <div class="auth-actions-group" id="auth-actions-group">
+                    <button type="button" class="auth-action-btn" id="tab-login-btn">Вход</button>
+                    <button type="button" class="auth-action-btn" id="tab-register-btn">Регистрация</button>
                 </div>
 
                 <div class="auth-forms-wrapper">
