@@ -212,7 +212,7 @@ document.addEventListener('keydown', (e) => {
         keySequence = [];
 
         if (typeof window.initGreetingUI === 'function') {
-            window.initGreetingUI();
+            window.initGreetingUI(null, true); // <--- передаем true для принудительного запуска
         } else {
             console.error('Функция initGreetingUI не найдена.');
         }
