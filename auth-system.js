@@ -26,7 +26,7 @@ window.showAuthModal = function() {
     
     const modal = document.getElementById('auth-modal-overlay');
     hideConfirmToast(true);
-    resetAuthToInitialState(); // Сбрасываем в состояние «только лого и две кнопки»
+    resetAuthToInitialState(); // Сбрасываем в исходное состояние
 
     if (modal) {
         modal.classList.add('active');
@@ -117,7 +117,7 @@ function hideConfirmToast(immediate = false) {
     }
 }
 
-// Сброс в начальное состояние (видны обе отдельные кнопки, формы скрыты)
+// Сброс в начальное состояние (обе кнопки яркие, формы скрыты)
 function resetAuthToInitialState() {
     currentAuthMode = null;
 
@@ -129,14 +129,11 @@ function resetAuthToInitialState() {
 
     if (!btnLogin || !btnRegister || !formLogin || !formRegister) return;
 
-    // Возвращаем обе кнопки в исходное видимое положение
-    btnLogin.style.opacity = '1';
+    btnLogin.classList.remove('dimmed', 'active-mode');
     btnLogin.style.pointerEvents = 'auto';
-    btnLogin.style.transform = 'translateY(0) scale(1)';
     
-    btnRegister.style.opacity = '1';
+    btnRegister.classList.remove('dimmed', 'active-mode');
     btnRegister.style.pointerEvents = 'auto';
-    btnRegister.style.transform = 'translateY(0) scale(1)';
 
     formLogin.classList.remove('visible');
     formRegister.classList.remove('visible');
@@ -154,24 +151,24 @@ function setAuthMode(mode) {
     if (!btnLogin || !btnRegister || !formLogin || !formRegister) return;
 
     if (mode === 'login') {
-        // Выбран «Вход»: показываем форму входа, плавно скрываем кнопку «Регистрация»
-        btnLogin.style.opacity = '1';
+        btnLogin.classList.add('active-mode');
+        btnLogin.classList.remove('dimmed');
         btnLogin.style.pointerEvents = 'auto';
-        
-        btnRegister.style.opacity = '0';
-        btnRegister.style.pointerEvents = 'none';
-        btnRegister.style.transform = 'scale(0.9)';
+
+        btnRegister.classList.add('dimmed');
+        btnRegister.classList.remove('active-mode');
+        btnRegister.style.pointerEvents = 'auto'; // Оставляем кликабельной, чтобы можно было переключиться обратно
 
         formRegister.classList.remove('visible');
         formLogin.classList.add('visible');
     } else {
-        // Выбрана «Регистрация»: показываем форму регистрации, плавно скрываем кнопку «Вход»
-        btnRegister.style.opacity = '1';
+        btnRegister.classList.add('active-mode');
+        btnRegister.classList.remove('dimmed');
         btnRegister.style.pointerEvents = 'auto';
-        
-        btnLogin.style.opacity = '0';
-        btnLogin.style.pointerEvents = 'none';
-        btnLogin.style.transform = 'scale(0.9)';
+
+        btnLogin.classList.add('dimmed');
+        btnLogin.classList.remove('active-mode');
+        btnLogin.style.pointerEvents = 'auto';
 
         formLogin.classList.remove('visible');
         formRegister.classList.add('visible');
@@ -253,11 +250,15 @@ function injectAuthStyles() {
         .auth-title-track span { height: 55px !important; line-height: 55px !important; font-family: 'Unbounded', sans-serif !important; font-size: 32px !important; font-weight: 900 !important; color: #ffffff !important; text-transform: uppercase !important; white-space: nowrap !important; display: flex !important; align-items: center !important; }
         @keyframes titleVerticalScroll { 0%, 20% { transform: translateY(0); } 25%, 45% { transform: translateY(-55px); } 50%, 70% { transform: translateY(-55px); } 75%, 100% { transform: translateY(0); } }
         
-        /* Стили для контейнера двух отдельных кнопок */
+        /* Стили кнопок Вход / Регистрация */
         .auth-actions-group { display: flex !important; gap: 12px !important; width: 100% !important; margin-bottom: 30px !important; box-sizing: border-box !important; }
         
-        .auth-action-btn { flex: 1 !important; background: transparent !important; border: 1px solid rgba(255, 255, 255, 0.3) !important; border-radius: 24px !important; padding: 11px 15px !important; color: #ffffff !important; font-size: 13px !important; font-weight: 500 !important; cursor: pointer !important; text-align: center !important; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; box-sizing: border-box !important; }
+        .auth-action-btn { flex: 1 !important; background: transparent !important; border: 1px solid rgba(255, 255, 255, 0.3) !important; border-radius: 24px !important; padding: 11px 15px !important; color: #ffffff !important; font-size: 13px !important; font-weight: 500 !important; cursor: pointer !important; text-align: center !important; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important; box-sizing: border-box !important; }
         .auth-action-btn:hover { background: #ffffff !important; color: #000000 !important; border-color: #ffffff !important; }
+
+        /* Плавное приглушение (серый цвет) для неактивной кнопки */
+        .auth-action-btn.dimmed { opacity: 0.35 !important; border-color: rgba(255, 255, 255, 0.1) !important; color: rgba(255, 255, 255, 0.4) !important; }
+        .auth-action-btn.dimmed:hover { background: transparent !important; color: rgba(255, 255, 255, 0.7) !important; border-color: rgba(255, 255, 255, 0.2) !important; }
 
         .auth-forms-wrapper { position: relative !important; width: 100% !important; min-height: 220px !important; }
         .auth-form { position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; display: flex !important; flex-direction: column !important; gap: 25px !important; opacity: 0 !important; filter: blur(8px) !important; pointer-events: none !important; transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), filter 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important; }
@@ -325,7 +326,7 @@ function initAuthModalUI() {
                     </div>
                 </div>
                 
-                <!-- Две отдельные независимые кнопки -->
+                <!-- Две кнопки выбора режима -->
                 <div class="auth-actions-group" id="auth-actions-group">
                     <button type="button" class="auth-action-btn" id="tab-login-btn">Вход</button>
                     <button type="button" class="auth-action-btn" id="tab-register-btn">Регистрация</button>
