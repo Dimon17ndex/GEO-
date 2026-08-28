@@ -301,11 +301,12 @@ function injectAuthStyles() {
             pointer-events: auto !important;
         }
 
-        /* Центрированное поле логина с неудаляемым белым суффиксом на одном уровне */
+        /* Центрированное поле логина с небольшим отступом и эффектом единого текста */
         .reg-login-container {
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
+            gap: 4px !important;
             border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
             padding: 4px 0 8px 0 !important;
             width: 100% !important;
