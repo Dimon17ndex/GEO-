@@ -3,6 +3,9 @@
 window.SUPABASE_URL = window.SUPABASE_URL || 'https://cwgkdpmxwgfypbiykafl.supabase.co'; 
 window.SUPABASE_KEY = window.SUPABASE_KEY || 'sb_publishable_mjHX0OTE6LSLh2qTVqMIng_mY9cvDcN';
 
+// Внутренний технический домен для аккаунтов
+const INTERNAL_DOMAIN = '@geo.geo';
+
 // Инициализация Supabase
 if (!window.supabaseClient && window.supabase) {
     try {
@@ -40,7 +43,6 @@ window.hideAuthModal = function() {
 
 // Функция выхода из аккаунта
 window.logoutUser = async function(event) {
-    // 1. Находим кнопку, на которую нажали, или ищем её в DOM
     let logoutBtn = event?.currentTarget || event?.target;
     
     if (!logoutBtn || !(logoutBtn instanceof HTMLElement)) {
@@ -49,22 +51,17 @@ window.logoutUser = async function(event) {
     }
 
     if (logoutBtn) {
-        // Отключаем клики по кнопке выхода
         logoutBtn.style.pointerEvents = 'none';
 
-        // Меняем текст на «Выход из аккаунта и загрузка»
         const textContainer = logoutBtn.querySelector('.profile-action-text, span') || logoutBtn;
         textContainer.innerHTML = 'Выход из аккаунта <span class="auth-spinner"></span>';
 
-        // 2. Находим родительский контейнер (виджет/панель профиля)
         const parentContainer = logoutBtn.closest('.profile-widget, .profile-dropdown, .side-panel, .user-menu') || logoutBtn.parentElement;
 
         if (parentContainer) {
-            // Ищем все кнопки и ссылки внутри родителя
             const allNavElements = Array.from(parentContainer.querySelectorAll('button, a, .btn, .profile-action-btn'));
             const logoutIndex = allNavElements.indexOf(logoutBtn);
 
-            // Замораживаем все элементы, находящиеся выше кнопки выхода
             allNavElements.forEach((el, index) => {
                 if (index < logoutIndex || (logoutIndex === -1 && el !== logoutBtn)) {
                     el.classList.add('btn-frozen');
@@ -73,7 +70,6 @@ window.logoutUser = async function(event) {
         }
     }
 
-    // 3. Выход из аккаунта и перезагрузка
     try {
         if (window.supabaseClient) {
             await window.supabaseClient.auth.signOut();
@@ -83,12 +79,11 @@ window.logoutUser = async function(event) {
     } finally {
         document.body.classList.add('page-hidden');
         setTimeout(() => {
-            window.location.href = 'login.html'; // Переход на страницу логина
+            window.location.href = 'login.html';
         }, 500);
     }
 };
 
-// Функция показа всплывающей плашки с прыжком и радиальной волной
 function showConfirmToast() {
     const toast = document.getElementById('auth-confirm-toast');
     const wave = document.getElementById('auth-confirm-wave');
@@ -97,14 +92,13 @@ function showConfirmToast() {
         toast.classList.remove('hiding', 'visible');
         if (wave) wave.classList.remove('active');
 
-        void toast.offsetWidth; // Перезапуск анимации
+        void toast.offsetWidth;
 
         toast.classList.add('visible');
         if (wave) wave.classList.add('active');
     }
 }
 
-// Функция мягкого скрытия плашки
 function hideConfirmToast(immediate = false) {
     const toast = document.getElementById('auth-confirm-toast');
     const wave = document.getElementById('auth-confirm-wave');
@@ -152,7 +146,6 @@ function setAuthMode(mode) {
     }
 }
 
-// Управление состоянием кнопки (анимация загрузки / блокировка)
 function setButtonLoading(button, isLoading, originalText) {
     if (!button) return;
 
@@ -168,7 +161,6 @@ function setButtonLoading(button, isLoading, originalText) {
     }
 }
 
-// --- ЗАГРУЗКА ---
 document.addEventListener('DOMContentLoaded', () => {
     injectAuthStyles();
     initAuthModalUI();
@@ -179,507 +171,87 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// --- СТИЛИ ---
 function injectAuthStyles() {
     if (document.getElementById('auth-system-styles')) return;
 
     const css = `
-        /* Замораживание вышестоящих кнопок */
-        .btn-frozen,
-        .btn-frozen:hover,
-        .btn-frozen:active,
-        .btn-frozen:focus {
-            pointer-events: none !important;
-            user-select: none !important;
-            cursor: default !important;
-            opacity: 0.65 !important;
-            transform: none !important;
-            transition: none !important;
-            box-shadow: none !important;
-            background: inherit !important;
-            color: inherit !important;
+        .btn-frozen, .btn-frozen:hover, .btn-frozen:active, .btn-frozen:focus {
+            pointer-events: none !important; user-select: none !important; cursor: default !important;
+            opacity: 0.65 !important; transform: none !important; transition: none !important;
+            box-shadow: none !important; background: inherit !important; color: inherit !important;
         }
-
         .auth-modal-overlay {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            background: rgba(10, 10, 12, 0.94) !important;
-            backdrop-filter: blur(12px) !important;
-            -webkit-backdrop-filter: blur(12px) !important;
-            z-index: 9999999 !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            padding: 20px !important;
-            box-sizing: border-box !important;
-            overflow: hidden !important;
-            
-            opacity: 0 !important;
-            visibility: hidden !important;
-            pointer-events: none !important;
+            position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important;
+            background: rgba(10, 10, 12, 0.94) !important; backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important;
+            z-index: 9999999 !important; display: flex !important; align-items: center !important; justify-content: center !important;
+            padding: 20px !important; box-sizing: border-box !important; overflow: hidden !important;
+            opacity: 0 !important; visibility: hidden !important; pointer-events: none !important;
             transition: opacity 0.3s ease, visibility 0.3s ease !important;
         }
-
-        .auth-modal-overlay.active {
-            opacity: 1 !important;
-            visibility: visible !important;
-            pointer-events: auto !important;
-        }
-
+        .auth-modal-overlay.active { opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; }
         .auth-modal-container {
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-            width: 100% !important;
-            max-width: 300px !important;
-            position: relative !important;
-            color: #ffffff !important;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-            box-sizing: border-box !important;
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            
-            transform: scale(0.96) !important;
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-            z-index: 5 !important;
+            background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important;
+            width: 100% !important; max-width: 300px !important; position: relative !important; color: #ffffff !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important; box-sizing: border-box !important;
+            display: flex !important; flex-direction: column !important; align-items: center !important;
+            transform: scale(0.96) !important; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important; z-index: 5 !important;
         }
-
-        .auth-modal-overlay.active .auth-modal-container {
-            transform: scale(1) !important;
-        }
-
-        .auth-modal-container.shake {
-            animation: shakeAnimation 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) !important;
-        }
-
+        .auth-modal-overlay.active .auth-modal-container { transform: scale(1) !important; }
+        .auth-modal-container.shake { animation: shakeAnimation 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) !important; }
         @keyframes shakeAnimation {
             10%, 90% { transform: scale(1) translateX(-3px); }
             20%, 80% { transform: scale(1) translateX(4px); }
             30%, 50%, 70% { transform: scale(1) translateX(-6px); }
             40%, 60% { transform: scale(1) translateX(6px); }
         }
-
         .auth-close-btn {
-            position: absolute !important;
-            top: 30px !important;
-            right: 30px !important;
-            background: transparent !important;
-            border: none !important;
-            color: rgba(255, 255, 255, 0.4) !important;
-            font-size: 28px !important;
-            line-height: 1 !important;
-            cursor: pointer !important;
-            z-index: 99999999 !important;
-            padding: 0 !important;
-            transform-origin: center center !important;
+            position: absolute !important; top: 30px !important; right: 30px !important; background: transparent !important;
+            border: none !important; color: rgba(255, 255, 255, 0.4) !important; font-size: 28px !important; line-height: 1 !important;
+            cursor: pointer !important; z-index: 99999999 !important; padding: 0 !important;
             transition: color 0.25s ease, transform 0.25s ease !important;
         }
-
-        .auth-close-btn::before {
-            content: '' !important;
-            position: absolute !important;
-            top: -12px !important;
-            bottom: -12px !important;
-            left: -12px !important;
-            right: -12px !important;
-        }
-
-        .auth-close-btn:hover {
-            color: #ffffff !important;
-            transform: scale(1.15) rotate(90deg) !important;
-        }
-
-        .auth-close-btn:active {
-            transform: scale(0.9) rotate(90deg) !important;
-        }
-
-        .auth-header-title {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            gap: 20px !important;
-            margin-top: -30px !important;
-            margin-bottom: 30px !important;
-        }
-
-        .auth-logo-wrapper {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            will-change: transform !important;
-            animation: logoHover 3s ease-in-out infinite alternate !important;
-        }
-
-        .auth-header-logo {
-            height: 105px !important;
-            width: auto !important;
-            display: block !important;
-            object-fit: contain !important;
-        }
-
-        @keyframes logoHover {
-            0% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-8px) rotate(-2deg); }
-            100% { transform: translateY(6px) rotate(2deg); }
-        }
-
-        .auth-title-ticker {
-            height: 55px !important;
-            overflow: hidden !important;
-            position: relative !important;
-        }
-
-        .auth-title-track {
-            display: flex !important;
-            flex-direction: column !important;
-            animation: titleVerticalScroll 8s cubic-bezier(0.77, 0, 0.175, 1) infinite !important;
-        }
-
-        .auth-title-track span {
-            height: 55px !important;
-            line-height: 55px !important;
-            font-family: 'Unbounded', sans-serif !important;
-            font-size: 32px !important;
-            font-weight: 900 !important;
-            letter-spacing: -0.5px !important;
-            color: #ffffff !important;
-            text-transform: uppercase !important;
-            white-space: nowrap !important;
-            display: flex !important;
-            align-items: center !important;
-        }
-
-        @keyframes titleVerticalScroll {
-            0%, 20% { transform: translateY(0); }
-            25%, 45% { transform: translateY(-55px); }
-            50%, 70% { transform: translateY(-55px); }
-            75%, 100% { transform: translateY(0); }
-        }
-
-        .auth-tabs {
-            position: relative !important;
-            display: flex !important;
-            background: rgba(255, 255, 255, 0.04) !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
-            border-radius: 24px !important;
-            padding: 3px !important;
-            width: 100% !important;
-            margin-bottom: 30px !important;
-            box-sizing: border-box !important;
-        }
-
-        .auth-tab-pill {
-            position: absolute !important;
-            top: 3px !important;
-            left: 3px !important;
-            width: calc(50% - 3px) !important;
-            height: calc(100% - 6px) !important;
-            background: #ffffff !important;
-            border-radius: 20px !important;
-            z-index: 1 !important;
-            transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1) !important;
-            pointer-events: none !important;
-        }
-
-        .auth-tabs.register-mode .auth-tab-pill {
-            transform: translateX(100%) !important;
-        }
-
-        .auth-tab-btn {
-            position: relative !important;
-            z-index: 2 !important;
-            flex: 1 !important;
-            padding: 7px 14px !important;
-            background: transparent !important;
-            border: none !important;
-            color: rgba(255, 255, 255, 0.5) !important;
-            font-size: 13px !important;
-            font-weight: 500 !important;
-            cursor: pointer !important;
-            transition: color 0.3s ease !important;
-            text-align: center !important;
-        }
-
-        .auth-tab-btn.active {
-            color: #000000 !important;
-            font-weight: 600 !important;
-        }
-
-        .auth-forms-wrapper {
-            position: relative !important;
-            width: 100% !important;
-            min-height: 220px !important;
-        }
-
-        .auth-form {
-            position: absolute !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            display: flex !important;
-            flex-direction: column !important;
-            gap: 25px !important;
-            
-            opacity: 0 !important;
-            filter: blur(8px) !important;
-            pointer-events: none !important;
-            transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
-                        filter 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        }
-
-        .auth-form.visible {
-            opacity: 1 !important;
-            filter: blur(0px) !important;
-            pointer-events: auto !important;
-        }
-
-        .auth-input-group {
-            position: relative !important;
-            width: 100% !important;
-        }
-
-        .auth-input {
-            background: transparent !important;
-            border: none !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
-            padding: 4px 0 8px 0 !important;
-            color: #ffffff !important;
-            font-size: 13px !important;
-            text-align: center !important;
-            outline: none !important;
-            width: 100% !important;
-            box-sizing: border-box !important;
-            transition: border-color 0.25s !important;
-        }
-
-        .auth-input::placeholder {
-            color: rgba(255, 255, 255, 0.35) !important;
-            text-align: center !important;
-        }
-
-        .auth-input:focus {
-            border-bottom-color: #ffffff !important;
-        }
-
-        /* --- КНОПКА ОТПРАВКИ И АНИМАЦИЯ ЗАГРУЗКИ --- */
-        .auth-submit-btn {
-            position: relative !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            background: transparent !important;
-            color: #ffffff !important;
-            border: 1px solid #ffffff !important;
-            border-radius: 24px !important;
-            padding: 10px 20px !important;
-            font-size: 14px !important;
-            font-weight: 500 !important;
-            cursor: pointer !important;
-            width: 100% !important;
-            margin-top: 15px !important;
-            transition: all 0.25s ease !important;
-            text-align: center !important;
-            min-height: 42px !important;
-            box-sizing: border-box !important;
-        }
-
-        .auth-submit-btn:hover:not(:disabled) {
-            background: #ffffff !important;
-            color: #000000 !important;
-        }
-
-        .auth-submit-btn:active:not(:disabled) {
-            transform: scale(0.98) !important;
-        }
-
-        /* Серый заблокированный вид кнопки при загрузке */
-        .auth-submit-btn.loading,
-        .auth-submit-btn:disabled {
-            background: rgba(255, 255, 255, 0.08) !important;
-            border-color: rgba(255, 255, 255, 0.25) !important;
-            color: rgba(255, 255, 255, 0.4) !important;
-            cursor: not-allowed !important;
-            transform: none !important;
-        }
-
-        /* Анимация крутящегося спиннера */
-        .auth-spinner {
-            display: inline-block !important;
-            width: 18px !important;
-            height: 18px !important;
-            border: 2px solid rgba(255, 255, 255, 0.25) !important;
-            border-radius: 50% !important;
-            border-top-color: #ffffff !important;
-            animation: authSpinnerRotate 0.75s linear infinite !important;
-        }
-
-        @keyframes authSpinnerRotate {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .auth-confirm-wave {
-            position: fixed !important;
-            bottom: 20px !important;
-            left: 50% !important;
-            width: 10px !important;
-            height: 10px !important;
-            border-radius: 50% !important;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.25) 30%, rgba(255, 255, 255, 0) 70%) !important;
-            transform: translate(-50%, 50%) scale(0) !important;
-            pointer-events: none !important;
-            z-index: 8 !important;
-            opacity: 0 !important;
-        }
-
-        .auth-confirm-wave.active {
-            animation: fullScreenWave 0.85s cubic-bezier(0.1, 0.8, 0.3, 1) forwards !important;
-        }
-
-        @keyframes fullScreenWave {
-            0% {
-                transform: translate(-50%, 50%) scale(1);
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.7;
-            }
-            100% {
-                transform: translate(-50%, 50%) scale(280);
-                opacity: 0;
-            }
-        }
-
-        .auth-confirm-toast {
-            position: fixed !important;
-            bottom: 30px !important;
-            left: 50% !important;
-            transform: translateX(-50%) translateY(100px) scale(0.85);
-            background: rgba(22, 22, 28, 0.96) !important;
-            border: 1px solid rgba(255, 255, 255, 0.25) !important;
-            border-radius: 16px !important;
-            padding: 12px 20px !important;
-            display: flex !important;
-            align-items: center !important;
-            gap: 15px !important;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7) !important;
-            opacity: 0 !important;
-            visibility: hidden !important;
-            pointer-events: none !important;
-            white-space: nowrap !important;
-            z-index: 10 !important;
-            transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease !important;
-        }
-
-        .auth-confirm-toast.visible {
-            opacity: 1 !important;
-            visibility: visible !important;
-            pointer-events: auto !important;
-            animation: bounceInUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
-        }
-
-        .auth-confirm-toast.hiding {
-            opacity: 0 !important;
-            transform: translateX(-50%) translateY(40px) scale(0.9) !important;
-            pointer-events: none !important;
-            animation: none !important;
-        }
-
-        @keyframes bounceInUp {
-            0% {
-                opacity: 0;
-                transform: translateX(-50%) translateY(100px) scale(0.7);
-            }
-            65% {
-                opacity: 1;
-                transform: translateX(-50%) translateY(-12px) scale(1.03);
-            }
-            85% {
-                transform: translateX(-50%) translateY(4px) scale(0.98);
-            }
-            100% {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0) scale(1);
-            }
-        }
-
-        .auth-confirm-text {
-            color: rgba(255, 255, 255, 0.95) !important;
-            font-size: 13px !important;
-            font-weight: 500 !important;
-        }
-
-        .auth-confirm-actions {
-            display: flex !important;
-            gap: 8px !important;
-        }
-
-        .auth-confirm-btn {
-            background: transparent !important;
-            border: 1px solid rgba(255, 255, 255, 0.2) !important;
-            color: #ffffff !important;
-            padding: 5px 12px !important;
-            border-radius: 12px !important;
-            font-size: 12px !important;
-            cursor: pointer !important;
-            transition: all 0.2s ease !important;
-        }
-
-        .auth-confirm-btn:hover {
-            background: rgba(255, 255, 255, 0.12) !important;
-        }
-
-        .auth-confirm-btn.danger {
-            background: #ffffff !important;
-            color: #000000 !important;
-            border-color: #ffffff !important;
-            font-weight: 600 !important;
-        }
-
-        .auth-confirm-btn.danger:hover {
-            background: rgba(255, 255, 255, 0.85) !important;
-        }
-
-        .auth-bg-watermark {
-            position: absolute !important;
-            top: 45% !important;
-            right: -15% !important;
-            left: auto !important;
-            width: 1200px !important;
-            height: auto !important;
-            max-width: none !important;
-            pointer-events: none !important;
-            z-index: 1 !important;
-            transform-origin: center right !important;
-            
-            opacity: 0 !important;
-            filter: blur(45px) brightness(0.6) !important;
-            transition: opacity 1.2s ease-out, filter 1.2s ease-out !important;
-            animation: intenseFloat 6s ease-in-out infinite alternate !important;
-        }
-
-        .auth-modal-overlay.active .auth-bg-watermark {
-            opacity: 0.22 !important;
-            filter: blur(12px) brightness(0.9) !important;
-        }
-
-        @keyframes intenseFloat {
-            0% {
-                transform: translateY(-50%) translateX(0px) rotate(0deg) scale(1);
-            }
-            50% {
-                transform: translateY(-58%) translateX(-25px) rotate(-5deg) scale(1.04);
-            }
-            100% {
-                transform: translateY(-42%) translateX(15px) rotate(4deg) scale(0.96);
-            }
-        }
+        .auth-close-btn::before { content: '' !important; position: absolute !important; top: -12px !important; bottom: -12px !important; left: -12px !important; right: -12px !important; }
+        .auth-close-btn:hover { color: #ffffff !important; transform: scale(1.15) rotate(90deg) !important; }
+        .auth-header-title { display: flex !important; align-items: center !important; justify-content: center !important; gap: 20px !important; margin-top: -30px !important; margin-bottom: 30px !important; }
+        .auth-logo-wrapper { display: flex !important; align-items: center !important; justify-content: center !important; animation: logoHover 3s ease-in-out infinite alternate !important; }
+        .auth-header-logo { height: 105px !important; width: auto !important; display: block !important; object-fit: contain !important; }
+        @keyframes logoHover { 0% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-8px) rotate(-2deg); } 100% { transform: translateY(6px) rotate(2deg); } }
+        .auth-title-ticker { height: 55px !important; overflow: hidden !important; position: relative !important; }
+        .auth-title-track { display: flex !important; flex-direction: column !important; animation: titleVerticalScroll 8s cubic-bezier(0.77, 0, 0.175, 1) infinite !important; }
+        .auth-title-track span { height: 55px !important; line-height: 55px !important; font-family: 'Unbounded', sans-serif !important; font-size: 32px !important; font-weight: 900 !important; color: #ffffff !important; text-transform: uppercase !important; white-space: nowrap !important; display: flex !important; align-items: center !important; }
+        @keyframes titleVerticalScroll { 0%, 20% { transform: translateY(0); } 25%, 45% { transform: translateY(-55px); } 50%, 70% { transform: translateY(-55px); } 75%, 100% { transform: translateY(0); } }
+        .auth-tabs { position: relative !important; display: flex !important; background: rgba(255, 255, 255, 0.04) !important; border: 1px solid rgba(255, 255, 255, 0.15) !important; border-radius: 24px !important; padding: 3px !important; width: 100% !important; margin-bottom: 30px !important; box-sizing: border-box !important; }
+        .auth-tab-pill { position: absolute !important; top: 3px !important; left: 3px !important; width: calc(50% - 3px) !important; height: calc(100% - 6px) !important; background: #ffffff !important; border-radius: 20px !important; z-index: 1 !important; transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1) !important; pointer-events: none !important; }
+        .auth-tabs.register-mode .auth-tab-pill { transform: translateX(100%) !important; }
+        .auth-tab-btn { position: relative !important; z-index: 2 !important; flex: 1 !important; padding: 7px 14px !important; background: transparent !important; border: none !important; color: rgba(255, 255, 255, 0.5) !important; font-size: 13px !important; font-weight: 500 !important; cursor: pointer !important; transition: color 0.3s ease !important; text-align: center !important; }
+        .auth-tab-btn.active { color: #000000 !important; font-weight: 600 !important; }
+        .auth-forms-wrapper { position: relative !important; width: 100% !important; min-height: 220px !important; }
+        .auth-form { position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; display: flex !important; flex-direction: column !important; gap: 25px !important; opacity: 0 !important; filter: blur(8px) !important; pointer-events: none !important; transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), filter 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important; }
+        .auth-form.visible { opacity: 1 !important; filter: blur(0px) !important; pointer-events: auto !important; }
+        .auth-input-group { position: relative !important; width: 100% !important; }
+        .auth-input { background: transparent !important; border: none !important; border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important; padding: 4px 0 8px 0 !important; color: #ffffff !important; font-size: 13px !important; text-align: center !important; outline: none !important; width: 100% !important; box-sizing: border-box !important; transition: border-color 0.25s !important; }
+        .auth-input::placeholder { color: rgba(255, 255, 255, 0.35) !important; text-align: center !important; }
+        .auth-input:focus { border-bottom-color: #ffffff !important; }
+        .auth-submit-btn { position: relative !important; display: flex !important; align-items: center !important; justify-content: center !important; background: transparent !important; color: #ffffff !important; border: 1px solid #ffffff !important; border-radius: 24px !important; padding: 10px 20px !important; font-size: 14px !important; font-weight: 500 !important; cursor: pointer !important; width: 100% !important; margin-top: 15px !important; transition: all 0.25s ease !important; min-height: 42px !important; box-sizing: border-box !important; }
+        .auth-submit-btn:hover:not(:disabled) { background: #ffffff !important; color: #000000 !important; }
+        .auth-submit-btn.loading, .auth-submit-btn:disabled { background: rgba(255, 255, 255, 0.08) !important; border-color: rgba(255, 255, 255, 0.25) !important; color: rgba(255, 255, 255, 0.4) !important; cursor: not-allowed !important; }
+        .auth-spinner { display: inline-block !important; width: 18px !important; height: 18px !important; border: 2px solid rgba(255, 255, 255, 0.25) !important; border-radius: 50% !important; border-top-color: #ffffff !important; animation: authSpinnerRotate 0.75s linear infinite !important; }
+        @keyframes authSpinnerRotate { to { transform: rotate(360deg); } }
+        .auth-confirm-wave { position: fixed !important; bottom: 20px !important; left: 50% !important; width: 10px !important; height: 10px !important; border-radius: 50% !important; background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.25) 30%, rgba(255, 255, 255, 0) 70%) !important; transform: translate(-50%, 50%) scale(0) !important; pointer-events: none !important; z-index: 8 !important; opacity: 0 !important; }
+        .auth-confirm-wave.active { animation: fullScreenWave 0.85s cubic-bezier(0.1, 0.8, 0.3, 1) forwards !important; }
+        @keyframes fullScreenWave { 0% { transform: translate(-50%, 50%) scale(1); opacity: 1; } 50% { opacity: 0.7; } 100% { transform: translate(-50%, 50%) scale(280); opacity: 0; } }
+        .auth-confirm-toast { position: fixed !important; bottom: 30px !important; left: 50% !important; transform: translateX(-50%) translateY(100px) scale(0.85); background: rgba(22, 22, 28, 0.96) !important; border: 1px solid rgba(255, 255, 255, 0.25) !important; border-radius: 16px !important; padding: 12px 20px !important; display: flex !important; align-items: center !important; gap: 15px !important; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7) !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; white-space: nowrap !important; z-index: 10 !important; transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease !important; }
+        .auth-confirm-toast.visible { opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; animation: bounceInUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important; }
+        .auth-confirm-toast.hiding { opacity: 0 !important; transform: translateX(-50%) translateY(40px) scale(0.9) !important; pointer-events: none !important; animation: none !important; }
+        @keyframes bounceInUp { 0% { opacity: 0; transform: translateX(-50%) translateY(100px) scale(0.7); } 65% { opacity: 1; transform: translateX(-50%) translateY(-12px) scale(1.03); } 85% { transform: translateX(-50%) translateY(4px) scale(0.98); } 100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } }
+        .auth-confirm-text { color: rgba(255, 255, 255, 0.95) !important; font-size: 13px !important; font-weight: 500 !important; }
+        .auth-confirm-actions { display: flex !important; gap: 8px !important; }
+        .auth-confirm-btn { background: transparent !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; color: #ffffff !important; padding: 5px 12px !important; border-radius: 12px !important; font-size: 12px !important; cursor: pointer !important; transition: all 0.2s ease !important; }
+        .auth-confirm-btn:hover { background: rgba(255, 255, 255, 0.12) !important; }
+        .auth-confirm-btn.danger { background: #ffffff !important; color: #000000 !important; border-color: #ffffff !important; font-weight: 600 !important; }
+        .auth-bg-watermark { position: absolute !important; top: 45% !important; right: -15% !important; width: 1200px !important; height: auto !important; pointer-events: none !important; z-index: 1 !important; opacity: 0 !important; filter: blur(45px) brightness(0.6) !important; transition: opacity 1.2s ease-out, filter 1.2s ease-out !important; animation: intenseFloat 6s ease-in-out infinite alternate !important; }
+        .auth-modal-overlay.active .auth-bg-watermark { opacity: 0.22 !important; filter: blur(12px) brightness(0.9) !important; }
+        @keyframes intenseFloat { 0% { transform: translateY(-50%) translateX(0px) rotate(0deg) scale(1); } 50% { transform: translateY(-58%) translateX(-25px) rotate(-5deg) scale(1.04); } 100% { transform: translateY(-42%) translateX(15px) rotate(4deg) scale(0.96); } }
     `;
 
     const styleElement = document.createElement('style');
@@ -688,7 +260,7 @@ function injectAuthStyles() {
     document.head.appendChild(styleElement);
 }
 
-// --- HTML РАЗМЕТКА ---
+// --- HTML РАЗМЕТКА (Изменены инпуты с email на text) ---
 function initAuthModalUI() {
     if (document.getElementById('auth-modal-overlay')) return;
 
@@ -721,7 +293,7 @@ function initAuthModalUI() {
                 <div class="auth-forms-wrapper">
                     <form id="auth-form-login" class="auth-form visible">
                         <div class="auth-input-group">
-                            <input type="email" id="login-email" placeholder="Email..." required class="auth-input" autocomplete="email">
+                            <input type="text" id="login-username" placeholder="Придуманный логин..." required class="auth-input" autocomplete="username">
                         </div>
                         <div class="auth-input-group">
                             <input type="password" id="login-password" placeholder="Пароль..." required class="auth-input" autocomplete="current-password">
@@ -731,10 +303,10 @@ function initAuthModalUI() {
 
                     <form id="auth-form-register" class="auth-form">
                         <div class="auth-input-group">
-                            <input type="text" id="reg-name" placeholder="Ваше имя / Никнейм..." required class="auth-input" autocomplete="nickname">
+                            <input type="text" id="reg-name" placeholder="Ваше имя / Никнейм..." required class="auth-input" autocomplete="name">
                         </div>
                         <div class="auth-input-group">
-                            <input type="email" id="reg-email" placeholder="Ваш Email..." required class="auth-input" autocomplete="email">
+                            <input type="text" id="reg-username" placeholder="Придумайте логин..." required class="auth-input" autocomplete="username">
                         </div>
                         <div class="auth-input-group">
                             <input type="password" id="reg-password" placeholder="Пароль (мин. 6 символов)..." required class="auth-input" autocomplete="new-password">
@@ -771,19 +343,15 @@ function initAuthEvents() {
     const btnConfirmYes = document.getElementById('auth-confirm-close-btn');
     const btnConfirmNo = document.getElementById('auth-cancel-close-btn');
 
-    // Предотвращение дублирования обработчиков при повторном вызове
     if (overlay && overlay.dataset.eventsInitialized) return;
     if (overlay) overlay.dataset.eventsInitialized = "true";
 
     btnConfirmYes?.addEventListener('click', window.hideAuthModal);
     btnConfirmNo?.addEventListener('click', () => hideConfirmToast(false));
-
     closeBtn?.addEventListener('click', window.hideAuthModal);
 
-    // Разделение single/double click на оверлее
     overlay?.addEventListener('click', (e) => {
         if (e.target !== overlay) return;
-
         if (overlayClickTimeout) clearTimeout(overlayClickTimeout);
 
         overlayClickTimeout = setTimeout(() => {
@@ -792,10 +360,7 @@ function initAuthEvents() {
                 container.classList.remove('shake');
                 void container.offsetWidth;
                 container.classList.add('shake');
-                
-                setTimeout(() => {
-                    container.classList.remove('shake');
-                }, 400);
+                setTimeout(() => container.classList.remove('shake'), 400);
             }
         }, 250);
     });
@@ -808,22 +373,23 @@ function initAuthEvents() {
     });
 
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            window.hideAuthModal();
-        }
+        if (e.key === 'Escape') window.hideAuthModal();
     });
 
     tabLogin?.addEventListener('click', () => setAuthMode('login'));
     tabRegister?.addEventListener('click', () => setAuthMode('register'));
 
-    // Форма Входа
+    // --- ОБРАБОТКА ВХОДА ---
     formLogin?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
 
         const submitBtn = document.getElementById('btn-submit-login');
-        const email = document.getElementById('login-email').value;
+        const userInput = document.getElementById('login-username').value.trim().toLowerCase();
         const password = document.getElementById('login-password').value;
+
+        // Превращаем введенный логин в технический вид (например: ivan -> ivan@geo.geo)
+        const email = userInput + INTERNAL_DOMAIN;
 
         setButtonLoading(submitBtn, true, 'Войти');
 
@@ -834,7 +400,6 @@ function initAuthEvents() {
                 alert(`Ошибка входа: ${error.message}`);
                 setButtonLoading(submitBtn, false, 'Войти');
             } else {
-                // Успешный вход: скрываем модалку и перенаправляем
                 window.hideAuthModal();
                 window.location.href = 'welcome.html';
             }
@@ -844,17 +409,19 @@ function initAuthEvents() {
         }
     });
 
-    // Форма Регистрации
+    // --- ОБРАБОТКА РЕГИСТРАЦИИ ---
     formRegister?.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
 
         const submitBtn = document.getElementById('btn-submit-register');
-        const name = document.getElementById('reg-name').value;
-        const email = document.getElementById('reg-email').value;
+        const name = document.getElementById('reg-name').value.trim();
+        const userInput = document.getElementById('reg-username').value.trim().toLowerCase();
         const password = document.getElementById('reg-password').value;
 
-        // Включаем статус загрузки
+        // Превращаем введенный логин в технический вид
+        const email = userInput + INTERNAL_DOMAIN;
+
         setButtonLoading(submitBtn, true, 'Зарегистрироваться');
 
         try {
@@ -864,7 +431,7 @@ function initAuthEvents() {
                 options: {
                     data: {
                         full_name: name,
-                        username: name
+                        username: userInput
                     }
                 }
             });
@@ -875,7 +442,8 @@ function initAuthEvents() {
             } else {
                 setButtonLoading(submitBtn, false, 'Зарегистрироваться');
                 window.hideAuthModal();
-                alert('Регистрация прошла успешно! Проверьте вашу почту для подтверждения.');
+                alert('Регистрация прошла успешно!');
+                window.location.href = 'welcome.html';
             }
         } catch (err) {
             console.error(err);
@@ -884,16 +452,12 @@ function initAuthEvents() {
     });
 }
 
-// --- ПРОВЕРКА СЕССИИ И ОБНОВЛЕНИЕ UI ---
 async function checkUserSession() {
     if (!window.supabaseClient) return;
 
-    // 1. Проверка сессии при загрузке
     const { data: { session } } = await window.supabaseClient.auth.getSession();
     
-    // ДОБАВЬТЕ ЭТОТ БЛОК:
     if (session && session.user) {
-        // Если мы на странице логина и пользователь уже зашел — перенаправляем
         if (window.location.pathname.includes('login.html')) {
             window.location.href = 'welcome.html';
             return;
@@ -902,7 +466,6 @@ async function checkUserSession() {
 
     updateUIForUser(session ? session.user : null);
 
-    // 2. Отслеживание изменения состояния авторизации
     window.supabaseClient.auth.onAuthStateChange((event, session) => {
         const user = session ? session.user : null;
         updateUIForUser(user);
@@ -913,7 +476,6 @@ function updateUIForUser(user) {
     const mainAuthBtn = document.getElementById('open-auth-btn') || document.getElementById('auth-main-btn');
     const profileWidget = document.getElementById('user-profile-widget');
     
-    // Элементы профиля
     const profileNameText = document.getElementById('profile-name-text');
     const profileEmailText = document.getElementById('profile-email-text');
 
@@ -923,28 +485,25 @@ function updateUIForUser(user) {
         if (mainAuthBtn) mainAuthBtn.style.display = 'none';
 
         if (profileWidget) {
-            const userEmail = user.email || '';
             const customName = user.user_metadata?.full_name || user.user_metadata?.username;
-            const username = customName || (userEmail ? userEmail.split('@')[0] : 'Пользователь');
+            // Убираем домен из отображения почты в профиле, если нужно показать чистый логин
+            const userEmail = user.email || '';
+            const cleanLogin = userEmail.replace(INTERNAL_DOMAIN, '');
+            const username = customName || cleanLogin || 'Пользователь';
 
-            // Выводим имя
             if (profileNameText) {
                 profileNameText.textContent = username;
             }
 
-            // Выводим почту
             if (profileEmailText) {
-                profileEmailText.textContent = userEmail;
+                profileEmailText.textContent = cleanLogin; // Показываем чистый логин вместо @geo.geo
             }
 
             profileWidget.style.display = 'block';
         }
     } else {
         document.body.classList.remove('user-logged-in');
-
         if (mainAuthBtn) mainAuthBtn.style.display = 'inline-block';
-
         if (profileWidget) profileWidget.style.display = 'none';
     }
 }
-
