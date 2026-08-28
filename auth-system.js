@@ -144,13 +144,11 @@ function resetAuthToInitialState() {
     formLogin.classList.remove('visible');
     formRegister.classList.remove('visible');
 
-    // Сброс шагов регистрации
     const rowUsername = document.getElementById('reg-username-row');
     const rowPassword = document.getElementById('reg-password-row');
     if (rowUsername) rowUsername.classList.remove('visible-row');
     if (rowPassword) rowPassword.classList.remove('visible-row');
 
-    // Очистка полей
     const regName = document.getElementById('reg-name');
     const regUser = document.getElementById('reg-username');
     const regPass = document.getElementById('reg-password');
@@ -288,7 +286,6 @@ function injectAuthStyles() {
         .auth-input::placeholder { color: rgba(255, 255, 255, 0.35) !important; text-align: center !important; }
         .auth-input:focus { border-bottom-color: #ffffff !important; }
 
-        /* Стили для поэтапного появления строк в регистрации */
         .reg-step-row {
             opacity: 0 !important;
             max-height: 0 !important;
@@ -304,10 +301,11 @@ function injectAuthStyles() {
             pointer-events: auto !important;
         }
 
-        /* Кастомное поле логина с неудаляемым белым суффиксом справа */
+        /* Центрированное поле логина с неудаляемым белым суффиксом на одном уровне */
         .reg-login-container {
             display: flex !important;
             align-items: center !important;
+            justify-content: center !important;
             border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
             padding: 4px 0 8px 0 !important;
             width: 100% !important;
@@ -324,10 +322,10 @@ function injectAuthStyles() {
             color: #ffffff !important;
             font-size: 13px !important;
             text-align: right !important;
-            flex: 1 !important;
             padding: 0 !important;
             margin: 0 !important;
-            min-width: 0 !important;
+            width: auto !important;
+            max-width: 60% !important;
         }
         .reg-login-input::placeholder {
             color: rgba(255, 255, 255, 0.35) !important;
@@ -340,6 +338,8 @@ function injectAuthStyles() {
             white-space: nowrap !important;
             user-select: none !important;
             text-align: left !important;
+            padding: 0 !important;
+            margin: 0 !important;
         }
         
         .auth-submit-btn { position: relative !important; display: flex !important; align-items: center !important; justify-content: center !important; background: transparent !important; color: #ffffff !important; border: 1px solid #ffffff !important; border-radius: 24px !important; padding: 10px 20px !important; font-size: 14px !important; font-weight: 500 !important; cursor: pointer !important; width: 100% !important; margin-top: 15px !important; transition: all 0.25s ease !important; min-height: 42px !important; box-sizing: border-box !important; }
@@ -421,7 +421,7 @@ function initAuthModalUI() {
                             <input type="text" id="reg-name" placeholder="Ваш никнейм..." required class="auth-input" autocomplete="name">
                         </div>
                         
-                        <!-- Шаг 2: Кастомный логин с суффиксом @geo.geo -->
+                        <!-- Шаг 2: Центрированный логин с суффиксом @geo.geo -->
                         <div class="auth-input-group reg-step-row" id="reg-username-row">
                             <div class="reg-login-container">
                                 <input type="text" id="reg-username" placeholder="придумайте логин" class="reg-login-input" autocomplete="username">
@@ -511,11 +511,9 @@ function initAuthEvents() {
 
     // --- ЛОГИКА ПОЭТАПНОЙ РЕГИСТРАЦИИ (1.5 сек затишья) ---
 
-    // 1. Ввод в «Ваш никнейм»
     regNameInput?.addEventListener('input', () => {
         const val = regNameInput.value.trim();
         
-        // Если поле пустое, скрываем последующие ряды
         if (!val) {
             rowUsername?.classList.remove('visible-row');
             rowPassword?.classList.remove('visible-row');
@@ -526,16 +524,13 @@ function initAuthEvents() {
             return;
         }
 
-        // Если пользователь снова печатает, а пароль еще не введен окончательно — скрываем строку пароля
         if (!regPasswordInput.value) {
             rowPassword?.classList.remove('visible-row');
             regUsernameTypedValid = false;
         }
 
-        // Если пароль уже введен, правило 1.5 сек отключено (по условию)
         if (regPasswordInput.value.length > 0) return;
 
-        // Перезапускаем таймер на 1.5 секунды для появления поля логина
         if (regStepTimeout) clearTimeout(regStepTimeout);
         
         regStepTimeout = setTimeout(() => {
@@ -546,7 +541,6 @@ function initAuthEvents() {
         }, 1500);
     });
 
-    // 2. Ввод в «Придумайте логин»
     regUsernameInput?.addEventListener('input', () => {
         const val = regUsernameInput.value.trim();
         
@@ -557,10 +551,8 @@ function initAuthEvents() {
             return;
         }
 
-        // Если пароль уже введен, правило отключено
         if (regPasswordInput.value.length > 0) return;
 
-        // Перезапускаем таймер на 1.5 секунды для появления поля пароля
         if (regStepTimeout) clearTimeout(regStepTimeout);
 
         regStepTimeout = setTimeout(() => {
@@ -571,23 +563,18 @@ function initAuthEvents() {
         }, 1500);
     });
 
-    // 3. Ввод в «Пароль...» (как только введен текст — выключаем правило 1.5 сек, оставляя поля на месте)
     regPasswordInput?.addEventListener('input', () => {
         const val = regPasswordInput.value;
         if (val.length > 0) {
-            // Очищаем любые активные таймеры, чтобы они больше ничего не скрывали
             if (regStepTimeout) clearTimeout(regStepTimeout);
-            // Гарантируем, что все строки открыты
             rowUsername?.classList.add('visible-row');
             rowPassword?.classList.add('visible-row');
         } else {
-            // Если пароль стерли полностью, можно вернуть зависимость
             if (!regUsernameInput.value.trim()) {
                 rowPassword?.classList.remove('visible-row');
             }
         }
     });
-
 
     // --- ОБРАБОТКА ВХОДА ---
     formLogin?.addEventListener('submit', async (e) => {
