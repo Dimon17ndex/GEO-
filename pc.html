@@ -17,10 +17,17 @@
     </script>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    // Правильный URL — только до .co, без /rest/v1/ на конце
+    const SUPABASE_URL = 'https://swigwhclmjnhcdrbjnes.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_6m2jizjeOQd1rqWdoyVUdQ_JKNfoUYw';
     
+    // Создаем глобальный клиент Supabase, который ожидает ваш скрипт
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
+    
+    <script src="console.js" defer></script>
     <script src="script.js"></script>
-    
-    <script src="console.js"></script>
 
     <link rel="icon" type="image/png" href="images/favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -366,8 +373,6 @@
 
     <div class="version-badge" id="version-badge">PC-VERSION</div>
 
-    <script src="console.js" defer></script>
-
     <script>
         // --- 1. ЛОГИКА ИНТЕРФЕЙСА СТРАНИЦЫ ---
         const textContainer = document.getElementById('wave-text');
@@ -647,16 +652,17 @@
                 submitBtn.classList.add('state-loading');
 
                 try {
-                    const response = await fetch('/api/login', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ password: rawPassword })
-                    });
+                    // Обращаемся к Supabase для проверки кода в таблице 'access_codes'
+                    const { data, error } = await supabaseClient
+                        .from('access_codes')
+                        .select('code')
+                        .eq('code', rawPassword)
+                        .single();
 
-                    const data = await response.json();
                     submitBtn.classList.remove('state-loading');
 
-                    if (response.ok && data.success) {
+                    // Если код найден в базе и нет ошибок
+                    if (!error && data) {
                         const mainContainer = document.querySelector('.main-container');
                         const cornerWrapper = document.querySelector('.corner-icon-floating-wrapper');
                         const dashboardOverlay = document.getElementById('session-dashboard');
@@ -680,16 +686,18 @@
                         }, 4000); 
 
                         setTimeout(() => {
-                            window.location.replace('/login.html');
+                            window.location.replace('login.html');
                         }, 5400);
 
                     } else {
+                        // Если код не найден в базе — подсвечиваем кнопку красным
                         livesInErrorState = true;
                         if (myInput) myInput.classList.add('input-error-state'); 
                         submitBtn.classList.add('state-error');        
                     }
+
                 } catch (err) {
-                    console.error("Ошибка сети или сервера:", err);
+                    console.error("Ошибка при проверке кода через Supabase:", err);
                     submitBtn.classList.remove('state-loading');
                     livesInErrorState = true;
                     if (myInput) myInput.classList.add('input-error-state'); 
@@ -697,7 +705,6 @@
                 }
             });
         }
-
         // --- 2. ЛОГИКА ОТОБРАЖЕНИЯ ПЛАШКИ ВЕРСИИ ПО 5 КЛИКАМ ---
         (function() {
             const vBadge = document.getElementById('version-badge');
