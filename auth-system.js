@@ -583,10 +583,10 @@ function initAuthEvents() {
         if (!window.supabaseClient) return alert('Supabase CDN не подключен!');
 
         const submitBtn = document.getElementById('btn-submit-login');
-        const userInput = document.getElementById('login-username').value.trim().toLowerCase();
+        
+        // Убираем автоматическое добавление INTERNAL_DOMAIN, оставляем то, что введено в поле
+        const email = document.getElementById('login-username').value.trim().toLowerCase();
         const password = document.getElementById('login-password').value;
-
-        const email = userInput + INTERNAL_DOMAIN;
 
         setButtonLoading(submitBtn, true, 'Войти');
 
