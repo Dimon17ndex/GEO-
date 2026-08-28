@@ -15,7 +15,7 @@ if (!window.supabaseClient && window.supabase) {
     }
 }
 
-let currentAuthMode = 'login';
+let currentAuthMode = null; // Изначально ни один режим не выбран
 let overlayClickTimeout = null;
 
 // --- ГЛОБАЛЬНЫЕ ФУНКЦИИ ---
@@ -26,7 +26,7 @@ window.showAuthModal = function() {
     
     const modal = document.getElementById('auth-modal-overlay');
     hideConfirmToast(true);
-    setAuthMode('login');
+    resetAuthToInitialState(); // Сбрасываем в состояние «только лого и кнопки»
 
     if (modal) {
         modal.classList.add('active');
@@ -117,6 +117,30 @@ function hideConfirmToast(immediate = false) {
     }
 }
 
+// Сброс в начальное состояние (видны только кнопки выбора, формы скрыты)
+function resetAuthToInitialState() {
+    currentAuthMode = null;
+
+    const authTabs = document.getElementById('auth-tabs');
+    const tabLogin = document.getElementById('tab-login-btn');
+    const tabRegister = document.getElementById('tab-register-btn');
+    
+    const formLogin = document.getElementById('auth-form-login');
+    const formRegister = document.getElementById('auth-form-register');
+
+    if (!authTabs || !tabLogin || !tabRegister || !formLogin || !formRegister) return;
+
+    // Возвращаем кнопки в исходное положение (видимые и на своих местах)
+    authTabs.classList.remove('register-mode', 'login-selected', 'register-selected');
+    tabLogin.style.opacity = '1';
+    tabLogin.style.pointerEvents = 'auto';
+    tabRegister.style.opacity = '1';
+    tabRegister.style.pointerEvents = 'auto';
+
+    formLogin.classList.remove('visible');
+    formRegister.classList.remove('visible');
+}
+
 function setAuthMode(mode) {
     currentAuthMode = mode;
 
@@ -130,16 +154,25 @@ function setAuthMode(mode) {
     if (!authTabs || !tabLogin || !tabRegister || !formLogin || !formRegister) return;
 
     if (mode === 'login') {
+        authTabs.classList.add('login-selected');
         authTabs.classList.remove('register-mode');
-        tabLogin.classList.add('active');
-        tabRegister.classList.remove('active');
+        
+        // Плавное скрытие неиспользуемой кнопки
+        tabRegister.style.opacity = '0';
+        tabRegister.style.pointerEvents = 'none';
+        tabLogin.style.opacity = '1';
+        tabLogin.style.pointerEvents = 'auto';
 
         formRegister.classList.remove('visible');
         formLogin.classList.add('visible');
     } else {
-        authTabs.classList.add('register-mode');
-        tabRegister.classList.add('active');
-        tabLogin.classList.remove('active');
+        authTabs.classList.add('register-selected', 'register-mode');
+        
+        // Плавное скрытие неиспользуемой кнопки
+        tabLogin.style.opacity = '0';
+        tabLogin.style.pointerEvents = 'none';
+        tabRegister.style.opacity = '1';
+        tabRegister.style.pointerEvents = 'auto';
 
         formLogin.classList.remove('visible');
         formRegister.classList.add('visible');
@@ -220,35 +253,50 @@ function injectAuthStyles() {
         .auth-title-track { display: flex !important; flex-direction: column !important; animation: titleVerticalScroll 8s cubic-bezier(0.77, 0, 0.175, 1) infinite !important; }
         .auth-title-track span { height: 55px !important; line-height: 55px !important; font-family: 'Unbounded', sans-serif !important; font-size: 32px !important; font-weight: 900 !important; color: #ffffff !important; text-transform: uppercase !important; white-space: nowrap !important; display: flex !important; align-items: center !important; }
         @keyframes titleVerticalScroll { 0%, 20% { transform: translateY(0); } 25%, 45% { transform: translateY(-55px); } 50%, 70% { transform: translateY(-55px); } 75%, 100% { transform: translateY(0); } }
+        
         .auth-tabs { position: relative !important; display: flex !important; background: rgba(255, 255, 255, 0.04) !important; border: 1px solid rgba(255, 255, 255, 0.15) !important; border-radius: 24px !important; padding: 3px !important; width: 100% !important; margin-bottom: 30px !important; box-sizing: border-box !important; }
-        .auth-tab-pill { position: absolute !important; top: 3px !important; left: 3px !important; width: calc(50% - 3px) !important; height: calc(100% - 6px) !important; background: #ffffff !important; border-radius: 20px !important; z-index: 1 !important; transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1) !important; pointer-events: none !important; }
+        .auth-tab-pill { position: absolute !important; top: 3px !important; left: 3px !important; width: calc(50% - 3px) !important; height: calc(100% - 6px) !important; background: #ffffff !important; border-radius: 20px !important; z-index: 1 !important; opacity: 0; transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.25s ease !important; pointer-events: none !important; }
+        
+        /* Показываем белый фон-таблетку только при выборе одного из режимов */
+        .auth-tabs.login-selected .auth-tab-pill,
+        .auth-tabs.register-selected .auth-tab-pill { opacity: 1 !important; }
+
         .auth-tabs.register-mode .auth-tab-pill { transform: translateX(100%) !important; }
-        .auth-tab-btn { position: relative !important; z-index: 2 !important; flex: 1 !important; padding: 7px 14px !important; background: transparent !important; border: none !important; color: rgba(255, 255, 255, 0.5) !important; font-size: 13px !important; font-weight: 500 !important; cursor: pointer !important; transition: color 0.3s ease !important; text-align: center !important; }
+        
+        .auth-tab-btn { position: relative !important; z-index: 2 !important; flex: 1 !important; padding: 7px 14px !important; background: transparent !important; border: none !important; color: rgba(255, 255, 255, 0.7) !important; font-size: 13px !important; font-weight: 500 !important; cursor: pointer !important; transition: color 0.3s ease, opacity 0.35s ease !important; text-align: center !important; }
         .auth-tab-btn.active { color: #000000 !important; font-weight: 600 !important; }
+
         .auth-forms-wrapper { position: relative !important; width: 100% !important; min-height: 220px !important; }
         .auth-form { position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; display: flex !important; flex-direction: column !important; gap: 25px !important; opacity: 0 !important; filter: blur(8px) !important; pointer-events: none !important; transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), filter 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important; }
         .auth-form.visible { opacity: 1 !important; filter: blur(0px) !important; pointer-events: auto !important; }
+        
         .auth-input-group { position: relative !important; width: 100% !important; }
         .auth-input { background: transparent !important; border: none !important; border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important; padding: 4px 0 8px 0 !important; color: #ffffff !important; font-size: 13px !important; text-align: center !important; outline: none !important; width: 100% !important; box-sizing: border-box !important; transition: border-color 0.25s !important; }
         .auth-input::placeholder { color: rgba(255, 255, 255, 0.35) !important; text-align: center !important; }
         .auth-input:focus { border-bottom-color: #ffffff !important; }
+        
         .auth-submit-btn { position: relative !important; display: flex !important; align-items: center !important; justify-content: center !important; background: transparent !important; color: #ffffff !important; border: 1px solid #ffffff !important; border-radius: 24px !important; padding: 10px 20px !important; font-size: 14px !important; font-weight: 500 !important; cursor: pointer !important; width: 100% !important; margin-top: 15px !important; transition: all 0.25s ease !important; min-height: 42px !important; box-sizing: border-box !important; }
         .auth-submit-btn:hover:not(:disabled) { background: #ffffff !important; color: #000000 !important; }
         .auth-submit-btn.loading, .auth-submit-btn:disabled { background: rgba(255, 255, 255, 0.08) !important; border-color: rgba(255, 255, 255, 0.25) !important; color: rgba(255, 255, 255, 0.4) !important; cursor: not-allowed !important; }
+        
         .auth-spinner { display: inline-block !important; width: 18px !important; height: 18px !important; border: 2px solid rgba(255, 255, 255, 0.25) !important; border-radius: 50% !important; border-top-color: #ffffff !important; animation: authSpinnerRotate 0.75s linear infinite !important; }
         @keyframes authSpinnerRotate { to { transform: rotate(360deg); } }
+        
         .auth-confirm-wave { position: fixed !important; bottom: 20px !important; left: 50% !important; width: 10px !important; height: 10px !important; border-radius: 50% !important; background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.25) 30%, rgba(255, 255, 255, 0) 70%) !important; transform: translate(-50%, 50%) scale(0) !important; pointer-events: none !important; z-index: 8 !important; opacity: 0 !important; }
         .auth-confirm-wave.active { animation: fullScreenWave 0.85s cubic-bezier(0.1, 0.8, 0.3, 1) forwards !important; }
         @keyframes fullScreenWave { 0% { transform: translate(-50%, 50%) scale(1); opacity: 1; } 50% { opacity: 0.7; } 100% { transform: translate(-50%, 50%) scale(280); opacity: 0; } }
+        
         .auth-confirm-toast { position: fixed !important; bottom: 30px !important; left: 50% !important; transform: translateX(-50%) translateY(100px) scale(0.85); background: rgba(22, 22, 28, 0.96) !important; border: 1px solid rgba(255, 255, 255, 0.25) !important; border-radius: 16px !important; padding: 12px 20px !important; display: flex !important; align-items: center !important; gap: 15px !important; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7) !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; white-space: nowrap !important; z-index: 10 !important; transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease !important; }
         .auth-confirm-toast.visible { opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; animation: bounceInUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important; }
         .auth-confirm-toast.hiding { opacity: 0 !important; transform: translateX(-50%) translateY(40px) scale(0.9) !important; pointer-events: none !important; animation: none !important; }
         @keyframes bounceInUp { 0% { opacity: 0; transform: translateX(-50%) translateY(100px) scale(0.7); } 65% { opacity: 1; transform: translateX(-50%) translateY(-12px) scale(1.03); } 85% { transform: translateX(-50%) translateY(4px) scale(0.98); } 100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } }
+        
         .auth-confirm-text { color: rgba(255, 255, 255, 0.95) !important; font-size: 13px !important; font-weight: 500 !important; }
         .auth-confirm-actions { display: flex !important; gap: 8px !important; }
         .auth-confirm-btn { background: transparent !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; color: #ffffff !important; padding: 5px 12px !important; border-radius: 12px !important; font-size: 12px !important; cursor: pointer !important; transition: all 0.2s ease !important; }
         .auth-confirm-btn:hover { background: rgba(255, 255, 255, 0.12) !important; }
         .auth-confirm-btn.danger { background: #ffffff !important; color: #000000 !important; border-color: #ffffff !important; font-weight: 600 !important; }
+        
         .auth-bg-watermark { position: absolute !important; top: 45% !important; right: -15% !important; width: 1200px !important; height: auto !important; pointer-events: none !important; z-index: 1 !important; opacity: 0 !important; filter: blur(45px) brightness(0.6) !important; transition: opacity 1.2s ease-out, filter 1.2s ease-out !important; animation: intenseFloat 6s ease-in-out infinite alternate !important; }
         .auth-modal-overlay.active .auth-bg-watermark { opacity: 0.22 !important; filter: blur(12px) brightness(0.9) !important; }
         @keyframes intenseFloat { 0% { transform: translateY(-50%) translateX(0px) rotate(0deg) scale(1); } 50% { transform: translateY(-58%) translateX(-25px) rotate(-5deg) scale(1.04); } 100% { transform: translateY(-42%) translateX(15px) rotate(4deg) scale(0.96); } }
@@ -260,7 +308,7 @@ function injectAuthStyles() {
     document.head.appendChild(styleElement);
 }
 
-// --- HTML РАЗМЕТКА (Изменены инпуты с email на text) ---
+// --- HTML РАЗМЕТКА ---
 function initAuthModalUI() {
     if (document.getElementById('auth-modal-overlay')) return;
 
@@ -286,12 +334,12 @@ function initAuthModalUI() {
                 
                 <div class="auth-tabs" id="auth-tabs">
                     <div class="auth-tab-pill"></div>
-                    <button type="button" class="auth-tab-btn active" id="tab-login-btn">Вход</button>
+                    <button type="button" class="auth-tab-btn" id="tab-login-btn">Вход</button>
                     <button type="button" class="auth-tab-btn" id="tab-register-btn">Регистрация</button>
                 </div>
 
                 <div class="auth-forms-wrapper">
-                    <form id="auth-form-login" class="auth-form visible">
+                    <form id="auth-form-login" class="auth-form">
                         <div class="auth-input-group">
                             <input type="text" id="login-username" placeholder="Придуманный логин..." required class="auth-input" autocomplete="username">
                         </div>
@@ -388,7 +436,6 @@ function initAuthEvents() {
         const userInput = document.getElementById('login-username').value.trim().toLowerCase();
         const password = document.getElementById('login-password').value;
 
-        // Превращаем введенный логин в технический вид (например: ivan -> ivan@geo.geo)
         const email = userInput + INTERNAL_DOMAIN;
 
         setButtonLoading(submitBtn, true, 'Войти');
@@ -419,7 +466,6 @@ function initAuthEvents() {
         const userInput = document.getElementById('reg-username').value.trim().toLowerCase();
         const password = document.getElementById('reg-password').value;
 
-        // Превращаем введенный логин в технический вид
         const email = userInput + INTERNAL_DOMAIN;
 
         setButtonLoading(submitBtn, true, 'Зарегистрироваться');
@@ -486,7 +532,6 @@ function updateUIForUser(user) {
 
         if (profileWidget) {
             const customName = user.user_metadata?.full_name || user.user_metadata?.username;
-            // Убираем домен из отображения почты в профиле, если нужно показать чистый логин
             const userEmail = user.email || '';
             const cleanLogin = userEmail.replace(INTERNAL_DOMAIN, '');
             const username = customName || cleanLogin || 'Пользователь';
@@ -496,7 +541,7 @@ function updateUIForUser(user) {
             }
 
             if (profileEmailText) {
-                profileEmailText.textContent = cleanLogin; // Показываем чистый логин вместо @geo.geo
+                profileEmailText.textContent = cleanLogin;
             }
 
             profileWidget.style.display = 'block';
