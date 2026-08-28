@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEOГРАФИЯ</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="auth-system.js?v=3" defer></script>
+    <script src="script.js" defer></script>
+    <script src="console.js" defer></script>
+    <script src="reset-password.js" defer></script>
+    <script src="app.js" defer></script>
+    <script src="welcome-greeting.js" defer></script>
+
+    <link rel="icon" type="image/png" href="images/favicon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="beginning.css">
+
+    <style>
+        body {
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        body.page-hidden {
+            opacity: 0 !important;
+        }
+
+        .top-left-brand {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            z-index: 10;
+        }
+
+        .top-left-brand .db-brand-block {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .top-left-brand .db-logo-icon {
+            height: auto;
+            max-width: 110px;
+            width: 100%;
+            display: block;
+            will-change: transform;
+            animation: floatingLogo 4s ease-in-out infinite alternate !important;
+        }
+
+        .top-left-brand .db-text-right {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .top-left-brand .db-main-title {
+            margin: 0;
+            font-family: 'Unbounded', sans-serif;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            line-height: 1;
+            color: #ffffff;
+            will-change: transform;
+            animation: floatingText 4.5s ease-in-out infinite alternate !important;
+        }
+
+        @keyframes floatingLogo {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(-1.5deg); }
+            100% { transform: translateY(5px) rotate(1.5deg); }
+        }
+
+        @keyframes floatingText {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+            100% { transform: translateY(4px); }
+        }
+    </style>
+</head>
+<body>
+
+<script src="shortcuts-system.js" defer></script>
+
+<div id="page-loader">
+    <div class="spinner"></div>
+</div>
+
+<div class="shadow-layer"></div>
+<div id="bg-wave-container"></div>
+
+<div class="top-left-brand">
+    <div class="db-brand-block">
+        <img src="images/geo_logo.png" alt="Geo Logo" class="db-logo-icon">
+        <div class="db-text-right">
+            <h1 class="db-main-title">GEOГРАФИЯ</h1>
+        </div>
+    </div>
+</div>
+
+<script>
+const waveContainer = document.getElementById('bg-wave-container');
+let intensityPercent = 20;
+let ambientTimeoutId = null;
+
+function showLoader() {
+    const loader = document.getElementById('page-loader');
+    if (loader) {
+        loader.classList.add('active');
+        document.body.classList.add('is-loading');
+    }
+}
+
+function hideLoader() {
+    const loader = document.getElementById('page-loader');
+    if (loader) {
+        loader.classList.remove('active');
+        document.body.classList.remove('is-loading');
+    }
+}
+
+function createBackgroundRipple(x, y, className, duration = 1500) {
+    if (!waveContainer) return;
+    const ripple = document.createElement('div');
+    ripple.classList.add(className);
+    ripple.style.left = `${x}px`;
+    ripple.style.top = `${y}px`;
+    waveContainer.appendChild(ripple);
+    setTimeout(() => { ripple.remove(); }, duration);
+}
+
+function spawnAmbientWave() {
+    clearTimeout(ambientTimeoutId);
+    if (intensityPercent === 0) { 
+        ambientTimeoutId = setTimeout(spawnAmbientWave, 1000); 
+        return; 
+    }
+
+    let spawnX = 0, spawnY = 0;
+    const side = Math.floor(Math.random() * 4);
+    switch(side) {
+        case 0: spawnX = Math.random() * window.innerWidth; spawnY = -50; break;
+        case 1: spawnX = window.innerWidth + 50; spawnY = Math.random() * window.innerHeight; break;
+        case 2: spawnX = Math.random() * window.innerWidth; spawnY = window.innerHeight + 50; break;
+        case 3: spawnX = -50; spawnY = Math.random() * window.innerHeight; break;
+    }
+
+    createBackgroundRipple(spawnX, spawnY, 'bg-ambient-ripple', 3000);
+
+    const baseDelay = 500, maxAdditionalDelay = 8000; 
+    const factor = (100 - intensityPercent) / 100;
+    const nextDelay = baseDelay + (Math.random() * maxAdditionalDelay * factor);
+
+    ambientTimeoutId = setTimeout(spawnAmbientWave, nextDelay);
+}
+
+const bgMusic = new Audio('audio/melody_start.mp3');
+bgMusic.volume = 0.4; 
+let musicStarted = false;
+
+function playMusic() {
+    if (musicStarted || bgMusic.muted) return;
+    bgMusic.play().then(() => { musicStarted = true; }).catch(() => {});
+}
+
+bgMusic.addEventListener('ended', () => {
+    setTimeout(() => { if (!bgMusic.muted) bgMusic.play(); }, 5000); 
+});
+
+document.body.addEventListener('mousedown', (e) => {
+    playMusic();
+    createBackgroundRipple(e.clientX, e.clientY, 'bg-click-ripple');
+});
+
+document.addEventListener('DOMContentLoaded', async () => {
+    hideLoader();
+
+    // Моментальный переход на beginning.html с учетом скрипта приветствия (если он есть)
+    setTimeout(() => {
+        if (typeof initGreetingUI === 'function') {
+            initGreetingUI(() => {
+                // Добавляем класс затемнения/исчезновения перед переходом
+                document.body.classList.add('page-hidden');
+                
+                // Переходим на beginning.html ровно по окончании анимации затемнения (0.5с)
+                setTimeout(() => {
+                    window.location.href = 'beginning.html';
+                }, 500);
+            });
+        } else {
+            document.body.classList.add('page-hidden');
+            setTimeout(() => {
+                window.location.href = 'beginning.html';
+            }, 500);
+        }
+    }, 50);
+
+    setTimeout(() => { 
+        if (typeof spawnAmbientWave === 'function') spawnAmbientWave(); 
+    }, 1000);
+});
+</script>
+
+<script src="site-warning.js" defer></script>
+
+</body>
+</html>
