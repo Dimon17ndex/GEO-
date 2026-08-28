@@ -443,11 +443,10 @@
         </div>
     </div>
 
-    <button onclick="forceLogout()" style="position:fixed; bottom:20px; right:20px; z-index:9999;">Выйти из аккаунта</button>
-
 <script src="welcome-greeting.js" defer></script>
 
 <script>
+// Переменные состояния
 // Переменные состояния
 const waveContainer = document.getElementById('bg-wave-container');
 const volumeStatusLabel = document.getElementById('volume-status-label');
@@ -472,11 +471,7 @@ function hideLoader() {
         loader.classList.remove('active');
         document.body.classList.remove('is-loading');
     }
-    
-    // Запускаем приветствие строго после скрытия лоадера
-    if (typeof initGreetingUI === 'function') {
-        initGreetingUI();
-    }
+    // Приветствие полностью удалено отсюда
 }
 
 function createBackgroundRipple(x, y, className, duration = 1500) {
@@ -565,7 +560,7 @@ window.addEventListener('popstate', function () {
 });
 
 function navigateToPage(targetPage) {
-    const currentPage = window.location.pathname.split('/').pop() || 'beginning.html';
+    const currentPage = window.location.pathname.split('/').pop() || 'welcome.html';
     if (currentPage === targetPage) return;
 
     document.body.classList.add('page-hidden');
@@ -574,29 +569,62 @@ function navigateToPage(targetPage) {
     }, 500);
 }
 
-// ЕДИНЫЙ ОБРАБОТЧИК ЗАГРУЗКИ СТРАНИЦЫ
-document.addEventListener('DOMContentLoaded', () => {
+// ЕДИНЫЙ АСИНХРОННЫЙ ОБРАБОТЧИК ЗАГРУЗКИ СТРАНИЦЫ
+document.addEventListener('DOMContentLoaded', async () => {
+    // Гарантированно сразу убираем черный экран (проявляем body)
+    document.body.classList.add('page-loaded');
+
     const hasVisitedSession = sessionStorage.getItem('hasVisitedBeginningSession');
 
-    if (!hasVisitedSession) {
-        // Первый вход за сессию: фиксируем сессию, показываем лоадер, а затем скрываем его (что вызовет приветствие)
-        sessionStorage.setItem('hasVisitedBeginningSession', 'true');
-        showLoader();
+    // Всегда включаем лоадер в начале, пока проверяем сессию
+    showLoader();
 
-        setTimeout(() => {
-            hideLoader();
-        }, 1200);
-    } else {
-        // Повторный вход в рамках сессии: сразу убираем лоадер, приветствие не показываем
-        const loader = document.getElementById('page-loader');
-        if (loader) {
-            loader.style.display = 'none';
+    // Функция ожидания инициализации Supabase (если скрипты грузятся асинхронно)
+    async function getSupabaseClientWithRetry() {
+        let attempts = 0;
+        while (!window.supabaseClient && !window.supabase && attempts < 20) {
+            await new Promise(r => setTimeout(r, 100));
+            attempts++;
+        }
+        return window.supabaseClient || window.supabase;
+    }
+
+    const client = await getSupabaseClientWithRetry();
+    let isUserLoggedIn = false;
+
+    if (client) {
+        try {
+            // Ожидаем ответ от сервера/хранилища о статусе сессии
+            const { data: { session } } = await client.auth.getSession();
+            if (session) {
+                isUserLoggedIn = true;
+                const wrapper = document.querySelector('.profile-name-container');
+                const userNameElement = document.getElementById('user-display-name');
+                const name = session.user.user_metadata.full_name || session.user.email.split('@')[0];
+                if (userNameElement) userNameElement.innerText = name;
+                if (wrapper) wrapper.style.display = 'block';
+            } else {
+                const wrapper = document.querySelector('.profile-name-container');
+                if (wrapper) wrapper.style.display = 'none';
+            }
+        } catch (err) {
+            console.error('Ошибка проверки сессии:', err);
         }
     }
 
-    requestAnimationFrame(() => {
-        document.body.classList.add('page-loaded');
-    });
+    // Логика поведения лоадера:
+    if (!hasVisitedSession) {
+        sessionStorage.setItem('hasVisitedBeginningSession', 'true');
+        hideLoader();
+    } else {
+        if (isUserLoggedIn) {
+            const loader = document.getElementById('page-loader');
+            if (loader) loader.style.display = 'none';
+            document.body.classList.remove('is-loading');
+        } else {
+            hideLoader();
+        }
+    }
 
     setTimeout(() => { spawnAmbientWave(); }, 1000);
 
@@ -612,9 +640,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function initDevPanel() {
-        const client = window.supabaseClient || window.supabase;
         if (!client) return;
-
         try {
             const { data: { session } } = await client.auth.getSession();
             if (session?.user?.email === DEV_EMAIL) {
@@ -651,42 +677,13 @@ document.addEventListener('DOMContentLoaded', () => {
     initDevPanel();
 });
 
-// Добавьте этот фрагмент в ваш основной скрипт после того, как определен supabaseClient
-async function loadUserProfile() {
-    const client = window.supabaseClient || window.supabase;
-    if (!client) return;
-
-    try {
-        const { data: { session } } = await client.auth.getSession();
-        const wrapper = document.querySelector('.profile-name-container'); // весь блок
-        const userNameElement = document.getElementById('user-display-name');
-        
-        if (session && userNameElement) {
-            const name = session.user.user_metadata.full_name || session.user.email.split('@')[0];
-            userNameElement.innerText = name;
-            wrapper.style.display = 'block'; // Показываем блок, если имя есть
-        } else {
-            // Если пользователь не вошел, просто прячем этот контейнер
-            if (wrapper) wrapper.style.display = 'none';
-        }
-    } catch (err) {
-        console.error('Ошибка загрузки профиля:', err);
-    }
-}
-
-// Вызываем функцию при загрузке страницы
-document.addEventListener('DOMContentLoaded', () => {
-    loadUserProfile();
-});
-
 async function forceLogout() {
     const client = window.supabaseClient || window.supabase;
     if (client) {
         await client.auth.signOut();
-        localStorage.clear(); // На всякий случай очищаем всё
+        localStorage.clear();
         window.location.reload();
     } else {
-        // Если вдруг клиент еще не загрузился, просто чистим хранилище
         localStorage.clear();
         window.location.reload();
     }
